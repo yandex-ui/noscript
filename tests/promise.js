@@ -1,4 +1,4 @@
-var Promise = require('../promise.js');
+var Promise = require('../lib/promise.js');
 
 // require('vows'); // Оно доопределяет много чего в модуле assert.
 var assert = require('assert');

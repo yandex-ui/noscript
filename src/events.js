@@ -115,10 +115,3 @@ no.events.trigger = function(name, params) {
     }
 };
 
-// ------------------------------------------------------------------------------------------------------------- //
-
-// Можно использовать как модуль для node.js.
-if (typeof module === 'object' && module) {
-    module.exports = no.events;
-}
-

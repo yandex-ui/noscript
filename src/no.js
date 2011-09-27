@@ -4,3 +4,5 @@
 */
 var no = {};
 
+no.pe = function() {};
+

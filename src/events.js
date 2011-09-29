@@ -63,7 +63,7 @@ no.events.bind = function(name, handler) {
         handler[ no.events._hid_key ] = no.events._hid++;
     } else {
         var i = no.array.firstMatch(handlers, function(handler) { // Ищем этот обработчик среди уже подписанных.
-            return (hid === handler[ no.events._hid_key ]);
+            return ( handler[ no.events._hid_key ] === hid );
         });
         if (i !== -1) { return; } // Этот обработчик уже подписан.
     }
@@ -84,7 +84,7 @@ no.events.unbind = function(name, handler) {
 
         var handlers = no.events._get(name);
         var i = no.array.firstMatch(handlers, function(_handler) { // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
-            return hid === _handler._hid;
+            return ( _handler._hid === hid );
         });
 
         if (i !== -1) {
@@ -100,7 +100,6 @@ no.events.unbind = function(name, handler) {
 /**
     "Генерим" событие name. Т.е. вызываем по-очереди (в порядке подписки) все обработчики события name.
     В каждый передаем name и params.
-    Если какой-то обработчик вернул false, то остальные обработчики не вызываются.
 
     @param {string} name
     @param {*=} params
@@ -109,7 +108,7 @@ no.events.trigger = function(name, params) {
     var handlers = no.events._get(name).slice(0); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван unbind,
                                                   // то мы не потеряем вызов следующего обработчика.
     for (var i = 0, l = handlers.length; i < l; i++) {
-        if (handlers[i](name, params) === false) { return; } // Если обработчик вернул false, то прекращаем дальнейшую обработку.
+        handlers[i](name, params);
     }
 };
 

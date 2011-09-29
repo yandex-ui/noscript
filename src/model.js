@@ -88,15 +88,15 @@ no.Model.getInfo = function(id) {
     @return {no.Model}
 */
 no.Model.get = function(id) {
-    var handler = no.Model._instances[id];
+    var model = no.Model._instances[id];
 
-    if (!handler) {
+    if (!model) {
         var info = no.Model._infos[id];
         var class_ = no.Model._classes[id];
-        handler = no.Model._instances[id] = new class_(id, info);
+        model = no.Model._instances[id] = new class_(id, info);
     }
 
-    return handler;
+    return model;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -109,7 +109,7 @@ no.Model.prototype.getKey = function(params) {
     var defaultParams = this.info.params;
     var keyParams = this.info._keyParams;
 
-    var key = 'handler=' + this.id;
+    var key = 'model=' + this.id;
 
     for (var i = 0, l = keyParams.length; i < l; i++) {
         var pName = keyParams[i];

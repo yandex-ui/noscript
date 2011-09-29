@@ -404,7 +404,7 @@ no.Request.items2groups = function(items) {
             add( item, item.params );
         }
     }
-    if (!no.object.empty(models)) {
+    if (!no.isEmpty(models)) {
         close();
     }
 

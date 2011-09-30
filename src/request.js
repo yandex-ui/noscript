@@ -1,60 +1,71 @@
 // ----------------------------------------------------------------------------------------------------------------- //
+// no.request
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {no.Request.type_requestItems} items
+    @param {function()=} callback
+    @return {no.Request}
+*/
+no.request = function(items, callback) {
+    var request = new no.Request(items);
+    if (callback) {
+        request.promise().then(callback);
+    }
+    return request;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
 // no.Request
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
+    @private
     @constructor
     @param {no.Request.type_requestItems} items
 */
 no.Request = function(items) {
-    this.id = no.Request._id++;
+    this.id = no.Request.id++;
     this.items = items;
 
-    this.promise = new no.Promise(); // FIXME: Может это нужно делать в методе send/request/...?
+    this._promise = new no.Promise();
 
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
 
-        var params = item.params; // FIXME: А не нужно ли склонировать items.params, чтобы их не портить?
-
-        /*
-        // FIXME: А это зачем?
-        params['_request_id'] = this.id;
-        */
-
         var model = no.Model.get( item.model_id );
 
-        // if (model instanceof no.Model.Do) { ... }
-        params['_item_id'] = no.Request._item_id++; // Этот параметр предполагается использовать для построения ключа do-моделей,
+        var params = item.params;
+        params['_item_id'] = no.Request.item_id++; // Этот параметр предполагается использовать для построения ключа do-моделей,
                                                     // чтобы можно было сделать одновременно несколько одинаковых do-запросов.
-
-
         item.key = model.getKey(params);
-
-        // TODO: Если это do-item, то сбросить соответствующие кэши.
-        //       Например, после do_addAlbum сбрасывать albumList.
     }
 
     this.request();
 };
 
-no.Request.prototype.cancel = function() { // FIXME: Нужно ли это?
-    // Что-то там...
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @return {no.Promise}
+*/
+no.Request.prototype.promise = function() {
+    return this._promise;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-// Typedefs:
+// Typedefs and constants.
 
 /**
-    Структура, описывающая запрос к одному хэндлеру.
+    Структура, описывающая запрос к одной модели.
 
         {
-            model_id: 'fotka-view',   // id хэндлера.
-            params: {                   // параметры, передаваемые хэндлеру.
+            model_id: 'fotka-view',   // id модели.
+            params: {                   // параметры, передаваемые модели.
                 id: 42
             },
-            force: true                 // необязательный параметра, указывающий на принудительный сборс кэша, если он есть.
+            force: true                 // необязательный параметр, указывающий на принудительный сброс кэша, если он есть.
         }
 
     @typedef {{
@@ -106,11 +117,21 @@ no.Request.type_requestGroup;
 no.Request.type_requestGroups;
 
 /**
+    @enum {number}
+*/
+no.Request.keyStatus = {
+    NONE: 0,    // Ключ еще не загружался.
+    LOADING: 1, // Ключ в процессе загрузки. Ожидаем ответа от сервера.
+    ERROR: 2,   // Ключ был запрошен, но ответ содержит ошибку или же в ответе ключа не было вовсе (что тоже ошибка).
+    OK: 3       // Ключ успешно получен.
+};
+
+/**
     @typedef {{
         promise: no.Promise,
         retries: number,
         requestCount: number,
-        status: ?(boolean|undefined),
+        status: no.Request.keyStatus,
         request_id: (number|undefined)
     }}
 */
@@ -119,10 +140,10 @@ no.Request.type_keyInfo;
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /** @type {number} */
-no.Request._id = 0;
+no.Request.id = 0;
 
 /** @type {number} */
-no.Request._item_id = 0;
+no.Request.item_id = 0;
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -132,7 +153,7 @@ no.Request._item_id = 0;
 
     @type {Object.<string, no.Request.type_keyInfo>}
 */
-no.Request._keys = {};
+no.Request.keys = {};
 
 /**
     Получаем ключ из хранилища.
@@ -141,7 +162,7 @@ no.Request._keys = {};
     @return {no.Request.type_keyInfo}
 */
 no.Request.getKey = function(key) {
-    return no.Request._keys[key];
+    return no.Request.keys[key];
 };
 
 /**
@@ -151,17 +172,18 @@ no.Request.getKey = function(key) {
     @return {no.Request.type_keyInfo}
 */
 no.Request.addKey = function(key) {
-    var info = no.Request._keys[key];
+    var info = no.Request.keys[key];
 
     if (!info) {
-        info = no.Request._keys[key] = {
+        info = no.Request.keys[key] = {
             promise: new no.Promise(),
             retries: 0,
-            requestCount: 1
+            requestCount: 0,
+            status: no.Request.keyStatus.NONE
         };
-    } else {
-        info.requestCount++;
     }
+
+    info.requestCount++; // Число реквестов, ждущих этот ключ.
 
     return info;
 };
@@ -173,10 +195,10 @@ no.Request.addKey = function(key) {
     @type {string} key
 */
 no.Request.doneKey = function(key) {
-    var info = no.Request._keys[key];
+    var info = no.Request.keys[key];
 
     if (!--info.requestCount) { // Это был последний запрос, ожидающий этот ключ.
-        delete no.Request._keys[key]; // Удаляем ключ из хранилища.
+        delete no.Request.keys[key]; // Удаляем ключ из хранилища.
     }
 };
 
@@ -197,46 +219,28 @@ no.Request.prototype.request = function() {
             continue;
         }
 
-        var requested = no.Request.getKey(key);
-        if (!requested) {
-            requested = no.Request.addKey(key);
-        }
+        requested = no.Request.addKey(key);
 
-        // FIXME: Переделать на нормальный enum.
-        var status = requested.status; // Возможные значения status'а и что это означает:
-                                       //     true          ключ был запрошен, получен ответ;
-                                       //     null          ключ запрошен, ожидаем ответ;
-                                       //     undefined     ключ еще не запрашивался;
-                                       //     false         ключ был запрошен, получен ответ с ошибкой или же ответ не получен (что тоже ошибка).
+        var status = requested.status;
+        if (status === no.Request.keyStatus.OK) {
+            // Do nothing.
 
-        if (status === true) {
-            // FIXME: А что тут нужно делать-то?
-
-        } else if (status === null) {
+        } else if (status === no.Request.keyStatus.LOADING && !item.force) {
             r_promises.push( requested.promise ); // Подписываемся на уведомление о получении ответа.
 
         } else {
-            requested.retries++;
-
             // Проверяем, нужно ли (можно ли) запрашивает этот ключ.
-            if ( requested.status === false && !( model.needRetry(requested.error) && (requested.retries < model.retries) ) ) {
+            if ( requested.status === no.Request.keyStatus.ERROR && !( model.needRetry(requested.error) && (requested.retries < model.retries) ) ) {
                 continue; // Превышен лимит перезапросов или же модель говорит, что с такой ошибкой перезапрашивать ключ не нужно.
             }
 
-            // status === undefined означает, что ключ еще не запрашивали.
-            // Выставляем этому ключу минимальный request_id, который будет засчитан в качестве ответа.
-            // Например, мы запросили ключ, а затем (пока первый ответ еще не пришел) запросили его еще раз с флагом force.
-            // В этом случае, первый ответ не нужно учитывать.
-            //
-            // NOTE: С do-запросами ситуация другая. Они никогда не повторяются. В предущем примере, независимо от флага force во втором запросе,
-            //       второй запрос все равно уйдет. И первый запрос получит ответ от первого же запроса, несмотря на отправленный второй запрос.
-            //       Достигается это за счет того, что при построении ключа do-хэндлеров используется параметр _item_id.
-            if ( requested.status === undefined || item.force ) {
-                requested.request_id = this.id;
-            }
+            requested.retries++;
+            requested.request_id = this.id; // Выставляем ключу минимальный request_id, который будет засчитан в качестве ответа.
+                                            // Например, мы запросили ключ, а затем (пока первый ответ еще не пришел) запросили его еще раз с флагом force.
+                                            // В этом случае, первый ответ не нужно учитывать.
+            requested.status = no.Request.keyStatus.LOADING; // Ключ будет (пере)запрошен.
 
             r_items.push( item );
-            requested.status = null; // Ключ будет (пере)запрошен.
         }
     }
 
@@ -414,6 +418,8 @@ no.Request.items2groups = function(items) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
+    Извлекаем данные моделей из ответа и раскладываем их в кэши.
+
     @param {Object} result
 */
 no.Request.prototype.extractData = function(result) {
@@ -424,35 +430,40 @@ no.Request.prototype.extractData = function(result) {
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
 
+        var key = item.key;
+        var requested = no.Request.getKey(key);
+
+        if (this.id < requested.request_id) { // После этого запроса был послан еще один и мы ожидаем ответа от него.
+                                              // Этот ключ игнорируем.
+            continue;
+        }
+
         var data;
         var group = result[ item.group_id ];
         if (group) {
             data = group[ item.model_id ];
-        } // FIXME: А если !group?
-
-        var requested = no.Request.getKey( item.key );
+        }
 
         var model = no.Model.get( item.model_id );
 
-        var error;
+        var isError;
         if (data) {
-            error = model.hasErrors(data);
+            isError = model.hasErrors(data);
         } else {
-            error = {
+            isError = true;
+            data = {
                 id: 'NO_DATA',
                 reason: 'Server returned no data'
             }
         }
 
-        if (error) {
-            requested.error = error;
-            requested.status = false;
+        requested.data = data;
+        if (isError) {
+            requested.status = no.Request.keyStatus.ERROR;
         } else {
-            // FIXME: Сравнить requested.request_id и this.id.
             model.setCache(item.key, data, item.params, timestamp);
-            requested.data = data;
             requested.promise.resolve();
-            requested.status = true; // FIXME: А не должен ли requested удалиться в этот же момент?
+            requested.status = no.Request.keyStatus.OK; // FIXME: А не должен ли requested удалиться в этот же момент?
         }
 
     }
@@ -469,7 +480,7 @@ no.Request.prototype.done = function() {
         no.Request.doneKey( items[i].key );
     }
 
-    this.promise.resolve(result);
+    this._promise.resolve(result);
 };
 
 /**
@@ -481,31 +492,11 @@ no.Request.prototype.buildResult = function() {
     var items = this.items;
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
-
         var requested = no.Request.getKey( item.key );
-        if (requested.error) {
-            result[i] = {
-                error: requested.error
-            };
-        } else {
-            result[i] = {
-                data: requested.data
-            }
-        }
+
+        result[i] = requested.data;
     }
 
     return result;
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-// no.request
-// ----------------------------------------------------------------------------------------------------------------- //
-
-no.request = function(items, callback) {
-    var request = new no.Request(items);
-    if (callback) {
-        request.promise.then(callback);
-    }
-    return request;
 };
 

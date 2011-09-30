@@ -16,7 +16,7 @@ no.inherits = function(child, parent) {
     @param {...!Object} srcs
     @return {!Object}
 */
-no.extends = function(dest) {
+no.extend = function(dest) {
     var srcs = [].slice.call(arguments, 1);
 
     for (var i = 0, l = srcs.length; i < l; i++) {

@@ -7,7 +7,7 @@ no.Box = function(id, path) {
     this.id = id;
     this.path = path;
 
-    /** @type { Object.<string, no.Block> } */
+    /** @type { Object.<string, no.View> } */
     this.archive = {};
 
     /** @type {Element} */
@@ -23,20 +23,20 @@ no.Box = function(id, path) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
-    @param {string} block_id
+    @param {string} view_id
     @return {string}
 */
-no.Box.prototype.subPath = function( block_id ) {
-    return this.path + '/' + block_id;
+no.Box.prototype.subPath = function( view_id ) {
+    return this.path + '/' + view_id;
 };
 
 /**
-    @param {string} block_id
+    @param {string} view_id
     @param {Object} params
-    @return {no.Block}
+    @return {no.View}
 */
-no.Box.prototype.subBlock = function( block_id, params ) {
-    return no.Block.make( block_id, this.subPath( block_id ), params );
+no.Box.prototype.subView = function( view_id, params ) {
+    return no.View.make( view_id, this.subPath( view_id ), params );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -71,15 +71,15 @@ no.Box.prototype.update = function(node, update) {
     for (var i = 0, l = children.length; i < l; i++) {
         var child = children[i];
         var className = child.className;
-        var r = className.match(/\bblock-(\S+)\b/);
+        var r = className.match(/\bview-(\S+)\b/);
         if (r) {
-            var block_id = r[1];
+            var view_id = r[1];
 
-            var key = no.Block.getKey(block_id, params);
+            var key = no.View.getKey(view_id, params);
             current.push(key);
 
-            var block = archive[key] = this.subBlock(block_id, params);
-            block.update(node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
+            var view = archive[key] = this.subView(view_id, params);
+            view.update(node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
         }
     }
 
@@ -100,8 +100,8 @@ no.Box.prototype.updateCurrent = function(node, update) {
 
     var archive = this.archive;
 
-    var blocks = update.layout[ this.path ];
-    var content = no.Block.ids2keys(blocks, params);
+    var views = update.layout[ this.path ];
+    var content = no.View.ids2keys(views, params);
     var contentKeys = no.array.toObject(content);
 
     var current = no.array.grep(this.current, function(key) {
@@ -113,18 +113,18 @@ no.Box.prototype.updateCurrent = function(node, update) {
     });
 
     var node = this.node;
-    for (var i = 0, l = blocks.length; i < l; i++) {
-        var block_id = blocks[i];
+    for (var i = 0, l = views.length; i < l; i++) {
+        var view_id = views[i];
         var key = content[i];
 
-        var block = archive[key];
-        if (!block) {
-            block = archive[key] = this.subBlock(block_id, params);
-            block.update(node, update);
+        var view = archive[key];
+        if (!view) {
+            view = archive[key] = this.subView(view_id, params);
+            view.update(node, update);
         }
-        block.show();
+        view.show();
 
-        node.appendChild(block.node);
+        node.appendChild(view.node);
     }
 
     this.current = content;
@@ -134,7 +134,7 @@ no.Box.prototype.updateCurrent = function(node, update) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
-    @param {function(no.Block): (boolean|undefined)}
+    @param {function(no.View): (boolean|undefined)}
 */
 no.Box.prototype.processTree = function(callback) {
     var r = callback(this);
@@ -144,8 +144,8 @@ no.Box.prototype.processTree = function(callback) {
     if (current) {
         var archive = this.archive;
         for (var i = 0, l = current.length; i < l; i++) {
-            var block = archive[ current[i] ];
-            block.processTree(callback);
+            var view = archive[ current[i] ];
+            view.processTree(callback);
         }
     }
 };
@@ -160,7 +160,7 @@ no.Box.prototype.needUpdate = function(update) {
     var current = this.current;
     if (!current) { return true; }
 
-    var content = no.Block.ids2keys( update.layout[ this.path ], update.params );
+    var content = no.View.ids2keys( update.layout[ this.path ], update.params );
 
     return ( content.join('|') !== current.join('|') );
 };
@@ -175,15 +175,15 @@ no.Box.prototype.getUpdateTrees = function(update, trees) {
     var params = update.params;
 
     var content_ids = update.layout[ this.path ];
-    var content_keys = no.Block.ids2keys( content_ids, params );
+    var content_keys = no.View.ids2keys( content_ids, params );
 
     for (var i = 0, l = content_keys.length; i < l; i++) {
         var key = content_keys[i];
-        var block = archive[key];
+        var view = archive[key];
         if (!archive[key]) {
-            block = this.subBlock( content_ids[i], params );
+            view = this.subView( content_ids[i], params );
         }
-        block.getUpdateTrees(update, trees);
+        view.getUpdateTrees(update, trees);
     }
 };
 

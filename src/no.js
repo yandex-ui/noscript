@@ -67,6 +67,10 @@ no.object.merge = function(to, from) {
     var o = {};
 
     for (var key in from) {
+        if (key.charAt(0) === '_') { // Не учитывать служебные параметры при merge'е объектов.
+            continue;
+        }
+
         var toValue = to[key];
         var fromValue = from[key];
 

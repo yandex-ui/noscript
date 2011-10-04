@@ -61,3 +61,37 @@ no.isEmpty = function(obj) {
     return true;
 };
 
+no.object = {};
+
+no.object.merge = function(to, from) {
+    var o = {};
+
+    for (var key in from) {
+        var toValue = to[key];
+        var fromValue = from[key];
+
+        if (toValue === undefined || toValue === fromValue) {
+            o[key] = fromValue;
+        } else {
+            return false;
+        }
+    }
+
+    return o;
+};
+
+no.http = function(url, params) {
+    var promise = new no.Promise();
+
+    $.ajax({
+        url: url,
+        data: params,
+        dataType: 'json',
+        success: function(data) {
+            promise.resolve(data);
+        }
+    });
+
+    return promise;
+};
+

@@ -174,7 +174,7 @@ no.Model.prototype.isCached = function(key) {
     if (!cached) { return; } // undefined означает, что кэша нет вообще никакого, а false, что есть, но уже неактуальный.
 
 
-    var maxage = this.options.maxage; // Время жизни кэша в милисекундах. После прошествии этого времени, кэш будет считаться невалидным.
+    var maxage = this.info.maxage; // Время жизни кэша в милисекундах. После прошествии этого времени, кэш будет считаться невалидным.
     if (maxage) {
         var now = +new Date();
         var timestamp = cached.timestamp;

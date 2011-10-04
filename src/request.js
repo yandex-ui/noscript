@@ -249,7 +249,7 @@ no.Request.prototype.request = function() {
     var l = r_items.length;
     if (l) {
         var params = no.Request.items2params(r_items);
-        promises.push( no.http('http://foo', params) ); // FIXME: Урл к серверной ручке.
+        promises.push( no.http('/models/', params) ); // FIXME: Урл к серверной ручке.
     }
 
     if (r_promises.length) {
@@ -317,7 +317,7 @@ no.Request.items2params = function(items) {
         }
 
         // Плюс добавляется один служебный параметр _model, содержащий список всех моделей этой группы.
-        params[ '_model' + suffix ] = group.model_ids.join(',');
+        params[ '_models' + suffix ] = group.model_ids.join(',');
 
     }
 
@@ -399,7 +399,7 @@ no.Request.items2groups = function(items) {
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
 
-        var merged = no.params.merge( params, item.params );
+        var merged = no.object.merge( params, item.params );
 
         if ( merged && !models[ item.model_id ] ) {
             add( item, merged );

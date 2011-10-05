@@ -161,6 +161,25 @@ no.Promise.prototype.reject = function(error) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
+    Проксируем resolve/reject в другой promise.
+
+    @param {no.Promise}
+    @return {no.Promise}
+*/
+no.Promise.prototype.pipe = function(promise) {
+    this.then(function(result) {
+        promise.resolve(result);
+    });
+    this.else_(function(error) {
+        promise.reject(error);
+    });
+
+    return this;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
     Создать из массива promise'ов новый promise, который зарезолвится только после того,
     как зарезолвятся все promise'ы из списка. Результатом будет массив результатов.
 

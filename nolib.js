@@ -64,6 +64,38 @@ no.array.firstMatch = function(array, condition) {
 };
 
 // ------------------------------------------------------------------------------------------------------------- //
+// no.object
+// ------------------------------------------------------------------------------------------------------------- //
+
+no.object = {};
+
+/**
+    @param {!Object} obj
+    @return {Array.<string>} Возвращает список всех ключей объекта.
+*/
+no.object.keys = function(obj) {
+    var keys = [];
+
+    for (var key in obj) {
+        keys.push(key);
+    }
+
+    return keys;
+};
+
+/**
+    @param {!Object} obj
+    @return {boolean} Определяет, пустой ли объект или нет.
+*/
+no.object.isEmpty = function(obj) {
+    for (var key in obj) {
+        return false;
+    }
+
+    return true;
+};
+
+// ------------------------------------------------------------------------------------------------------------- //
 // no.events
 // ------------------------------------------------------------------------------------------------------------- //
 
@@ -465,6 +497,30 @@ no.Future.seq = function(futures) {
     return new no.Future.Seq(futures);
 };
 
+// ------------------------------------------------------------------------------------------------------------- //
+// no.http
+// ------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} url
+    @param {Object} params
+    @return {no.Promise}
+*/
+no.http = function(url, params) {
+    var promise = new no.Promise();
+
+    $.ajax({
+        url: url,
+        data: params,
+        dataType: 'json',
+        success: function(data) {
+            promise.resolve(data);
+        }
+    });
+
+    return promise;
+};
+
 // ----------------------------------------------------------------------------------------------------------------- //
 // no.Model
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -537,7 +593,7 @@ no.Model.register = function(id, info, class_) {
     info.params = info.params || {};
     info.retries = info.retries || 3;
 
-    info._keyParams = no.keys(info.params).sort();
+    info._keyParams = no.object.keys(info.params).sort();
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -1135,7 +1191,7 @@ no.Request.items2groups = function(items) {
     function close() {
         if (models) {
             groups.push({
-                model_ids: no.keys( models ),
+                model_ids: no.object.keys( models ),
                 params: params
             });
             id++;
@@ -1156,7 +1212,7 @@ no.Request.items2groups = function(items) {
             add( item, item.params );
         }
     }
-    if (!no.isEmpty(models)) {
+    if (!no.object.isEmpty(models)) {
         close();
     }
 
@@ -1367,7 +1423,7 @@ no.View.register = function(id, info, class_) {
         }
     }
 
-    info._keyParams = no.keys(keyParams).sort();
+    info._keyParams = no.object.keys(keyParams).sort();
 
     no.View._infos[id] = info;
     no.View._classes[id] = class_ || no.View;
@@ -2036,7 +2092,7 @@ no.Update.prototype.addItemToRequest = function(type, item) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.request = function() {
-    var all = no.keys( this.requests['all'] );
+    var all = no.object.keys( this.requests['all'] );
     // FIXME: Отправить запрос и подписаться на ответ.
     // FIXME: Построить дерево для наложения шаблонов.
     // FIXME: Наложить шаблон и получить результат в виде html-ноды.

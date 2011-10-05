@@ -70,7 +70,7 @@ no.Model.register = function(id, info, class_) {
     info.params = info.params || {};
     info.retries = info.retries || 3;
 
-    info._keyParams = no.keys(info.params).sort();
+    info._keyParams = no.object.keys(info.params).sort();
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

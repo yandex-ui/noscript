@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>future // tests</title>
+    <script type="text/javascript" src="../src/no.js"></script>
+    <script type="text/javascript" src="../src/promise.js"></script>
+    <script type="text/javascript" src="../src/future.js"></script>
+</head>
+<body>
+
+<script>
+    var f1 = new no.Future(function(promise) {
+        setTimeout(function() {
+            promise.resolve(1);
+        }, 1000);
+    });
+
+    var f2 = new no.Future(function(promise) {
+        setTimeout(function() {
+            promise.resolve(2);
+        }, 2000);
+    });
+
+    f1.run().then(function(r) {
+        console.log('f1', r);
+    });
+</script>
+
+</body>
+</html>

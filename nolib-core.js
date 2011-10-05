@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------------------- //
+// no
+// ------------------------------------------------------------------------------------------------------------- //
+
 var no = {};
 
 // ------------------------------------------------------------------------------------------------------------- //
@@ -31,73 +35,10 @@ no.extend = function(dest) {
 
 // ------------------------------------------------------------------------------------------------------------- //
 
+/**
+    Пустая функция. No operation.
+*/
 no.pe = function() {};
-
-// ------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {!Object} obj
-    @return {Array.<string>} Возвращает список всех ключей объекта.
-*/
-no.keys = function(obj) {
-    var keys = [];
-
-    for (var key in obj) {
-        keys.push(key);
-    }
-
-    return keys;
-};
-
-/**
-    @param {!Object} obj
-    @return {boolean} Определяет, пустой ли объект или нет.
-*/
-no.isEmpty = function(obj) {
-    for (var key in obj) {
-        return false;
-    }
-
-    return true;
-};
-
-no.object = {};
-
-no.object.merge = function(to, from) {
-    var o = {};
-
-    for (var key in from) {
-        if (key.charAt(0) === '_') { // Не учитывать служебные параметры при merge'е объектов.
-            continue;
-        }
-
-        var toValue = to[key];
-        var fromValue = from[key];
-
-        if (toValue === undefined || toValue === fromValue) {
-            o[key] = fromValue;
-        } else {
-            return false;
-        }
-    }
-
-    return o;
-};
-
-no.http = function(url, params) {
-    var promise = new no.Promise();
-
-    $.ajax({
-        url: url,
-        data: params,
-        dataType: 'json',
-        success: function(data) {
-            promise.resolve(data);
-        }
-    });
-
-    return promise;
-};
 
 // ------------------------------------------------------------------------------------------------------------- //
 // no.array

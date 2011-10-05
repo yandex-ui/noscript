@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------------------- //
+// no
+// ------------------------------------------------------------------------------------------------------------- //
+
 var no = {};
 
 // ------------------------------------------------------------------------------------------------------------- //
@@ -31,73 +35,10 @@ no.extend = function(dest) {
 
 // ------------------------------------------------------------------------------------------------------------- //
 
+/**
+    Пустая функция. No operation.
+*/
 no.pe = function() {};
-
-// ------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {!Object} obj
-    @return {Array.<string>} Возвращает список всех ключей объекта.
-*/
-no.keys = function(obj) {
-    var keys = [];
-
-    for (var key in obj) {
-        keys.push(key);
-    }
-
-    return keys;
-};
-
-/**
-    @param {!Object} obj
-    @return {boolean} Определяет, пустой ли объект или нет.
-*/
-no.isEmpty = function(obj) {
-    for (var key in obj) {
-        return false;
-    }
-
-    return true;
-};
-
-no.object = {};
-
-no.object.merge = function(to, from) {
-    var o = {};
-
-    for (var key in from) {
-        if (key.charAt(0) === '_') { // Не учитывать служебные параметры при merge'е объектов.
-            continue;
-        }
-
-        var toValue = to[key];
-        var fromValue = from[key];
-
-        if (toValue === undefined || toValue === fromValue) {
-            o[key] = fromValue;
-        } else {
-            return false;
-        }
-    }
-
-    return o;
-};
-
-no.http = function(url, params) {
-    var promise = new no.Promise();
-
-    $.ajax({
-        url: url,
-        data: params,
-        dataType: 'json',
-        success: function(data) {
-            promise.resolve(data);
-        }
-    });
-
-    return promise;
-};
 
 // ------------------------------------------------------------------------------------------------------------- //
 // no.array
@@ -1206,7 +1147,7 @@ no.Request.items2groups = function(items) {
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
 
-        var merged = no.object.merge( params, item.params );
+        var merged = no.Request.mergeParams( params, item.params );
 
         if ( merged && !models[ item.model_id ] ) {
             add( item, merged );
@@ -1220,6 +1161,35 @@ no.Request.items2groups = function(items) {
     }
 
     return groups;
+};
+
+/**
+    Пытаемся смержить два объекта. Если для какого-то ключа возникает конфликт
+    (т.е. значение с этим ключом в to есть и не совпадает со значением в from), то возвращаем null.
+
+    @param {!Object} to
+    @param {!Object} from
+    @return {Object}
+*/
+no.Request.mergeParams = function(to, from) {
+    var o = {};
+
+    for (var key in from) {
+        if (key.charAt(0) === '_') { // Не учитывать служебные параметры при merge'е объектов.
+            continue;
+        }
+
+        var toValue = to[key];
+        var fromValue = from[key];
+
+        if (toValue === undefined || toValue === fromValue) {
+            o[key] = fromValue;
+        } else {
+            return null;
+        }
+    }
+
+    return o;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

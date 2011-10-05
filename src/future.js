@@ -31,6 +31,10 @@ no.Future.Wait.prototype.run = function(params) {
     return no.Promise.wait( promises );
 };
 
+no.Future.wait = function(futures) {
+    return new no.Future.Wait(futures);
+};
+
 // ------------------------------------------------------------------------------------------------------------- //
 
 no.Future.Seq = function(futures) {
@@ -60,5 +64,9 @@ no.Future.Seq.prototype.run = function(params) {
     })(0, params);
 
     return promise;
+};
+
+no.Future.seq = function(futures) {
+    return new no.Future.Seq(futures);
 };
 

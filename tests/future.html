@@ -9,22 +9,41 @@
 <body>
 
 <script>
-    var f1 = new no.Future(function(promise) {
+    var f1 = new no.Future(function(promise, n) {
         setTimeout(function() {
-            promise.resolve(1);
-        }, 1000);
+            promise.resolve(n * 2);
+        }, 200);
     });
 
-    var f2 = new no.Future(function(promise) {
+    var f2 = new no.Future(function(promise, n) {
         setTimeout(function() {
-            promise.resolve(2);
-        }, 2000);
+            promise.resolve(n * 3);
+        }, 300);
     });
 
+    /*
     f1.run().then(function(r) {
         console.log('f1', r);
+    });
+
+    f2.run().then(function(r) {
+        console.log('f2', r);
+    });
+    */
+
+    no.Future.wait([ f1, f2 ]).run(1).then(function(r) {
+        console.log('wait', r);
+    });
+
+    no.Future.seq([ f1, f2 ]).run(1).then(function(r) {
+        console.log('seq', r);
+    });
+
+    no.Future.seq([ f1, f1, f1, f1, f1 ]).run(1).then(function(r) {
+        console.log('f1 x 5', r);
     });
 </script>
 
 </body>
 </html>
+

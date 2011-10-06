@@ -789,7 +789,7 @@ no.Model.prototype.touch = function(key, timestamp) {
     @return {boolean}
 */
 no.Model.prototype.hasErrors = function(data) {
-    return data && data.error;
+    return !!(data && data.error);
 };
 
 /**
@@ -1034,7 +1034,7 @@ no.Request.prototype.request = function() {
 
         } else {
             // Проверяем, нужно ли (можно ли) запрашивает этот ключ.
-            if ( requested.status === no.Request.keyStatus.ERROR && !( model.needRetry(requested.error) && (requested.retries < model.retries) ) ) {
+            if ( requested.status === no.Request.keyStatus.ERROR && !( model.needRetry(requested.error) && (requested.retries < model.info.retries) ) ) {
                 continue; // Превышен лимит перезапросов или же модель говорит, что с такой ошибкой перезапрашивать ключ не нужно.
             }
 
@@ -1298,7 +1298,6 @@ no.Request.prototype.extractData = function(result) {
             requested.promise.resolve();
             requested.status = no.Request.keyStatus.OK; // FIXME: А не должен ли requested удалиться в этот же момент?
         }
-
     }
 };
 

@@ -88,7 +88,7 @@ no.View.register = function(id, info, class_) {
         }
     }
 
-    info._keyParams = no.keys(keyParams).sort();
+    info._keyParams = no.object.keys(keyParams).sort();
 
     no.View._infos[id] = info;
     no.View._classes[id] = class_ || no.View;

@@ -61,7 +61,7 @@ no.Update.prototype.addItemToRequest = function(type, item) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.request = function() {
-    var all = no.keys( this.requests['all'] );
+    var all = no.object.keys( this.requests['all'] );
     // FIXME: Отправить запрос и подписаться на ответ.
     // FIXME: Построить дерево для наложения шаблонов.
     // FIXME: Наложить шаблон и получить результат в виде html-ноды.

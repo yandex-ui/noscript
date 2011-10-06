@@ -387,7 +387,7 @@ no.Request.items2groups = function(items) {
     function close() {
         if (models) {
             groups.push({
-                model_ids: no.keys( models ),
+                model_ids: no.object.keys( models ),
                 params: params
             });
             id++;
@@ -408,7 +408,7 @@ no.Request.items2groups = function(items) {
             add( item, item.params );
         }
     }
-    if (!no.isEmpty(models)) {
+    if (!no.object.isEmpty(models)) {
         close();
     }
 

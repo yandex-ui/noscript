@@ -266,7 +266,7 @@ no.Model.prototype.touch = function(key, timestamp) {
     @return {boolean}
 */
 no.Model.prototype.hasErrors = function(data) {
-    return data && data.error;
+    return !!(data && data.error);
 };
 
 /**

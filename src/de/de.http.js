@@ -16,7 +16,7 @@ de.http.url2options = function(url, params) {
 
     var query = url.query || {};
     if (params) {
-        de.util.extend(query, params);
+        no.extend(query, params);
     }
 
     return {

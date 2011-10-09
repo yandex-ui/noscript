@@ -2,7 +2,41 @@
 // no.array
 // ------------------------------------------------------------------------------------------------------------- //
 
-no.array = {};
+no.array = function(s) {
+    return (s instanceof Array) ? s : [ s ];
+};
+
+/**
+    @param {Array.<string>} array
+    @return {Object.<string, boolean>}
+*/
+no.array.toObject = function(array) {
+    var object = {};
+
+    for (var i = 0, l = array.length; i < l; i++) {
+        object[ array[i] ] = true;
+    }
+
+    return object;
+};
+
+/**
+    @param {Array} array
+    @param {function} filter
+    @return {Array}
+*/
+no.array.grep = function(array, filter) {
+    var r = [];
+
+    for (var i = 0, l = array.length; i < l; i++) {
+        var value = array[i];
+        if (filter(value, i)) {
+            r.push(value);
+        }
+    }
+
+    return r;
+};
 
 // ------------------------------------------------------------------------------------------------------------- //
 

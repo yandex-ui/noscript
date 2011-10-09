@@ -40,3 +40,23 @@ no.extend = function(dest) {
 */
 no.pe = function() {};
 
+// ------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} className
+    @param {Element} context
+    @return {Array.<Element>}
+*/
+no.byClass = function(className, context) {
+    context = context || document;
+    return context.getElementsByClassName(className); // FIXME: Поддержка старых браузеров.
+};
+
+/**
+    @param {Element} oldNode
+    @param {Element} newNode
+*/
+no.replaceNode = function(oldNode, newNode) {
+    oldNode.parentNode.replaceChild(newNode, oldNode);
+};
+

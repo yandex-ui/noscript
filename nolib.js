@@ -41,10 +41,64 @@ no.extend = function(dest) {
 no.pe = function() {};
 
 // ------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} className
+    @param {Element} context
+    @return {Array.<Element>}
+*/
+no.byClass = function(className, context) {
+    context = context || document;
+    return context.getElementsByClassName(className); // FIXME: Поддержка старых браузеров.
+};
+
+/**
+    @param {Element} oldNode
+    @param {Element} newNode
+*/
+no.replaceNode = function(oldNode, newNode) {
+    oldNode.parentNode.replaceChild(newNode, oldNode);
+};
+
+// ------------------------------------------------------------------------------------------------------------- //
 // no.array
 // ------------------------------------------------------------------------------------------------------------- //
 
-no.array = {};
+no.array = function(s) {
+    return (s instanceof Array) ? s : [ s ];
+};
+
+/**
+    @param {Array.<string>} array
+    @return {Object.<string, boolean>}
+*/
+no.array.toObject = function(array) {
+    var object = {};
+
+    for (var i = 0, l = array.length; i < l; i++) {
+        object[ array[i] ] = true;
+    }
+
+    return object;
+};
+
+/**
+    @param {Array} array
+    @param {function} filter
+    @return {Array}
+*/
+no.array.grep = function(array, filter) {
+    var r = [];
+
+    for (var i = 0, l = array.length; i < l; i++) {
+        var value = array[i];
+        if (filter(value, i)) {
+            r.push(value);
+        }
+    }
+
+    return r;
+};
 
 // ------------------------------------------------------------------------------------------------------------- //
 
@@ -1381,7 +1435,7 @@ no.View.Create;
 /**
     @typedef {{
         layout: Object,
-        handlers: Object
+        models: Object
     }}
 */
 no.View.Info;
@@ -1404,11 +1458,11 @@ no.View._classes = {};
 no.View.register = function(id, info, class_) {
     info = info || {};
 
-    var handlers = info.handlers = info.handlers || {};
+    var models = info.models = info.models || {};
 
     var keyParams = {};
-    for (var handler_id in info.handlers) {
-        no.extends( keyParams, no.Handler.getInfo( handler_id ).params );
+    for (var model_id in info.models) {
+        no.extend( keyParams, no.View.getInfo( model_id ).params );
     }
 
     var layout = info.layout = info.layout || {};
@@ -1550,7 +1604,7 @@ no.View.prototype.getLayoutTree = function(update) {
     function viewTree(id, path, tree) {
         var viewLayout = no.View.getInfo(id).layout;
 
-        if (no.object.empty( viewLayout )) { // Обычный блок, без подблоков или боксов.
+        if (no.object.isEmpty( viewLayout )) { // Обычный блок, без подблоков или боксов.
             tree[id] = true;
         } else {
             tree = tree[id] = {};
@@ -2030,14 +2084,14 @@ no.router.compile = function(route) {
 
 /**
     @constructor
-    @param {no.Block} block
+    @param {no.View} view
     @param {string} layout_id
     @param {Object} params
 */
-no.Update = function(block, layout_id, params) {
+no.Update = function(view, layout_id, params) {
     this.id = no.Update.id++;
 
-    this.block = block;
+    this.view = view;
     this.layout_id = layout_id;
     this.params = params;
 
@@ -2055,18 +2109,18 @@ no.Update.id = 0;
 no.Update.prototype.prepare = function() {
     this.requests = {};
 
-    var tree = this.tree = this.block.getLayoutTree(this);
+    var tree = this.tree = this.view.getLayoutTree(this);
 
     var params = this.params;
 
     var that = this;
-    no.object.walkLeafs(tree, function(block_id, type) {
-        var handlers = no.Block.getInfo( block_id ).handlers;
-        for (var handler_id in handlers) {
+    no.Update.walkLeafs(tree, function(view_id, type) {
+        var models = no.View.getInfo( view_id ).models;
+        for (var model_id in models) {
             var item = {
-                handler_id: handler_id,
+                model_id: model_id,
                 params: params,
-                key: no.Handler.get( handler_id ).getKey( params )
+                key: no.Model.get( model_id ).getKey( params )
             };
 
             that.addItemToRequest('all', item);
@@ -2076,8 +2130,24 @@ no.Update.prototype.prepare = function() {
 };
 
 /**
+    @param {!Object} obj
+    @param {function} callback
+*/
+no.Update.walkLeafs = function(obj, callback) {
+    for (var key in obj) {
+        var value = obj[key];
+        if (typeof value !== 'object') {
+            callback(key, value);
+        } else {
+            no.Update.walkLeafs(value, callback);
+        }
+    }
+};
+
+
+/**
     @param {boolean|string|undefined} type
-    @param {{ handler_id: string, params: Object, key: string }} item
+    @param {{ model_id: string, params: Object, key: string }} item
 */
 no.Update.prototype.addItemToRequest = function(type, item) {
     var items = this.requests[type];
@@ -2096,14 +2166,13 @@ no.Update.prototype.request = function() {
     // FIXME: Построить дерево для наложения шаблонов.
     // FIXME: Наложить шаблон и получить результат в виде html-ноды.
 
-    var blocksTree = [];
-    this.block.getUpdateTrees(this, blocksTree);
+    var viewsTree = [];
+    this.view.getUpdateTrees(this, viewsTree);
 
     var tree = {
-        blocks: blocksTree,
+        views: viewsTree,
         update_id: this.id
     };
-    // console.log('tree', tree);
 
     var html = stylesheet( tree );
     var div = document.createElement('div');
@@ -2134,11 +2203,11 @@ no.Update.prototype.update = function(node) {
 
 
     var that = this;
-    this.block.processTree(function(block) {
-        // console.log('update.walk', block.id, block.needUpdate(that));
-        if (block.needUpdate(that)) {
-            // console.log('updating...', block.id);
-            block.update(node, that, true);
+    this.view.processTree(function(view) {
+        // console.log('update.walk', view.id, view.needUpdate(that));
+        if (view.needUpdate(that)) {
+            // console.log('updating...', view.id);
+            view.update(node, that, true);
             return false;
         }
     });

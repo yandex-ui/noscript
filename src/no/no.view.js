@@ -47,7 +47,7 @@ no.View.Create;
 /**
     @typedef {{
         layout: Object,
-        handlers: Object
+        models: Object
     }}
 */
 no.View.Info;
@@ -70,11 +70,11 @@ no.View._classes = {};
 no.View.register = function(id, info, class_) {
     info = info || {};
 
-    var handlers = info.handlers = info.handlers || {};
+    var models = info.models = info.models || {};
 
     var keyParams = {};
-    for (var handler_id in info.handlers) {
-        no.extends( keyParams, no.Handler.getInfo( handler_id ).params );
+    for (var model_id in info.models) {
+        no.extend( keyParams, no.View.getInfo( model_id ).params );
     }
 
     var layout = info.layout = info.layout || {};
@@ -216,7 +216,7 @@ no.View.prototype.getLayoutTree = function(update) {
     function viewTree(id, path, tree) {
         var viewLayout = no.View.getInfo(id).layout;
 
-        if (no.object.empty( viewLayout )) { // Обычный блок, без подблоков или боксов.
+        if (no.object.isEmpty( viewLayout )) { // Обычный блок, без подблоков или боксов.
             tree[id] = true;
         } else {
             tree = tree[id] = {};

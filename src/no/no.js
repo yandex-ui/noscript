@@ -52,6 +52,8 @@ no.byClass = function(className, context) {
     return context.getElementsByClassName(className); // FIXME: Поддержка старых браузеров.
 };
 
+// ------------------------------------------------------------------------------------------------------------- //
+
 /**
     @param {Element} oldNode
     @param {Element} newNode

@@ -32,7 +32,8 @@ no.Update.prototype.prepare = function() {
     var that = this;
     no.Update.walkLeafs(tree, function(view_id, type) {
         var models = no.View.getInfo( view_id ).models;
-        for (var model_id in models) {
+        for (var i = 0, l = models.length; i < l; i++) {
+            var model_id = models[i];
             var item = {
                 model_id: model_id,
                 params: params,
@@ -95,7 +96,6 @@ no.Update.prototype.request = function() {
     div.innerHTML = html;
 
     var node = div.firstChild;
-    // console.log('result.node', node);
 
     this.update(node);
 };
@@ -120,9 +120,7 @@ no.Update.prototype.update = function(node) {
 
     var that = this;
     this.view.processTree(function(view) {
-        // console.log('update.walk', view.id, view.needUpdate(that));
         if (view.needUpdate(that)) {
-            // console.log('updating...', view.id);
             view.update(node, that, true);
             return false;
         }

@@ -284,8 +284,10 @@ no.View.prototype.getUpdateTrees = function(update, trees) {
     @param {boolean} replace
 */
 no.View.prototype.update = function(node, update, replace) {
-    node = no.byClass( 'view-' + this.id, node )[0];
-    if (!node) { return; }
+    if (!this.node) {
+        this.node = no.byClass( 'view-' + this.id, node )[0];
+        if (!this.node) { return; }
+    }
 
     var views = this.views;
     for (var view_id in views) {
@@ -296,7 +298,6 @@ no.View.prototype.update = function(node, update, replace) {
         no.replaceNode(this.node, node);
     }
 
-    this.node = node;
     this.status = true;
 };
 

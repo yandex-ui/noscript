@@ -116,6 +116,6 @@ test("Then chainability", function() {
     p.else_(else_).else_(else_);
 
     // Tests.
-    equals(then.callCount, 4, "Then was called a needed amount of times");
+    equals(else_.callCount, 4, "Else was called a needed amount of times");
 });
 

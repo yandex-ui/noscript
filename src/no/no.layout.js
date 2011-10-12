@@ -40,7 +40,7 @@ no.layout.get = function(id) {
         var parent_id = raw[ '..' ];
         if (parent_id) {
             var parent = no.layout.get( parent_id );
-            no.extends( compiled, parent );
+            no.extend( compiled, parent );
 
             delete raw[ '..' ];
         }

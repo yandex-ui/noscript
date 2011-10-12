@@ -52,6 +52,8 @@ no.byClass = function(className, context) {
     return context.getElementsByClassName(className); // FIXME: Поддержка старых браузеров.
 };
 
+// ------------------------------------------------------------------------------------------------------------- //
+
 /**
     @param {Element} oldNode
     @param {Element} newNode
@@ -1672,8 +1674,10 @@ no.View.prototype.getUpdateTrees = function(update, trees) {
     @param {boolean} replace
 */
 no.View.prototype.update = function(node, update, replace) {
-    node = no.byClass( 'view-' + this.id, node )[0];
-    if (!node) { return; }
+    if (!this.node) {
+        this.node = no.byClass( 'view-' + this.id, node )[0];
+        if (!this.node) { return; }
+    }
 
     var views = this.views;
     for (var view_id in views) {
@@ -1684,7 +1688,6 @@ no.View.prototype.update = function(node, update, replace) {
         no.replaceNode(this.node, node);
     }
 
-    this.node = node;
     this.status = true;
 };
 
@@ -1810,25 +1813,25 @@ no.Box.prototype.update = function(node, update) {
     // Поэтому приходится смотреть, что же там сгенерилось и в каком порядке.
     // Дальше, если порядок неправильный, блоки будут переставлены в нужном порядке дальше, в updateCurrent().
 
-    var current = [];
-    var children = node.children; // FIXME: node.children не работает в FF3.0.
-
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        var className = child.className;
-        var r = className.match(/\bview-(\S+)\b/);
-        if (r) {
-            var view_id = r[1];
-
-            var key = no.View.getKey(view_id, params);
-            current.push(key);
-
-            var view = archive[key] = this.subView(view_id, params);
-            view.update(node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
-        }
-    }
-
     if (!this.current) {
+        var current = [];
+        var children = node.children; // FIXME: node.children не работает в FF3.0.
+
+        for (var i = 0, l = children.length; i < l; i++) {
+            var child = children[i];
+            var className = child.className;
+            var r = className.match(/\bview-(\S+)\b/);
+            if (r) {
+                var view_id = r[1];
+
+                var key = no.View.getKey(view_id, params);
+                current.push(key);
+
+                var view = archive[key] = this.subView(view_id, params);
+                view.update(this.node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
+            }
+        }
+
         this.current = current;
     }
 
@@ -1857,7 +1860,6 @@ no.Box.prototype.updateCurrent = function(node, update) {
         return true;
     });
 
-    var node = this.node;
     for (var i = 0, l = views.length; i < l; i++) {
         var view_id = views[i];
         var key = content[i];
@@ -1865,11 +1867,11 @@ no.Box.prototype.updateCurrent = function(node, update) {
         var view = archive[key];
         if (!view) {
             view = archive[key] = this.subView(view_id, params);
-            view.update(node, update);
         }
+        view.update(node, update);
         view.show();
 
-        node.appendChild(view.node);
+        this.node.appendChild(view.node);
     }
 
     this.current = content;
@@ -1976,7 +1978,7 @@ no.layout.get = function(id) {
         var parent_id = raw[ '..' ];
         if (parent_id) {
             var parent = no.layout.get( parent_id );
-            no.extends( compiled, parent );
+            no.extend( compiled, parent );
 
             delete raw[ '..' ];
         }
@@ -2034,7 +2036,7 @@ no.router = function(url) {
 
     // Ничего подходящего не нашли.
     return {
-        page: '404',
+        page: 'not-found',
         params: {}
     };
 
@@ -2116,7 +2118,8 @@ no.Update.prototype.prepare = function() {
     var that = this;
     no.Update.walkLeafs(tree, function(view_id, type) {
         var models = no.View.getInfo( view_id ).models;
-        for (var model_id in models) {
+        for (var i = 0, l = models.length; i < l; i++) {
+            var model_id = models[i];
             var item = {
                 model_id: model_id,
                 params: params,
@@ -2179,7 +2182,6 @@ no.Update.prototype.request = function() {
     div.innerHTML = html;
 
     var node = div.firstChild;
-    // console.log('result.node', node);
 
     this.update(node);
 };
@@ -2204,9 +2206,7 @@ no.Update.prototype.update = function(node) {
 
     var that = this;
     this.view.processTree(function(view) {
-        // console.log('update.walk', view.id, view.needUpdate(that));
         if (view.needUpdate(that)) {
-            // console.log('updating...', view.id);
             view.update(node, that, true);
             return false;
         }

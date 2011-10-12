@@ -65,25 +65,25 @@ no.Box.prototype.update = function(node, update) {
     // Поэтому приходится смотреть, что же там сгенерилось и в каком порядке.
     // Дальше, если порядок неправильный, блоки будут переставлены в нужном порядке дальше, в updateCurrent().
 
-    var current = [];
-    var children = node.children; // FIXME: node.children не работает в FF3.0.
-
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        var className = child.className;
-        var r = className.match(/\bview-(\S+)\b/);
-        if (r) {
-            var view_id = r[1];
-
-            var key = no.View.getKey(view_id, params);
-            current.push(key);
-
-            var view = archive[key] = this.subView(view_id, params);
-            view.update(node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
-        }
-    }
-
     if (!this.current) {
+        var current = [];
+        var children = node.children; // FIXME: node.children не работает в FF3.0.
+
+        for (var i = 0, l = children.length; i < l; i++) {
+            var child = children[i];
+            var className = child.className;
+            var r = className.match(/\bview-(\S+)\b/);
+            if (r) {
+                var view_id = r[1];
+
+                var key = no.View.getKey(view_id, params);
+                current.push(key);
+
+                var view = archive[key] = this.subView(view_id, params);
+                view.update(this.node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
+            }
+        }
+
         this.current = current;
     }
 
@@ -112,7 +112,6 @@ no.Box.prototype.updateCurrent = function(node, update) {
         return true;
     });
 
-    var node = this.node;
     for (var i = 0, l = views.length; i < l; i++) {
         var view_id = views[i];
         var key = content[i];
@@ -120,11 +119,11 @@ no.Box.prototype.updateCurrent = function(node, update) {
         var view = archive[key];
         if (!view) {
             view = archive[key] = this.subView(view_id, params);
-            view.update(node, update);
         }
+        view.update(node, update);
         view.show();
 
-        node.appendChild(view.node);
+        this.node.appendChild(view.node);
     }
 
     this.current = content;

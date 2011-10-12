@@ -36,7 +36,7 @@ no.router = function(url) {
 
     // Ничего подходящего не нашли.
     return {
-        page: '404',
+        page: 'not-found',
         params: {}
     };
 

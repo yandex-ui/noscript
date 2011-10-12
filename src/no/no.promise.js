@@ -85,12 +85,12 @@ no.Promise = function() {
     @return {no.Promise}
 */
 no.Promise.prototype.then = function(callback) {
-    if (this.rejected) { return null; }
-
-    if (this.resolved) {
-        callback(this.result);
-    } else {
-        this.thens.push(callback);
+    if (!this.rejected) {
+        if (this.resolved) {
+            callback(this.result);
+        } else {
+            this.thens.push(callback);
+        }
     }
 
     return this;
@@ -103,12 +103,12 @@ no.Promise.prototype.then = function(callback) {
     @return {no.Promise}
 */
 no.Promise.prototype.else_ = function(callback) {
-    if (this.resolved) { return null; }
-
-    if (this.rejected) {
-        callback(this.result);
-    } else {
-        this.elses.push(callback);
+    if (!this.resolved) {
+        if (this.rejected) {
+            callback(this.error);
+        } else {
+            this.elses.push(callback);
+        }
     }
 
     return this;

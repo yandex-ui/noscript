@@ -1,3 +1,8 @@
+include('../../src/no/no.js');
+include('../../src/no/no.promise.js');
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
 module("no.Promise: thens");
 
 test("Then chainability", function() {
@@ -17,7 +22,8 @@ test("Then chainability", function() {
     equals(then.callCount, 4, "Then was called a needed amount of times");
 });
 
-// ------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------- //
+
 test("Then is called", function() {
     var resolution_value = { id: 42 };
     var copy = { id: 42 };
@@ -54,8 +60,7 @@ test("Then is called", function() {
     ok(!elses.before.called, "Else, added before resolution, not called");
 });
 
-// ------------------------------------------------------------------------------------------------------------- //
-// ------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------- //
 
 module("no.Promise: thens");
 
@@ -95,7 +100,8 @@ test("Elses", function() {
     ok(!thens.before.called, "A callback, added before rejection, was not called");
 });
 
-// ------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------- //
+
 test("Then chainability", function() {
     var then = this.spy();
     var else_ = this.spy();
@@ -112,3 +118,4 @@ test("Then chainability", function() {
     // Tests.
     equals(then.callCount, 4, "Then was called a needed amount of times");
 });
+

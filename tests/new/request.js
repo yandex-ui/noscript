@@ -130,7 +130,82 @@ test("Retries", function() {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-// Params grouping
-// id=1, id=1
-// id=1, name=1
-// id=1, id=2
+module("Группировка");
+var createItem = function(ar) { return { model_id: ar[0], params: ar[1] } };
+var testGrouping = function(message, g /* items */) {
+    var items = $.map(Array.prototype.slice.call(arguments, 2), createItem);
+    var groups = no.Request.items2groups(items);
+    deepEqual(groups, g, message);
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+test("Группировка неконфликтующих параметров", function() {
+
+    testGrouping(
+        "Одинаковое количество параметров с одинаковыми значениями",
+        [ { model_ids: [ "photo", "profile" ], params: { id: 1 } } ],
+        [ "photo", { id: 1 } ],
+        [ "profile", { id: 1 } ]
+    );
+
+    testGrouping(
+        "Разный набор параметров, те, что пересекаются, - одинаковые",
+        [ { model_ids: [ "photo", "profile" ], params: { id: 1, login: "che" } } ],
+        [ "photo", { id: 1 } ],
+        [ "profile", { id: 1, login: "che" } ]
+    );
+
+    // XXX здесь, кажется, должна быть только одна группа.
+    testGrouping(
+        "Запрос одной и той же модели дважды",
+        [ { model_ids: [ "photo" ], params: { id: 1 } } ],
+        [ "photo", { id: 1 } ],
+        [ "photo", { id: 1 } ]
+    );
+});
+
+// ----------------------------------------------------------------------------------------------------------------- //
+test("Группировка конфликтующих параметров", function() {
+    testGrouping(
+        "Запрос двух моделей с разными значениями переодного и того же параметра",
+        [
+            { model_ids: [ "photo" ], params: { id: 1 } },
+            { model_ids: [ "profile" ], params: { id: 2 } }
+        ],
+        [ "photo", { id: 1 } ],
+        [ "profile", { id: 2 } ]
+    );
+
+    testGrouping(
+        "Запрос двух моделей с разными значениями переодного и того же параметра",
+        [
+            { model_ids: [ "photo" ], params: { id: 1, login: "nop" } },
+            { model_ids: [ "profile" ], params: { id: 1, login: "mmoo" } }
+        ],
+        [ "photo", { id: 1, login: "nop" } ],
+        [ "profile", { id: 1, login: "mmoo" } ]
+    );
+
+    // NOTE к сожалению, группировка только последовательная.
+    testGrouping(
+        "Не группируются те элементы, что идут непоследовательно",
+        [
+            { model_ids: [ "photo" ], params: { id: 1 } },
+            { model_ids: [ "profile" ], params: { id: 2 } },
+            { model_ids: [ "album" ], params: { id: 1 } }
+        ],
+        [ "photo", { id: 1 } ],
+        [ "profile", { id: 2 } ],
+        [ "album", { id: 1 } ]
+    );
+
+    // XXX почему-то группа получается без параметров
+    testGrouping(
+        "Не группируются те элементы, что идут непоследовательно",
+        [
+            { model_ids: [ "photo", "album" ], params: { id: 1, login: "nop" } }
+        ],
+        [ "photo", { id: 1, login: "nop" } ],
+        [ "album", {} ]
+    );
+});

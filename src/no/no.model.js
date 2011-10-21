@@ -253,9 +253,9 @@ no.Model.prototype.touch = function(key, timestamp) {
         }
     } else {
         var cache = this._cache;
-        for (var key in cache) {
-            cache.timestamp = timestamp;
-        };
+        for (var item_key in cache) {
+            cache[item_key].timestamp = timestamp;
+        }
     }
 };
 

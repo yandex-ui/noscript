@@ -219,7 +219,7 @@ no.Request.prototype.request = function() {
             continue;
         }
 
-        requested = no.Request.addKey(key);
+        var requested = no.Request.addKey(key);
 
         var status = requested.status;
         if (status === no.Request.keyStatus.OK) {
@@ -277,20 +277,21 @@ no.Request.prototype.request = function() {
 
 /**
     Вычисляем query-параметры запроса.
+    NOTE раньше была группировка параметров. Теперь она не делается для исключения конфликтров (к примеру,
+    у модели могут быть необязательные параметры, которые явно передаются для другой модели: конфликт).
 
-    Например, для реквеста, указанного в комментариях к no.Request.items2groups параметры будут такие:
+    Например:
 
         {
-            '_model.0': 'photo,album',
+            '_models.0': 'photo',
             'user.0': 'nop',
             'photo_id.0': 42,
-            'album_id.0': 66,
 
-            '_model.1': 'photo'
+            '_models.1': 'photo'
             'user.1': 'nop',
             'photo_id.1': 97
 
-            '_model.2': 'album',
+            '_models.2': 'album',
             'user.2': 'mmoo',
             'album_id.2': 33
         }
@@ -299,149 +300,27 @@ no.Request.prototype.request = function() {
     @return {!Object}
 */
 no.Request.items2params = function(items) {
-    var groups = no.Request.items2groups(items); // Группируем item'ы.
-
     var params = {};
 
-    for (var i = 0, l = groups.length; i < l; i++) {
-        var group = groups[i];
-
-        var suffix = '.' + i; // Чтобы не путать параметры с одинаковыми именами из разных групп,
+    for (var i = 0, l = items.length; i < l; i++) {
+        var suffix = '.' + i; // Чтобы не путать параметры с одинаковыми именами разных моделей,
                               // добавляем к именам параметров специальный суффикс.
+        var item = items[i];
+        item.group_id = i;
 
-        // Каждая группа прокидывает в params все свои параметры.
-        for (var key in group.params) {
+        // Каждая модель прокидывает в params все свои параметры (кроме служебных вида _<name>).
+        for (var key in item.params) {
             if (!/^_/.test(key)) { // Служебные параметры (начинающиеся на '_') игнорируем.
-                params[ key + suffix ] = group.params[key];
+                params[ key + suffix ] = item.params[key];
             }
         }
 
-        // Плюс добавляется один служебный параметр _model, содержащий список всех моделей этой группы.
-        params[ '_models' + suffix ] = group.model_ids.join(',');
-
+        // Плюс добавляется один служебный параметр _models, содержащий список запрашиваемых моделей.
+        // ВАЖНО: models, потому что не сервере мы умеем вытаскивать несколько моделей из урла вида: _models=profile,fotka-view,album.
+        params[ '_models' + suffix ] = item.model_id;
     }
 
     return params;
-};
-
-/**
-    Группируем item'ы на основе "совместимости параметров".
-    Если параметры двух подряд идущих item'а не конфликтуют (т.е. в них нет параметров в одинаковыми именами,
-    но разными значениями), то они попадают в одну группу.
-
-        [
-            {
-                model_id: 'photo',
-                params: {
-                    user: 'nop',
-                    photo_id: 42
-                }
-            }, // группа 0
-
-            {
-                model_id: 'album',
-                params: {
-                    user: 'nop',
-                    album_id: 66
-                }
-            }, // также группа 0, т.к. параметры можно смержить в один объект.
-
-            {
-                model_id: 'photo',
-                params: {
-                    user: 'nop',
-                    photo_id: 97
-                }
-            }, // группа 1, т.к. в группе 0 уже есть модель photo.
-
-            {
-                model_id: 'album',
-                params: {
-                    user: 'mmoo',
-                    album_id: 33
-                }
-            } // группа 2, т.к. в предыдущем item'е есть параметр user и он отличается от текущего.
-        ]
-
-    @param {no.Request.type_requestItems} items
-    @return {no.Request.type_requestGroups}
-*/
-no.Request.items2groups = function(items) {
-    var groups = [];
-
-    var models = {};
-    var params = {};
-    var id = 0;
-
-    function add(item, _params) {
-        if (!models) {
-            models = {};
-        }
-
-        item.group_id = id;
-
-        models[ item.model_id ] = true;
-        params = _params;
-    }
-
-    function close() {
-        if (models) {
-            groups.push({
-                model_ids: no.object.keys( models ),
-                params: params
-            });
-            id++;
-            models = null;
-            params = {};
-        };
-    }
-
-    for (var i = 0, l = items.length; i < l; i++) {
-        var item = items[i];
-
-        var merged = no.Request.mergeParams( params, item.params );
-
-        if ( merged && !models[ item.model_id ] ) {
-            add( item, merged );
-        } else {
-            close();
-            add( item, item.params );
-        }
-    }
-    if (!no.object.isEmpty(models)) {
-        close();
-    }
-
-    return groups;
-};
-
-/**
-    Пытаемся смержить два объекта. Если для какого-то ключа возникает конфликт
-    (т.е. значение с этим ключом в to есть и не совпадает со значением в from), то возвращаем null.
-
-    @param {!Object} to
-    @param {!Object} from
-    @return {Object}
-*/
-no.Request.mergeParams = function(to, from) {
-    var o = {};
-
-    for (var key in from) {
-        if (key.charAt(0) === '_') { // Не учитывать служебные параметры при merge'е объектов.
-            continue;
-        }
-
-        var toValue = to[key];
-        var fromValue = from[key];
-
-        if (toValue === undefined || toValue === fromValue) {
-            o[key] = fromValue;
-        } else {
-            return null;
-        }
-    }
-
-    return o;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

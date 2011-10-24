@@ -39,6 +39,7 @@ no.Request = function(items) {
         params['_item_id'] = no.Request.item_id++; // Этот параметр предполагается использовать для построения ключа do-моделей,
                                                     // чтобы можно было сделать одновременно несколько одинаковых do-запросов.
         item.key = model.getKey(params);
+        no.Request.addKey(item.key); // Добавляем ключ сразу, потому как сразу же будем делать запрос данных.
     }
 
     this.request();
@@ -219,7 +220,7 @@ no.Request.prototype.request = function() {
             continue;
         }
 
-        var requested = no.Request.addKey(key);
+        var requested = no.Request.getKey(key);
 
         var status = requested.status;
         if (status === no.Request.keyStatus.OK) {

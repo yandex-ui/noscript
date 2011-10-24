@@ -1,6 +1,3 @@
-// For jshint.
-/*global no: true, module: true, test: true, ok: true, raises: true */
-
 include('../../src/no/no.js');
 include('../../src/no/no.promise.js');
 include('../../src/no/no.js');
@@ -51,13 +48,17 @@ var getProfileItem = function() {
     };
 };
 
+var empty_result = {
+    id: "NO_DATA",
+    reason: "Server returned no data"
+};
+
 // ----------------------------------------------------------------------------------------------------------------- //
 
 module("Basic functionality");
 
 test("Creation", function() {
-    // Empty constructor.
-    raises(function() { no.request(); }, /length/, "User must specify items");
+    raises(function() { no.request(); }, /length/, "При создании no.Request необходимо указывать items");
 });
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -98,6 +99,7 @@ test("Simple request", function() {
 });
 
 // ----------------------------------------------------------------------------------------------------------------- //
+
 test("Retries", function() {
     var server = sinon.fakeServer.create();
     server.respondWith(
@@ -106,29 +108,26 @@ test("Retries", function() {
 
     var then = sinon.spy();
     var else_ = sinon.spy();
-
     var item = getProfileItem();
+
     var request = no.request([ item ]);
+    var key = no.Request.getKey(item.key);
     request.promise()
         .then(then)
         .else_(else_);
-    var key = no.Request.getKey(item.key);
 
-    // Send request.
+    // Сервер отвечает сразу на все запросы. До вызова respond весит один запрос.
+    // После вызова respond - все последующие запросы будут сразу получать ответы. XXX: как заставить сервер ответить только на один запрос - я не нашёл.
     server.respond();
+    // Здесь уже будут выполнены все 3 запроса.
 
-    // Check callbacks.
+    // TESTS
+
     is(then.callCount, 1, "Вызывается один раз then с объектом, который создаётся при ошибочном ответе");
-
-    var empty_result = {
-        id: "NO_DATA",
-        reason: "Server returned no data"
-    };
-    isTrue(then.calledWith([ empty_result ]), "В результате хэндлеры будут вызваны с пустым объектом");
-
+    isTrue(then.calledWith([ empty_result ]), "В результате хэндлеры будут вызваны с пустым объектом"); // NOTE мне не нравится, что тут массив.
     is(else_.callCount, 0, "Else не вызывается, потому запрос, который ничего не получил считается всё равно выполненным");
     is(key.retries, 3, "Количество выполненных запросов данных");
-    is(key.requestCount, 1, "Число запросов, ожидающих данный запрос");
+    is(key.requestCount, 0, "Число запросов, ожидающих данный запрос: все должны были получить результат");
 });
 
 // ----------------------------------------------------------------------------------------------------------------- //

@@ -25,7 +25,7 @@ var isTrue = function(value, message) { strictEqual(value, true, message); };
 // ----------------------------------------------------------------------------------------------------------------- //
 // Test data.
 
-var getTestPhotoModel = function() {
+var getPhotoItem = function() {
     return {
         model_id: "photo",
         params: {
@@ -39,7 +39,7 @@ var getTestPhotoModel = function() {
     };
 };
 
-var getTestProfileModel = function() {
+var getProfileItem = function() {
     return {
         model_id: "profile",
         params: {
@@ -65,15 +65,15 @@ test("Simple request", function() {
     var server = sinon.fakeServer.create();
     server.respondWith(
         "GET",
-        /\/models\/\?model=photo&/,
-        '{ "0": { "photo": { "data": "fake" } } }'
+        /^\/models\/.*_models\.0=photo.*$/,
+        [ 200, {}, '{ "0": { "photo": { "data": "fake" } } }' ]
     );
 
     var callback = sinon.spy();
     var then = sinon.spy();
     var else_ = sinon.spy();
 
-    var items = [ getTestPhotoModel() ];
+    var items = [ getPhotoItem() ];
     var request = no.request(items, callback);
     request.promise()
         .then(then)
@@ -99,20 +99,16 @@ test("Simple request", function() {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 test("Retries", function() {
-    var clock = sinon.useFakeTimers();
     var server = sinon.fakeServer.create();
     server.respondWith(
-        //"GET",
-        ///\/models\/\?model=profile&/,
-        [403, {}, ""]
+        [ 403, {}, "" ]
     );
 
     var then = sinon.spy();
     var else_ = sinon.spy();
 
-    var items = [ getTestProfileModel() ];
-    var item = items[0];
-    var request = no.request(items);
+    var item = getProfileItem();
+    var request = no.request([ item ]);
     request.promise()
         .then(then)
         .else_(else_);
@@ -122,10 +118,17 @@ test("Retries", function() {
     server.respond();
 
     // Check callbacks.
-    is(then.callCount, 0, "Then callback calls"); // XXX почему-то вызывается then, но может это и правильно.
-    is(else_.callCount, 1, "Else callback calls"); // XXX кажется, имеено else должен вызываться
-    is(key.retries, 3, "The number of retries, done");
-    is(key.requestCount, 1, "The number of requests, waiting for this key");
+    is(then.callCount, 1, "Вызывается один раз then с объектом, который создаётся при ошибочном ответе");
+
+    var empty_result = {
+        id: "NO_DATA",
+        reason: "Server returned no data"
+    };
+    isTrue(then.calledWith([ empty_result ]), "В результате хэндлеры будут вызваны с пустым объектом");
+
+    is(else_.callCount, 0, "Else не вызывается, потому запрос, который ничего не получил считается всё равно выполненным");
+    is(key.retries, 3, "Количество выполненных запросов данных");
+    is(key.requestCount, 1, "Число запросов, ожидающих данный запрос");
 });
 
 // ----------------------------------------------------------------------------------------------------------------- //

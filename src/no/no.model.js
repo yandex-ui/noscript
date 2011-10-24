@@ -190,10 +190,11 @@ no.Model.prototype.isCached = function(key) {
     @param {Object} data
     @param {!Object} params
     @param {number} timestamp
-    @param {boolean=} soft
+    @param {boolean=} noforce Не трогать уже закэшированное значение.
 */
-no.Model.prototype.setCache = function(key, data, params, timestamp, soft) {
+no.Model.prototype.setCache = function(key, data, params, timestamp, noforce) {
     var cached = this._cache[key];
+    var force = !noforce;
 
     if (!cached) {
         this._cache[key] = {
@@ -201,7 +202,7 @@ no.Model.prototype.setCache = function(key, data, params, timestamp, soft) {
             timestamp: timestamp,
             params: params
         };
-    } else if (!soft) { // Если soft, то не перезаписываем уже существующий кэш.
+    } else if (force) { // Если force, то перезаписываем существующий кэш.
         cached.data = data;
         cached.timestamp = timestamp;
         // cached.params не перезаписываем никогда, т.к. они не могут измениться.

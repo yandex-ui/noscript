@@ -129,8 +129,8 @@ no.Request.keyStatus = {
 /**
     @typedef {{
         promise: no.Promise,
-        retries: number,
-        requestCount: number,
+        retries: number,                // Количество сделанных попыток получить данные.
+        requestCount: number,           // Количество запросов, которые ждут ключ.
         status: no.Request.keyStatus,
         request_id: (number|undefined)
     }}

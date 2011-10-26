@@ -16,6 +16,10 @@ no.http = function(url, params) {
         dataType: 'json',
         success: function(data) {
             promise.resolve(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            var error = errorThrown || textStatus || "some error";
+            promise.resolve({ error: error });
         }
     });
 

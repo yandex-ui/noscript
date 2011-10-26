@@ -206,7 +206,7 @@ no.Request.doneKey = function(key) {
 
 no.Request.prototype.request = function() {
     var r_promises = [];
-    var r_items = [];
+    var r_items = this.requestedItems = [];
 
     var items = this.items;
     for (var i = 0, l = items.length; i < l; i++) {
@@ -462,8 +462,8 @@ no.Request.prototype.extractData = function(result) {
         var key = item.key;
         var requested = no.Request.getKey(key);
 
-        if (this.id < requested.request_id) { // После этого запроса был послан еще один и мы ожидаем ответа от него.
-                                              // Этот ключ игнорируем.
+        if (!requested || this.id < requested.request_id) { // После этого запроса был послан еще один и мы ожидаем ответа от него.
+                                                            // Этот ключ игнорируем.
             continue;
         }
 
@@ -500,20 +500,24 @@ no.Request.prototype.extractData = function(result) {
 /**
 */
 no.Request.prototype.done = function() {
-    var items = this.items;
+    /// var items = this.items;
+    var items = this.requestedItems;
 
-    var result = this.buildResult();
+    // var result = this.buildResult();
 
     for (var i = 0, l = items.length; i < l; i++) {
         no.Request.doneKey( items[i].key );
     }
 
-    this._promise.resolve(result);
+    // this._promise.resolve(result);
+    this._promise.resolve();
 };
 
 /**
     @return {Array.<{ error: (Object|undefined), data: (Object|undefined) }>}
 */
+/*
+// FIXME: Кажется, не нужно этот результат никуда возвращать. Он и так уже в кэшах лежит.
 no.Request.prototype.buildResult = function() {
     var result = [];
 
@@ -527,4 +531,5 @@ no.Request.prototype.buildResult = function() {
 
     return result;
 };
+*/
 

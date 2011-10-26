@@ -78,26 +78,38 @@ no.Update.prototype.addItemToRequest = function(type, item) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.request = function() {
-    var all = no.object.keys( this.requests['all'] );
-    // FIXME: Отправить запрос и подписаться на ответ.
-    // FIXME: Построить дерево для наложения шаблонов.
-    // FIXME: Наложить шаблон и получить результат в виде html-ноды.
+    var all = this.requests['all'];
+    var items = no.object.values(all);
 
-    var viewsTree = [];
-    this.view.getUpdateTrees(this, viewsTree);
+    var that = this;
+    no.request(items).promise()
+        .then(function() {
+            var viewsTree = [];
+            that.view.getUpdateTrees(that, viewsTree);
 
-    var tree = {
-        views: viewsTree,
-        update_id: this.id
-    };
+            var tree = {
+                views: viewsTree,
+                models: {}
+            };
+            var models = tree.models;
+            for (var i = 0, l = items.length; i < l; i++) {
+                var item = items[i];
+                var model_id = item.model_id;
 
-    var html = stylesheet( tree );
-    var div = document.createElement('div');
-    div.innerHTML = html;
+                models[model_id] = no.Model.get(model_id).getCache( item.key );
+            }
 
-    var node = div.firstChild;
+            // console.time('template');
+            var html = stylesheet( tree ); // FIXME: Нужно проверять, что update не нужен и ничего не делать.
+            // console.timeEnd('template');
+            var div = document.createElement('div');
+            div.innerHTML = html;
 
-    this.update(node);
+            var node = div.firstChild;
+
+            that.update(node);
+        });
+
 };
 
 /**

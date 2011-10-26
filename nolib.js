@@ -151,6 +151,20 @@ no.object.isEmpty = function(obj) {
     return true;
 };
 
+/**
+    @param {!Object} obj
+    @return {Array.<string>} Возвращает список всех значений объекта.
+*/
+no.object.values = function(obj) {
+    var values = [];
+
+    for (var key in obj) {
+        values.push( obj[key] );
+    }
+
+    return values;
+};
+
 // ------------------------------------------------------------------------------------------------------------- //
 // no.events
 // ------------------------------------------------------------------------------------------------------------- //
@@ -571,6 +585,10 @@ no.http = function(url, params) {
         dataType: 'json',
         success: function(data) {
             promise.resolve(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            var error = errorThrown || textStatus || "some error";
+            promise.resolve({ error: error });
         }
     });
 
@@ -769,10 +787,11 @@ no.Model.prototype.isCached = function(key) {
     @param {Object} data
     @param {!Object} params
     @param {number} timestamp
-    @param {boolean=} noforce
+    @param {boolean=} noforce Не трогать уже закэшированное значение.
 */
 no.Model.prototype.setCache = function(key, data, params, timestamp, noforce) {
     var cached = this._cache[key];
+    var force = !noforce;
 
     if (!cached) {
         this._cache[key] = {
@@ -780,7 +799,7 @@ no.Model.prototype.setCache = function(key, data, params, timestamp, noforce) {
             timestamp: timestamp,
             params: params
         };
-    } else if (!noforce) { // Если noforce, то не перезаписываем уже существующий кэш.
+    } else if (force) { // Если force, то перезаписываем существующий кэш.
         cached.data = data;
         cached.timestamp = timestamp;
         // cached.params не перезаписываем никогда, т.к. они не могут измениться.
@@ -832,9 +851,9 @@ no.Model.prototype.touch = function(key, timestamp) {
         }
     } else {
         var cache = this._cache;
-        for (var key in cache) {
-            cache.timestamp = timestamp;
-        };
+        for (var item_key in cache) {
+            cache[item_key].timestamp = timestamp;
+        }
     }
 };
 
@@ -899,6 +918,7 @@ no.Request = function(items) {
         params['_item_id'] = no.Request.item_id++; // Этот параметр предполагается использовать для построения ключа do-моделей,
                                                     // чтобы можно было сделать одновременно несколько одинаковых do-запросов.
         item.key = model.getKey(params);
+        no.Request.addKey(item.key); // Добавляем ключ сразу, потому как сразу же будем делать запрос данных.
     }
 
     this.request();
@@ -989,8 +1009,8 @@ no.Request.keyStatus = {
 /**
     @typedef {{
         promise: no.Promise,
-        retries: number,
-        requestCount: number,
+        retries: number,                // Количество сделанных попыток получить данные.
+        requestCount: number,           // Количество запросов, которые ждут ключ.
         status: no.Request.keyStatus,
         request_id: (number|undefined)
     }}
@@ -1066,7 +1086,7 @@ no.Request.doneKey = function(key) {
 
 no.Request.prototype.request = function() {
     var r_promises = [];
-    var r_items = [];
+    var r_items = this.requestedItems = [];
 
     var items = this.items;
     for (var i = 0, l = items.length; i < l; i++) {
@@ -1079,7 +1099,7 @@ no.Request.prototype.request = function() {
             continue;
         }
 
-        requested = no.Request.addKey(key);
+        var requested = no.Request.getKey(key);
 
         var status = requested.status;
         if (status === no.Request.keyStatus.OK) {
@@ -1137,20 +1157,21 @@ no.Request.prototype.request = function() {
 
 /**
     Вычисляем query-параметры запроса.
+    NOTE раньше была группировка параметров. Теперь она не делается для исключения конфликтров (к примеру,
+    у модели могут быть необязательные параметры, которые явно передаются для другой модели: конфликт).
 
-    Например, для реквеста, указанного в комментариях к no.Request.items2groups параметры будут такие:
+    Например:
 
         {
-            '_model.0': 'photo,album',
+            '_models.0': 'photo',
             'user.0': 'nop',
             'photo_id.0': 42,
-            'album_id.0': 66,
 
-            '_model.1': 'photo'
+            '_models.1': 'photo'
             'user.1': 'nop',
             'photo_id.1': 97
 
-            '_model.2': 'album',
+            '_models.2': 'album',
             'user.2': 'mmoo',
             'album_id.2': 33
         }
@@ -1159,149 +1180,27 @@ no.Request.prototype.request = function() {
     @return {!Object}
 */
 no.Request.items2params = function(items) {
-    var groups = no.Request.items2groups(items); // Группируем item'ы.
-
     var params = {};
 
-    for (var i = 0, l = groups.length; i < l; i++) {
-        var group = groups[i];
-
-        var suffix = '.' + i; // Чтобы не путать параметры с одинаковыми именами из разных групп,
+    for (var i = 0, l = items.length; i < l; i++) {
+        var suffix = '.' + i; // Чтобы не путать параметры с одинаковыми именами разных моделей,
                               // добавляем к именам параметров специальный суффикс.
+        var item = items[i];
+        item.group_id = i;
 
-        // Каждая группа прокидывает в params все свои параметры.
-        for (var key in group.params) {
+        // Каждая модель прокидывает в params все свои параметры (кроме служебных вида _<name>).
+        for (var key in item.params) {
             if (!/^_/.test(key)) { // Служебные параметры (начинающиеся на '_') игнорируем.
-                params[ key + suffix ] = group.params[key];
+                params[ key + suffix ] = item.params[key];
             }
         }
 
-        // Плюс добавляется один служебный параметр _model, содержащий список всех моделей этой группы.
-        params[ '_models' + suffix ] = group.model_ids.join(',');
-
+        // Плюс добавляется один служебный параметр _models, содержащий список запрашиваемых моделей.
+        // ВАЖНО: models, потому что не сервере мы умеем вытаскивать несколько моделей из урла вида: _models=profile,fotka-view,album.
+        params[ '_models' + suffix ] = item.model_id;
     }
 
     return params;
-};
-
-/**
-    Группируем item'ы на основе "совместимости параметров".
-    Если параметры двух подряд идущих item'а не конфликтуют (т.е. в них нет параметров в одинаковыми именами,
-    но разными значениями), то они попадают в одну группу.
-
-        [
-            {
-                model_id: 'photo',
-                params: {
-                    user: 'nop',
-                    photo_id: 42
-                }
-            }, // группа 0
-
-            {
-                model_id: 'album',
-                params: {
-                    user: 'nop',
-                    album_id: 66
-                }
-            }, // также группа 0, т.к. параметры можно смержить в один объект.
-
-            {
-                model_id: 'photo',
-                params: {
-                    user: 'nop',
-                    photo_id: 97
-                }
-            }, // группа 1, т.к. в группе 0 уже есть модель photo.
-
-            {
-                model_id: 'album',
-                params: {
-                    user: 'mmoo',
-                    album_id: 33
-                }
-            } // группа 2, т.к. в предыдущем item'е есть параметр user и он отличается от текущего.
-        ]
-
-    @param {no.Request.type_requestItems} items
-    @return {no.Request.type_requestGroups}
-*/
-no.Request.items2groups = function(items) {
-    var groups = [];
-
-    var models = {};
-    var params = {};
-    var id = 0;
-
-    function add(item, _params) {
-        if (!models) {
-            models = {};
-        }
-
-        item.group_id = id;
-
-        models[ item.model_id ] = true;
-        params = _params;
-    }
-
-    function close() {
-        if (models) {
-            groups.push({
-                model_ids: no.object.keys( models ),
-                params: params
-            });
-            id++;
-            models = null;
-            params = {};
-        };
-    }
-
-    for (var i = 0, l = items.length; i < l; i++) {
-        var item = items[i];
-
-        var merged = no.Request.mergeParams( params, item.params );
-
-        if ( merged && !models[ item.model_id ] ) {
-            add( item, merged );
-        } else {
-            close();
-            add( item, item.params );
-        }
-    }
-    if (!no.object.isEmpty(models)) {
-        close();
-    }
-
-    return groups;
-};
-
-/**
-    Пытаемся смержить два объекта. Если для какого-то ключа возникает конфликт
-    (т.е. значение с этим ключом в to есть и не совпадает со значением в from), то возвращаем null.
-
-    @param {!Object} to
-    @param {!Object} from
-    @return {Object}
-*/
-no.Request.mergeParams = function(to, from) {
-    var o = {};
-
-    for (var key in from) {
-        if (key.charAt(0) === '_') { // Не учитывать служебные параметры при merge'е объектов.
-            continue;
-        }
-
-        var toValue = to[key];
-        var fromValue = from[key];
-
-        if (toValue === undefined || toValue === fromValue) {
-            o[key] = fromValue;
-        } else {
-            return null;
-        }
-    }
-
-    return o;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -1322,8 +1221,8 @@ no.Request.prototype.extractData = function(result) {
         var key = item.key;
         var requested = no.Request.getKey(key);
 
-        if (this.id < requested.request_id) { // После этого запроса был послан еще один и мы ожидаем ответа от него.
-                                              // Этот ключ игнорируем.
+        if (!requested || this.id < requested.request_id) { // После этого запроса был послан еще один и мы ожидаем ответа от него.
+                                                            // Этот ключ игнорируем.
             continue;
         }
 
@@ -1360,20 +1259,24 @@ no.Request.prototype.extractData = function(result) {
 /**
 */
 no.Request.prototype.done = function() {
-    var items = this.items;
+    /// var items = this.items;
+    var items = this.requestedItems;
 
-    var result = this.buildResult();
+    // var result = this.buildResult();
 
     for (var i = 0, l = items.length; i < l; i++) {
         no.Request.doneKey( items[i].key );
     }
 
-    this._promise.resolve(result);
+    // this._promise.resolve(result);
+    this._promise.resolve();
 };
 
 /**
     @return {Array.<{ error: (Object|undefined), data: (Object|undefined) }>}
 */
+/*
+// FIXME: Кажется, не нужно этот результат никуда возвращать. Он и так уже в кэшах лежит.
 no.Request.prototype.buildResult = function() {
     var result = [];
 
@@ -1387,6 +1290,7 @@ no.Request.prototype.buildResult = function() {
 
     return result;
 };
+*/
 
 /**
     @constructor
@@ -2164,26 +2068,38 @@ no.Update.prototype.addItemToRequest = function(type, item) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.request = function() {
-    var all = no.object.keys( this.requests['all'] );
-    // FIXME: Отправить запрос и подписаться на ответ.
-    // FIXME: Построить дерево для наложения шаблонов.
-    // FIXME: Наложить шаблон и получить результат в виде html-ноды.
+    var all = this.requests['all'];
+    var items = no.object.values(all);
 
-    var viewsTree = [];
-    this.view.getUpdateTrees(this, viewsTree);
+    var that = this;
+    no.request(items).promise()
+        .then(function() {
+            var viewsTree = [];
+            that.view.getUpdateTrees(that, viewsTree);
 
-    var tree = {
-        views: viewsTree,
-        update_id: this.id
-    };
+            var tree = {
+                views: viewsTree,
+                models: {}
+            };
+            var models = tree.models;
+            for (var i = 0, l = items.length; i < l; i++) {
+                var item = items[i];
+                var model_id = item.model_id;
 
-    var html = stylesheet( tree );
-    var div = document.createElement('div');
-    div.innerHTML = html;
+                models[model_id] = no.Model.get(model_id).getCache( item.key );
+            }
 
-    var node = div.firstChild;
+            // console.time('template');
+            var html = stylesheet( tree ); // FIXME: Нужно проверять, что update не нужен и ничего не делать.
+            // console.timeEnd('template');
+            var div = document.createElement('div');
+            div.innerHTML = html;
 
-    this.update(node);
+            var node = div.firstChild;
+
+            that.update(node);
+        });
+
 };
 
 /**

@@ -70,11 +70,12 @@ no.View._classes = {};
 no.View.register = function(id, info, class_) {
     info = info || {};
 
-    var models = info.models = info.models || {};
+    var models = info.models = info.models || [];
 
     var keyParams = {};
-    for (var model_id in info.models) {
-        no.extend( keyParams, no.View.getInfo( model_id ).params );
+    for (var i = 0, l = info.models.length; i < l; i++) {
+        var model_id = info.models[i];
+        no.extend( keyParams, no.Model.getInfo( model_id ).params );
     }
 
     var layout = info.layout = info.layout || {};

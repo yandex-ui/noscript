@@ -26,9 +26,10 @@ no.events._handlers = {};
 no.events._hid = 1;
 
 /**
+    @type {string}
     @const
 */
-no.events._hid_key = '_hid';
+no.events._expando = '__events' + (+new Date());
 
 // ------------------------------------------------------------------------------------------------------------- //
 
@@ -55,15 +56,15 @@ no.events._get = function(name) {
     @param {string} name
     @param {no.events.type_handler} handler
 */
-no.events.bind = function(name, handler) {
+no.events.on = function(name, handler) {
     var handlers = no.events._get(name);
 
-    var hid = handler[ no.events._hid_key ];
+    var hid = handler[ no.events._expando ];
     if (!hid) {
-        handler[ no.events._hid_key ] = no.events._hid++;
+        handler[ no.events._expando ] = no.events._hid++;
     } else {
         var i = no.array.firstMatch(handlers, function(handler) { // Ищем этот обработчик среди уже подписанных.
-            return ( handler[ no.events._hid_key ] === hid );
+            return ( handler[ no.events._expando ] === hid );
         });
         if (i !== -1) { return; } // Этот обработчик уже подписан.
     }
@@ -78,13 +79,13 @@ no.events.bind = function(name, handler) {
     @param {string} name
     @param {no.events.type_handler=} handler
 */
-no.events.unbind = function(name, handler) {
+no.events.off = function(name, handler) {
     if (handler) {
-        var hid = handler[ no.events._hid_key ];
+        var hid = handler[ no.events._expando ];
 
         var handlers = no.events._get(name);
-        var i = no.array.firstMatch(handlers, function(_handler) { // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
-            return ( _handler._hid === hid );
+        var i = no.array.firstMatch(handlers, function(handler) { // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
+            return ( handler._hid === hid );
         });
 
         if (i !== -1) {
@@ -105,8 +106,8 @@ no.events.unbind = function(name, handler) {
     @param {*=} params
 */
 no.events.trigger = function(name, params) {
-    var handlers = no.events._get(name).slice(0); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван unbind,
-                                                  // то мы не потеряем вызов следующего обработчика.
+    var handlers = no.events._get(name).slice(); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван off(),
+                                                 // то мы не потеряем вызов следующего обработчика.
     for (var i = 0, l = handlers.length; i < l; i++) {
         handlers[i](name, params);
     }

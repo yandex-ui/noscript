@@ -33,7 +33,7 @@ de.file.get = function(filename) {
     return promise;
 };
 
-no.events.bind('file-changed', function(e, filename) { // Файл изменился, выкидываем его из кэша.
+no.events.on('file-changed', function(e, filename) { // Файл изменился, выкидываем его из кэша.
     /** @type {string} */ filename;
 
     delete de.file._cache[ filename ];

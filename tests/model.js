@@ -1,14 +1,14 @@
 // For jshint.
 /*global no: true, module: true, test: true, ok: true, equal: true */
 
-include('../../src/no/no.js');
-include('../../src/no/no.promise.js');
-include('../../src/no/no.js');
-include('../../src/no/no.object.js');
-include('../../src/no/no.http.js');
-include('../../src/no/no.promise.js');
+include('../src/no/no.js');
+include('../src/no/no.promise.js');
+include('../src/no/no.js');
+include('../src/no/no.object.js');
+include('../src/no/no.http.js');
+include('../src/no/no.promise.js');
 
-include('../../src/no/no.model.js');
+include('../src/no/no.model.js');
 
 // ----------------------------------------------------------------------------------------------------------------- //
 module("Регистрация новой модели");

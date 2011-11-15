@@ -18,7 +18,7 @@ no.http = function(url, params) {
             promise.resolve(data);
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            var error = errorThrown || textStatus || "some error";
+            var error = errorThrown || textStatus || 'some error';
             promise.resolve({ error: error });
         }
     });

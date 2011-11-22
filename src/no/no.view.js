@@ -1,13 +1,11 @@
 /**
     @constructor
     @param {string} id          Уникальный id класса. Важно! Это не id инстанса, у всех блоков этого класса один id.
-    @param {string} path        path блока в дереве блоков (в общем-то это просто xpath, отложенный от корня дерева).
     @param {!Object} params     Параметры блока (участвуют при построении ключа).
 */
-no.View = function(id, path, params) {
+no.View = function(id, params) {
     this.id = id;
     this.params = params;
-    this.path = path;
 
     var info = this.info = no.View.getInfo(id);
 
@@ -19,10 +17,14 @@ no.View = function(id, path, params) {
         var type = layout[ view_id ];
 
         var view = (type === null) ? this.subBox( view_id ) : this.subView( view_id );
-        views[ view_id ] = {
+        views[ view_id ] = view;
+        /*
+        // FIXME
+        {
             type: type,
             view: view
         };
+        */
     }
 
     /** @type {Element} */
@@ -36,8 +38,7 @@ no.View = function(id, path, params) {
     @typedef {function(
         new:no.View,
         string,
-        string,
-        Object
+        !Object
     )}
 */
 no.View.Create;
@@ -107,32 +108,23 @@ no.View.getInfo = function(id) {
 
 /**
     @param {string} view_id
-    @param {string} path
     @param {Object} params
     @return {no.View}
 */
-no.View.make = function( view_id, path, params ) {
+no.View.make = function( view_id, params ) {
     var class_ = no.View._classes[ view_id ];
 
-    return new class_( view_id, path, params );
+    return new class_( view_id, params );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
     @param {string} view_id
-    @return {string}
-*/
-no.View.prototype.subPath = function( view_id ) {
-    return this.path + '/' + view_id;
-};
-
-/**
-    @param {string} view_id
     @return {no.View}
 */
 no.View.prototype.subView = function( view_id ) {
-    return no.View.make( view_id, this.subPath( view_id ), this.params );
+    return no.View.make( view_id, this.params );
 };
 
 /**
@@ -140,7 +132,7 @@ no.View.prototype.subView = function( view_id ) {
     @return {no.Box}
 */
 no.View.prototype.subBox = function( box_id ) {
-    return new no.Box( box_id, this.subPath( box_id ) );
+    return new no.Box( box_id, this.params );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -208,50 +200,40 @@ no.View.prototype.onrepaint = no.pe;
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
+    @param {string} id
     @param {no.Update} update
     @return {Object}
 */
-no.View.prototype.getLayoutTree = function(update) {
-    var layout = update.layout;
+no.View.getLayoutTree = function(id, update) {
 
-    function viewTree(id, path, tree) {
-        var viewLayout = no.View.getInfo(id).layout;
-
-        if (no.object.isEmpty( viewLayout )) { // Обычный блок, без подблоков или боксов.
-            tree[id] = true;
-        } else {
-            tree = tree[id] = {};
-
-            for (var view_id in viewLayout) {
-                var type = viewLayout[ view_id ];
-
-                if (type === null) { // box.
-                    boxTree( view_id, path, tree );
-                } else { // view.
-                    tree[ view_id ] = type;
-                }
-            }
-        }
-    }
-
-    function boxTree(id, path, tree) {
-        tree = tree[ id ] = {};
-
-        var boxPath = path + '/' + id;
-
-        var views = layout[ boxPath ];
-        for (var i = 0, l = views.length; i < l; i++) {
-            var view_id = views[i];
-            var viewPath = boxPath + '/' + view_id;
-
-            viewTree( view_id, viewPath, tree );
-        }
-    }
+    var pLayout = update.layout; // page layout.
+    var vLayout = no.View.getInfo(id).layout; // view layout.
 
     var tree = {};
-    viewTree( this.id, this.path, tree );
+
+    if (no.object.isEmpty( vLayout )) { // Обычный блок, без подблоков или боксов.
+        tree[id] = true;
+    } else {
+        var subtree = tree[id] = {};
+
+        for (var view_id in vLayout) {
+            var type = vLayout[ view_id ];
+            subtree[ view_id ] = (type === null) ? boxTree( view_id, id ) : no.View.getLayoutTree( view_id, update );
+        }
+    }
 
     return tree;
+
+    function boxTree(box_id, view_id) {
+        var tree = {};
+
+        var views = pLayout[ view_id ][ box_id ];
+        for (var i = 0, l = views.length; i < l; i++) {
+            var id = views[i];
+            tree[id] = no.View.getLayoutTree(id, update);
+        }
+    }
+
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -268,12 +250,12 @@ no.View.prototype.getLayoutTree = function(update) {
     @param {Array} trees
 */
 no.View.prototype.getUpdateTrees = function(update, trees) {
-    if (this.needUpdate(update)) {
-        trees.push( this.getLayoutTree(update) );
+    if ( this.needUpdate(update) ) {
+        trees.push( no.view.getLayoutTree( this.id, update ) );
     } else {
-        this.processChildren( function(view) {
+        this.processChildren(function(view) {
             view.getUpdateTrees(update, trees);
-        } );
+        });
     }
 };
 
@@ -290,10 +272,9 @@ no.View.prototype.update = function(node, update, replace) {
         if (!this.node) { return; }
     }
 
-    var views = this.views;
-    for (var view_id in views) {
-        views[ view_id ].view.update(node, update, false);
-    }
+    this.processChildren(function(view) {
+        view.update(node, update, false);
+    });
 
     if (replace) {
         no.replaceNode(this.node, node);
@@ -316,24 +297,21 @@ no.View.prototype.processTree = function(callback) {
     var r = callback(this);
     if (r === false) { return; }
 
-    var views = this.views;
-    for (var view_id in views) {
-        var view = views[ view_id ].view;
+    this.processChildren(function(view) {
         view.processTree(callback);
-    }
+    });
 };
 
 /**
     Применяем переданный callback ко всем "детям" блока.
     Т.е. к непосредственным потомкам этого блока.
 
-    @param {function(no.View|no.Box)} callback
+    @param {function((no.View|no.Box))} callback
 */
 no.View.prototype.processChildren = function(callback) {
     var views = this.views;
     for (var view_id in views) {
-        var view = views[ view_id ].view;
-        callback(view);
+        callback( views[ view_id ] );
     }
 };
 

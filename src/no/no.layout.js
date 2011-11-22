@@ -46,10 +46,7 @@ no.layout.get = function(id) {
         }
 
         for (var key in raw) {
-            var value = raw[key];
-            if (value) {
-                compiled[key] = no.array(value);
-            }
+            compiled[key] = no.array( raw[key] );
         }
 
         no.layout._compiled[id] = compiled;

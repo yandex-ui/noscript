@@ -45,8 +45,13 @@ no.layout.get = function(id) {
             delete raw[ '..' ];
         }
 
-        for (var key in raw) {
-            compiled[key] = no.array( raw[key] );
+        for (var view_id in raw) {
+            var boxes = compiled[ view_id ] || (( compiled[ view_id ] = {} ));
+
+            var raw_boxes = raw[ view_id ];
+            for (var box_id in raw_boxes) {
+                boxes[ box_id ] = no.array( raw_boxes[ box_id ] );
+            }
         }
 
         no.layout._compiled[id] = compiled;

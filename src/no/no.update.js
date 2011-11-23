@@ -25,7 +25,7 @@ no.Update.id = 0;
 no.Update.prototype.prepare = function() {
     this.requests = {};
 
-    var tree = this.tree = this.view.getLayoutTree(this);
+    var tree = this.tree = no.View.getLayoutTree( this.view.id, this );
 
     var params = this.params;
 

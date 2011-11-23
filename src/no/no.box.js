@@ -1,11 +1,13 @@
 /**
     @constructor
     @param {string} id
-    @param {string} path
+    @param {!Object} params
+    @param {no.View} parent
 */
-no.Box = function(id, path) {
+no.Box = function(id, params, parent) {
     this.id = id;
-    this.path = path;
+    this.params = params;
+    this.parent = parent;
 
     /** @type { Object.<string, no.View> } */
     this.archive = {};
@@ -24,19 +26,10 @@ no.Box = function(id, path) {
 
 /**
     @param {string} view_id
-    @return {string}
-*/
-no.Box.prototype.subPath = function( view_id ) {
-    return this.path + '/' + view_id;
-};
-
-/**
-    @param {string} view_id
-    @param {Object} params
     @return {no.View}
 */
-no.Box.prototype.subView = function( view_id, params ) {
-    return no.View.make( view_id, this.subPath( view_id ), params );
+no.Box.prototype.subView = function(view_id, params) {
+    return no.View.make( view_id, params, this );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -100,7 +93,7 @@ no.Box.prototype.updateCurrent = function(node, update) {
 
     var archive = this.archive;
 
-    var views = update.layout[ this.path ];
+    var views = update.layout[ this.parent.id ][ this.id ];
     var content = no.View.ids2keys(views, params);
     var contentKeys = no.array.toObject(content);
 
@@ -159,7 +152,7 @@ no.Box.prototype.needUpdate = function(update) {
     var current = this.current;
     if (!current) { return true; }
 
-    var content = no.View.ids2keys( update.layout[ this.path ], update.params );
+    var content = no.View.ids2keys( update.layout[ this.parent.id ][ this.path ], update.params );
 
     return ( content.join('|') !== current.join('|') );
 };
@@ -173,7 +166,7 @@ no.Box.prototype.getUpdateTrees = function(update, trees) {
     var archive = this.archive;
     var params = update.params;
 
-    var content_ids = update.layout[ this.path ];
+    var content_ids = update.layout[ this.parent.id ][ this.path ];
     var content_keys = no.View.ids2keys( content_ids, params );
 
     for (var i = 0, l = content_keys.length; i < l; i++) {

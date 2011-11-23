@@ -2,10 +2,12 @@
     @constructor
     @param {string} id          Уникальный id класса. Важно! Это не id инстанса, у всех блоков этого класса один id.
     @param {!Object} params     Параметры блока (участвуют при построении ключа).
+    @param {no.View=} parent    Родительский view.
 */
-no.View = function(id, params) {
+no.View = function(id, params, parent) {
     this.id = id;
     this.params = params;
+    this.parent = parent || null;
 
     var info = this.info = no.View.getInfo(id);
 
@@ -16,15 +18,8 @@ no.View = function(id, params) {
     for (var view_id in layout) {
         var type = layout[ view_id ];
 
-        var view = (type === null) ? this.subBox( view_id ) : this.subView( view_id );
+        var view = (type === null) ? this.subBox( view_id, params ) : this.subView( view_id, params );
         views[ view_id ] = view;
-        /*
-        // FIXME
-        {
-            type: type,
-            view: view
-        };
-        */
     }
 
     /** @type {Element} */
@@ -108,13 +103,13 @@ no.View.getInfo = function(id) {
 
 /**
     @param {string} view_id
-    @param {Object} params
+    @param {!Object} params
     @return {no.View}
 */
-no.View.make = function( view_id, params ) {
+no.View.make = function(view_id, params, parent) {
     var class_ = no.View._classes[ view_id ];
 
-    return new class_( view_id, params );
+    return new class_( view_id, params, parent );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -123,16 +118,17 @@ no.View.make = function( view_id, params ) {
     @param {string} view_id
     @return {no.View}
 */
-no.View.prototype.subView = function( view_id ) {
-    return no.View.make( view_id, this.params );
+no.View.prototype.subView = function(view_id) {
+    return no.View.make( view_id, this.params, this );
 };
 
 /**
     @param {string} box_id
+    @param {!Object} params
     @return {no.Box}
 */
-no.View.prototype.subBox = function( box_id ) {
-    return new no.Box( box_id, this.params );
+no.View.prototype.subBox = function(box_id, params) {
+    return new no.Box( box_id, params, this );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -207,31 +203,39 @@ no.View.prototype.onrepaint = no.pe;
 no.View.getLayoutTree = function(id, update) {
 
     var pLayout = update.layout; // page layout.
-    var vLayout = no.View.getInfo(id).layout; // view layout.
 
     var tree = {};
-
-    if (no.object.isEmpty( vLayout )) { // Обычный блок, без подблоков или боксов.
-        tree[id] = true;
-    } else {
-        var subtree = tree[id] = {};
-
-        for (var view_id in vLayout) {
-            var type = vLayout[ view_id ];
-            subtree[ view_id ] = (type === null) ? boxTree( view_id, id ) : no.View.getLayoutTree( view_id, update );
-        }
-    }
+    tree[id] = viewTree(id);
 
     return tree;
 
-    function boxTree(box_id, view_id) {
+    function viewTree(id) {
+        var vLayout = no.View.getInfo(id).layout; // view layout.
+
+        if (no.object.isEmpty( vLayout )) { // Обычный блок, без подблоков или боксов.
+            return true;
+        } else {
+            var tree = {};
+
+            for (var view_id in vLayout) {
+                var type = vLayout[ view_id ];
+                tree[ view_id ] = (type === null) ? boxTree( view_id, id ) : viewTree( view_id );
+            }
+
+            return tree;
+        }
+    }
+
+    function boxTree(id, parent_id) {
         var tree = {};
 
-        var views = pLayout[ view_id ][ box_id ];
+        var views = pLayout[ parent_id ][ id ];
         for (var i = 0, l = views.length; i < l; i++) {
-            var id = views[i];
-            tree[id] = no.View.getLayoutTree(id, update);
+            var view_id = views[i];
+            tree[ view_id ] = viewTree( view_id );
         }
+
+        return tree;
     }
 
 };
@@ -251,7 +255,7 @@ no.View.getLayoutTree = function(id, update) {
 */
 no.View.prototype.getUpdateTrees = function(update, trees) {
     if ( this.needUpdate(update) ) {
-        trees.push( no.view.getLayoutTree( this.id, update ) );
+        trees.push( no.View.getLayoutTree( this.id, update ) );
     } else {
         this.processChildren(function(view) {
             view.getUpdateTrees(update, trees);

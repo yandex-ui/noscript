@@ -62,3 +62,9 @@ no.replaceNode = function(oldNode, newNode) {
     oldNode.parentNode.replaceChild(newNode, oldNode);
 };
 
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.todo = function() {
+    throw new Error('Unimplemented');
+};
+

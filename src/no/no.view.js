@@ -71,7 +71,7 @@ no.View.register = function(id, info, class_) {
     var keyParams = {};
     for (var i = 0, l = info.models.length; i < l; i++) {
         var model_id = info.models[i];
-        no.extend( keyParams, no.Model.getInfo( model_id ).params );
+        no.extend( keyParams, no.Model.info( model_id ).params );
     }
 
     var layout = info.layout = info.layout || {};

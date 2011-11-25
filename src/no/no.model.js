@@ -5,72 +5,94 @@
 /**
     @constructor
     @param {string} id
-    @param {no.Model.type_info} info
+    @param {Object} params
+    @param {Object=} data
 */
-no.Model = function(id, info) {
-    this.id = id;
-    this.info = info;
+no.Model = function(id, params, data) {
+    this.init(id, params, data);
+};
 
-    /** @type { Object.<string, no.Model.type_cacheItem> } */
-    this._cache = {};
+/**
+    @param {string} id
+    @param {Object} params
+    @param {Object=} data
+*/
+no.Model.init = function(id, params, data) {
+    this.id = id;
+    this.params = params;
+
+    this.setData(data);
+
+    this.info = no.Model._infos[id];
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @typedef {{
-        data: Object,
-        timestamp: number,
-        params: !Object
-    }}
-*/
-no.Model.type_cacheItem;
+// Typedefs.
 
 /**
     @typedef {function(
         new:no.Model,
         string,
-        no.Model.type_info
+        Object,
+        Object=
     )}
 */
-no.Model.type_create;
+no.Model.type_class;
 
 /**
     @typedef {{
-        params: !Object
+        id: string,
+        keyParams: Object,
+        reqParams: Object
     }}
 */
 no.Model.type_info;
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/** @type { Object.<string, no.Model.type_create> } */
+/** @type { Object.<string, no.Model.type_class> } */
 no.Model._classes = {};
 
 /** @type { Object.<string, no.Model.type_info> } */
 no.Model._infos = {};
 
-/** @type { Object.<string, no.Model> } */
-no.Model._instances = {};
-
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
-    @param {string} id
-    @param {no.Model.type_info=} info
-    @param {no.Model.type_create=} class_
-    @return {no.Model}
+    @param {string | no.Model.type_info} info
+    @param {no.Model.type_class=} class_
 */
-no.Model.register = function(id, info, class_) {
-    info = info || {};
+no.Model.register = function(info, class_) {
+    if (typeof info === 'string') {
+        info = {
+            'id': info
+        };
+    }
+
+    var keyParams = info.keyParams = info.keyParams || {};
+    info.reqParams = info.reqParams || keyParams;
+
+    info.keysOrder = no.object.keys(keyParams).sort();
+
+    var id = info.id;
 
     no.Model._infos[id] = info;
     no.Model._classes[id] = class_ || no.Model;
 
-    info.params = info.params || {};
-    info.retries = info.retries || 3;
+    no.Cache.register(id, info);
+};
 
-    info._keyParams = no.object.keys(info.params).sort();
+/**
+    @param {string} id
+    @param {Object} params
+    @param {Object=} data
+    @return {no.Model}
+*/
+no.Model.create = function(id, params, data) {
+    var class_ = no.Model._classes[id];
+
+    return new class_(id, params, data);
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -79,42 +101,37 @@ no.Model.register = function(id, info, class_) {
     @param {string} id
     @return {no.Model.type_info}
 */
-no.Model.getInfo = function(id) {
+no.Model.info = function(id) {
     return no.Model._infos[id];
-};
-
-/**
-    @param {string} id
-    @return {no.Model}
-*/
-no.Model.get = function(id) {
-    var model = no.Model._instances[id];
-
-    if (!model) {
-        var info = no.Model._infos[id];
-        var class_ = no.Model._classes[id];
-        model = no.Model._instances[id] = new class_(id, info);
-    }
-
-    return model;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
-    @param {!Object} params
     @return {string}
 */
-no.Model.prototype.getKey = function(params) {
-    var defaultParams = this.info.params;
-    var keyParams = this.info._keyParams;
+no.Model.prototype.key = function() {
+    return no.Model.key( this.id, this.params, this.info );
+};
+
+/**
+    @param {string} id
+    @param {!Object} params
+    @param {no.Model.type_info=} info
+    @return {string}
+*/
+no.Model.key = function(id, params, info) {
+    info || ( info = no.Model._infos[id] );
+
+    var keyParams = info.keyParams;
+    var keysOrder = info.keysOrder;
 
     var key = 'model=' + this.id;
 
-    for (var i = 0, l = keyParams.length; i < l; i++) {
-        var pName = keyParams[i];
-        var pValue = params[pName];
-        if (pValue && pValue !== defaultParams[pName]) {
+    for (var i = 0, l = keysOrder.length; i < l; i++) {
+        var pName = keysOrder[i];
+        var pValue = params[pName] || keyParams[pName];
+        if (pValue) {
             key += '&' + pName + '=' + pValue;
         }
     }
@@ -124,159 +141,39 @@ no.Model.prototype.getKey = function(params) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @param {string} key
-    @return {no.Model.type_cacheItem}
-*/
-no.Model.prototype.getRawCache = function(key) {
-    return this._cache[key];
+no.Model.prototype.get = function(path) {
+    return no.path.get( this.data, path );
 };
 
-/**
-    @param {!Object} params
-    @return {no.Model.type_cacheItem}
-*/
-no.Model.prototype.getRawCacheByParams = function(params) {
-    var key = this.getKey(params);
-    return this._cache[key];
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {string} key
-    @return {Object}
-*/
-no.Model.prototype.getCache = function(key) {
-    var cached = this._cache[key];
-    if (cached) {
-        return cached.data;
+no.Model.prototype.set = function(path, value, options) {
+    var oldValue = no.path.set( this.data, path, value );
+    if ( !options.silent && !no.isEqual( value, oldValue ) ) {
+        this.trigger( 'change', {
+            path: path,
+            before: oldValue,
+            after: value
+        });
     }
 };
 
-/**
-    @param {!Object} params
-    @return {Object}
-*/
-no.Model.prototype.getCacheByParams = function(params) {
-    var key = this.getKey(params);
-    return this.getCache(key);
+no.Model.prototype.getData = function() {
+    return this.data;
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {string} key
-    @return {(boolean|undefined)}
-*/
-no.Model.prototype.isCached = function(key) {
-    var cached = this._cache[key];
-    if (!cached) { return; } // undefined означает, что кэша нет вообще никакого, а false, что есть, но уже неактуальный.
-
-
-    var maxage = this.info.maxage; // Время жизни кэша в милисекундах. После прошествии этого времени, кэш будет считаться невалидным.
-    if (maxage) {
-        var now = +new Date();
-        var timestamp = cached.timestamp;
-
-        if (now - timestamp > maxage) { return false; }
-    }
-
-    return true;
-};
-
-/**
-    @param {string} key
-    @param {Object} data
-    @param {!Object} params
-    @param {number} timestamp
-    @param {boolean=} noforce Не трогать уже закэшированное значение.
-*/
-no.Model.prototype.setCache = function(key, data, params, timestamp, noforce) {
-    var cached = this._cache[key];
-    var force = !noforce;
-
-    if (!cached) {
-        this._cache[key] = {
-            data: data,
-            timestamp: timestamp,
-            params: params
-        };
-    } else if (force) { // Если force, то перезаписываем существующий кэш.
-        cached.data = data;
-        cached.timestamp = timestamp;
-        // cached.params не перезаписываем никогда, т.к. они не могут измениться.
-    }
-
-    this.onsetcache(key, data, params); // Возможность что-нибудь сделать с новым значением кэша.
-};
-
-no.Model.prototype.onsetcache = no.pe;
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {string} key
-*/
-no.Model.prototype.unCache = function(key) {
-    delete this._cache[key];
-};
-
-/**
-    @param {function(string, no.Model.type_cacheItem) boolean=} condition
-*/
-no.Model.prototype.clearCache = function(condition) {
-    if (condition) {
-        var cache = this._cache;
-        for (var key in cache) {
-            if (condition(key, cache[key])) {
-                this.unCache(key);
-            }
-        }
-    } else {
-        this._cache = {};
+no.Model.prototype.setData = function(data) {
+    if (data) {
+        this.data = this.processData(data);
+        this.trigger( 'change', {} ); // FIXME
     }
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {string} key
-    @param {number=} timestamp
-*/
-no.Model.prototype.touch = function(key, timestamp) {
-    timestamp = timestamp || +new Date();
-
-    if (key) {
-        var cached = this._cache[key];
-        if (cached) {
-            cached.timestamp = timestamp;
-        }
-    } else {
-        var cache = this._cache;
-        for (var item_key in cache) {
-            cache[item_key].timestamp = timestamp;
-        }
-    }
+no.Model.prototype.processData = function(data) {
+    return data;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @param {Object} data
-    @return {boolean}
-*/
-no.Model.prototype.hasErrors = function(data) {
-    return !!(data && data.error);
+no.Model.prototype.processParams = function(params) {
+    return params;
 };
-
-/**
-    @param {Object} error
-    @return {boolean}
-*/
-no.Model.prototype.needRetry = function(error) {
-    return true;
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
 

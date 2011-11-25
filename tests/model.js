@@ -39,7 +39,7 @@ test("Генерация ключа", function() {
             params: { id: 3, name: "Vasya Pupkin" }
         }
     );
-    info = no.Model.getInfo(id);
+    info = no.Model.info(id);
     instance = new no.Model(id, info);
 
     equal(instance.getKey({}), "model=for_test", "Пустой набор параметров: параметры не передаются вообще");

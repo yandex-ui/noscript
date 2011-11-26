@@ -13,7 +13,7 @@ no.Path = function(path) {
 
 no.Path._cache = {};
 
-no.Path.compile = function(path) {
+no.Path._compile = function(path) {
     var compiled = no.Path._cache[path];
 
     if (!compiled) {
@@ -40,15 +40,15 @@ no.Path.compile = function(path) {
 };
 
 no.Path.prototype.get = function(obj) {
-    var getter = this.getter;
+    var getter = this._getter;
     if (!getter) {
-        getter = no.Path.compile( this.path );
+        getter = this._getter = no.Path._compile( this.path );
     }
     return getter(obj);
 };
 
 no.Path.prototype.set = function(obj, value) {
-    var setter = this.setter;
+    var setter = this._setter;
     if (!setter) {
         var path = this.path;
         var r = /^(.*)(?:\[(\d+)\]|\.([\w-]+))$/.exec(path);
@@ -63,6 +63,7 @@ no.Path.prototype.set = function(obj, value) {
                 path.get(obj)[index] = value;
             }
         }
+        this._setter = setter;
     }
     setter(obj, value);
 };

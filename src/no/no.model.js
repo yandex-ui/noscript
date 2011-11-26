@@ -178,3 +178,130 @@ no.Model.prototype.processParams = function(params) {
     return params;
 };
 
+// ----------------------------------------------------------------------------------------------------------------- //
+// Кэширующие метода для no.Model.
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.Model._cache = {};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @typedef {{
+        model: no.Model,
+        timestamp: number
+    }}
+*/
+no.Model.type_cacheItem;
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.Model.register = function(id, info) {
+    no.Model._cache[id] = {};
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} id                  id модели.
+    @param {string|Object} key          key или params.
+    @return {no.Model.type_cacheItem}   Возвращает соответствующую запись в кэше или null.
+*/
+no.Model.getRaw = function(id, key) {
+    var key = (typeof key === 'string') ? key : no.Model.key(id, key);
+
+    return no.Model._cache[id].items[key] || null;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} id
+    @param {string|Object} key
+    @return {no.Model}
+*/
+no.Model.get = function(id, key) {
+    var cached = no.Model.getRaw(id, key);
+    if (cached) {
+        return cached.model;
+    }
+
+    return null;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} id
+    @param {string|Object} key
+    @return {(boolean|undefined)}
+*/
+no.Model.isCached = function(id, key) {
+    var cached = no.Model.getRaw(id, key);
+    if (!cached) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
+
+    var maxage = cached.model.maxage; // Время жизни модели в милисекундах. После прошествии этого времени, модель будет считаться невалидной.
+    if (maxage) {
+        var now = +new Date();
+        var timestamp = cached.timestamp;
+
+        if (now - timestamp > maxage) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {no.Model} model
+    @param {number} timestamp
+*/
+no.Model.set = function(model, timestamp) {
+    var id = model.id;
+    var key = model.key;
+
+    timestamp || ( timestamp = +new Date() );
+
+    var items = no.Model._cache[id].items;
+
+    if (!items[key]) {
+        items[key] = {
+            model: model,
+            timestamp: timestamp
+        };
+    } else {
+        cached.model.setData( model.data );
+        cached.timestamp = timestamp;
+    }
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    @param {string} id
+    @param {string} key
+*/
+no.Model.destroy = function(id, key) {
+    delete no.Model._cache[id].items[key];
+};
+
+/**
+    @param {string} id
+    @param {function(no.Model) boolean=} condition
+*/
+no.Model.clear = function(id, condition) {
+    if (condition) {
+        var items = no.Model._cache[id];
+        for (var key in items) {
+            if (condition( items[key].model )) {
+                no.Model.destroy(id, key);
+            }
+        }
+    } else {
+        no.Model._cache[id].items = {};
+    }
+};
+

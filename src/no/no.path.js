@@ -1,4 +1,4 @@
-no.path = function(data, path, value) {
+no.path = function(path, data, value) {
     var path = new no.Path(path);
     if (value) {
         path.set(data, value);
@@ -60,7 +60,10 @@ no.Path.prototype.set = function(obj, value) {
             var path = new no.Path(r[1]);
             var index = r[2] || r[3];
             setter = function(obj, value) {
-                path.get(obj)[index] = value;
+                obj = path.get(obj);
+                if (obj) {
+                    obj[index] = value;
+                }
             }
         }
         this._setter = setter;

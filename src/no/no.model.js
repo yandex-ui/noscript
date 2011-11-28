@@ -175,6 +175,8 @@ no.Model.prototype.set = function(path, value, options) {
     }
 };
 
+// ----------------------------------------------------------------------------------------------------------------- //
+
 no.Model.prototype.getData = function() {
     return this.data;
 };
@@ -187,7 +189,7 @@ no.Model.prototype.setData = function(data, options) {
         this.data = this.preprocessData(data);
 
         // FIXME: Копипаст из set().
-        if (!no.object.isEqual(data, oldData)) {
+        if ( oldData != null && !no.object.isEqual(data, oldData) ) {
             this._changes.push({
                 path: '',
                 before: oldData,

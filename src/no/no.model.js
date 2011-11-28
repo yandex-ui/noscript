@@ -137,6 +137,16 @@ no.Model.key = function(id, params, info) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
+no.Model.prototype.getStatus = function() {
+    return !!this.data;
+};
+
+no.Model.prototype.invalidate = function() {
+    this.data = null;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
 no.Model.prototype.get = function(path) {
     return no.path.get( path, this.data );
 };
@@ -166,6 +176,7 @@ no.Model.prototype.setData = function(data) {
     if (data) {
         this.data = this.preprocessData(data);
     }
+    // FIXME: Тут где-то нужно вызывать this.change().
 };
 
 no.Model.prototype.preprocessData = function(data) {
@@ -208,7 +219,7 @@ no.Model.prototype.change = function() {
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
-// Кэширующие метода для no.Model.
+// Кэширующие методы для no.Model.
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Model._cache = {};
@@ -256,7 +267,7 @@ no.Model.get = function(id, key) {
 
 /**
     @param {no.Model} model
-    @param {number} timestamp
+    @param {number=} timestamp
 */
 no.Model.set = function(model, timestamp) {
     var id = model.id;
@@ -266,13 +277,14 @@ no.Model.set = function(model, timestamp) {
 
     var items = no.Model._cache[id].items;
 
-    if (!items[key]) {
+    var cached = items[key];
+    if (!cached) {
         items[key] = {
             model: model,
             timestamp: timestamp
         };
-    } else {
-        cached.model.setData( model.data );
+    } else { // FIXME: А может нужно просто менять модель на новую и все?
+        cached.model.data = model.data;
         cached.timestamp = timestamp;
     }
 };
@@ -288,7 +300,7 @@ no.Model.getStatus = function(id, key) {
     var cached = no.Model.getRaw(id, key);
     if (!cached) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
 
-    return !!this.data;
+    return cached.model.getStatus();
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

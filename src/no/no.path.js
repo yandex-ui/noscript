@@ -2,12 +2,6 @@
 // no.Path
 // ------------------------------------------------------------------------------------------------------------- //
 
-/*  TODO:
-
-  * Поддержать пути вида 'foo.bar[]' -- [] означают push.
-
-*/
-
 /**
     @constructor
     @param {string} path    Строка, описывающая путь в объекте (нечто вроде xpath'а), например 'foo.bar[3]'.
@@ -113,16 +107,16 @@ no.Path._getter = function(path) {
     if (!compiled) {
         var body = '';
 
-        // Предположим, path = 'foo.bar[2].boo'
-        // Разбиваем его на компоненты: [ 'foo', 'bar', 2, 'boo' ].
+        // Предположим, path = 'foo.bar[2]'
+        // Разбиваем его на компоненты: [ 'foo', 'bar', 2 ].
         var parts = path.replace(/\]/g, '').split(/\.|\[/);
         if (!parts[0]) { parts.shift(); } // Если path начинается на [...], то parts[0] === ''.
 
         for (var i = 0, l = parts.length; i < l; i++) {
             var part = parts[i];
 
-            var value = (/^[0-9]/.test(part)) ? 'obj[' + part + ']' : 'obj["' + part + '"]'; // Строка вида 'obj[3]' или 'obj["foo"]'.
-            body += 'obj = ' + value + '; if (!obj) { return obj; }';
+            var value = (/^[0-9]/.test(part)) ? 'obj[' + part + ']' : 'obj["' + part + '"]'; // Строка вида obj[3] или obj['foo'].
+            body += 'obj = ' + value + '; if (obj == null) { return obj; }';
         }
         body += 'return obj;';
 
@@ -142,34 +136,55 @@ no.Path._setter = function(path) {
     var compiled = no.Path._setters[path];
 
     if (!compiled) {
-        var body = 'var obj_;';
+        var body = 'var obj_, l;';
 
         // Предположим, path = 'foo.bar[3]'
         // Разбиваем его на компоненты: [ 'foo', 'bar', 3 ].
         var parts = path.replace(/\]/g, '').split(/\.|\[/);
         if (!parts[0]) { parts.shift(); } // Если path начинается на [...], то parts[0] === ''.
 
+        // Компоненты означают следующее:
+        //      число:          индекс в массиве, например, [23].
+        //      строка:         ключ в объекте, например ['foo'].
+        //      пустая строка:  вставка в конец массива, например, [].
+
         var l = parts.length;
-        for (var i = 1; i < l; i++) {
+        for (var i = 1; i < l; i++) { // Обрабатываем все компоненты, кроме последней.
             var part = parts[i - 1];
             var next = parts[i];
 
             var value = getValue(part);
-            var empty = (/^[0-9]/.test(next)) ? '[]' : '{}';
+            var empty = (!next || /^[0-9]/.test(next)) ? '[]' : '{}';
 
-            body += 'obj_ = ' + value + '; obj = (obj_ == null) ? ' + value + ' = ' + empty + ' : obj_; ';
+            if (!part) { // Добавляем вычисление длинны текущего массива.
+                body += 'l = obj.length;';
+            }
+            // Делаем шаг. Если получился null или undefined, создаем пустой объект или массив
+            // (в зависимости от типа следующего шага).
+            body += 'obj_ = ' + value + ';';
+            body += 'obj = (obj_ == null) ? ' + value + ' = ' + empty + ' : obj_;';
         }
-        var value = getValue( parts[l - 1] );
-        body += 'var old = ' + value + '; ';
-        body += value + ' = value; ';
-        body += 'return old;';
+        // Последний компонент, собственно уже запись значения в объект, полученный выше.
+        var part = parts[l - 1];
+        var value = getValue(part);
+        if (!part) {
+            body += 'l = obj.length;';
+        }
+        body += 'var old = ' + value + ';'; // Сохраняем старое значение.
+        body += value + ' = value;'; // Меняем значение.
+        body += 'return old;'; // Возвращаем старое значение.
 
         compiled = no.Path._setters[path] = new Function('obj', 'value', body);
     }
 
+    // Строка, представляющая доступ к объекту по ключу или к массиву по индексу.
     function getValue(part) {
-        return (/^[0-9]/.test(part)) ? 'obj[' + part + ']' : 'obj["' + part + '"]'; // Строка вида 'obj[3]' или 'obj["foo"]'.
+        if (!part) { // Индекс не задан. Добавляем в конец массива.
+            return 'obj[l]';
+        }
+        return (/^[0-9]/.test(part)) ? 'obj[' + part + ']' : 'obj["' + part + '"]'; // Строка вида obj[3] или obj['foo'].
     }
 
     return compiled;
 };
+

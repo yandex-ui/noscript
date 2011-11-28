@@ -20,16 +20,13 @@ no.Model = function(id, params, data) {
 no.Model.prototype.init = function(id, params, data) {
     this.id = id;
     this.params = params;
-
     this.setData(data);
 
     var info = this.info = no.Model._infos[id];
 
-    if (info.maxage) {
-        this.maxage = info.maxage;
-    }
-
     this.key = no.Model.key(id, params, info);
+
+    this._changes = [];
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -86,7 +83,7 @@ no.Model.register = function(info, class_) {
     no.Model._infos[id] = info;
     no.Model._classes[id] = class_ || no.Model;
 
-    no.cache.register(id, info);
+    no.Model._cache[id] = {};
 };
 
 /**
@@ -141,19 +138,23 @@ no.Model.key = function(id, params, info) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Model.prototype.get = function(path) {
-    return no.path.get( this.data, path );
+    return no.path.get( path, this.data );
 };
 
 no.Model.prototype.set = function(path, value, options) {
-    var oldValue = no.path.set( this.data, path, value );
-    if ( !options.silent && !no.isEqual( value, oldValue ) ) {
-        /*
-        this.trigger( 'change', {
+    options || ( options = {} );
+
+    var oldValue = no.path( path, this.data, value );
+
+    if (!no.object.isEqual( value, oldValue )) {
+        this._changes.push({
             path: path,
             before: oldValue,
             after: value
         });
-        */
+        if (!options.silent) {
+            this.change();
+        }
     }
 };
 
@@ -163,12 +164,11 @@ no.Model.prototype.getData = function() {
 
 no.Model.prototype.setData = function(data) {
     if (data) {
-        this.data = this.processData(data);
-        // this.trigger( 'change', {} ); // FIXME
+        this.data = this.preprocessData(data);
     }
 };
 
-no.Model.prototype.processData = function(data) {
+no.Model.prototype.preprocessData = function(data) {
     return data;
 };
 
@@ -176,6 +176,35 @@ no.Model.prototype.processData = function(data) {
 
 no.Model.prototype.processParams = function(params) {
     return params;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.Model.prototype.getReqParams = function() {
+    var params = this.params;
+
+    var reqParams = this.info.reqParams;
+    var reqParams_ = {};
+
+    for (var pName in reqParams) {
+        var pValue = params[pName];
+        if (reqParams[pName] === true && pValue == null) { // true означает, что параметр обязательный.
+            return null;
+        }
+        reqParams_[pName] = pValue;
+    }
+
+    return reqParams_;
+};
+
+no.Model.prototype.change = function() {
+    var changes = this._changes;
+    this._changes = [];
+
+    no.events.trigger('model.change', {
+        key: this.key,
+        changes: changes
+    });
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -193,12 +222,6 @@ no.Model._cache = {};
     }}
 */
 no.Model.type_cacheItem;
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-no.Model.register = function(id, info) {
-    no.Model._cache[id] = {};
-};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -232,30 +255,6 @@ no.Model.get = function(id, key) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
-    @param {string} id
-    @param {string|Object} key
-    @return {(boolean|undefined)}
-*/
-no.Model.isCached = function(id, key) {
-    var cached = no.Model.getRaw(id, key);
-    if (!cached) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
-
-    var maxage = cached.model.maxage; // Время жизни модели в милисекундах. После прошествии этого времени, модель будет считаться невалидной.
-    if (maxage) {
-        var now = +new Date();
-        var timestamp = cached.timestamp;
-
-        if (now - timestamp > maxage) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
     @param {no.Model} model
     @param {number} timestamp
 */
@@ -282,26 +281,40 @@ no.Model.set = function(model, timestamp) {
 
 /**
     @param {string} id
-    @param {string} key
+    @param {string|Object} key
+    @return {(boolean|undefined)}
 */
-no.Model.destroy = function(id, key) {
-    delete no.Model._cache[id].items[key];
+no.Model.getStatus = function(id, key) {
+    var cached = no.Model.getRaw(id, key);
+    if (!cached) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
+
+    return !!this.data;
 };
 
-/**
-    @param {string} id
-    @param {function(no.Model) boolean=} condition
-*/
-no.Model.clear = function(id, condition) {
-    if (condition) {
-        var items = no.Model._cache[id];
-        for (var key in items) {
-            if (condition( items[key].model )) {
-                no.Model.destroy(id, key);
-            }
-        }
-    } else {
-        no.Model._cache[id].items = {};
-    }
-};
+// ----------------------------------------------------------------------------------------------------------------- //
+
+// /**
+//     @param {string} id
+//     @param {string} key
+// */
+// no.Model.destroy = function(id, key) {
+//     delete no.Model._cache[id].items[key];
+// };
+// 
+// /**
+//     @param {string} id
+//     @param {function(no.Model) boolean=} condition
+// */
+// no.Model.clear = function(id, condition) {
+//     if (condition) {
+//         var items = no.Model._cache[id];
+//         for (var key in items) {
+//             if (condition( items[key].model )) {
+//                 no.Model.destroy(id, key);
+//             }
+//         }
+//     } else {
+//         no.Model._cache[id].items = {};
+//     }
+// };
 

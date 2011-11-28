@@ -2,6 +2,13 @@
 // no.Model
 // ----------------------------------------------------------------------------------------------------------------- //
 
+/*  TODO:
+
+  * Непонятно, как апдейтить несколько разных моделей и не генерить события для всех этих изменений.
+  * Garbage collector.
+
+*/
+
 /**
     @constructor
     @param {string} id
@@ -137,7 +144,7 @@ no.Model.key = function(id, params, info) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-no.Model.prototype.getStatus = function() {
+no.Model.prototype.isValid = function() {
     return !!this.data;
 };
 
@@ -152,7 +159,7 @@ no.Model.prototype.get = function(path) {
 };
 
 no.Model.prototype.set = function(path, value, options) {
-    options || ( options = {} );
+    options || ( options = {}; );
 
     var oldValue = no.path( path, this.data, value );
 
@@ -172,11 +179,25 @@ no.Model.prototype.getData = function() {
     return this.data;
 };
 
-no.Model.prototype.setData = function(data) {
+no.Model.prototype.setData = function(data, options) {
+    options || ( options = {}; );
+
     if (data) {
+        var oldData = this.data;
         this.data = this.preprocessData(data);
+
+        // FIXME: Копипаст из set().
+        if (!no.object.isEqual(data, oldData)) {
+            this._changes.push({
+                path: '',
+                before: oldData,
+                after: data
+            });
+            if (!options.silent) {
+                this.change();
+            }
+        }
     }
-    // FIXME: Тут где-то нужно вызывать this.change().
 };
 
 no.Model.prototype.preprocessData = function(data) {
@@ -296,37 +317,10 @@ no.Model.set = function(model, timestamp) {
     @param {string|Object} key
     @return {(boolean|undefined)}
 */
-no.Model.getStatus = function(id, key) {
+no.Model.isValid = function(id, key) {
     var cached = no.Model.getRaw(id, key);
     if (!cached) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
 
-    return cached.model.getStatus();
+    return cached.model.isValid();
 };
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-// /**
-//     @param {string} id
-//     @param {string} key
-// */
-// no.Model.destroy = function(id, key) {
-//     delete no.Model._cache[id].items[key];
-// };
-// 
-// /**
-//     @param {string} id
-//     @param {function(no.Model) boolean=} condition
-// */
-// no.Model.clear = function(id, condition) {
-//     if (condition) {
-//         var items = no.Model._cache[id];
-//         for (var key in items) {
-//             if (condition( items[key].model )) {
-//                 no.Model.destroy(id, key);
-//             }
-//         }
-//     } else {
-//         no.Model._cache[id].items = {};
-//     }
-// };
 

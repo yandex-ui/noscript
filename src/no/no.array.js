@@ -55,3 +55,15 @@ no.array.firstMatch = function(array, condition) {
     return -1;
 };
 
+// ------------------------------------------------------------------------------------------------------------- //
+
+no.array.map = function(array, callback) {
+    var r = [];
+
+    for (var i = 0, l = array.length; i < l; i++) {
+        r.push( callback( array[i] ) );
+    }
+
+    return r;
+};
+

@@ -27,6 +27,8 @@ no.Model = function(id, params, data) {
 no.Model.prototype.init = function(id, params, data) {
     this.id = id;
     this.params = params;
+
+    this.reset();
     this.setData(data);
 
     var info = this.info = no.Model._infos[id];
@@ -34,6 +36,23 @@ no.Model.prototype.init = function(id, params, data) {
     this.key = no.Model.key(id, params, info);
 
     this._changes = [];
+};
+
+no.Model.prototype.reset = function() {
+    this.data = null;
+    this.error = null;
+    /*
+        Возможные варианты status:
+
+            'none'          данные еще не загружались
+            'loading'       данные загружаются в данный момент
+            'failed'        данные загрузились с ошибкой, нужен retry
+            'error'         данные загрузились с ошибкой, retry невозможен
+            'ok'            данные загрузились успешно
+    */
+    this.status = 'none';
+    this.retries = 0;
+    this.requests = 0;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -145,23 +164,25 @@ no.Model.key = function(id, params, info) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Model.prototype.isValid = function() {
-    return !!this.data;
-};
-
-no.Model.prototype.invalidate = function() {
-    this.data = null;
+    return ( this.status === 'ok' );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Model.prototype.get = function(path) {
-    return no.path.get( path, this.data );
+    var data = this.data;
+    if (data) {
+        return no.path.get( path, this.data );
+    }
 };
 
 no.Model.prototype.set = function(path, value, options) {
+    var data = this.data;
+    if (!data) { return; }
+
     options || ( options = {}; );
 
-    var oldValue = no.path( path, this.data, value );
+    var oldValue = no.path( path, data, value );
 
     if (!no.object.isEqual( value, oldValue )) {
         this._changes.push({
@@ -214,6 +235,7 @@ no.Model.prototype.processParams = function(params) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
+// TODO: Закэшировать результат этого вызова?
 no.Model.prototype.getReqParams = function() {
     var params = this.params;
 
@@ -267,7 +289,7 @@ no.Model.type_cacheItem;
 no.Model.getRaw = function(id, key) {
     var key = (typeof key === 'string') ? key : no.Model.key(id, key);
 
-    return no.Model._cache[id].items[key] || null;
+    return no.Model._cache[key] || null;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -298,16 +320,15 @@ no.Model.set = function(model, timestamp) {
 
     timestamp || ( timestamp = +new Date() );
 
-    var items = no.Model._cache[id].items;
-
-    var cached = items[key];
+    var cached = no.Model._cache[key];
     if (!cached) {
-        items[key] = {
+        no.Model._cache[key] = {
             model: model,
             timestamp: timestamp
         };
-    } else { // FIXME: А может нужно просто менять модель на новую и все?
-        cached.model.data = model.data;
+    } else {
+        cached.model.data = model.data; // FIXME: А может нужно просто менять модель на новую и все?
+                                        // FIXME: А может нужно экстендить/мержить data, а не заменять?
         cached.timestamp = timestamp;
     }
 };

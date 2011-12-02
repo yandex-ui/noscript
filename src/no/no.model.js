@@ -108,8 +108,6 @@ no.Model.register = function(info, class_) {
 
     no.Model._infos[id] = info;
     no.Model._classes[id] = class_ || no.Model;
-
-    no.Model._cache[id] = {};
 };
 
 /**
@@ -180,7 +178,7 @@ no.Model.prototype.set = function(path, value, options) {
     var data = this.data;
     if (!data) { return; }
 
-    options || ( options = {}; );
+    options || ( options = {} );
 
     var oldValue = no.path( path, data, value );
 
@@ -203,7 +201,7 @@ no.Model.prototype.getData = function() {
 };
 
 no.Model.prototype.setData = function(data, options) {
-    options || ( options = {}; );
+    options || ( options = {} );
 
     if (data) {
         var oldData = this.data;
@@ -230,7 +228,7 @@ no.Model.prototype.preprocessData = function(data) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Model.prototype.processParams = function(params) {
-    return params;
+    // Do nothing.
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -345,5 +343,21 @@ no.Model.isValid = function(id, key) {
     if (!cached) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
 
     return cached.model.isValid();
+};
+
+no.Model.prototype.canRetry = function(error) {
+    return ( this.retries < 3 );
+};
+
+no.Model.prototype.extractData = function(result) {
+    if (result) {
+        return result.result;
+    }
+};
+
+no.Model.prototype.extractError = function(result) {
+    if (result) {
+        return result.error;
+    }
 };
 

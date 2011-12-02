@@ -41,7 +41,7 @@ no.Request.prototype.ungroup = function() {
         var models = group.models;
         var params = group.params;
 
-        for (var j = 0, l = models.length; j < l; j++) {
+        for (var j = 0, m = models.length; j < m; j++) {
             var model_id = models[j];
 
             var model = no.Model.get( model_id, params );
@@ -61,17 +61,17 @@ no.Request.prototype.ungroup = function() {
 
     for (var i = 0, l = uncached.length; i < l; i++) {
         var item = uncached[i];
-        var id = item.id;
+        var model_id = item.model_id;
 
-        var model = no.Model.get( id, item.params );
+        var model = no.Model.get( model_id, item.params );
         if (!model) {
-            model = no.Model.create( id, item.params );
+            model = no.Model.create( model_id, item.params );
             no.Model.set(model);
         }
 
         var reqParams = model.getReqParams();
         if (reqParams) {
-            models.push(models);
+            models.push(model);
         } else {
             leftovers++;
         }
@@ -87,7 +87,7 @@ no.Request.prototype.ungroup = function() {
 // ------------------------------------------------------------------------------------------------------------- //
 
 no.Request.prototype.requestModels = function(models) {
-    var request = new no.Requst.Models(models);
+    var request = new no.Request.Models(models);
     return request.start();
 };
 
@@ -134,7 +134,9 @@ no.Request.Models.prototype.start = function() {
         }
     }
 
-    return this.request(loading, requesting);
+    this.request(loading, requesting);
+
+    return this.promise;
 };
 
 no.Request.Models.prototype.request = function(loading, requesting) {
@@ -143,7 +145,7 @@ no.Request.Models.prototype.request = function(loading, requesting) {
     var l = requesting.length;
     if (l) {
         var params = no.Request.Models.models2params(requesting);
-        promises.push( no.http('/models/', params) ); // FIXME: Урл к серверной ручке.
+        all.push( no.http('/models/', params) ); // FIXME: Урл к серверной ручке.
     }
 
     if (loading.length) {
@@ -156,12 +158,12 @@ no.Request.Models.prototype.request = function(loading, requesting) {
     if (all.length) { // Либо нужно запросить какие-то ключи, либо дождаться ответа от предыдущих запросов.
         var that = this;
         no.Promise.wait(all).then(function(r) { // В r должен быть массив из одного или двух элементов.
-                                                 // Если мы делали http-запрос, то в r[0] должен быть его результат.
+                                                // Если мы делали http-запрос, то в r[0] должен быть его результат.
             if (l) { // Мы на самом деле делали http-запрос.
-                that.extractData(requesting, r[0]);
+                that.extract(requesting, r[0]);
             }
-            that.request(); // "Повторяем" запрос. Если какие-то ключи не пришли, они будут перезапрошены.
-                            // Если же все получено, то будет выполнен метод done().
+            that.start(); // "Повторяем" запрос. Если какие-то ключи не пришли, они будут перезапрошены.
+                          // Если же все получено, то будет выполнен метод done().
         });
 
     } else {
@@ -185,33 +187,36 @@ no.Request.Models.models2params = function(models) {
             }
         }
 
-        params[ '_models' + suffix ] = model.id;
+        params[ '_model' + suffix ] = model.id;
     }
 
     return params;
 };
 
-no.Request.Models.prototype.extractData = function(models, data) {
+no.Request.Models.prototype.extract = function(models, results) {
     var timestamp = +new Date();
 
     for (var i = 0, l = models.length; i < l; i++) {
         var model = models[i];
-        var mData = data[i];
+        var result = results[i];
 
-        if (!mData) { // Данные вообще не пришли или пришел null и т.д.
+        if (!result) {
             model.error = {
                 id: 'NO_DATA',
                 reason: 'Server returned no data'
             };
-            model.status = 'error';
-        } else if (mData.error) {
-            model.error = mData.error;
-            model.status = 'error';
-        } else {
-            model.data = mData.result;
-            model.status = 'ok';
-        }
+            model.status = 'failed';
 
+        } else {
+            var data = model.extractData(result);
+            if (data) {
+                model.data = data;
+                model.status = 'ok';
+            } else {
+                model.error = model.extractError(result);
+                model.status = 'failed';
+            }
+        }
         model.promise.resolve();
     }
 };

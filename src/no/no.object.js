@@ -8,7 +8,7 @@ no.object = {};
     @param {!Object} obj
     @return {Array.<string>} Возвращает список всех ключей объекта.
 */
-no.object.keys = function(obj) {
+no.object.keys = Object.keys || function(obj) {
     var keys = [];
 
     for (var key in obj) {

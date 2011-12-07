@@ -102,7 +102,7 @@ no.Model.register = function(info, class_) {
     var keyParams = info.keyParams = info.keyParams || {};
     info.reqParams = info.reqParams || keyParams;
 
-    info.keysOrder = no.object.keys(keyParams).sort();
+    info.keysOrder = no.object.keys(keyParams).sort(); // Отсортированные ключи нужны для того, чтобы в ключе параметры были всегда в одной и той же последовательности.
 
     var id = info.id;
 
@@ -170,7 +170,7 @@ no.Model.prototype.isValid = function() {
 no.Model.prototype.get = function(path) {
     var data = this.data;
     if (data) {
-        return no.path.get( path, this.data );
+        return no.path.get( path, data );
     }
 };
 

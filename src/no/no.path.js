@@ -55,7 +55,7 @@ no.Path._setters = {};
 no.path = function(path, obj, value) {
     var path = new no.Path(path);
     if (value !== undefined) {
-        path.set(obj, value);
+        return path.set(obj, value);
     } else {
         return path.get(obj);
     }

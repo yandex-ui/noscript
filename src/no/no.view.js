@@ -105,9 +105,10 @@ no.View.info = function(id) {
 /**
     @param {string} view_id
     @param {!Object} params
+    @param {no.View=} parent
     @return {no.View}
 */
-no.View.make = function(view_id, params, parent) {
+no.View.create = function(view_id, params, parent) {
     var class_ = no.View._classes[ view_id ];
 
     return new class_( view_id, params, parent );
@@ -120,7 +121,7 @@ no.View.make = function(view_id, params, parent) {
     @return {no.View}
 */
 no.View.prototype.subView = function(view_id) {
-    return no.View.make( view_id, this.params, this );
+    return no.View.create( view_id, this.params, this );
 };
 
 /**
@@ -179,11 +180,17 @@ no.View.prototype.needUpdate = function(update) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.View.prototype.hide = function() {
-    this.node.style.display = 'none';
+    var node = this.node;
+    if (node) {
+        node.style.display = 'none';
+    }
 };
 
 no.View.prototype.show = function() {
-    this.node.style.display = '';
+    var node = this.node;
+    if (node) {
+        node.style.display = '';
+    }
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

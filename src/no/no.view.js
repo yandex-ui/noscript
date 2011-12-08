@@ -9,7 +9,7 @@ no.View = function(id, params, parent) {
     this.params = params;
     this.parent = parent || null;
 
-    var info = this.info = no.View.getInfo(id);
+    var info = this.info = no.View.info(id);
 
     /** @type { Object.<string, { type, view: no.View }> } */
     var views = this.views = {};
@@ -36,7 +36,7 @@ no.View = function(id, params, parent) {
         !Object
     )}
 */
-no.View.Create;
+no.View.type_class;
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -46,39 +46,40 @@ no.View.Create;
         models: Object
     }}
 */
-no.View.Info;
+no.View.type_info;
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/** @type { Object.<string, no.View.Info> } */
+/** @type { Object.<string, no.View.type_info> } */
 no.View._infos = {};
 
-/** @type { Object.<string, no.View.Create> } */
+/** @type { Object.<string, no.View.type_class> } */
 no.View._classes = {};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
     @param {string} id
-    @param {no.View.Info=} info
-    @param {no.View.Create=} class_
+    @param {no.View.type_info=} info
+    @param {no.View.type_class=} class_
 */
 no.View.register = function(id, info, class_) {
     info = info || {};
+    class_ = class_ || no.View;
 
     var models = info.models = info.models || [];
 
     var keyParams = {};
     for (var i = 0, l = info.models.length; i < l; i++) {
         var model_id = info.models[i];
-        no.extend( keyParams, no.Model.info( model_id ).params );
+        no.extend( keyParams, no.Model.info( model_id ).keyParams );
     }
 
     var layout = info.layout = info.layout || {};
 
     for (var view_id in layout) {
         if (layout[ view_id ] !== null) { // Это не box.
-            var viewParams = no.View.getInfo( view_id )._keyParams;
+            var viewParams = no.View.info( view_id )._keyParams;
             for (var i = 0, l = viewParams.length; i < l; i++) {
                 keyParams[ viewParams[i] ] = true;
             }
@@ -88,15 +89,15 @@ no.View.register = function(id, info, class_) {
     info._keyParams = no.object.keys(keyParams).sort();
 
     no.View._infos[id] = info;
-    no.View._classes[id] = class_ || no.View;
+    no.View._classes[id] = class_;
 };
 
 /**
     @param {string} id
-    @return {no.View.Info}
+    @return {no.View.type_info}
 */
-no.View.getInfo = function(id) {
-    return no.View._infos[id] || {};
+no.View.info = function(id) {
+    return no.View._infos[id];
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -104,9 +105,10 @@ no.View.getInfo = function(id) {
 /**
     @param {string} view_id
     @param {!Object} params
+    @param {no.View=} parent
     @return {no.View}
 */
-no.View.make = function(view_id, params, parent) {
+no.View.create = function(view_id, params, parent) {
     var class_ = no.View._classes[ view_id ];
 
     return new class_( view_id, params, parent );
@@ -119,7 +121,7 @@ no.View.make = function(view_id, params, parent) {
     @return {no.View}
 */
 no.View.prototype.subView = function(view_id) {
-    return no.View.make( view_id, this.params, this );
+    return no.View.create( view_id, this.params, this );
 };
 
 /**
@@ -133,13 +135,17 @@ no.View.prototype.subBox = function(box_id, params) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
+no.View.prototype.getKey = function() {
+    return no.View.getKey( this.id, this.params, this.info );
+};
+
 /**
     @param {string} view_id
     @param {Object} params
     @return {string}
 */
-no.View.getKey = function(view_id, params) {
-    var info = no.View.getInfo(view_id);
+no.View.getKey = function(view_id, params, info) {
+    info || ( info = no.View.info(view_id) );
 
     var key = 'view=' + view_id;
 
@@ -174,11 +180,17 @@ no.View.prototype.needUpdate = function(update) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.View.prototype.hide = function() {
-    this.node.style.display = 'none';
+    var node = this.node;
+    if (node) {
+        node.style.display = 'none';
+    }
 };
 
 no.View.prototype.show = function() {
-    this.node.style.display = '';
+    var node = this.node;
+    if (node) {
+        node.style.display = '';
+    }
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -210,7 +222,7 @@ no.View.getLayoutTree = function(id, update) {
     return tree;
 
     function viewTree(id) {
-        var vLayout = no.View.getInfo(id).layout; // view layout.
+        var vLayout = no.View.info(id).layout; // view layout.
 
         if (no.object.isEmpty( vLayout )) { // Обычный блок, без подблоков или боксов.
             return true;
@@ -335,6 +347,28 @@ no.View.ids2keys = function(ids, params) {
         keys.push( no.View.getKey( ids[i], params ) );
     }
     return keys;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.view2model = {};
+
+no.view2model._cache = {};
+
+no.view2model.addModel = function(id, key) {
+
+};
+
+no.view2model.removeModel = function(id, key) {
+
+};
+
+no.view2model.addView = function(id, key) {
+
+};
+
+no.view2model.removeView = function(id, key) {
+
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

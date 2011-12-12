@@ -351,6 +351,13 @@ no.View.ids2keys = function(ids, params) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
+//  При описании view можно задать поле events в виде:
+//
+//  events: {
+//      'click a.foo': 'doFoo',
+//      'keyup': 'doKeyUp'
+//  }
+
 no.View.prototype.bindEvents = function() {
     var $node = this.$node;
 
@@ -362,17 +369,23 @@ no.View.prototype.bindEvents = function() {
     for (var event in events) {
         var method = events[event];
 
-        // event представляет собой строку вида 'click .foo .bar'.
+        // Делим строку с event на имя события и опциональный селектор.
         var parts = event.split(/\s/);
-        var name = parts.shift(); // name === 'click'.
-        var selector = parts.join(' '); // selector === '.foo .bar'.
+        var name = parts.shift();
+        var selector = parts.join(' ');
 
         var handler = function(e) {
-            var that[method].call( that, e );
+            that[method].call(that, e);
         };
 
-        $node.on(name, selector, handler);
+        // Вешаем событие.
+        if (selector) {
+            $node.on(name, selector, handler);
+        } else {
+            $node.on(name, handler);
+        }
 
+        // Запоминаем, что повесили, чтобы знать потом, что удалять в unbindEvents.
         attachedEvents.push({
             name: name,
             selector: selector,

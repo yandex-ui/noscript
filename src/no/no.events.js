@@ -2,7 +2,46 @@
 // no.events
 // ------------------------------------------------------------------------------------------------------------- //
 
-no.events = {};
+/**
+    Простейший pub/sub.
+
+    no.Events --- объект, который можно подмиксовать к любому другому объекту:
+
+        var foo = {};
+        no.extend( foo, no.Events );
+
+        foo.on('bar', function(e, data) {
+            console.log(e, data);
+        });
+
+        foo.trigger('bar', 42);
+
+    Или же:
+
+        function Foo() {}
+
+        no.extend( Foo.prototype, no.Events );
+
+        var foo = new Foo();
+
+        foo.on('bar', function(e, data) {
+            console.log(e, data);
+        });
+
+        foo.trigger('bar', 42);
+
+    Для общение с "космосом" есть специальный предопределенный объект no.events.
+    Через него нужно обмениваться сообщениями, не привязанными к какому-то конкретному инстансу объекта.
+
+        no.events.on('bar', function(e, data) {
+            console.log(e, data);
+        });
+
+        no.events.trigger('bar', 42);
+
+*/
+
+no.Events = {};
 
 // ------------------------------------------------------------------------------------------------------------- //
 
@@ -10,26 +49,7 @@ no.events = {};
     Тип для обработчиков событий.
     @typedef {function(string, *=)}
 */
-no.events.type_handler;
-
-// ------------------------------------------------------------------------------------------------------------- //
-
-/**
-    Внутренний кэш обработчиков событий.
-    @type {Object.<string, Array.<no.events.type_handler>>}
-*/
-no.events._handlers = {};
-
-/**
-    @type {number}
-*/
-no.events._hid = 1;
-
-/**
-    @type {string}
-    @const
-*/
-no.events._expando = '__events' + (+new Date());
+no.Events.type_handler;
 
 // ------------------------------------------------------------------------------------------------------------- //
 
@@ -38,14 +58,12 @@ no.events._expando = '__events' + (+new Date());
     Если еще ни одного обработчика не забинжено, возвращает (и сохраняет) пустой список.
 
     @param {string} name
-    @return {Array.<no.events.type_handler>}
+    @return {Array.<no.Events.type_handler>}
 */
-no.events._get = function(name) {
-    var handlers = no.events._handlers[name];
-    if (!handlers) {
-        handlers = no.events._handlers[name] = [];
-    }
-    return handlers;
+no.Events._getEventHandlers = function(name) {
+    var handlers = this._eventHandlers || (( this._eventHandlers = {} ));
+
+    return handlers[name] || (( handlers[name] = [] ));
 };
 
 // ------------------------------------------------------------------------------------------------------------- //
@@ -54,20 +72,10 @@ no.events._get = function(name) {
     Подписываем обработчик handler на событие name.
 
     @param {string} name
-    @param {no.events.type_handler} handler
+    @param {no.Events.type_handler} handler
 */
-no.events.on = function(name, handler) {
-    var handlers = no.events._get(name);
-
-    var hid = handler[ no.events._expando ];
-    if (!hid) {
-        handler[ no.events._expando ] = no.events._hid++;
-    } else {
-        var i = no.array.firstMatch(handlers, function(handler) { // Ищем этот обработчик среди уже подписанных.
-            return ( handler[ no.events._expando ] === hid );
-        });
-        if (i !== -1) { return; } // Этот обработчик уже подписан.
-    }
+no.Events.on = function(name, handler) {
+    var handlers = this._getEventHandlers(name);
 
     handlers.push(handler);
 };
@@ -77,22 +85,21 @@ no.events.on = function(name, handler) {
     Если не передать handler, то удалятся вообще все обработчики события name.
 
     @param {string} name
-    @param {no.events.type_handler=} handler
+    @param {no.Events.type_handler=} handler
 */
-no.events.off = function(name, handler) {
+no.Events.off = function(name, handler) {
     if (handler) {
-        var hid = handler[ no.events._expando ];
-
-        var handlers = no.events._get(name);
-        var i = no.array.firstMatch(handlers, function(handler) { // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
-            return ( handler._hid === hid );
-        });
+        var handlers = this._getEventHandlers(name);
+        var i = no.array.indexOf(handlers, handler); // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
 
         if (i !== -1) {
             handlers.splice(i, 1); // Нашли и удаляем этот обработчик.
         }
     } else {
-        delete no.events._handlers[name]; // Удаляем всех обработчиков этого события.
+        var handlers = this._eventHandlers;
+        if (handlers) {
+            delete handlers[name]; // Удаляем всех обработчиков этого события.
+        }
     }
 };
 
@@ -105,11 +112,17 @@ no.events.off = function(name, handler) {
     @param {string} name
     @param {*=} params
 */
-no.events.trigger = function(name, params) {
-    var handlers = no.events._get(name).slice(); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван off(),
-                                                 // то мы не потеряем вызов следующего обработчика.
+no.Events.trigger = function(name, params) {
+    var handlers = this._getEventHandlers(name).slice(); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван off(),
+                                                         // то мы не потеряем вызов следующего обработчика.
     for (var i = 0, l = handlers.length; i < l; i++) {
         handlers[i](name, params);
     }
 };
+
+// ------------------------------------------------------------------------------------------------------------- //
+
+// Создаем "космос" --- дефолтный канал для обмена сообщениями.
+
+no.events = no.extend( {}, no.Events );
 

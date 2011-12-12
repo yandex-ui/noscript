@@ -40,6 +40,27 @@ no.array.grep = function(array, filter) {
 
 // ------------------------------------------------------------------------------------------------------------- //
 
+if ( typeof Array.prototype.indexOf === 'function' ) {
+
+    no.array.indexOf = function(array, value) {
+        return array.indexOf(value);
+    };
+
+} else {
+
+    no.array.indexOf = function(array, value) {
+        for (var i = 0, l = array.length; i < l; i++) {
+            if ( array[i] === value ) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
+}
+
+// ------------------------------------------------------------------------------------------------------------- //
+
 /**
     @param {Array} array
     @param {function(*): boolean} condition

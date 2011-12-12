@@ -351,25 +351,49 @@ no.View.ids2keys = function(ids, params) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-no.view2model = {};
+/*
+// TODO: Заготовки для хранения связей view2model.
 
-no.view2model._cache = {};
+no.View._links = {};
 
-no.view2model.addModel = function(id, key) {
+no.View.add = function(view) {
+    var model_ids = view.info.models;
+    var params = this.params;
+
+    for (var i = 0, l = model_ids.length; i < l; i++) {
+        var model_id = model_ids[i];
+        var model = no.Model.get( model_id, params );
+
+        no.View._link(model, view);
+    }
+};
+
+no.View.remove = function(view) {
 
 };
 
-no.view2model.removeModel = function(id, key) {
+no.View._link = function(model, view) {
+    var model_id = model.id;
 
+    var links = no.View._links[ model_id ];
+    if (!links) {
+        views = no.View._links[ model_id ] = {};
+    }
+
+    links[ view.key ] = true;
 };
 
-no.view2model.addView = function(id, key) {
+no.View._unlink = function(model, view) {
+    var model_id = model.id;
 
+    var links = no.View._links[ model_id ];
+    delete links[ view.id ];
+    if ( no.object.empty(links) ) {
+        delete no.View._links[ model_id ];
+        // FIXME: Удалить модель.
+    }
 };
-
-no.view2model.removeView = function(id, key) {
-
-};
+*/
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

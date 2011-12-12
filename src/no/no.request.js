@@ -5,17 +5,26 @@
 no.Request = function(groups) {
     this.groups = groups;
     this.promise = new no.Promise();
+    this._leftovers = 0;
+    this._models_count = 0;
 };
 
 // ------------------------------------------------------------------------------------------------------------- //
 
 no.Request.prototype.start = function() {
     var ungrouped = this.ungroup();
-
     var models = ungrouped.models;
-    if (!models.length && ungrouped.leftovers) {
-        throw Error('Недостаточно параметров, чтобы сделать запрос'); // FIXME: Непонятно, что с этим дальше делать.
+
+    var leftovers_changed = (this._leftovers - ungrouped.leftovers) !== 0; // Количество моделей, которые мы пока не можем запросить, поменялось.
+    var models_number_changed = (this._models_count - models.length) !== 0; // Количество запрашиваемых моделей поменялось.
+
+    // Проверяем, поменялось ли что-то после последнего запроса моделей.
+    if (!models_number_changed && !leftovers_changed) {
+        this.promise.resolve();
+        return this.promise;
     }
+    this._leftovers = ungrouped.leftovers;
+    this._models_count = models.length;
 
     var that = this;
     this.requestModels(models).then(function() {
@@ -45,7 +54,7 @@ no.Request.prototype.ungroup = function() {
             var model_id = models[j];
 
             var model = no.Model.get( model_id, params );
-            if ( model && model.isValid() ) {
+            if ( model && model.isValid() ) { // Модели, которые уже есть в кэше и валидны - запрашивать не надо.
                 model.processParams(params);
             } else {
                 uncached.push({
@@ -69,7 +78,7 @@ no.Request.prototype.ungroup = function() {
             no.Model.set(model);
         }
 
-        var reqParams = model.getReqParams();
+        var reqParams = model.getReqParams(); // Модель может быть запрошена тогда, когда для её запроса есть всё необходимые параметры.
         if (reqParams) {
             models.push(model);
         } else {
@@ -81,7 +90,6 @@ no.Request.prototype.ungroup = function() {
         models: models, // Модели, которые нужно/можно запросить сейчас.
         leftovers: leftovers // То, что по причине отсутствия необходимых параметров, отложено на следующий проход.
     };
-
 };
 
 // ------------------------------------------------------------------------------------------------------------- //

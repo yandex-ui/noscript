@@ -31,7 +31,7 @@ no.Update.prototype.prepare = function() {
 
     var that = this;
     no.Update.walkLeafs(tree, function(view_id, type) {
-        var models = no.View.getInfo( view_id ).models;
+        var models = no.View.info( view_id ).models;
         for (var i = 0, l = models.length; i < l; i++) {
             var model_id = models[i];
             var item = {

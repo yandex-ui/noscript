@@ -145,7 +145,7 @@ no.View.prototype.getKey = function() {
     @return {string}
 */
 no.View.getKey = function(view_id, params, info) {
-    info || ( info = no.View.info(view_id) );
+    info || (( info = no.View.info(view_id) ));
 
     var key = 'view=' + view_id;
 
@@ -347,6 +347,50 @@ no.View.ids2keys = function(ids, params) {
         keys.push( no.View.getKey( ids[i], params ) );
     }
     return keys;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.View.prototype.bindEvents = function() {
+    var $node = this.$node;
+
+    var attachedEvents = this._attachedEvents = [];
+
+    var that = this;
+    var events = this.info.events || {};
+
+    for (var event in events) {
+        var method = events[event];
+
+        // event представляет собой строку вида 'click .foo .bar'.
+        var parts = event.split(/\s/);
+        var name = parts.shift(); // name === 'click'.
+        var selector = parts.join(' '); // selector === '.foo .bar'.
+
+        var handler = function(e) {
+            var that[method].call( that, e );
+        };
+
+        $node.on(name, selector, handler);
+
+        attachedEvents.push({
+            name: name,
+            selector: selector,
+            handler: handler
+        });
+    }
+};
+
+no.View.prototype.unbindEvents = function() {
+    var $node = this.$node;
+
+    var attachedEvents = this._attachedEvents = [];
+
+    for (var event in attachedEvents) {
+        $node.off( event.name, event.selector, event.handler );
+    }
+
+    this._attachedEvents = null;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

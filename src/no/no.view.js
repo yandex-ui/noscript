@@ -145,7 +145,7 @@ no.View.prototype.getKey = function() {
     @return {string}
 */
 no.View.getKey = function(view_id, params, info) {
-    info || ( info = no.View.info(view_id) );
+    info || (( info = no.View.info(view_id) ));
 
     var key = 'view=' + view_id;
 
@@ -347,6 +347,67 @@ no.View.ids2keys = function(ids, params) {
         keys.push( no.View.getKey( ids[i], params ) );
     }
     return keys;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+//  При описании view можно задать поле events в виде:
+//
+//  events: {
+//      'click a.foo': 'doFoo',
+//      'keyup': function(e) { ... }
+//  }
+
+no.View.prototype.bindEvents = function() {
+    var $node = this.$node;
+
+    var attachedEvents = this._attachedEvents = [];
+
+    var that = this;
+    var events = this.info.events || {};
+
+    for (var event in events) {
+        // Метод -- это либо строка с именем нужного метода, либо же функция.
+        var method = events[event];
+        if (typeof method === 'string') {
+            method = that[method];
+        }
+
+        // Делим строку с event на имя события и опциональный селектор.
+        var parts = event.split(/\s/);
+        var name = parts.shift();
+        var selector = parts.join(' ');
+
+        var handler = function(e) {
+            return method.call(that, e);
+        };
+
+        // Вешаем событие.
+        if (selector) {
+            $node.on(name, selector, handler);
+        } else {
+            $node.on(name, handler);
+        }
+
+        // Запоминаем, что повесили, чтобы знать потом, что удалять в unbindEvents.
+        attachedEvents.push({
+            name: name,
+            selector: selector,
+            handler: handler
+        });
+    }
+};
+
+no.View.prototype.unbindEvents = function() {
+    var $node = this.$node;
+
+    var attachedEvents = this._attachedEvents = [];
+
+    for (var event in attachedEvents) {
+        $node.off( event.name, event.selector, event.handler );
+    }
+
+    this._attachedEvents = null;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

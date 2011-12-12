@@ -355,7 +355,7 @@ no.View.ids2keys = function(ids, params) {
 //
 //  events: {
 //      'click a.foo': 'doFoo',
-//      'keyup': 'doKeyUp'
+//      'keyup': function(e) { ... }
 //  }
 
 no.View.prototype.bindEvents = function() {
@@ -367,7 +367,11 @@ no.View.prototype.bindEvents = function() {
     var events = this.info.events || {};
 
     for (var event in events) {
+        // Метод -- это либо строка с именем нужного метода, либо же функция.
         var method = events[event];
+        if (typeof method === 'string') {
+            method = that[method];
+        }
 
         // Делим строку с event на имя события и опциональный селектор.
         var parts = event.split(/\s/);
@@ -375,7 +379,7 @@ no.View.prototype.bindEvents = function() {
         var selector = parts.join(' ');
 
         var handler = function(e) {
-            that[method].call(that, e);
+            return method.call(that, e);
         };
 
         // Вешаем событие.

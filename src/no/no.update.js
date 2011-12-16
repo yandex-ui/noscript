@@ -93,7 +93,7 @@ no.Update.prototype.request = function() {
                 for (var j = 0, m = group.models.length; j < m; j++) {
                     var model_id = group.models[j];
                     var key = no.Model.key(model_id, group.params);
-                    models[model_id] = no.Model.get(model_id, key);
+                    models[model_id] = no.Model.get(model_id, key).data;
                 }
             }
 

@@ -85,15 +85,18 @@ no.Update.prototype.request = function() {
 
             var tree = {
                 views: viewsTree,
-                models: {}
+                models: {},
+                params: {}
             };
             var models = tree.models;
+            var params = tree.params;
             for (var i = 0, l = groups.length; i < l; i++) {
                 var group = groups[i];
                 for (var j = 0, m = group.models.length; j < m; j++) {
                     var model_id = group.models[j];
                     var key = no.Model.key(model_id, group.params);
                     models[model_id] = no.Model.get(model_id, key).data;
+                    params[model_id] = group.params;
                 }
             }
 

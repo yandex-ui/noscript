@@ -66,7 +66,7 @@ no.Update.prototype.addItemToGroup = function(group_name, model_id, params) {
         group = ((this.groups[group_name] = { models: [], params: {} } ));
     }
 
-    group.models.push = model_id;
+    group.models.push(model_id);
     no.extend(group.params, params); // Расширяем параметры для запроса моделей.
 };
 
@@ -92,7 +92,8 @@ no.Update.prototype.request = function() {
                 var group = groups[i];
                 for (var j = 0, m = group.models.length; j < m; j++) {
                     var model_id = group.models[j];
-                    models[model_id] = no.Model.get(model_id).getCache( no.Model.key(model_id, group.params) );
+                    var key = no.Model.key(model_id, group.params);
+                    models[model_id] = no.Model.get(model_id, key);
                 }
             }
 

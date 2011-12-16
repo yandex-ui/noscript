@@ -29,7 +29,7 @@ no.Box = function(id, params, parent) {
     @return {no.View}
 */
 no.Box.prototype.subView = function(view_id, params) {
-    return no.View.make( view_id, params, this );
+    return no.View.create( view_id, params, this );
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -40,7 +40,7 @@ no.Box.prototype.subView = function(view_id, params) {
 */
 no.Box.prototype.update = function(node, update) {
     if (!this.status) {
-        var node = no.byClass('box-' + this.id, node)[0];
+        node = no.byClass('box-' + this.id, node)[0];
         if (!node) { return; }
 
         this.node = node;
@@ -152,7 +152,8 @@ no.Box.prototype.needUpdate = function(update) {
     var current = this.current;
     if (!current) { return true; }
 
-    var content = no.View.ids2keys( update.layout[ this.parent.id ][ this.path ], update.params );
+    var views = update.layout[ this.parent.id ][ this.id ];
+    var content = no.View.ids2keys(views, update.params);
 
     return ( content.join('|') !== current.join('|') );
 };
@@ -166,14 +167,15 @@ no.Box.prototype.getUpdateTrees = function(update, trees) {
     var archive = this.archive;
     var params = update.params;
 
-    var content_ids = update.layout[ this.parent.id ][ this.path ];
-    var content_keys = no.View.ids2keys( content_ids, params );
+    var views = update.layout[ this.parent.id ][ this.id ];
+    var content = no.View.ids2keys(views, update.params);
 
-    for (var i = 0, l = content_keys.length; i < l; i++) {
-        var key = content_keys[i];
+    for (var i = 0, l = content.length; i < l; i++) {
+        var view_id = views[i];
+        var key = content[i];
         var view = archive[key];
         if (!archive[key]) {
-            view = this.subView( content_ids[i], params );
+            view = this.subView( view_id, params );
         }
         view.getUpdateTrees(update, trees);
     }

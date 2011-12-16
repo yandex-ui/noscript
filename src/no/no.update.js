@@ -23,7 +23,7 @@ no.Update.id = 0;
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.prepare = function() {
-    this.requests = {};
+    this.groups = {};
 
     var tree = this.tree = no.View.getLayoutTree( this.view.id, this );
 
@@ -34,13 +34,7 @@ no.Update.prototype.prepare = function() {
         var models = no.View.info( view_id ).models;
         for (var i = 0, l = models.length; i < l; i++) {
             var model_id = models[i];
-            var item = {
-                model_id: model_id,
-                params: params,
-                key: no.Model.get( model_id ).getKey( params )
-            };
-
-            that.addItemToRequest('all', item);
+            that.addItemToGroup('all', model_id, params);
             // FIXME: Добавить item в lazy/nonlazy.
         }
     });
@@ -61,28 +55,30 @@ no.Update.walkLeafs = function(obj, callback) {
     }
 };
 
-
 /**
-    @param {boolean|string|undefined} type
-    @param {{ model_id: string, params: Object, key: string }} item
+    @param {string} group_name Group name.
+    @param {string} model_id Model identifier.
+    @param {Object} params Model get params.
 */
-no.Update.prototype.addItemToRequest = function(type, item) {
-    var items = this.requests[type];
-    if (!items) {
-        items = this.requests[type] = {};
+no.Update.prototype.addItemToGroup = function(group_name, model_id, params) {
+    var group = this.groups[group_name];
+    if (!group) {
+        group = ((this.groups[group_name] = { models: [], params: {} } ));
     }
 
-    items[ item.key ] = item;
+    group.models.push = model_id;
+    no.extend(group.params, params); // Расширяем параметры для запроса моделей.
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.request = function() {
-    var all = this.requests['all'];
-    var items = no.object.values(all);
+    var groups = no.object.values(this.groups);
 
     var that = this;
-    no.request(items).promise()
+    var req = new no.Request(groups);
+    req
+        .start()
         .then(function() {
             var viewsTree = [];
             that.view.getUpdateTrees(that, viewsTree);
@@ -92,11 +88,12 @@ no.Update.prototype.request = function() {
                 models: {}
             };
             var models = tree.models;
-            for (var i = 0, l = items.length; i < l; i++) {
-                var item = items[i];
-                var model_id = item.model_id;
-
-                models[model_id] = no.Model.get(model_id).getCache( item.key );
+            for (var i = 0, l = groups.length; i < l; i++) {
+                var group = groups[i];
+                for (var j = 0, m = group.models.length; j < m; j++) {
+                    var model_id = group.models[j];
+                    models[model_id] = no.Model.get(model_id).getCache( no.Model.key(model_id, group.params) );
+                }
             }
 
             // console.time('template');

@@ -34,7 +34,7 @@ no.Update.prototype.prepare = function() {
         var view_info = no.View.info( view_id );
         var models = view_info.models;
         if (view_info.async) {
-            that.createAsyncViewRequest(new no.View(view_id, params), params);
+            that.createAsyncViewRequest(view_id, params);
         } else {
             that.addItemsToMainRequest(models, params);
         }
@@ -76,13 +76,14 @@ no.Update.prototype.addItemsToMainRequest = function(model_ids, params) {
     @param {no.View} view View instance.
     @param {Object} params Model get params.
 */
-no.Update.prototype.createAsyncViewRequest = function(view, params) {
+no.Update.prototype.createAsyncViewRequest = function(view_id, params) {
     var request = {
-        view: view,
-        models: view.info.models,
+        view_id: view_id,
+        models: no.View.info(view_id).models,
         params: params
     };
-    var request_id = view.getKey(); // Использует view_id в качестве id запроса, чтобы избежать конфликтов с другими запросами.
+    var request_id = view_id;   // Использует view_id в качестве id запроса, чтобы избежать конфликтов с другими запросами.
+                                // XXX плохой выбор для request_id, могут быть конфликты
     this.requests[request_id] = request;
 };
 
@@ -109,8 +110,10 @@ no.Update.prototype.request = function() {
 
                 // Создаём no.Request на каждый асинхронный блок.
                 (function(req) {
+                    var view = no.View.get(req.view_id, req.params);
+                    view.invalidate(); // Поскольку мы уже отрендерили это view - надо его инвалидировать, т.к. релально данные ещё не запрашивались.
+
                     var async = new no.Request([ req ]);
-                    var view = req.view;
                     async
                         .start()
                         .then(function() {
@@ -174,7 +177,7 @@ no.Update.prototype.update = function(root_view, node) {
     var that = this;
     root_view.processTree(function(view) {
         if (view.needUpdate(that)) {
-            view.update(node, that, !!view.node); // Может быть у нас ещё нет ноды, вообще говоря. Как в случае с comments.
+            view.update(node, that, true);
             return false;
         }
     });

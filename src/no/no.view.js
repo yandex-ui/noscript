@@ -29,6 +29,12 @@ no.View = function(id, params, parent) {
     this.status;
 };
 
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.View._cache = {};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
 /**
     @typedef {function(
         new:no.View,
@@ -110,9 +116,15 @@ no.View.info = function(id) {
 */
 no.View.create = function(view_id, params, parent) {
     var class_ = no.View._classes[ view_id ];
-
-    return new class_( view_id, params, parent );
+    var view = new class_( view_id, params, parent );
+    no.View._cache[view.getKey()] = view;
+    return view;
 };
+
+no.View.get = function(id, params) {
+    var key = no.View.getKey(id, params);
+    return no.View._cache[key];
+}
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -284,7 +296,7 @@ no.View.prototype.getUpdateTrees = function(update, trees) {
 */
 no.View.prototype.update = function(node, update, replace) {
     if (!this.node) {
-        this.node = no.byClass( 'view-' + this.id, node )[0];
+        this.node = no.byClass( 'view-' + this.id, node )[0]; // XXX тут возможное поле для косяков: когда у нас нет this.node и replace = true
         if (!this.node) { return; }
     }
 
@@ -298,6 +310,12 @@ no.View.prototype.update = function(node, update, replace) {
 
     this.status = true;
 };
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.View.prototype.invalidate = function() {
+    this.status = false;
+}
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

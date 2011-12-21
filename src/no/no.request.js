@@ -29,8 +29,9 @@ no.Request.prototype.start = function() {
     var that = this;
     this.requestModels(models).then(function() {
         if (ungrouped.leftovers) { // Если после этого прохода остались незапрошенные данные -- повторяем процедуру.
-            that.start();
+            that.start(); // processParams вызывается внутри ungroup
         } else {
+            that.processParams([]);
             that.promise.resolve();
         }
     });
@@ -40,10 +41,8 @@ no.Request.prototype.start = function() {
 
 // ------------------------------------------------------------------------------------------------------------- //
 
-no.Request.prototype.ungroup = function() {
+no.Request.prototype.processParams = function(uncached) {
     var groups = this.groups;
-
-    var uncached = [];
     for (var i = 0, l = groups.length; i < l; i++) {
         var group = groups[i];
 
@@ -64,6 +63,11 @@ no.Request.prototype.ungroup = function() {
             }
         }
     }
+}
+
+no.Request.prototype.ungroup = function() {
+    var uncached = [];
+    this.processParams(uncached);
 
     var models = [];
     var leftovers = 0;

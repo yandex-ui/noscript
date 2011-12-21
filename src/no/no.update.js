@@ -34,7 +34,7 @@ no.Update.prototype.prepare = function() {
         var view_info = no.View.info( view_id );
         var models = view_info.models;
         if (view_info.async) {
-            that.createAsyncViewRequest(new no.View(view_id, params), models, params);
+            that.createAsyncViewRequest(new no.View(view_id, params), params);
         } else {
             that.addItemsToMainRequest(models, params);
         }
@@ -63,12 +63,13 @@ no.Update.walkLeafs = function(obj, callback) {
 no.Update.prototype.addItemsToMainRequest = function(model_ids, params) {
     var request_id = "all";
     var request = this.requests[request_id];
-    if (!request) {
-        request = ((this.requests[request_id] = { models: [], params: {} } ));
-    }
 
-    request.models = request.models.concat(model_ids);
-    no.extend(request.params, params); // Расширяем параметры для запроса моделей.
+    if (!request) {
+        request = ((this.requests[request_id] = { models: model_ids, params: params } ));
+    } else {
+        request.models = request.models.concat(model_ids);
+        no.extend(request.params, params); // Расширяем параметры для запроса моделей.
+    }
 };
 
 /**
@@ -79,7 +80,7 @@ no.Update.prototype.createAsyncViewRequest = function(view, params) {
     var request = {
         view: view,
         models: view.info.models,
-        params: no.extend({}, params)
+        params: params
     };
     var request_id = view.getKey(); // Использует view_id в качестве id запроса, чтобы избежать конфликтов с другими запросами.
     this.requests[request_id] = request;

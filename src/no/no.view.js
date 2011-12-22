@@ -254,6 +254,11 @@ no.View.getLayoutTree = function(id, update) {
         var tree = {};
 
         var views = pLayout[ parent_id ][ id ];
+
+        if (!views) {
+            return tree;
+        }
+
         for (var i = 0, l = views.length; i < l; i++) {
             var view_id = views[i];
             tree[ view_id ] = viewTree( view_id );
@@ -306,6 +311,7 @@ no.View.prototype.update = function(node, update, replace) {
 
     if (replace) {
         no.replaceNode(this.node, node);
+        this.node = node; // Не забываем обновить саму ссылку на узел.
     }
 
     this.status = true;

@@ -97,7 +97,7 @@ no.Box.prototype.updateCurrent = function(node, update) {
     var content = no.View.ids2keys(views, params);
     var contentKeys = no.array.toObject(content);
 
-    var current = no.array.grep(this.current, function(key) {
+    var current = no.array.grep(this.current, function(key) { // Проходим по текущему контенту и прячем все блоки, которые не должны отображаться в текущем layout.
         if (!(key in contentKeys)) {
             archive[key].hide();
             return false;

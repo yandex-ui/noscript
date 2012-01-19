@@ -110,13 +110,11 @@ no.Update.prototype.request = function() {
 
                 // Создаём no.Request на каждый асинхронный блок.
                 (function(req) {
-                    var view = no.View.get(req.view_id, req.params);
-                    view.invalidate(); // Поскольку мы уже отрендерили это view - надо его инвалидировать, т.к. релально данные ещё не запрашивались.
-
                     var async = new no.Request([ req ]);
                     async
                         .start()
                         .then(function() {
+                            var view = no.View.get(req.view_id, req.params);
                             that.render(view, async);
                         });
                 })(requests[key]);

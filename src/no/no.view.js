@@ -1,4 +1,17 @@
 /**
+    Enum for view status.
+    @enum {number}
+*/
+no.viewStatus = {
+    unknown: undefined,
+    ok: 1,
+    loading: 2,
+    error: 3,
+    failed: 4
+};
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
     @constructor
     @param {string} id          Уникальный id класса. Важно! Это не id инстанса, у всех блоков этого класса один id.
     @param {!Object} params     Параметры блока (участвуют при построении ключа).
@@ -25,7 +38,7 @@ no.View = function(id, params, parent) {
     /** @type {Element} */
     this.node;
 
-    /** @type {boolean|undefined} */
+    /** @type {no.viewStatus|undefined} */
     this.status;
 };
 
@@ -179,14 +192,14 @@ no.View.getKey = function(view_id, params, info) {
     @return {boolean}
 */
 no.View.prototype.isCached = function() {
-    return this.status;
+    return this.status === no.viewStatus.ok;
 };
 
 /**
     @return {boolean}
 */
 no.View.prototype.needUpdate = function(update) {
-    return !this.status;
+    return this.status !== no.viewStatus.ok;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -302,7 +315,9 @@ no.View.prototype.getUpdateTrees = function(update, trees) {
 no.View.prototype.update = function(node, update, replace) {
     if (!this.node) {
         this.node = no.byClass( 'view-' + this.id, node )[0]; // XXX тут возможное поле для косяков: когда у нас нет this.node и replace = true
-        if (!this.node) { return; }
+        if (!this.node) {
+            return;
+        }
     }
 
     this.processChildren(function(view) {
@@ -314,13 +329,19 @@ no.View.prototype.update = function(node, update, replace) {
         this.node = node; // Не забываем обновить саму ссылку на узел.
     }
 
-    this.status = true;
+    this.status = this._getStatus(update.params);
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
-
-no.View.prototype.invalidate = function() {
-    this.status = false;
+no.View.prototype._getStatus = function(params) {
+    var models = this.info.models;
+    for (var i = 0; i < models.length; i++) {
+        var model_id = models[i];
+        var key = no.Model.key(model_id, params);
+        if (!no.Model.get(model_id, key)) {
+            return no.viewStatus.loading;
+        }
+    }
+    return no.viewStatus.ok;
 }
 
 // ----------------------------------------------------------------------------------------------------------------- //

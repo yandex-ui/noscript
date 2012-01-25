@@ -18,6 +18,16 @@ no.viewStatus = {
     @param {no.View=} parent    Родительский view.
 */
 no.View = function(id, params, parent) {
+    this.init(id, params, parent);
+}
+
+/**
+    Метод инициализации view. Нужен такой отдельный метод, чтобы было проще наследоваться.
+    @param {string} id          Уникальный id класса. Важно! Это не id инстанса, у всех блоков этого класса один id.
+    @param {!Object} params     Параметры блока (участвуют при построении ключа).
+    @param {no.View=} parent    Родительский view.
+*/
+no.View.prototype.init = function(id, params, parent) {
     this.id = id;
     this.params = params;
     this.parent = parent || null;
@@ -40,6 +50,8 @@ no.View = function(id, params, parent) {
 
     /** @type {no.viewStatus|undefined} */
     this.status;
+
+    return this;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -318,15 +330,18 @@ no.View.prototype.update = function(node, update, replace) {
         if (!this.node) {
             return;
         }
+        this.bindEvents();
     }
 
     this.processChildren(function(view) {
         view.update(node, update, false);
     });
 
-    if (replace) {
+    if (replace && this.node !== node) {
+        this.unbindEvents();
         no.replaceNode(this.node, node);
         this.node = node; // Не забываем обновить саму ссылку на узел.
+        this.bindEvents();
     }
 
     this.status = this._getStatus(update.params);
@@ -404,7 +419,7 @@ no.View.ids2keys = function(ids, params) {
 //  }
 
 no.View.prototype.bindEvents = function() {
-    var $node = this.$node;
+    var $node = $(this.node);
 
     var attachedEvents = this._attachedEvents = [];
 
@@ -412,39 +427,41 @@ no.View.prototype.bindEvents = function() {
     var events = this.info.events || {};
 
     for (var event in events) {
-        // Метод -- это либо строка с именем нужного метода, либо же функция.
-        var method = events[event];
-        if (typeof method === 'string') {
-            method = that[method];
-        }
+        (function(event) {
+            // Метод -- это либо строка с именем нужного метода, либо же функция.
+            var method = events[event];
+            if (typeof method === 'string') {
+                method = that[method];
+            }
 
-        // Делим строку с event на имя события и опциональный селектор.
-        var parts = event.split(/\s/);
-        var name = parts.shift();
-        var selector = parts.join(' ');
+            // Делим строку с event на имя события и опциональный селектор.
+            var parts = event.split(/\s/);
+            var name = parts.shift();
+            var selector = parts.join(' ');
 
-        var handler = function(e) {
-            return method.call(that, e);
-        };
+            var handler = function(e) {
+                return method.call(that, e);
+            };
 
-        // Вешаем событие.
-        if (selector) {
-            $node.on(name, selector, handler);
-        } else {
-            $node.on(name, handler);
-        }
+            // Вешаем событие.
+            if (selector) {
+                $node.on(name, selector, handler);
+            } else {
+                $node.on(name, handler);
+            }
 
-        // Запоминаем, что повесили, чтобы знать потом, что удалять в unbindEvents.
-        attachedEvents.push({
-            name: name,
-            selector: selector,
-            handler: handler
-        });
+            // Запоминаем, что повесили, чтобы знать потом, что удалять в unbindEvents.
+            attachedEvents.push({
+                name: name,
+                selector: selector,
+                handler: handler
+            });
+        }(event));
     }
 };
 
 no.View.prototype.unbindEvents = function() {
-    var $node = this.$node;
+    var $node = $(this.node);
 
     var attachedEvents = this._attachedEvents = [];
 

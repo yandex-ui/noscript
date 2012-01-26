@@ -145,7 +145,7 @@ no.Update.prototype.render = function(view, request) {
     }
 
     // console.time('template');
-    var html = stylesheet( tree ); // FIXME: Нужно проверять, что update не нужен и ничего не делать.
+    var html = Yater.run( tree ); // FIXME: Нужно проверять, что update не нужен и ничего не делать.
     // console.timeEnd('template');
     var div = document.createElement('div');
     div.innerHTML = html;

@@ -113,7 +113,9 @@ no.Box.prototype.updateCurrent = function(node, update) {
         if (!view) {
             view = archive[key] = this.subView(view_id, params);
         }
-        view.update(node, update);
+        if (view.needUpdate()) {
+            view.update(node, update);
+        }
         view.show();
 
         this.node.appendChild(view.node);

@@ -333,9 +333,13 @@ no.View.prototype.update = function(node, update, replace) {
         this.bindEvents();
     }
 
-    this.processChildren(function(view) {
-        view.update(node, update, false);
-    });
+    this.processChildren(
+        (function(n,u){
+            return function(view) {
+                view.update(n, u, false);
+            };
+        }(node, update))
+    );
 
     if (replace && this.node !== node) {
         this.unbindEvents();
@@ -345,7 +349,19 @@ no.View.prototype.update = function(node, update, replace) {
     }
 
     this.status = this._getStatus(update.params);
+
+    this.afterUpdate();
 };
+
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    Вызывается сразу после того, как view обновлён.
+*/
+no.View.prototype.afterUpdate = function() {}
+
+// ----------------------------------------------------------------------------------------------------------------- //
 
 no.View.prototype._getStatus = function(params) {
     var models = this.info.models;

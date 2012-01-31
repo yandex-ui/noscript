@@ -79,12 +79,12 @@ no.Request.prototype.ungroup = function() {
         var model = no.Model.get( model_id, item.params );
         if (!model) {
             model = no.Model.create( model_id, item.params );
-            no.Model.set(model);
         }
 
         var reqParams = model.getReqParams(); // Модель может быть запрошена тогда, когда для её запроса есть всё необходимые параметры.
         if (reqParams) {
             models.push(model);
+            no.Model.set(model); // Модель можно запрашивать, поэтому мы уже можем построить для неё валидный ключ и можно её сохранить в кэше моделей.
         } else {
             leftovers++;
         }

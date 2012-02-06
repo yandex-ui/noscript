@@ -242,6 +242,8 @@ no.View.prototype.onhide = no.pe;
 
 no.View.prototype.onrepaint = no.pe;
 
+no.View.prototype.onready = no.pe;
+
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
@@ -348,22 +350,19 @@ no.View.prototype.update = function(node, update, replace) {
         this.bindEvents();
     }
 
-    this.status = this._getStatus(update.params);
+    this.status = this._getStatus(this.params);
+    if (this.status === no.viewStatus.ok) {
+        this.onready();
+    }
 
-    this.afterUpdate();
+    this.onrepaint();
 };
 
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    Вызывается сразу после того, как view обновлён.
-*/
-no.View.prototype.afterUpdate = function() {}
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
 no.View.prototype._getStatus = function(params) {
+
     var models = this.info.models;
     for (var i = 0; i < models.length; i++) {
         var model_id = models[i];

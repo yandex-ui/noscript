@@ -116,7 +116,7 @@ no.Events.trigger = function(name, params) {
     var handlers = this._getEventHandlers(name).slice(); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван off(),
                                                          // то мы не потеряем вызов следующего обработчика.
     for (var i = 0, l = handlers.length; i < l; i++) {
-        handlers[i](name, params);
+        handlers[i].call(this, name, params);
     }
 };
 

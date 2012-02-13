@@ -11,41 +11,74 @@ include('../src/no/no.promise.js');
 include('../src/no/no.model.js');
 
 // ----------------------------------------------------------------------------------------------------------------- //
-module("Регистрация новой модели");
+module("key");
 
-test("Модель без параметров", function() {
-    var model;
-    var id = "test_model";
-    var type_info = { params: null };
-    var create = function(model_id, type_info) {}
+test("Sorting", function() {
+    expect(2);
 
-    no.Model.register(id, type_info, create);
-    model = no.Model.get(id);
+    no.Model.register({
+        id: "first",
+        keyParams: {
+            "a": null,
+            "b": null
+        }
+    }, no.Model);
+    equal(no.Model.key("first", { a: 1, b: 3 }), "model=first&a=1&b=3", "Sorting: a first");
 
-    ok(model, "Модель может не иметь параметров");
+    no.Model.register({
+        id: "second",
+        keyParams: {
+            "b": null,
+            "a": null
+        }
+    }, no.Model);
+    equal(no.Model.key("second", { a: 1, b: 3 }), "model=second&a=1&b=3", "Sorting: a first");
+
+    // cleanup
+    no.Model._infos = {};
+    no.Model._classes = {};
 });
 
-// ----------------------------------------------------------------------------------------------------------------- //
-module("Ключ модели");
+test("Missing params", function() {
+    expect(2);
 
-test("Генерация ключа", function() {
-    var id = "for_test";
-    var info;
-    var instance;
-
-    no.Model.register(
-        id,
-        {
-            params: { id: 3, name: "Vasya Pupkin" }
+    no.Model.register({
+        id: "first",
+        keyParams: {
+            "a": null,
+            "b": null
         }
-    );
-    info = no.Model.info(id);
-    instance = new no.Model(id, info);
+    }, no.Model);
+    equal(no.Model.key("first", { a: 1 }), "model=first&a=1", "Key will be created using specified params, missing params are ignored");
 
-    equal(instance.getKey({}), "model=for_test", "Пустой набор параметров: параметры не передаются вообще");
-    equal(instance.getKey({ id: 3 }), "model=for_test", "Параметры со значениями по умолчанию не передаются");
-    equal(instance.getKey({ id2: 3 }), "model=for_test", "Только зарегистрированные параметры передаются");
+    no.Model.register({
+        id: "first",
+        keyParams: {
+            "a": null,
+            "b": null
+        }
+    }, no.Model);
+    equal(no.Model.key("first", { a: 1, c: 3 }), "model=first&a=1", "Only keyParams will be used in key");
 
-    equal(instance.getKey({ id: "3" }), "model=for_test&id=3", "Не поддерживается приведение типа для значений параметров");
-    equal(instance.getKey({ id: 4, name: "Hey" }), "model=for_test&id=4&name=Hey", "Если у параметра значение отличается от значения поумолчанию - он передаётся");
+    // cleanup
+    no.Model._infos = {};
+    no.Model._classes = {};
+});
+
+test("defaults", function() {
+    expect(4);
+
+    no.Model.register({
+        id: "first",
+        keyParams: {
+            "a": null,
+            "b": null,
+            "c": "hello"
+        }
+    }, no.Model);
+
+    equal(no.Model.key("first", { a: 1, b: 2 }), "model=first&a=1&b=2&c=hello", "Default value is placed in key, when parameter is not specified");
+    equal(no.Model.key("first", { a: 1, b: 2, c: null }), "model=first&a=1&b=2&c=hello", "Default value is used when parameter=null");
+    equal(no.Model.key("first", { a: 1, b: 2, c: undefined }), "model=first&a=1&b=2&c=hello", "Default value is used when parameter=undefined");
+    equal(no.Model.key("first", { a: 1, b: 2, c: 3 }), "model=first&a=1&b=2&c=3", "Default value is replaced in key, when parameter specified");
 });

@@ -88,3 +88,18 @@ no.array.map = function(array, callback) {
     return r;
 };
 
+no.array.equal = function(ar1, ar2) {
+    if (ar1 === ar2) {
+        return true;
+    }
+    if (ar1.length !== ar2.length) {
+        return false;
+    }
+    for (var i = 0; i < ar1.length; i++) {
+        if (ar1[i] !== ar2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+

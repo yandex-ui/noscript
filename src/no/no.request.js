@@ -193,7 +193,7 @@ no.Request.Models.models2params = function(models) {
 
         // Каждая модель прокидывает в params все свои параметры (кроме служебных вида _<name>).
         var mParams = model.getReqParams();
-        for (var key in model.params) {
+        for (var key in mParams) {
             if (!/^_/.test(key)) { // Служебные параметры (начинающиеся на '_') игнорируем.
                 params[ key + suffix ] = mParams[key];
             }

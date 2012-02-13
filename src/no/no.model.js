@@ -245,15 +245,25 @@ no.Model.prototype.getReqParams = function() {
     var reqParams_ = {};
 
     for (var pName in reqParams) {
+        var pDefaultValue = reqParams[pName];
         var pValue = params[pName];
-        if (reqParams[pName] === true && pValue == null) { // true означает, что параметр обязательный.
+
+        if (pDefaultValue === true && this._paramValueIsEmpty(pValue)) { // обязательный параметр должен быть указан (true означает, что параметр обязательный).
             return null;
         }
-        reqParams_[pName] = pValue;
+
+        var value = this._paramValueIsEmpty(pValue) ? pDefaultValue : pValue;
+        if (!this._paramValueIsEmpty(value)) {
+            reqParams_[pName] = value;
+        }
     }
 
     return reqParams_;
 };
+
+no.Model.prototype._paramValueIsEmpty = function(value) {
+    return value === null || value === undefined;
+}
 
 no.Model.prototype.change = function() {
     var changes = this._changes;

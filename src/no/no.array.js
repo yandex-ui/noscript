@@ -25,7 +25,7 @@ no.array.toObject = function(array) {
     @param {function} filter
     @return {Array}
 */
-no.array.grep = function(array, filter) {
+no.array.grep = function(array, filter) { // TODO это наверное всё-таки filter?
     var r = [];
 
     for (var i = 0, l = array.length; i < l; i++) {
@@ -82,7 +82,7 @@ no.array.map = function(array, callback) {
     var r = [];
 
     for (var i = 0, l = array.length; i < l; i++) {
-        r.push( callback( array[i] ) );
+        r.push( callback( array[i], i ) );
     }
 
     return r;
@@ -101,5 +101,28 @@ no.array.equal = function(ar1, ar2) {
         }
     }
     return true;
+}
+
+no.array.forEach = function(ar, callback) {
+    for (var i = 0; i < ar.length; i++) {
+        callback(ar[i], i);
+    }
+}
+
+no.array.has = function(ar, value) {
+    for (var i = 0; i < ar.length; i++) {
+        if (ar[i] === value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+no.array.create = function(count, creator) {
+    var ar = [];
+    for (var i = 0; i < count; i++) {
+        ar.push(creator(i));
+    }
+    return ar;
 }
 

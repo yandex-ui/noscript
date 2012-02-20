@@ -126,3 +126,11 @@ no.array.create = function(count, creator) {
     return ar;
 }
 
+no.array.clone = function(ar) {
+    var new_ar = [];
+    for (var i = 0; i < ar.length; i++) {
+        new_ar[i] = ar[i];
+    }
+    return new_ar;
+}
+

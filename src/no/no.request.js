@@ -154,28 +154,34 @@ no.Request.Models.prototype.start = function() {
 no.Request.Models.prototype.request = function(loading, requesting) {
     var all = [];
 
-    var l = requesting.length;
-    if (l) {
+    if (requesting.length) { // Запрашиваем модели, которые можно запросить.
         var params = no.Request.Models.models2params(requesting);
         all.push( no.http('/models/', params) ); // FIXME: Урл к серверной ручке.
     }
 
-    if (loading.length) {
+    if (loading.length) { // Ждём все остальные модели, которые должны загрузиться (уже были запрошены).
         var promises = no.array.map( loading, function(model) {
             return model.promise;
         });
         all.push( no.Promise.wait(promises) );
     }
 
-    if (all.length) { // Либо нужно запросить какие-то ключи, либо дождаться ответа от предыдущих запросов.
+    // Мы ждём какие-то данные:
+    // - либо мы запросили какие-то новые модели;
+    // - либо мы ждём ранее запрошенные модели (получив их мы, может быть, сможем запросить ещё другие модели).
+    if (all.length) {
         var that = this;
-        no.Promise.wait(all).then(function(r) { // В r должен быть массив из одного или двух элементов.
-                                                // Если мы делали http-запрос, то в r[0] должен быть его результат.
-            if (l) { // Мы на самом деле делали http-запрос.
+
+        // В r должен быть массив из одного или двух элементов.
+        // Если мы делали http-запрос, то в r[0] должен быть его результат.
+        no.Promise.wait(all).then(function(r) {
+            if (requesting.length) {
                 that.extract(requesting, r[0]);
             }
-            that.start(); // "Повторяем" запрос. Если какие-то ключи не пришли, они будут перезапрошены.
-                          // Если же все получено, то будет выполнен метод done().
+
+            // "Повторяем" запрос. Если какие-то ключи не пришли, они будут перезапрошены.
+            // Если же все получено, то будет выполнен: this.promise.resolve();
+            that.start();
         });
 
     } else {
@@ -218,7 +224,6 @@ no.Request.Models.prototype.extract = function(models, results) {
                 reason: 'Server returned no data'
             };
             model.status = 'failed';
-
         } else {
             var data = model.extractData(result);
             if (data) {

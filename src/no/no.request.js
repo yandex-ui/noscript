@@ -4,12 +4,21 @@
 
 /**
     @param {Array.<no.Request.type_group>} group Groups to request.
+    @param {boolean=} autoretry Whether this request must autoretry or not.
+        For example: we have models, that were not loaded and we cannot request (do not have params).
+        autoretry === true: we fail this request
+        autoretry === false: we wait someone to call send() method, when, maybe, we have more params.
+        default: true
 */
-no.Request = function(groups) {
+no.Request = function(groups, autoretry) {
     this.groups = groups;
+    this.autoretry = autoretry === undefined ? true : autoretry;
+
     this.promise = new no.Promise();
+
     this._leftovers = 0;
     this._models_count = 0;
+    this.status = "ready"; // active | waiting | done
 };
 
 no.extend(no.Request.prototype, no.Events);
@@ -30,20 +39,26 @@ no.Request.type_group;
 no.Request.prototype.start = function() {
     var ungrouped = this.ungroup();
     var models = ungrouped.models;
+    var can_request = this.canRequest(ungrouped);
 
-    var leftovers_changed = (this._leftovers - ungrouped.leftovers) !== 0; // Количество моделей, которые мы пока не можем запросить, поменялось.
-    var models_number_changed = (this._models_count - models.length) !== 0; // Количество запрашиваемых моделей поменялось.
+    if (!can_request) {
+        this.status = "waiting";
 
-    // Проверяем, поменялось ли что-то после последнего запроса моделей.
-    if (!models_number_changed && !leftovers_changed) {
-        this.promise.resolve();
+        if (this.autoretry) {
+            this.status = "done";
+            this.promise.resolve();
+        }
+
         return this.promise;
     }
+
     this._leftovers = ungrouped.leftovers;
     this._models_count = models.length;
 
     var that = this;
     this.requestModels(models).then(function() {
+        that.status = "ready";
+
         if (ungrouped.leftovers) { // Если после этого прохода остались незапрошенные данные -- повторяем процедуру.
             that.start(); // processParams вызывается внутри ungroup
         } else {
@@ -57,7 +72,27 @@ no.Request.prototype.start = function() {
     return this.promise;
 };
 
-// ------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+    Проверяем, поменялось ли что-то после последнего запроса моделей.
+*/
+no.Request.prototype.canRequest = function(ungrouped) {
+    var models = ungrouped.models;
+
+    var leftovers_changed = (this._leftovers - ungrouped.leftovers) !== 0; // Количество моделей, которые мы пока не можем запросить, поменялось.
+    var models_number_changed = (this._models_count - models.length) !== 0; // Количество запрашиваемых моделей поменялось.
+
+    return models_number_changed || leftovers_changed;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.Request.prototype.send = function() {
+    this.start();
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
 
 no.Request.prototype.processParams = function(uncached) {
     var groups = this.groups;
@@ -118,6 +153,7 @@ no.Request.prototype.ungroup = function() {
 
 no.Request.prototype.requestModels = function(models) {
     var request = new no.Request.Models(models);
+    this.status = "active";
     return request.start();
 };
 

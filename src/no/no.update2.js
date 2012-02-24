@@ -17,8 +17,10 @@ no.Update = function(layoutId, pageRootView, params) {
     this.params = params;
 
     this.layout = no.layout.get(this.layout_id);
-    this.createRequests(); // This is main page request.
+    this.createRequests();
 };
+
+no.extend(no.Update.prototype, no.Events);
 
 /** @type {number} */
 no.Update.id = 0;
@@ -27,16 +29,32 @@ no.Update.prototype.start = function() {
     this.requestMore();
 };
 
-/**
-    Add async view in update list.
-*/
-no.Update.prototype.addAsync = function(viewId) {
-    this.createRequest(viewId);
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.Update.prototype.createRequests = function() {
+    var that = this;
+    var tree = this.tree = no.View.getLayoutTree(this.view.id, this);
+    var main_models = []; // Main request models list.
+
+    no.Update.walkLeafs(tree, function(view_id, type) {
+        var view_info = no.View.info(view_id);
+        var models = view_info.models;
+        if (view_info.async) {
+            that.createRequest4Async(view_id);
+        } else {
+            main_models = main_models.concat(models);
+        }
+    });
+
+    this.createMainRequest(main_models);
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-no.Update.prototype.createRequest = function(viewId) {
+/**
+    Create request for async view.
+*/
+no.Update.prototype.createRequest4Async = function(viewId) {
     var that = this;
 
     var request = new no.Request([ this._createGroup(viewId) ]);
@@ -58,24 +76,12 @@ no.Update.prototype.createRequest = function(viewId) {
     });
 };
 
-no.Update.prototype.createRequests = function() {
-    var that = this;
-    var tree = this.tree = no.View.getLayoutTree(this.view.id, this);
-    var main_models = []; // Main request models list.
+// ----------------------------------------------------------------------------------------------------------------- //
 
-    no.Update.walkLeafs(tree, function(view_id, type) {
-        var view_info = no.View.info(view_id);
-        var models = view_info.models;
-        if (view_info.async) {
-            that.addAsync(view_id);
-        } else {
-            no.array.append(main_models, models);
-        }
-    });
-
-    this.createMainRequest(main_models);
-};
-
+/**
+    Creates a request for all !async blocks for main update view.
+    @param {Array.<string>} models Model ids for !async blocks.
+*/
 no.Update.prototype.createMainRequest = function(models) {
     var that = this;
     var page_redraw_promise = new no.Promise();
@@ -83,7 +89,7 @@ no.Update.prototype.createMainRequest = function(models) {
 
     this.page_ready = no.Promise.wait(
         request.promise, // Got main page data.
-        page_ready_promise // Page main blocks were drawn.
+        page_redraw_promise // Page main blocks were drawn (main page redraw promise).
     );
 
     request.on("gotData", function() { // После каждой очередной порции данных - пытаемся запросить ещё данных.
@@ -98,15 +104,15 @@ no.Update.prototype.createMainRequest = function(models) {
         delete that.queue[viewId];
 
         that.updateView(viewId, request); // Update main page view.
-        page_redraw_promise.resolve();
+        page_redraw_promise.resolve(); // Resolve main page redraw promise.
     });
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
-    @param {!Object} obj
-    @param {function} callback
+    @param {!Object} obj Target object to go through its properties.
+    @param {function} callback A callback, called only on leaf properties (primitive types, !object).
 */
 no.Update.walkLeafs = function(obj, callback) {
     no.object.forEach(obj, function(value, key) {
@@ -128,7 +134,6 @@ no.Update.prototype.updateView = function(view, request) {
         view = no.View.get(view, request.params);
     }
 
-    var groups = request.groups;
     var viewsTree = [];
     view.getUpdateTrees(this, viewsTree);
 
@@ -140,13 +145,15 @@ no.Update.prototype.updateView = function(view, request) {
 
     var models = tree.models;
     var params = tree.params;
+
+    var groups = request.groups;
     for (var i = 0, l = groups.length; i < l; i++) {
         var group = groups[i];
         for (var j = 0, m = group.models.length; j < m; j++) {
             var model_id = group.models[j];
             var key = no.Model.key(model_id, group.params);
             models[model_id] = no.Model.get(model_id, key).data;
-            params[model_id] = group.params;
+            params[model_id] = group.params; // TODO all params are the same instance. So: add only one params instance to tree.
         }
     }
 
@@ -177,12 +184,29 @@ no.Update.prototype.updateHtml = function(view, node) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.requestMore = function() {
-    // TODO Check, if something was requested
-    // When all done - notify about it.
+    var all_done = true; // this update has nothing more to do.
 
     no.object.forEach(this.queue, function(request, view_id) {
+        if (request.status === "active") { // this request is active, waiting for response.
+            all_done = false;
+        }
 
+        request.send();
+        if (request.status !== "waiting" && request.status !== "done") { // XXX
+            all_done = false;
+        }
     });
+
+    if (all_done) {
+
+        no.object.forEach(this.queue, function(request, view_id) {
+            if (request.status === "waiting") {
+                request.promise.resolve(); // Manually resolve all waiting requests.
+            }
+        });
+
+        this.trigger("done"); // XXX all rendered?
+    }
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

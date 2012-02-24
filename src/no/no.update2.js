@@ -57,7 +57,7 @@ no.Update.prototype.createRequests = function() {
 no.Update.prototype.createRequest4Async = function(viewId) {
     var that = this;
 
-    var request = new no.Request([ this._createGroup(viewId) ]);
+    var request = new no.Request([ this._createGroup(viewId) ], false);
 
     request.on("gotData", function() { // После каждой очередной порции данных - пытаемся запросить ещё данных.
         that.requestMore();
@@ -84,26 +84,27 @@ no.Update.prototype.createRequest4Async = function(viewId) {
 */
 no.Update.prototype.createMainRequest = function(models) {
     var that = this;
+    var viewId = this.view.id;
     var page_redraw_promise = new no.Promise();
-    var request = new no.Request([ { models: models, params: this.params } ]);
+    var request = new no.Request([ { models: models, params: this.params } ], false);
 
-    this.page_ready = no.Promise.wait(
+    this.page_ready = no.Promise.wait([
         request.promise, // Got main page data.
         page_redraw_promise // Page main blocks were drawn (main page redraw promise).
-    );
+    ]);
 
     request.on("gotData", function() { // После каждой очередной порции данных - пытаемся запросить ещё данных.
         that.requestMore();
     });
 
-    this.queue[this.view.id] = request;
+    this.queue[viewId] = request;
 
     request.promise.then(function() {
         // Remove request from queue when done.
         // "All done" check will be done in gotData handler.
         delete that.queue[viewId];
 
-        that.updateView(viewId, request); // Update main page view.
+        that.updateView(that.view, request); // Update main page view.
         page_redraw_promise.resolve(); // Resolve main page redraw promise.
     });
 };
@@ -131,7 +132,7 @@ no.Update.walkLeafs = function(obj, callback) {
 */
 no.Update.prototype.updateView = function(view, request) {
     if (typeof view === "string") {
-        view = no.View.get(view, request.params);
+        view = no.View.get(view, this.params);
     }
 
     var viewsTree = [];
@@ -191,17 +192,16 @@ no.Update.prototype.requestMore = function() {
             all_done = false;
         }
 
-        request.send();
-        if (request.status !== "waiting" && request.status !== "done") { // XXX
+        if (request.send()) { // Could request more models.
             all_done = false;
         }
     });
 
     if (all_done) {
-
         no.object.forEach(this.queue, function(request, view_id) {
+            // Waiting requests must be terminated.
             if (request.status === "waiting") {
-                request.promise.resolve(); // Manually resolve all waiting requests.
+                request.promise.resolve();
             }
         });
 

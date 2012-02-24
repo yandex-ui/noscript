@@ -37,6 +37,13 @@ no.Request.type_group;
 // ------------------------------------------------------------------------------------------------------------- //
 
 no.Request.prototype.start = function() {
+    this.send();
+    return this.promise;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+no.Request.prototype.send = function() {
     var ungrouped = this.ungroup();
     var models = ungrouped.models;
     var can_request = this.canRequest(ungrouped);
@@ -49,7 +56,7 @@ no.Request.prototype.start = function() {
             this.promise.resolve();
         }
 
-        return this.promise;
+        return false;
     }
 
     this._leftovers = ungrouped.leftovers;
@@ -69,7 +76,7 @@ no.Request.prototype.start = function() {
         that.trigger("gotData");
     });
 
-    return this.promise;
+    return true;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -84,12 +91,6 @@ no.Request.prototype.canRequest = function(ungrouped) {
     var models_number_changed = (this._models_count - models.length) !== 0; // Количество запрашиваемых моделей поменялось.
 
     return models_number_changed || leftovers_changed;
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-no.Request.prototype.send = function() {
-    this.start();
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

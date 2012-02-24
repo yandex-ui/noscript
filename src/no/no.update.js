@@ -23,13 +23,12 @@ no.Update.id = 0;
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.Update.prototype.prepare = function() {
-    this.requests = {};
-
+    var that = this;
+    var params = this.params;
     var tree = this.tree = no.View.getLayoutTree( this.view.id, this );
 
-    var params = this.params;
+    this.requests = {};
 
-    var that = this;
     no.Update.walkLeafs(tree, function(view_id, type) {
         var view_info = no.View.info( view_id );
         var models = view_info.models;
@@ -46,14 +45,13 @@ no.Update.prototype.prepare = function() {
     @param {function} callback
 */
 no.Update.walkLeafs = function(obj, callback) {
-    for (var key in obj) {
-        var value = obj[key];
+    no.object.forEach(obj, function(value, key) {
         if (typeof value !== 'object') {
             callback(key, value);
         } else {
             no.Update.walkLeafs(value, callback);
         }
-    }
+    });
 };
 
 /**

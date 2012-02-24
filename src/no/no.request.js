@@ -2,12 +2,28 @@
 // no.Request
 // ------------------------------------------------------------------------------------------------------------- //
 
+/**
+    @param {Array.<no.Request.type_group>} group Groups to request.
+*/
 no.Request = function(groups) {
     this.groups = groups;
     this.promise = new no.Promise();
     this._leftovers = 0;
     this._models_count = 0;
 };
+
+no.extend(no.Request.prototype, no.Events);
+
+// ----------------------------------------------------------------------------------------------------------------- //
+// Typedefs.
+
+/**
+    @typedef {{
+        models: Array.<string>,
+        params: Object
+    }}
+*/
+no.Request.type_group;
 
 // ------------------------------------------------------------------------------------------------------------- //
 
@@ -34,6 +50,8 @@ no.Request.prototype.start = function() {
             that.processParams([]);
             that.promise.resolve();
         }
+
+        that.trigger("gotData");
     });
 
     return this.promise;

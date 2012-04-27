@@ -327,8 +327,10 @@ no.View.prototype.getUpdateTrees = function(update, trees) {
     @param {boolean} replace
 */
 no.View.prototype.update = function(node, update, replace) {
+    var view_node = no.byClass( 'view-' + this.id, node )[0];
+
     if (!this.node) {
-        this.node = no.byClass( 'view-' + this.id, node )[0]; // XXX тут возможное поле для косяков: когда у нас нет this.node и replace = true
+        this.node = view_node;
         if (!this.node) {
             return;
         }
@@ -343,10 +345,10 @@ no.View.prototype.update = function(node, update, replace) {
         }(node, update))
     );
 
-    if (replace && this.node !== node) {
+    if (replace && this.node !== view_node) {
         this.unbindEvents();
-        no.replaceNode(this.node, node);
-        this.node = node; // Не забываем обновить саму ссылку на узел.
+        no.replaceNode(this.node, view_node);
+        this.node = view_node;
         this.bindEvents();
     }
 

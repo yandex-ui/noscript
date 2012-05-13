@@ -46,7 +46,7 @@ no.Update.prototype.createRequests = function() {
         }
     });
 
-    this.createMainRequest(main_models);
+    this.createMainRequest(no.array.uniq(main_models));
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

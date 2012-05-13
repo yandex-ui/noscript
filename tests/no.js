@@ -1,5 +1,3 @@
-include('../src/no/no.js');
-
 module("no.extendRecursive");
 
 test("Рекурсивное копирование объекта не приводит к копироваю ссылок на объекты-свойства", function() {
@@ -35,4 +33,21 @@ test("Рекурсивное копирование объекта не прив
     strictEqual(1, a1.prop.inner);
     strictEqual(8, b1.prop.inner);
     strictEqual(9, c1.prop.inner);
+});
+
+// ----------------------------------------------------------------------------------------------------------------- //
+module('no.array');
+
+test('no.array.uniq', function() {
+    deepEqual(no.array.uniq([]), []);
+    deepEqual(no.array.uniq([1,2,3]), [1,2,3]);
+
+    deepEqual(no.array.uniq([1,1,2,3]), [1,2,3]);
+    deepEqual(no.array.uniq([1,2,1,3]), [1,2,3]);
+    deepEqual(no.array.uniq([1,2,3,1]), [1,2,3]);
+
+    deepEqual(no.array.uniq([1,2,3,2,1,2]), [1,2,3]);
+
+    deepEqual(no.array.uniq([1,'2',3]), [1,'2',3], 'No type coercion');
+    deepEqual(no.array.uniq([2,'2']), [2,'2'], 'No type coercion');
 });

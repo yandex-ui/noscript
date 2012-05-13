@@ -65,10 +65,18 @@ no.object.isEqual = function(a, b) {
         var l = a.length;
         if (b.length !== l) { return false; }
         for (var i = 0; i < l; i++) {
-            if (!no.object.isEqual(a[i], b[i])) { return false };
+            if (!no.object.isEqual(a[i], b[i])) { return false }
         }
     }
 
     return true;
 };
+
+no.object.forEach = function(obj, action) {
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            action(obj[key], key);
+        }
+    }
+}
 

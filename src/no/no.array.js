@@ -134,3 +134,21 @@ no.array.clone = function(ar) {
     return new_ar;
 }
 
+/*
+    Returns a new array with unique values.
+    For primitive types only.
+    @param {Array.<string|number>} ar Array of values.
+*/
+no.array.uniq = no.array.unique = function(ar) {
+    var ready = [];
+    var val;
+
+    for (var i = 0; i < ar.length; i++) {
+        val = ar[i];
+        if (no.array.indexOf(ready, val) < 0) {
+            ready.push(val);
+        }
+    }
+    return ready;
+};
+

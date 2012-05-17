@@ -46,7 +46,7 @@ no.Update.prototype.createRequests = function() {
         }
     });
 
-    this.createMainRequest(main_models);
+    this.createMainRequest(no.array.uniq(main_models));
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -152,8 +152,7 @@ no.Update.prototype.updateView = function(view, request) {
         var group = groups[i];
         for (var j = 0, m = group.models.length; j < m; j++) {
             var model_id = group.models[j];
-            var key = no.Model.key(model_id, group.params);
-            models[model_id] = no.Model.get(model_id, key).data;
+            models[model_id] = no.Model.get(model_id, group.params).data;
             params[model_id] = group.params; // TODO all params are the same instance. So: add only one params instance to tree.
         }
     }

@@ -227,6 +227,7 @@ no.View.prototype.show = function() {
     var node = this.node;
     if (node) {
         node.style.display = '';
+        this.onshow();
     }
 };
 

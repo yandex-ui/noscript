@@ -141,7 +141,8 @@ no.Update.prototype.updateView = function(view, request) {
     var tree = {
         views: viewsTree,
         models: {},
-        params: {}
+        params: {},
+        location: document.location
     };
 
     var models = tree.models;

@@ -489,6 +489,10 @@ no.View.prototype.unbindEvents = function() {
     this._attachedEvents = null;
 };
 
+no.View.prototype.invalidate = function() {
+    this.status = no.viewStatus.unknown;
+};
+
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /*

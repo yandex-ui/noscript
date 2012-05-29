@@ -76,6 +76,10 @@ no.Update.prototype.createRequest4Async = function(viewId) {
         delete that.queue[viewId];
 
         that.page_ready.then(function() {
+            var view = no.View.get(viewId, that.params);
+            if (view) {
+                view.invalidate();
+            }
             that.updateView(viewId, request);
         });
     });

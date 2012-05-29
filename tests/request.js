@@ -1,5 +1,6 @@
 include('../src/no/no.js');
 include('../src/no/no.object.js');
+include('../src/no/no.events.js');
 include('../src/no/no.http.js');
 include('../src/no/no.promise.js');
 include('../src/no/no.model.js');
@@ -79,7 +80,11 @@ var generateTest = function(test_case) {
         // Реальные данные.
         var photo = {
             id: 42,
-            rootCommentId: "root-3-73741478-548823"
+            rootCommentId: "root-3-73741478-548823",
+            albumRef: {
+                authorId: 123,
+                albumId: 1
+            }
         };
         var comments = {
             fake_data: 666
@@ -89,6 +94,12 @@ var generateTest = function(test_case) {
         // false - вернуть 404 / 403 / пустую строку.
         // true - вернуть валидные данные.
         var server = sinon.fakeServer.create();
+        var counters = {
+            photo_success: 0,
+            photo_fail: 0,
+            comments_success: 0,
+            comments_fail: 0
+        };
 
         server.respondWith(
             "GET",
@@ -96,8 +107,10 @@ var generateTest = function(test_case) {
             function(req) {
                 var result = test_case.photo[test_case.photo_index++];
                 if (result) {
+                    counters.photo_success++;
                     req.respond(200, {}, '{ "0": { "result": ' + JSON.stringify(photo) + ' } }');
                 } else {
+                    counters.photo_fail++;
                     req.respond(404);
                 }
             }
@@ -109,8 +122,10 @@ var generateTest = function(test_case) {
             function(req) {
                 var result = test_case.comments[test_case.comments_index++];
                 if (result) {
+                    counters.comments_success++;
                     req.respond(200, {}, '{ "0": { "result": ' + JSON.stringify(comments) + ' } }');
                 } else {
+                    counters.comments_fail++;
                     req.respond(404);
                 }
             }
@@ -122,8 +137,8 @@ var generateTest = function(test_case) {
 
         // Конструируем запрос.
         var params = {
-            'author-login': "chestozo",
-            'image-id': 42
+            "author-login": "chestozo",
+            "image-id": 42
         };
 
         // Сбрасываем кэш, потому как тесты выполняются в одном и том же контексте.
@@ -148,7 +163,7 @@ var generateTest = function(test_case) {
         is(then.callCount, 1, "Then был вызван один раз");
         is(else_.callCount, 0, "Else не был вызван ни разу");
 
-        // Что в кэше.
+        // Photo.
         var cached_photo = no.Model.get("photo", no.Model.key("photo", params));
         var photo_retries = test_case.photo.length;
         var photo_success = test_case.photo[photo_retries - 1];
@@ -161,16 +176,23 @@ var generateTest = function(test_case) {
             is(cached_photo.status, photo_retries > 0 ? "error" : "none", "Статус фото");
         }
 
-        var cached_comments = no.Model.get("comments", no.Model.key("comments", params));
-        var comments_retries = test_case.comments.length;
-        var comments_success = test_case.comments[comments_retries - 1];
-
-        is(cached_comments.retries, comments_retries, "Количество запросов для получения комментариев");
-        if (comments_success) {
-            is(cached_comments.status, "ok", "Статус комментов: ok");
-            deepEqual(cached_comments.getData(), comments, "Комменты в кэше то, что надо");
+        // Comments.
+        if (test_case.comments.length === 0) {
+            var cached_comments = no.Model.get("comments", no.Model.key("comments", params));
+            equal(cached_comments, null, "Comments not loaded");
+            deepEqual(counters, { photo_success: 0, photo_fail: 3, comments_success: 0, comments_fail: 0 });
         } else {
-            is(cached_comments.status, comments_retries > 0 ? "error" : "none", "Статус комментов");
+            var cached_comments = no.Model.get("comments", no.Model.key("comments", params));
+            var comments_retries = test_case.comments.length;
+            var comments_success = test_case.comments[comments_retries - 1];
+
+            is(cached_comments.retries, comments_retries, "Количество запросов для получения комментариев");
+            if (comments_success) {
+                is(cached_comments.status, "ok", "Статус комментов: ok");
+                deepEqual(cached_comments.getData(), comments, "Комменты в кэше то, что надо");
+            } else {
+                is(cached_comments.status, comments_retries > 0 ? "error" : "none", "Статус комментов");
+            }
         }
 
         server.restore();
@@ -210,9 +232,7 @@ test("Test case: photo [ true ] comments [ false, false, false ]", generateTest(
 // ----------------------------------------------------------------------------------------------------------------- //
 module("Misc");
 
-test("Недостаточно данных даже для запроса первой модели", function() {
-
-});
+test("Недостаточно данных даже для запроса первой модели", function() {});
 
 test("Недостаточно данных для запроса второй модели", function() {
     var server = sinon.fakeServer.create();
@@ -252,22 +272,26 @@ test("Недостаточно данных для запроса второй �
     server.respond();
 
     // Проверка, какие колбэки вызывались.
-    is(then.callCount, 1, "Then был вызван один раз");
-    is(else_.callCount, 0, "Else не был вызван ни разу");
+    equal(then.callCount, 1, "Then был вызван один раз");
+    equal(else_.callCount, 0, "Else не был вызван ни разу");
 
     // Что в кэше.
     var key = no.Model.key("photo", params);
     var cached_photo = no.Model.get("photo", key);
-    strictEqual(cached_photo.retries, 0, "Модель для фото хоть и создалась - не должна была запроситься, так как недостаточно параметров");
-    strictEqual(cached_photo.status, "none", "Статус должен был остаться неопределённым");
+    strictEqual(cached_photo, null, "Модель для фото не была запрошена и потому не была создана и сохранена в кэше");
 
     server.restore();
 });
 
 test("После получения фото мы всё равное не можем запросить комментарии, потому что не вернулся нужный параметр", function() {
     // Реальные данные.
+    // NO rootCommentId
     var photo = {
-        id: 42
+        id: 42,
+        albumRef: {
+            authorId: 123,
+            albumId: 1
+        }
     };
 
     var server = sinon.fakeServer.create();
@@ -318,8 +342,7 @@ test("После получения фото мы всё равное не мо�
     deepEqual(cached_photo.getData(), photo, "Фото в кэше то, что надо");
 
     var cached_comments = no.Model.get("comments", no.Model.key("comments", params));
-    is(cached_comments.retries, 0, "Количество запросов для получения комментариев");
-    is(cached_comments.status, "none", "Статус комментов");
+    equal(cached_comments, null, "Комментов нет");
 
     server.restore();
 });

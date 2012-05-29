@@ -144,14 +144,13 @@ no.Update.prototype.updateView = function(view, request) {
     view.getUpdateTrees(this, viewsTree);
 
     var tree = {
-        views: viewsTree,
         models: {},
-        params: {},
+        params: this.params,
+        views: viewsTree,
         location: document.location
     };
 
     var models = tree.models;
-    var params = tree.params;
 
     var groups = request.groups;
     for (var i = 0, l = groups.length; i < l; i++) {
@@ -159,7 +158,6 @@ no.Update.prototype.updateView = function(view, request) {
         for (var j = 0, m = group.models.length; j < m; j++) {
             var model_id = group.models[j];
             models[model_id] = no.Model.get(model_id, group.params).data;
-            params[model_id] = group.params; // TODO all params are the same instance. So: add only one params instance to tree.
         }
     }
 

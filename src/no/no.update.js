@@ -57,7 +57,12 @@ no.Update.prototype.createRequests = function() {
 no.Update.prototype.createRequest4Async = function(viewId) {
     var that = this;
 
-    var request = new no.Request([ this._createGroup(viewId) ], false);
+    var group = this._createGroup(viewId);
+    if (!group) {
+        return;
+    }
+
+    var request = new no.Request([ group ], false);
 
     request.on("gotData", function() { // После каждой очередной порции данных - пытаемся запросить ещё данных.
         that.requestMore();
@@ -213,6 +218,10 @@ no.Update.prototype.requestMore = function() {
 
 no.Update.prototype._createGroup = function(viewId) {
     var info = no.View.info(viewId);
+    if (info.models.length === 0) {
+        return null;
+    }
+
     return {
         models: info.models,
         params: this.params

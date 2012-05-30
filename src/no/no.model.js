@@ -72,11 +72,18 @@ no.Model.type_class;
 /**
     @typedef {{
         id: string,
-        keyParams: Object,
-        reqParams: Object
+        keyParams: Object
     }}
 */
 no.Model.type_info;
+
+/**
+    @typedef {{
+        id: string,
+        params: Object
+    }}
+*/
+no.Model.request_model_item;
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -100,7 +107,6 @@ no.Model.register = function(info, class_) {
     }
 
     var keyParams = info.keyParams = info.keyParams || {};
-    info.reqParams = info.reqParams || keyParams;
 
     info.keysOrder = no.object.keys(keyParams).sort(); // Отсортированные ключи нужны для того, чтобы в ключе параметры были всегда в одной и той же последовательности.
 
@@ -163,6 +169,13 @@ no.Model.key = function(id, params, info) {
 
 no.Model.prototype.isValid = function() {
     return ( this.status === 'ok' );
+};
+
+/**
+ * Модель может быть запрошена тогда, когда для её запроса есть всё необходимые параметры.
+ */
+no.Model.prototype.canBeRequested = function() {
+    return !!this.getReqParams();
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -241,7 +254,7 @@ no.Model.prototype.processParams = function(params) {
 no.Model.prototype.getReqParams = function() {
     var params = this.params;
 
-    var reqParams = this.info.reqParams;
+    var reqParams = this.info.keyParams;
     var reqParams_ = {};
 
     for (var pName in reqParams) {
@@ -263,7 +276,7 @@ no.Model.prototype.getReqParams = function() {
 
 no.Model.prototype._paramValueIsEmpty = function(value) {
     return value === null || value === undefined;
-}
+};
 
 no.Model.prototype.change = function() {
     var changes = this._changes;
@@ -299,7 +312,7 @@ no.Model.type_cacheItem;
     @return {no.Model.type_cacheItem}   Возвращает соответствующую запись в кэше или null.
 */
 no.Model.getRaw = function(id, key) {
-    var key = (typeof key === 'string') ? key : no.Model.key(id, key);
+    key = (typeof key === 'string') ? key : no.Model.key(id, key);
 
     return no.Model._cache[key] || null;
 };
@@ -347,6 +360,68 @@ no.Model.set = function(model, timestamp) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
+no.Model.clear = function(model) {
+    delete no.Model._cache[model.key];
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+ * Request models with check that all models were recieved.
+ * @param {Array.<no.Model.request_model_item>} model_items An array of models to be requested.
+ * @return {no.Promise} Models request promise.
+ */
+no.Model.requestModels = function(model_items) {
+    var models = [];
+    var promise = new no.Promise();
+
+    for (var i = 0; i < model_items.length; i++) {
+        var item = model_items[i];
+        var model = no.Model.get(item.id, item.params);
+        model = model || no.Model.create(item.id, item.params);
+
+        // If some model cannot be requested - action fails.
+        if (!model.canBeRequested()) {
+            promise.reject();
+            return promise;
+        }
+
+        models.push(model);
+        no.Model.set(model);
+    }
+
+    var request = new no.Request.Models(models);
+    var request_promise = request.start();
+    request_promise.then(function() {
+        var model;
+        var failed = false;
+
+        // Check all models were got and are valid.
+        for (var i = 0; i < models.length; i++) {
+            model = models[i];
+
+            if (!model.isValid()) {
+                failed = true;
+            }
+
+            // Remove all do-models from cache.
+            if (model instanceof no.DoModel) {
+                no.Model.clear(model);
+            }
+        }
+
+        if (failed) {
+            promise.reject();
+        } else {
+            promise.resolve(models);
+        }
+    });
+
+    return promise;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
 /**
     @param {string} id
     @param {string|Object} key
@@ -374,4 +449,3 @@ no.Model.prototype.extractError = function(result) {
         return result.error;
     }
 };
-

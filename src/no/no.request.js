@@ -117,7 +117,7 @@ no.Request.prototype.processParams = function(uncached) {
             }
         }
     }
-}
+};
 
 no.Request.prototype.ungroup = function() {
     var uncached = [];
@@ -135,8 +135,7 @@ no.Request.prototype.ungroup = function() {
             model = no.Model.create( model_id, item.params );
         }
 
-        var reqParams = model.getReqParams(); // Модель может быть запрошена тогда, когда для её запроса есть всё необходимые параметры.
-        if (reqParams) {
+        if (model.canBeRequested()) {
             models.push(model);
             no.Model.set(model); // Модель можно запрашивать, поэтому мы уже можем построить для неё валидный ключ и можно её сохранить в кэше моделей.
         } else {
@@ -289,6 +288,9 @@ no.Request.Models.prototype.extract = function(models, results) {
                 model.status = 'failed';
             }
         }
+
+        // Обновляем модель в кэше.
+        no.Model.set(model, timestamp);
         model.promise.resolve();
     }
 };

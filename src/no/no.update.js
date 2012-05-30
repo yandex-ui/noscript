@@ -57,7 +57,12 @@ no.Update.prototype.createRequests = function() {
 no.Update.prototype.createRequest4Async = function(viewId) {
     var that = this;
 
-    var request = new no.Request([ this._createGroup(viewId) ], false);
+    var group = this._createGroup(viewId);
+    if (!group) {
+        return;
+    }
+
+    var request = new no.Request([ group ], false);
 
     request.on("gotData", function() { // После каждой очередной порции данных - пытаемся запросить ещё данных.
         that.requestMore();
@@ -71,6 +76,10 @@ no.Update.prototype.createRequest4Async = function(viewId) {
         delete that.queue[viewId];
 
         that.page_ready.then(function() {
+            var view = no.View.get(viewId, that.params);
+            if (view) {
+                view.invalidate();
+            }
             that.updateView(viewId, request);
         });
     });
@@ -139,22 +148,20 @@ no.Update.prototype.updateView = function(view, request) {
     view.getUpdateTrees(this, viewsTree);
 
     var tree = {
-        views: viewsTree,
         models: {},
-        params: {}
+        params: this.params,
+        views: viewsTree,
+        location: document.location
     };
 
     var models = tree.models;
-    var params = tree.params;
 
     var groups = request.groups;
     for (var i = 0, l = groups.length; i < l; i++) {
         var group = groups[i];
         for (var j = 0, m = group.models.length; j < m; j++) {
             var model_id = group.models[j];
-            var key = no.Model.key(model_id, group.params);
-            models[model_id] = no.Model.get(model_id, key).data;
-            params[model_id] = group.params; // TODO all params are the same instance. So: add only one params instance to tree.
+            models[model_id] = no.Model.get(model_id, group.params).data;
         }
     }
 
@@ -213,6 +220,10 @@ no.Update.prototype.requestMore = function() {
 
 no.Update.prototype._createGroup = function(viewId) {
     var info = no.View.info(viewId);
+    if (info.models.length === 0) {
+        return null;
+    }
+
     return {
         models: info.models,
         params: this.params

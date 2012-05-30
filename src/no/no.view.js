@@ -19,7 +19,7 @@ no.viewStatus = {
 */
 no.View = function(id, params, parent) {
     this.init(id, params, parent);
-}
+};
 
 /**
     Метод инициализации view. Нужен такой отдельный метод, чтобы было проще наследоваться.
@@ -149,7 +149,7 @@ no.View.create = function(view_id, params, parent) {
 no.View.get = function(id, params) {
     var key = no.View.getKey(id, params);
     return no.View._cache[key];
-}
+};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -227,6 +227,7 @@ no.View.prototype.show = function() {
     var node = this.node;
     if (node) {
         node.style.display = '';
+        this.onshow();
     }
 };
 
@@ -364,17 +365,14 @@ no.View.prototype.update = function(node, update, replace) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.View.prototype._getStatus = function(params) {
-
     var models = this.info.models;
     for (var i = 0; i < models.length; i++) {
-        var model_id = models[i];
-        var key = no.Model.key(model_id, params);
-        if (!no.Model.get(model_id, key)) {
+        if (!no.Model.get(models[i], params)) {
             return no.viewStatus.loading;
         }
     }
     return no.viewStatus.ok;
-}
+};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -456,8 +454,10 @@ no.View.prototype.bindEvents = function() {
             var name = parts.shift();
             var selector = parts.join(' ');
 
-            var handler = function(e) {
-                return method.call(that, e);
+            var handler = function() {
+                // Не теряем остальные аргументы.
+                var args = Array.prototype.slice.call(arguments, 0);
+                return method.apply(that, args);
             };
 
             // Вешаем событие.
@@ -487,6 +487,10 @@ no.View.prototype.unbindEvents = function() {
     }
 
     this._attachedEvents = null;
+};
+
+no.View.prototype.invalidate = function() {
+    this.status = no.viewStatus.unknown;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

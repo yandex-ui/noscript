@@ -295,3 +295,69 @@ no.Request.Models.prototype.extract = function(models, results) {
     }
 };
 
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+/**
+    @typedef {{
+        id: string,
+        params: Object
+    }}
+*/
+/// no.Model.request_model_item;
+
+/**
+    Request models with check that all models were recieved.
+    @param {Array.<no.Model.request_model_item>} model_items An array of models to be requested.
+    @return {no.Promise} Models request promise.
+
+no.Model.requestModels = function(model_items) {
+    var models = [];
+    var promise = new no.Promise();
+
+    for (var i = 0; i < model_items.length; i++) {
+        var item = model_items[i];
+        var model = no.Model.get(item.id, item.params);
+        model = model || no.Model.create(item.id, item.params);
+
+        // If some model cannot be requested - action fails.
+        if (!model.canBeRequested()) {
+            promise.reject();
+            return promise;
+        }
+
+        models.push(model);
+        no.Model.set(model);
+    }
+
+    var request = new no.Request.Models(models);
+    var request_promise = request.start();
+    request_promise.then(function() {
+        var model;
+        var failed = false;
+
+        // Check all models were got and are valid.
+        for (var i = 0; i < models.length; i++) {
+            model = models[i];
+
+            if (!model.isValid()) {
+                failed = true;
+            }
+
+            //  FIXME: Использовать флаг isDoModel.
+            // Remove all do-models from cache.
+            if (model instanceof no.DoModel) {
+                no.Model.clear(model);
+            }
+        }
+
+        if (failed) {
+            promise.reject();
+        } else {
+            promise.resolve(models);
+        }
+    });
+
+    return promise;
+};
+*/
+

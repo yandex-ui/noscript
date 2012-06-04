@@ -183,7 +183,7 @@ no.Model.prototype.canBeRequested = function() {
 no.Model.prototype.get = function(path) {
     var data = this.data;
     if (data) {
-        return no.path.get( path, data );
+        return no.path( path, data );
     }
 };
 

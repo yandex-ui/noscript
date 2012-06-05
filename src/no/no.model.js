@@ -143,7 +143,7 @@ no.Model.define = function(info, ctor) {
     var id = info.id;
 
     //  Для do-моделей отдельные правила кэширования и построения ключей.
-    info.isDoModel = /^do-/.test(id);
+    info.isDo = /^do-/.test(id);
 
     no.Model._infos[id] = info;
     no.Model._ctors[id] = ctor;
@@ -191,7 +191,7 @@ no.Model.key = function(id, params, info) {
     info || ( info = no.Model._infos[id] );
 
     //  Для do-моделей ключ строим особым образом.
-    if (info.isDoModel) {
+    if (info.isDo) {
         return 'do-' + no.Model._keySuffix++;
     }
 
@@ -287,21 +287,27 @@ no.Model.prototype.getData = function() {
 no.Model.prototype.setData = function(data, options) {
     options || ( options = {} );
 
-    if (data) {
-        var oldData = this.data;
-        this.data = this.preprocessData(data);
+    this.data = this.preprocessData(data);
+    this.error = null;
+    this.status = 'ok';
 
-        //  Не проверяем здесь, действительно ли data отличается от oldData --
-        //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
-        //  Можно считать, что она в этом случае всегда меняется.
-        if (!options.silent) {
-            this.trigger('changed');
-        }
-
-        if (!options.notouch) {
-            this.timestamp = +new Date();
-        }
+    //  Не проверяем здесь, действительно ли data отличается от oldData --
+    //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
+    //  Можно считать, что она в этом случае всегда меняется.
+    if (!options.silent) {
+        this.trigger('changed');
     }
+
+    if (!options.notouch) {
+        this.timestamp = +new Date();
+    }
+
+};
+
+no.Model.prototype.setError = function(error) {
+    this.data = null;
+    this.error = error;
+    this.status = 'failed';
 };
 
 no.Model.prototype.preprocessData = function(data) {
@@ -314,7 +320,9 @@ no.Model.prototype.preprocessData = function(data) {
     @returns {Object=}  null в случае, когда данной модели недостаточно параметров для запроса данных.
                         Объект с параметрами для запроса модели, если для запроса модели имеются все необходимые параметры.
 */
-no.Model.prototype.getReqParams = function() {
+//  FIXME: Этот код сильно пересекается с вычислением ключа.
+//  Нельзя ли избавиться от копипаста?
+no.Model.prototype.getRequestParams = function() {
     var params = this.params;
 
     var defaults = this.info.params;
@@ -359,6 +367,10 @@ no.Model.get = function(id, key) {
     @param {no.Model} model
 */
 no.Model.cache = function(model) {
+    if ( model.isDo() ) {
+        return;
+    }
+
     var id = model.id;
     var key = model.key;
 
@@ -432,7 +444,7 @@ no.Model.isValid = function(id, key) {
 */
 no.Model.prototype.canRetry = function(error) {
     //  do-модели нельзя перезапрашивать.
-    return (!this.info.isDoModel && this.retries < 3);
+    return ( !this.isDo() && this.retries < 3 );
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -447,5 +459,9 @@ no.Model.prototype.extractError = function(result) {
     if (result) {
         return result.error;
     }
+};
+
+no.Model.prototype.isDo = function() {
+    return this.info.isDo;
 };
 

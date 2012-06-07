@@ -62,6 +62,7 @@ no.object.isEqual = function(a, b) {
             if (!(key in a)) { return false; }
         }
     } else {
+        //  FIXME: У массива typeof === 'object', так что сюда мы не попадаем никогда.
         var l = a.length;
         if (b.length !== l) { return false; }
         for (var i = 0; i < l; i++) {

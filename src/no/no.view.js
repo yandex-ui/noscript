@@ -141,7 +141,7 @@ no.View.info = function(id) {
     @return {no.View}
 */
 no.View.create = function(id, params) {
-    var ctor = _ctors[id];
+    var ctor = _ctors[id] || no.View;
     var view = new ctor();
     view.init(id, params);
 
@@ -203,6 +203,7 @@ no.View.prototype.walk = function(callback) {
 
     @param {function(no.View)} callback
 */
+//  FIXME: Внест эту функцию в walk?
 no.View.prototype._processChildren = function(callback) {
     var boxes = this.boxes;
     for (var id in boxes) {
@@ -256,7 +257,7 @@ no.View.prototype.onrepaint = no.pe;
 //      'keyup': function(e) { ... }
 //  }
 //
-no.View.prototype.bindEvents = function() {
+no.View.prototype._bindEvents = function() {
     var $node = $(this.node);
 
     var attachedEvents = this._attachedEvents = [];
@@ -291,7 +292,7 @@ no.View.prototype.bindEvents = function() {
                 $node.on(name, handler);
             }
 
-            // Запоминаем, что повесили, чтобы знать потом, что удалять в unbindEvents.
+            // Запоминаем, что повесили, чтобы знать потом, что удалять в _unbindEvents.
             attachedEvents.push({
                 name: name,
                 selector: selector,
@@ -301,7 +302,7 @@ no.View.prototype.bindEvents = function() {
     }
 };
 
-no.View.prototype.unbindEvents = function() {
+no.View.prototype._unbindEvents = function() {
     var $node = $(this.node);
 
     var attachedEvents = this._attachedEvents = [];
@@ -314,6 +315,13 @@ no.View.prototype.unbindEvents = function() {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+no.View.prototype.update = function(layout_id, params) {
+    var layout = no.layout.get(layout_id, this.id);
+    var update = new no.Update(this, layout, params);
+
+    return update.start();
+};
 
 })();
 

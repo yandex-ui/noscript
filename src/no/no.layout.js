@@ -8,36 +8,68 @@
 
 no.layout = {};
 
-//  Приватное хранилище layout'ов.
-var layouts = {};
+//  Хранилище layout'ов для всех страниц.
+var pageLayouts = {};
+//  Хранилище layout'ов для всех view.
+var viewLayouts = {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} id
-    @param {!Object} layout
-*/
 no.layout.define = function(id, layout) {
-    layouts[id] = layout;
+    pageLayouts[id] = compileLayout(layout);
+    extractViewLayouts('app', layout);
 };
 
-/**
-    @param {string} id
-*/
-no.layout.get = function(id, view_id) {
-    var layout = layouts[id];
+no.layout.page = function(id) {
+    return pageLayouts[id];
+};
 
-    if (view_id) {
-        no.object.walk(layout, function(key, value) {
-            if (key === view_id) {
-                layout = value;
-                return false;
+no.layout.view = function(id) {
+    return viewLayouts[id];
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+function extractViewLayouts(id, layout) {
+    if ( !isBox(id) ) {
+        var r = {};
+
+        if (typeof layout === 'object') {
+            for (var key in layout) {
+                r[ stripAt(key) ] = ( isBox(key) ) ? 'box' : 'view';
             }
-        });
+        }
+
+        viewLayouts[id] = r;
     }
 
-    return value;
+    for (var key in layout) {
+        extractViewLayouts( key, layout[key] );
+    }
+}
+
+function compileLayout(layout) {
+    if (typeof layout !== 'object') {
+        return layout;
+    }
+
+    var tree = {};
+    for (var key in layout) {
+        tree[ stripAt(key) ] = compileLayout( layout[key] );
+    }
+
+    return tree;
 };
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+function isBox(s) {
+    return (s.substr(0, 1) === '@');
+}
+
+function stripAt(s) {
+    return ( isBox(s) ) ? s.substr(1) : s;
+}
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 

@@ -31,7 +31,9 @@ no.layout.view = function(id) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 function extractViewLayouts(id, layout) {
-    if ( !isBox(id) ) {
+    //  Для боксов не нужно строить layout,
+    //  кроме того, не нужно строить layout повторно.
+    if ( !isBox(id) && !viewLayouts[id] ) {
         var r = {};
 
         if (typeof layout === 'object') {

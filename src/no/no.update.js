@@ -43,34 +43,78 @@ no.Update = function(view, layout, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+no.View.prototype._getUpdated = function(updated, layout, params) {
+    if ( !this.isValid() ) {
+        updated.push({
+            view: this,
+            layout: layout
+        });
+    }
+
+    var views = this._views;
+    for (var id in views) {
+        views[id]._getUpdated(updated, layout[id], params);
+    }
+
+    return updated;
+};
+
+no.Box.prototype._getUpdated = function(updated, layout, params) {
+    var views = this._views;
+
+    for (var id in layout) {
+        var key = no.View.key(id, params);
+        var view = views[key];
+        if (!view) {
+            view = views[key] = no.View.create(id, params);
+        }
+        view._getUpdated(updated, layout[id], params);
+    }
+};
+
+no.View.prototype._update = function() {
+    var tree = this._templateTree(...);
+    var html = Yater.run(tree, null, '');
+    var node = html2node(html);
+    this._updateTree(node, true);
+};
+
+no.View.prototype._updateTree = function(node, toplevel) {
+    if ( !this.isValid() ) {
+
+    } else {
+
+    }
+};
+
+no.Box.prototype._updateTree = function(node, toplevel) {
+
+};
+
+no.View.prototype._templateTree = function(layout, models) {
+    var data = {};
+    for (var i = 0, l = models.length; i < l; i++) {
+        var model = models[i];
+        data[model.id] = model.getData();
+    }
+
+    return {
+        views: layout,
+        data: data
+    };
+};
+
+//  Удаляет рекурсивно все блоки со статусом none/loading.
+no.View.prototype._cleanup = function() {
+
+};
+
 no.Update.prototype.start = function() {
-    var visibility = {};
-    this.view.walk(function(view) {
-        visibility[view.key] = view.visible();
-    });
+    var updated = this.view_getUpdated( [], this.layout, this.params );
 
-    var params = this.params;
-
-    //  Список невалидных блоков.
-    var views = [];
-    this.view.walk(
-        function(view, layout) {
-            if ( !view.isValid() ) {
-                views.push({
-                    view: view,
-                    layout: layout
-                });
-            }
-
-            return layout[view.id];
-        },
-        this.layout
-    );
-
-    var sync = [];
-    var async = [];
-    for (var i = 0, l = views.length; i < l; i++) {
-        var item = views[i];
+    var sync = [], async = [];
+    for (var i = 0, l = updated.length; i < l; i++) {
+        var item = updated[i];
         if (item.layout === false) {
             async.push(item.view);
         } else {
@@ -78,32 +122,39 @@ no.Update.prototype.start = function() {
         }
     }
 
-    var promise = no.request( views2models(sync) ).then(function() {
-
-
+    var promise = no.request( no.View.views2models(sync) ).then(function() {
+        that.view._update(that);
     });
-    for (var i = 0, l = async.length; i < l; i++) {
-        var view = async[i];
-        var models = views2models( [ view ] );
-        no.promise.wait([
+
+    async.forEach(function(view, i) {
+        var models = no.View.views2models( [ view ] );
+        no.Promise.wait([
             promise,
             no.request(models)
         ]).then(function() {
-
+            view._update(that);
         });
-    }
+    });
 
-    function process(view, layout) {
-    }
+};
 
-    function layout2state(layout, params) {
-        var keys = [];
-        for (var id in layout) {
-            var key = no.View.getKey(id, params);
-            keys.push(key);
+no.View.views2models = function(views) {
+    var added = {};
+    var models = [];
+
+    for (var i = 0, l = views.length; i < l; i++) {
+        var viewModels = views[i].models;
+        for (var j = 0, k = viewModels.length; j < k; j++) {
+            var model = viewModels[j];
+            var key = model.key;
+            if ( !added[key] ) {
+                models.push(model);
+                added[key] = true;
+            }
         }
-        return keys.sort().join(',');
     }
+
+    return models;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

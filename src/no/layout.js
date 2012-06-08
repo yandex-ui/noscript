@@ -1,11 +1,11 @@
 no.layout.define('index', {
-    '@app': {
+    '@layout': {
         'index': true
     }
 });
 
 no.layout.define('view-album', {
-    '@app': {
+    '@layout': {
         'user': {
             '@left': {
                 'profile': true
@@ -18,7 +18,7 @@ no.layout.define('view-album', {
 });
 
 no.layout.define('view-photo', {
-    '@app': {
+    '@layout': {
         'user': {
             '@left': {
                 'profile': true,
@@ -28,7 +28,7 @@ no.layout.define('view-photo', {
                 'photo': {
                     'photo-image': true,
                     '@comments': {
-                        'photo-comments': true
+                        'photo-comments': false
                     }
                 }
             }

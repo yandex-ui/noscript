@@ -42,7 +42,12 @@ no.View.prototype.init = function(id, params) {
 
     this.status = 'none';
 
-    this.state = '';
+    var model_ids = this.info.models;
+    var models = this.models = {};
+    for (var i = 0, l = model_ids.length; i < l; i++) {
+        var model_id = model_ids[i];
+        models[model_id] = no.Model.get( model_id, params, { force: true } );
+    }
 
     //  Здесь хранятся все непосредственный view-потомки.
     //  Структура такая:
@@ -62,7 +67,7 @@ no.View.prototype.init = function(id, params) {
     //          ...
     //      }
     //
-    this._boxes = {};
+    this._views = {};
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -186,33 +191,28 @@ no.View.prototype._setActiveView = function(view) {
     Рекурсивно обходим все дерево блока и применяем к каждому потомку (блоку или боксу) переданный callback.
 
     При этом сперва вызываем callback, а потом уже обрабатываем под-дерево.
-    Если же callback возвращает false, то подблоки не обрабатываем.
+    Если же callback возвращает null, то подблоки не обрабатываем.
 
     @param {function(no.View): (boolean|undefined)} callback
+    @param {*=} params
 */
-no.View.prototype.walk = function(callback) {
-    var r = callback(this);
-    if (r === false) { return; }
+no.View.prototype.walk = function(callback, params) {
+    var r = callback(this, params);
+    if (r === null) { return; }
 
-    this.processChildren(function(view) {
-        view.walk(callback);
-    });
+    r = (r == null) ? params : r;
+
+    var views = this._views;
+    for (var id in views) {
+       views[id].walk(callback, r);
+    }
 };
 
-/**
-    Применяем переданный callback ко всем "детям" блока.
-    Т.е. к непосредственным потомкам этого блока.
-
-    @param {function(no.View)} callback
-*/
-//  FIXME: Внест эту функцию в walk?
-no.View.prototype._processChildren = function(callback) {
-    var boxes = this.boxes;
-    for (var id in boxes) {
-        var box = boxes[id];
-        if (box.active) {
-           callback( box[box.active] );
-        }
+no.Box.prototype.walk = function(callback, params) {
+    var views = this._views;
+    var active = this._active;
+    for (var i = 0, l = active.length; i < l; i++) {
+        views[ active[i] ].walk(callback, params);
     }
 };
 
@@ -324,6 +324,35 @@ no.View.prototype.update = function(layout_id, params) {
 
     return update.start();
 };
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.View.prototype.isValid = function() {
+    if ( this.status !== 'ok' || !this.isModelsValid() ) {
+        return false;
+    }
+
+    var views = this.views;
+    for (var id in views) {
+        if ( !views[id].isValid() ) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+no.View.prototype.isModelsValid = function() {
+    var models = this.models;
+    for (var id in models) {
+        if ( !models[id].isValid() ) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 
 })();
 

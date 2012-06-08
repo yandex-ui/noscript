@@ -160,7 +160,8 @@ no.Model.define = function(info, ctor) {
     @param {Object=} data
     @return {no.Model}
 */
-no.Model.create = function(id, params, data) {
+//  FIXME: Любой create должен сохранять модель в кэше автоматически.
+no.Model.create = function(id, params, data)  {
     var ctor = no.Model._ctors[id];
 
     var model = new ctor();
@@ -355,10 +356,16 @@ no.Model.prototype.touch = function(timestamp) {
     @param {string|Object} key  key или params.
     @return {no.Model}          Возвращает соответствующую модель или null.
 */
-no.Model.get = function(id, key) {
+no.Model.get = function(id, key, options) {
     key = (typeof key === 'string') ? key : no.Model.key(id, key);
 
-    return no.Model._cache[id][key] || null;
+    var model = no.Model._cache[id][key];
+    //  Если передан флаг force: true, создаем модель, даже если ее нет в кэше.
+    if (!model && options && options.force) {
+        model = no.Model.create(id, params);
+    }
+
+    return model;
 };
 
 /**

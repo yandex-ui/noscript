@@ -44,15 +44,28 @@ no.Update = function(view, layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype.start = function() {
-    var was = [];
+    var visibility = {};
     this.view.walk(function(view) {
-        was.push(view);
+        visibility[view.key] = view.visible();
     });
 
     var params = this.params;
 
+    //  Список невалидных блоков.
     var views = [];
-    process(this.view, this.layout);
+    this.view.walk(
+        function(view, layout) {
+            if ( !view.isValid() ) {
+                views.push({
+                    view: view,
+                    layout: layout
+                });
+            }
+
+            return layout[view.id];
+        },
+        this.layout
+    );
 
     var sync = [];
     var async = [];
@@ -81,21 +94,6 @@ no.Update.prototype.start = function() {
     }
 
     function process(view, layout) {
-        if ( view.state !== layout2state(layout, params) ) {
-            views.push({
-                view: view,
-                layout: layout
-            });
-        }
-
-        for (var id in layout) {
-            var subview = view.find(id, params);
-            if (!subview) {
-                subview = view.create(id, params);
-            }
-
-            process( subview, layout[id] );
-        }
     }
 
     function layout2state(layout, params) {

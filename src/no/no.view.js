@@ -42,6 +42,8 @@ no.View.prototype.init = function(id, params) {
 
     this.status = 'none';
 
+    this.state = '';
+
     //  Здесь хранятся все непосредственный view-потомки.
     //  Структура такая:
     //

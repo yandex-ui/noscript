@@ -44,15 +44,68 @@ no.Update = function(view, layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype.start = function() {
-    var views = [];
-
+    var was = [];
     this.view.walk(function(view) {
-        if ( !view.visible() ) {
-            return false;
+        was.push(view);
+    });
+
+    var params = this.params;
+
+    var views = [];
+    process(this.view, this.layout);
+
+    var sync = [];
+    var async = [];
+    for (var i = 0, l = views.length; i < l; i++) {
+        var item = views[i];
+        if (item.layout === false) {
+            async.push(item.view);
+        } else {
+            sync.push(item.view);
+        }
+    }
+
+    var promise = no.request( views2models(sync) ).then(function() {
+
+
+    });
+    for (var i = 0, l = async.length; i < l; i++) {
+        var view = async[i];
+        var models = views2models( [ view ] );
+        no.promise.wait([
+            promise,
+            no.request(models)
+        ]).then(function() {
+
+        });
+    }
+
+    function process(view, layout) {
+        if ( view.state !== layout2state(layout, params) ) {
+            views.push({
+                view: view,
+                layout: layout
+            });
         }
 
-        views.push(view);
-    });
+        for (var id in layout) {
+            var subview = view.find(id, params);
+            if (!subview) {
+                subview = view.create(id, params);
+            }
+
+            process( subview, layout[id] );
+        }
+    }
+
+    function layout2state(layout, params) {
+        var keys = [];
+        for (var id in layout) {
+            var key = no.View.getKey(id, params);
+            keys.push(key);
+        }
+        return keys.sort().join(',');
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

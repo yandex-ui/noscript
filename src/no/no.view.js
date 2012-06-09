@@ -42,6 +42,7 @@ no.View.prototype.init = function(id, params) {
 
     this.status = 'none';
 
+    //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
     for (var i = 0, l = model_ids.length; i < l; i++) {
@@ -49,25 +50,13 @@ no.View.prototype.init = function(id, params) {
         models[model_id] = no.Model.get( model_id, params, { force: true } );
     }
 
-    //  Здесь хранятся все непосредственный view-потомки.
-    //  Структура такая:
-    //
-    //      {
-    //          'photo': {
-    //              active: 'key_2',
-    //              views: {
-    //                  'key_1': view_1,
-    //                  'key_2': view_2,
-    //                  ...
-    //              }
-    //          },
-    //          'comments': {
-    //              ...
-    //          },
-    //          ...
-    //      }
-    //
-    this._views = {};
+    //  Создаем подблоки.
+    var view_ids = no.layout.view(id);
+    var views = this._views = {};
+    for (var view_id in view_ids) {
+        var view = (view_ids[view_id] === 'box') ? this.subBox(view_id, params) : this.subView(view_id, params);
+        views[view_id] = view;
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

@@ -130,6 +130,7 @@ no.View.prototype._addBox = function(id, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 
+/*
 //  Рекурсивно обходим все дерево блока и применяем к каждому потомку (блоку или боксу) переданный callback.
 //
 //  При этом сперва вызываем callback, а потом уже обрабатываем под-дерево.
@@ -146,6 +147,7 @@ no.View.prototype.walk = function(callback, params) {
        views[id].walk(callback, r);
     }
 };
+*/
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -268,11 +270,14 @@ no.View.prototype.isModelsValid = function() {
 
 no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
     if ( !this.isValid() ) {
+        //  Если это асинхронный блок, то он всегда toplevel.
+        toplevel = toplevel || (layout === false);
         updated.push({
             view: this,
             layout: layout,
             toplevel: toplevel
         });
+        //  Все нижележащие блоки точно не toplevel.
         toplevel = false;
     }
 
@@ -282,6 +287,26 @@ no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
     }
 
     return updated;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.View.prototype._templateTree = function(layout, params) {
+    if ( !this.isModelsValid() ) {
+        return false;
+    }
+
+    if (typeof layout !== 'object') {
+        return true;
+    }
+
+    var tree = {};
+    var views = this.views;
+    for (var id in layout) {
+        tree[id] = views[id]._templateTree( layout[id], params );
+    }
+
+    return tree;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

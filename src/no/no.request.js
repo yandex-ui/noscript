@@ -88,7 +88,6 @@ Request.prototype.start = function() {
         }
     }
 
-    console.log(loading, requesting);
     this.request(loading, requesting);
 
     return this.promise;

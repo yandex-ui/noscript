@@ -25,37 +25,68 @@ no.Update.prototype.start = function() {
     var async = [];
     for (var i = 0, l = updated.length; i < l; i++) {
         var item = updated[i];
-        //  FIXME: Убрать false, использовать только внятные константы.
-        if (item.layout === 'async' || item.layout === false) {
-            async.push(item.view);
+        if (item.layout === false) {
+            async.push(item);
         } else {
-            sync.push(item.view);
+            sync.push(item);
         }
     }
 
     var that = this;
 
-    var promise = no.requestModels( no.View.views2models(sync) ).then(function(r) {
-        console.log('done', r);
-        //  that.update(that.view);
+    var promise = no.requestModels( items2models(sync) ).then(function(r) {
+        that.update(sync);
     });
 
-    async.forEach(function(view) {
-        var models = no.View.views2models( [ view ] );
+    async.forEach(function(item) {
+        var items = [ item ];
+        var models = items2models(items);
         no.Promise.wait([
             promise,
             no.requestModels(models)
         ]).then(function(r) {
-            console.log('done', r);
-            //  that.update(view);
+            that.update(items);
         });
     });
 
 };
 
+function items2models(items) {
+    var views = items.map(function(item) {
+        return item.view;
+    });
+
+    return no.View.views2models(views);
+}
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Update.prototype.update = function() {
+no.Update.prototype.update = function(items) {
+    var layoutTree = {};
+    for (var i = 0, l = items.length; i < l; i++) {
+        var item = items[i];
+        var view = item.view;
+        if (item.toplevel) {
+            layoutTree[view.id] = view._templateTree(item.layout, this.params);
+        }
+    }
+    console.dir(layoutTree);
+
+    var models = items2models(items);
+    var modelsTree = {};
+    for (var i = 0, l = models.length; i < l; i++) {
+        var model = models[i];
+        modelsTree[model.id] = model.getData() || false;
+    }
+
+    var tree = {
+        params: this.params,
+        views: layoutTree,
+        models: modelsTree
+    };
+
+    var html = Yater.run(tree, null, '');
+    console.log(html);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

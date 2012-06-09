@@ -40,6 +40,7 @@ no.Box.prototype.activate = function(views) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+/*
 no.Box.prototype.walk = function(callback, params) {
     var active = this.active;
 
@@ -52,6 +53,7 @@ no.Box.prototype.walk = function(callback, params) {
         }
     }
 };
+*/
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -62,6 +64,21 @@ no.Box.prototype._getUpdated = function(updated, layout, params, toplevel) {
         var view = this._addView(id, params);
         view._getUpdated(updated, layout[id], params, toplevel);
     }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Box.prototype._templateTree = function(layout, params) {
+    var tree = {};
+
+    var views = this.views;
+    for (var id in layout) {
+        var key = no.View.getKey(id, params);
+        var view = views[key];
+        tree[id] = view._templateTree( layout[id], params );
+    }
+
+    return tree;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

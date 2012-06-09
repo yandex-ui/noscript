@@ -166,7 +166,7 @@ Request.prototype.extract = function(models, results) {
             model.setError(error);
         }
 
-        no.Model.cache(model);
+        no.Model.store(model);
 
         model.promise.resolve();
     }

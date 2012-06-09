@@ -2,60 +2,10 @@
 //  no.Model
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-
-// Typedefs.
-
-/**
-    Конструктор модели.
-
-    @typedef {function(
-        new:no.Model,
-        string,
-        Object,
-        Object=
-    )}
-*/
-no.Model.type_ctor;
-
-/**
-    Объект, описывающий модель.
-
-    @typedef {{
-        id: string,
-        params: Object
-    }}
-*/
-no.Model.type_info;
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
-    Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
-    Вся инициализация делается в init(), который вызывает фабрикой no.Model.create().
-
-    @constructor
-*/
+//  Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
+//  Вся инициализация делается в init(), который вызывает фабрикой no.Model.create().
+//
 no.Model = function() {};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
-    Хранилище конструкторов моделей.
-    @type { Object.<string, no.Model.type_ctor> }
-*/
-no.Model._ctors = {};
-
-/**
-    Хранилище описаний моделей.
-    @type { Object.<string, no.Model.type_info> }
-*/
-no.Model._infos = {};
-
-//  Инкрементальный счетчик, используется для построения ключей do-моделей.
-no.Model._keySuffix = 0;
-
-//  Кэш, где хранятся все существующие модели.
-no.Model._cache = {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -64,11 +14,15 @@ no.extend(no.Model.prototype, no.Events);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} id
-    @param {Object} params
-    @param {Object=} data
-*/
+var ctors = {};
+var infos = {};
+
+var keySuffix = 0;
+
+var cache = {};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
 no.Model.prototype.init = function(id, params, data) {
     this.id = id;
     this.params = params;
@@ -76,14 +30,11 @@ no.Model.prototype.init = function(id, params, data) {
     this._reset();
     this.setData(data);
 
-    var info = this.info = no.Model._infos[id];
+    var info = this.info = infos[id];
 
     this.key = no.Model.key(id, params, info);
 };
 
-/**
-    @private
-*/
 no.Model.prototype._reset = function() {
     this.data = null;
     this.error = null;
@@ -103,29 +54,25 @@ no.Model.prototype._reset = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    Определяем новую модель.
-
-        //  Простая модель, без параметров.
-        no.Model.define('profile');
-
-        no.Model.define({
-            id: 'album',
-            params: {
-                //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
-                //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
-                'author-login': null,
-                'album-id': null,
-
-                //  Этим двум параметрам заданы дефолтные значения.
-                'page': 0,
-                'pageSize': 20
-            }
-        });
-
-    @param {string | no.Model.type_info} info
-    @param {no.Model.type_ctor=} ctor
-*/
+//  Определяем новую модель.
+//
+//      //  Простая модель, без параметров.
+//      no.Model.define('profile');
+//
+//      no.Model.define({
+//          id: 'album',
+//          params: {
+//              //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
+//              //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
+//              'author-login': null,
+//              'album-id': null,
+//
+//              //  Этим двум параметрам заданы дефолтные значения.
+//              'page': 0,
+//              'pageSize': 20
+//          }
+//      });
+//
 no.Model.define = function(info, ctor) {
     if (typeof info === 'string') {
         info = {
@@ -145,24 +92,18 @@ no.Model.define = function(info, ctor) {
     //  Для do-моделей отдельные правила кэширования и построения ключей.
     info.isDo = /^do-/.test(id);
 
-    no.Model._infos[id] = info;
-    no.Model._ctors[id] = ctor;
+    infos[id] = info;
+    ctors[id] = ctor;
 
     //  Создаем пустой кэш для всех моделей с данным id.
-    no.Model._cache[id] = {};
+    cache[id] = {};
 };
 
-/**
-    Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
-
-    @param {string} id
-    @param {Object} params
-    @param {Object=} data
-    @return {no.Model}
-*/
+//  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
+//
 //  FIXME: Любой create должен сохранять модель в кэше автоматически.
 no.Model.create = function(id, params, data)  {
-    var ctor = no.Model._ctors[id];
+    var ctor = ctors[id];
 
     var model = new ctor();
     model.init(id, params, data);
@@ -172,24 +113,14 @@ no.Model.create = function(id, params, data)  {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} id
-    @return {no.Model.type_info}
-*/
 no.Model.info = function(id) {
-    return no.Model._infos[id];
+    return infos[id];
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} id
-    @param {!Object} params
-    @param {no.Model.type_info=} info
-    @return {string}
-*/
 no.Model.key = function(id, params, info) {
-    info || ( info = no.Model._infos[id] );
+    info || ( info = infos[id] );
 
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {
@@ -225,14 +156,11 @@ no.Model.prototype.isValid = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    Возвращает данные, находящиеся по пути path.
-
-        var foo = model.get('foo'); // model.data.foo.
-        var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
-
-    @param {string} path
-*/
+//  Возвращает данные, находящиеся по пути path.
+//
+//      var foo = model.get('foo'); // model.data.foo.
+//      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
+//
 no.Model.prototype.get = function(path) {
     var data = this.data;
     if (data) {
@@ -240,16 +168,14 @@ no.Model.prototype.get = function(path) {
     }
 };
 
-/**
-    Сохраняет value по пути path.
-
-    Возможные флаги, которые могут быть в options:
-
-        {
-            silent: true        //  Не генерить событие о том, что модель изменилась,
-        }
-
-*/
+//  Сохраняет value по пути path.
+//
+//  Возможные флаги, которые могут быть в options:
+//
+//      {
+//          silent: true        //  Не генерить событие о том, что модель изменилась,
+//      }
+//
 no.Model.prototype.set = function(path, value, options) {
     var data = this.data;
     if (!data) { return; }
@@ -270,21 +196,17 @@ no.Model.prototype.getData = function() {
     return this.data;
 };
 
-/**
-    Заменяет данные модели на data.
-
-    При этом по-дефолту на модели генерится событие 'changed' и обновляется ее timestamp.
-    Это поведение можно поменять, передав объект options.
-    Возможные флаги, которые могут быть в options:
-
-        {
-            silent: true        //  Не генерить событие о том, что модель изменилась,
-            notouch: true       //  Не обновлять timestamp модели.
-        }
-
-    @param {*} data
-    @param {Object=} options
-*/
+//  Заменяет данные модели на data.
+//
+//  При этом по-дефолту на модели генерится событие 'changed' и обновляется ее timestamp.
+//  Это поведение можно поменять, передав объект options.
+//  Возможные флаги, которые могут быть в options:
+//
+//      {
+//          silent: true        //  Не генерить событие о том, что модель изменилась,
+//          notouch: true       //  Не обновлять timestamp модели.
+//      }
+//
 no.Model.prototype.setData = function(data, options) {
     options || ( options = {} );
 
@@ -317,10 +239,6 @@ no.Model.prototype.preprocessData = function(data) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @returns {Object=}  null в случае, когда данной модели недостаточно параметров для запроса данных.
-                        Объект с параметрами для запроса модели, если для запроса модели имеются все необходимые параметры.
-*/
 //  FIXME: Этот код сильно пересекается с вычислением ключа.
 //  Нельзя ли избавиться от копипаста?
 no.Model.prototype.getRequestParams = function() {
@@ -349,17 +267,11 @@ no.Model.prototype.touch = function(timestamp) {
 
 //  Работа с кэшем.
 
-/**
-    Достаем модель из кэша.
-
-    @param {string} id          id модели.
-    @param {string|Object} key  key или params.
-    @return {no.Model}          Возвращает соответствующую модель или null.
-*/
+//  Достаем модель из кэша.
 no.Model.get = function(id, key, options) {
     key = (typeof key === 'string') ? key : no.Model.key(id, key);
 
-    var model = no.Model._cache[id][key];
+    var model = cache[id][key];
     //  Если передан флаг force: true, создаем модель, даже если ее нет в кэше.
     if (!model && options && options.force) {
         model = no.Model.create(id, params);
@@ -368,11 +280,7 @@ no.Model.get = function(id, key, options) {
     return model;
 };
 
-/**
-    Сохраняем модель в кэше.
-
-    @param {no.Model} model
-*/
+//  Сохраняем модель в кэше.
 no.Model.cache = function(model) {
     if ( model.isDo() ) {
         return;
@@ -381,11 +289,9 @@ no.Model.cache = function(model) {
     var id = model.id;
     var key = model.key;
 
-    var cache = no.Model._cache[id];
-
-    var cached = cache[key];
+    var cached = cache[id][key];
     if (!cached) {
-        cache[key] = model;
+        cache[id][key] = model;
     } else {
         //  NOTE: Почему тут нельзя просто заменить старую модель на новую.
         //  Потому, что в этом случае все, кто был подписан на события от старой модели
@@ -394,29 +300,25 @@ no.Model.cache = function(model) {
     }
 };
 
-/**
-    Очищает кэш моделей с данным id:
-
-        //  Удаляем конкретную модель (с заданным ключом).
-        no.Model.clear('photo', '...');
-
-        //  Удаляем несколько моделей по заданному фильтру.
-        no.Model.clear('photo', function(model) {
-            return model.params['author-id'] === 'nop';
-        });
-
-        //  Удаляем все модели определенного типа:
-        no.Model.clear('photo');
-
-    @param {string} id
-    @param {(string|function(no.Model):boolean)=} key
-*/
+//  Очищает кэш моделей с данным id:
+//
+//      //  Удаляем конкретную модель (с заданным ключом).
+//      no.Model.clear('photo', '...');
+//
+//      //  Удаляем несколько моделей по заданному фильтру.
+//      no.Model.clear('photo', function(model) {
+//          return model.params['author-id'] === 'nop';
+//      });
+//
+//      //  Удаляем все модели определенного типа:
+//      no.Model.clear('photo');
+//
 no.Model.uncache = function(id, key) {
     if (key) {
         if (typeof key === 'string') {
-            delete no.Model._cache[id][key];
+            delete cache[id][key];
         } else {
-            var models = no.Model._cache[id];
+            var models = cache[id];
             for (var k in models) {
                 if ( key( models[k] ) ) {
                     delete models[k];
@@ -424,17 +326,11 @@ no.Model.uncache = function(id, key) {
             }
         }
     } else {
-        no.Model._cache[id] = {};
+        cache[id] = {};
     }
 };
 
-/**
-    Проверяем, есть ли модель в кэше и валидна ли она.
-
-    @param {string} id
-    @param {string|Object} key
-    @return {(boolean|undefined)}
-*/
+//  Проверяем, есть ли модель в кэше и валидна ли она.
 no.Model.isValid = function(id, key) {
     var model = no.Model.get(id, key);
     if (!model) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
@@ -444,11 +340,7 @@ no.Model.isValid = function(id, key) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
-
-    @return {boolean}
-*/
+//  Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
 no.Model.prototype.canRetry = function(error) {
     //  do-модели нельзя перезапрашивать.
     return ( !this.isDo() && this.retries < 3 );

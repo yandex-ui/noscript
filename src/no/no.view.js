@@ -1,36 +1,14 @@
+(function() {
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 //  no.View
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-(function() {
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 no.View = function() {};
 
-no.extend(View.prototype, no.Events);
-
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Typedefs.
-
-/**
-    @typedef {function(
-        new:no.View,
-        string,
-        !Object
-    )}
-*/
-no.View.type_ctor;
-
-/**
-    @typedef {{
-        models: Object,
-        params: Object,
-        events: Object
-    }}
-*/
-no.View.type_info;
+no.extend(no.View.prototype, no.Events);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -40,7 +18,7 @@ no.View.prototype.init = function(id, params) {
 
     this.info = no.View.info(id);
 
-    this.status = 'none';
+    this.key = no.View.getKey(id, params, this.info);
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
@@ -52,27 +30,25 @@ no.View.prototype.init = function(id, params) {
 
     //  Создаем подблоки.
     var view_ids = no.layout.view(id);
-    var views = this._views = {};
+    var views = this.views = {};
     for (var view_id in view_ids) {
-        var view = (view_ids[view_id] === 'box') ? this.subBox(view_id, params) : this.subView(view_id, params);
-        views[view_id] = view;
+        if (view_ids[view_id] === 'box') {
+            this._addBox(view_id, params);
+        } else {
+            this._addView(view_id, params);
+        }
     }
+
+    this.node = null;
+    this.status = 'none';
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype.getKey = function() {
-    return no.View.getKey(this.id, this.params, this.info);
-};
-
-/**
-    @param {string} id
-    @param {Object} params
-    @param {no.View.type_info=} info
-    @return {string}
-*/
 no.View.getKey = function(id, params, info) {
-    info = info || no.View.info(id);
+    //  Ключ можно вычислить даже для неопределенных view,
+    //  в частности, для боксов.
+    info = info || no.View.info(id) || {};
 
     var key = 'view=' + id;
 
@@ -90,18 +66,9 @@ no.View.getKey = function(id, params, info) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/** @type { Object.<string, no.View.type_info> } */
 var _infos = {};
-
-/** @type { Object.<string, no.View.type_ctor> } */
 var _ctors = {};
 
-
-/**
-    @param {string} id
-    @param {no.View.type_info=} info
-    @param {no.View.type_ctor=} ctor
-*/
 no.View.define = function(id, info, ctor) {
     info = info || {};
     ctor = ctor || no.View;
@@ -121,21 +88,12 @@ no.View.define = function(id, info, ctor) {
     _ctors[id] = ctor;
 };
 
-/**
-    @param {string} id
-    @return {no.View.type_info}
-*/
 no.View.info = function(id) {
     return _infos[id];
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} view_id
-    @param {!Object} params
-    @return {no.View}
-*/
 no.View.create = function(id, params) {
     var ctor = _ctors[id] || no.View;
     var view = new ctor();
@@ -146,45 +104,37 @@ no.View.create = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._subView = function(id, params) {
-    var view = no.View.create(id, params);
-    this._addView(view);
+no.View.prototype._getView = function(id, params) {
+    var key = no.View.getKey(id, params);
+    return this.views[key];
 };
 
-no.View.prototype._addView = function(view) {
-    var id = view.id;
-    var box = this._boxes[id];
+no.View.prototype._addView = function(id, params) {
+    var view = this._getView(id, params);
+    if (!view) {
+        view = no.View.create(id, params);
+        this.views[view.key] = view;
+    }
+    return view;
+};
+
+no.View.prototype._addBox = function(id, params) {
+    var box = this._getView(id, params);
     if (!box) {
-        box = this._boxes[id] = {
-            active: null,
-            views: {}
-        };
+        box = new no.Box(id, params);
+        this.views[box.key] = box;
     }
-    box.views[view.key] = view;
-};
-
-no.View.prototype._setActiveView = function(view) {
-    var id = view.id;
-    var key = view.key;
-
-    var box = this._boxes[id];
-    if ( box && (key in box.views) ) {
-        box.active = key;
-    }
+    return box;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 
-/**
-    Рекурсивно обходим все дерево блока и применяем к каждому потомку (блоку или боксу) переданный callback.
-
-    При этом сперва вызываем callback, а потом уже обрабатываем под-дерево.
-    Если же callback возвращает null, то подблоки не обрабатываем.
-
-    @param {function(no.View): (boolean|undefined)} callback
-    @param {*=} params
-*/
+//  Рекурсивно обходим все дерево блока и применяем к каждому потомку (блоку или боксу) переданный callback.
+//
+//  При этом сперва вызываем callback, а потом уже обрабатываем под-дерево.
+//  Если же callback возвращает null, то подблоки не обрабатываем.
+//
 no.View.prototype.walk = function(callback, params) {
     var r = callback(this, params);
     if (r === null) { return; }
@@ -194,14 +144,6 @@ no.View.prototype.walk = function(callback, params) {
     var views = this._views;
     for (var id in views) {
        views[id].walk(callback, r);
-    }
-};
-
-no.Box.prototype.walk = function(callback, params) {
-    var views = this._views;
-    var active = this._active;
-    for (var i = 0, l = active.length; i < l; i++) {
-        views[ active[i] ].walk(callback, params);
     }
 };
 
@@ -307,28 +249,8 @@ no.View.prototype._unbindEvents = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype.update = function(layout_id, params) {
-    var layout = no.layout.get(layout_id, this.id);
-    var update = new no.Update(this, layout, params);
-
-    return update.start();
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 no.View.prototype.isValid = function() {
-    if ( this.status !== 'ok' || !this.isModelsValid() ) {
-        return false;
-    }
-
-    var views = this.views;
-    for (var id in views) {
-        if ( !views[id].isValid() ) {
-            return false;
-        }
-    }
-
-    return true;
+    return ( this.status === 'ok' && this.isModelsValid() );
 };
 
 no.View.prototype.isModelsValid = function() {
@@ -342,25 +264,48 @@ no.View.prototype.isModelsValid = function() {
     return true;
 };
 
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-})();
+no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
+    if ( !this.isValid() ) {
+        updated.push({
+            view: this,
+            layout: layout,
+            toplevel: toplevel
+        });
+        toplevel = false;
+    }
 
+    var views = this.views;
+    for (var id in views) {
+        views[id]._getUpdated(updated, layout[id], params, toplevel);
+    }
+
+    return updated;
+};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/*
-no.View.prototype._getStatus = function(params) {
-    var models = this.info.models;
-    for (var i = 0; i < models.length; i++) {
-        if (!no.Model.get(models[i], params)) {
-            return no.viewStatus.loading;
+no.View.views2models = function(views) {
+    var added = {};
+    var models = [];
+
+    for (var i = 0, l = views.length; i < l; i++) {
+        var viewModels = views[i].models;
+        for (var j = 0, k = viewModels.length; j < k; j++) {
+            var model = viewModels[j];
+            var key = model.key;
+            if ( !added[key] ) {
+                models.push(model);
+                added[key] = true;
+            }
         }
     }
-    return no.viewStatus.ok;
+
+    return models;
 };
 
-no.View.prototype.invalidate = function() {
-    this.status = no.viewStatus.unknown;
-};
-*/
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+})();
 

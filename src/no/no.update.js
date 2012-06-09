@@ -1,76 +1,67 @@
-/*
-    Процесс апдейта:
-
-      * Берем layout.
-      * Проходим по текущему дереву блоков, выписываем все видимые сейчас.
-      * Согласно layout выписываем все блоки, которые будут видны после апдейта.
-      * Все несуществующие блоки создаются в соответствующих боксах со статусом loading. ???
-      * Строим списки моделей, которые нужно запросить. Один список для основного (синхронного) апдейта,
-        и по одному списку для всех асинхронных view.
-      * Отправляем все запросы параллельно.
-        Но! Первым отправляем запрос для синхронного апдейта.
-      * При получении всех данных для синхро-апдейта строим дерево для шаблонизатор.
-        В этом дереве должно быть под-дерево соответствующее иерархии блоков
-        с дополнительной информацией, в частности, про статус блока.
-        Для блоков, для которых еще нет данных нужно генерить блок-заглушку стандартным шаблоном.
-      * Возможно, для асинхронные блоки верхнего уровня нужно создавать сразу и создавать отдельные апдейты для них.
-      * Блок-заглушка показывает место этого "бокса" в ДОМе, все однотипные блоки создаются как сиблинги этой ноды.
-      * После того, как отработал синхро-апдейт, можно апдейтить ДОМ для асинхронных апдейтов.
-      * В дереве для шаблонизаторов лучше не линковать данные для каждого блока и использовать true/false для
-        синхронных и асинхронных блоков.
-      * Странная идея: есть проблема в том, что если не описывать подблоки в описании блока, а использовать
-        только лейауты страниц, то неоткуда взять список параметров блока, чтобы строить ключ.
-        Идея: пройтись по всем лейаутам и вытащить оттуда, какие блоки бывают внутри данного и составить список параметров.
-
-      * Могут ли быть "боксы" с одинаковыми именами? Наверное, да, но есть проблемы:
-
-          * Как генерить их в шаблонизатор?
-            Ответ: использовать "каскад", т.е. match .app.left и match .foo.left.
-
-          * Как доставать ноду "бокса", если внутри блока может быть несколько "боксов" с одним именем.
-            И при этом нужная нода может быть и не первой?
-            Ответ: Можно проверять, что ближайший сверху блок это именно наш, а не подблок.
-
-*/
-
 (function() {
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+//  no.Update
+//  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update = function(view, layout, params) {
     this.view = view;
     this.layout = layout;
     this.params = params;
+
+    this.id = update_id++;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._getUpdated = function(updated, layout, params) {
-    if ( !this.isValid() ) {
-        updated.push({
-            view: this,
-            layout: layout
-        });
-    }
+var update_id = 0;
 
-    var views = this._views;
-    for (var id in views) {
-        views[id]._getUpdated(updated, layout[id], params);
-    }
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-    return updated;
-};
+no.Update.prototype.start = function() {
+    var updated = this.updated = this.view._getUpdated( [], this.layout, this.params, true );
 
-no.Box.prototype._getUpdated = function(updated, layout, params) {
-    var views = this._views;
+    console.log(updated);
 
-    for (var id in layout) {
-        var key = no.View.key(id, params);
-        var view = views[key];
-        if (!view) {
-            view = views[key] = no.View.create(id, params);
+    var sync = [];
+    var async = [];
+    for (var i = 0, l = updated.length; i < l; i++) {
+        var item = updated[i];
+        if (item.layout === 'async') {
+            async.push(item.view);
+        } else {
+            sync.push(item.view);
         }
-        view._getUpdated(updated, layout[id], params);
     }
+
+    console.log(sync, async);
+
+    return;
+
+    var that = this;
+
+    var promise = no.request( no.View.views2models(sync) ).then(function() {
+        that.update(that.view);
+    });
+
+    async.forEach(function(view) {
+        var models = no.View.views2models( [ view ] );
+        no.Promise.wait([
+            promise,
+            no.request(models)
+        ]).then(function() {
+            that.update(view);
+        });
+    });
+
 };
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Update.prototype.update = function() {
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._update = function() {
     var tree = this._templateTree(...);
@@ -109,54 +100,6 @@ no.View.prototype._cleanup = function() {
 
 };
 
-no.Update.prototype.start = function() {
-    var updated = this.view_getUpdated( [], this.layout, this.params );
-
-    var sync = [], async = [];
-    for (var i = 0, l = updated.length; i < l; i++) {
-        var item = updated[i];
-        if (item.layout === false) {
-            async.push(item.view);
-        } else {
-            sync.push(item.view);
-        }
-    }
-
-    var promise = no.request( no.View.views2models(sync) ).then(function() {
-        that.view._update(that);
-    });
-
-    async.forEach(function(view, i) {
-        var models = no.View.views2models( [ view ] );
-        no.Promise.wait([
-            promise,
-            no.request(models)
-        ]).then(function() {
-            view._update(that);
-        });
-    });
-
-};
-
-no.View.views2models = function(views) {
-    var added = {};
-    var models = [];
-
-    for (var i = 0, l = views.length; i < l; i++) {
-        var viewModels = views[i].models;
-        for (var j = 0, k = viewModels.length; j < k; j++) {
-            var model = viewModels[j];
-            var key = model.key;
-            if ( !added[key] ) {
-                models.push(model);
-                added[key] = true;
-            }
-        }
-    }
-
-    return models;
-};
-
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 
@@ -169,15 +112,7 @@ no.View.views2models = function(views) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-
-/**
-    Usage:
-    var update = new no.Update(pageinfo.layoutId, appView, pageinfo.params);
-
-    @param {string} layoutId Current layout id. Initially it current page layout id.
-    @param {no.View} pageRootView Start view for update. Currenty, it is app view.
-    @param {Object} params Update params. Initially these are page params from URL.
-*/
+/*
 no.Update = function(layoutId, pageRootView, params) {
     this.id = no.Update.id++;
 
@@ -194,12 +129,13 @@ no.Update = function(layoutId, pageRootView, params) {
 
 no.extend(no.Update.prototype, no.Events);
 
-/** @type {number} */
 no.Update.id = 0;
 
 no.Update.prototype.start = function() {
     this.requestMore();
 };
+
+//  ---------------------------------------------------------------------------------------------------------------  //
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -223,9 +159,6 @@ no.Update.prototype.createRequests = function() {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    Create request for async view.
-*/
 no.Update.prototype.createRequest4Async = function(viewId) {
     var that = this;
 
@@ -259,10 +192,6 @@ no.Update.prototype.createRequest4Async = function(viewId) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    Creates a request for all !async blocks for main update view.
-    @param {Array.<string>} models Model ids for !async blocks.
-*/
 no.Update.prototype.createMainRequest = function(models) {
     var that = this;
     var viewId = this.view.id;
@@ -292,10 +221,6 @@ no.Update.prototype.createMainRequest = function(models) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @param {!Object} obj Target object to go through its properties.
-    @param {function} callback A callback, called only on leaf properties (primitive types, !object).
-*/
 no.Update.walkLeafs = function(obj, callback) {
     no.object.forEach(obj, function(value, key) {
         if (typeof value !== 'object') {
@@ -308,9 +233,6 @@ no.Update.walkLeafs = function(obj, callback) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @param {no.View|no.Box|string} view View instance or view id, to find it.
-*/
 no.Update.prototype.updateView = function(view, request) {
     if (typeof view === "string") {
         view = no.View.get(view, this.params);
@@ -347,10 +269,6 @@ no.Update.prototype.updateView = function(view, request) {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @param {no.View|no.Box} view View / box, which html must be updated.
-    @param {Element} node Generated html.
-*/
 no.Update.prototype.updateHtml = function(view, node) {
     var that = this;
     view.processTree(function(view) {
@@ -401,3 +319,5 @@ no.Update.prototype._createGroup = function(viewId) {
         params: this.params
     };
 };
+*/
+

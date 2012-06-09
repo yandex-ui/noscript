@@ -1,43 +1,73 @@
-/**
-    @constructor
-    @param {string} id
-    @param {!Object} params
-    @param {no.View} parent
-*/
-no.Box = function(id, params, parent) {
+//  ---------------------------------------------------------------------------------------------------------------  //
+//  no.Box
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Box = function(id, params) {
     this.id = id;
     this.params = params;
-    this.parent = parent;
 
-    /** @type { Object.<string, no.View> } */
-    this.archive = {};
+    this.views = {};
 
-    /** @type {Element} */
-    this.node;
+    //  NOTE: Нет специального метода no.Box.getKey --
+    //  все ключи вычисляются только через no.View.getKey.
+    this.key = no.View.key(id, params);
 
-    /** @type {boolean|undefined} */
-    this.status;
-
-    /** @type {Array.<string>} */
-    this.current;
+    this.node = null;
+    this.active = null;
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} view_id
-    @return {no.View}
-*/
-no.Box.prototype.subView = function(view_id, params) {
-    return no.View.create( view_id, params, this );
+no.Box.prototype._getView = function(id, params) {
+    var key = no.View.getKey(id, params);
+    return this.views[key];
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+no.Box.prototype._addView = function(id, params) {
+    var view = this._getView(id, params);
+    if (!view) {
+        view = no.View.create(id, params);
+        this.views[view.key] = view;
+    }
+    return view;
+};
 
-/**
-    @param {Element} node
-    @param {no.Update} update
-*/
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Box.prototype.activate = function(views) {
+    //  TODO
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Box.prototype.walk = function(callback, params) {
+    var active = this.active;
+
+    if (active) {
+        var views = this.views;
+
+        for (var i = 0, l = active.length; i < l; i++) {
+            var view = views[ active[i] ];
+            view.walk(callback, params);
+        }
+    }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Box.prototype._getUpdated = function(updated, layout, params, toplevel) {
+    var views = this.views;
+
+    for (var id in layout) {
+        var view = this._addView(id, params);
+        view._getUpdated(updated, layout[id], params, toplevel);
+    }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+
+/*
 no.Box.prototype.update = function(node, update) {
     if (!this.status) {
         node = no.byClass('box-' + this.id, node)[0];
@@ -84,10 +114,6 @@ no.Box.prototype.update = function(node, update) {
 
 };
 
-/**
-    @param {Element} node
-    @param {no.Update} update
-*/
 no.Box.prototype.updateCurrent = function(node, update) {
     var params = update.params;
 
@@ -123,48 +149,12 @@ no.Box.prototype.updateCurrent = function(node, update) {
 
     this.current = content;
 };
-
+*/
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-/**
-    @param {function(no.View): (boolean|undefined)}
-*/
-no.Box.prototype.processTree = function(callback) {
-    var r = callback(this);
-    if (r === false) { return; }
 
-    var current = this.current;
-    if (current) {
-        var archive = this.archive;
-        for (var i = 0, l = current.length; i < l; i++) {
-            var view = archive[ current[i] ];
-            view.processTree(callback);
-        }
-    }
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {no.Update} update
-    @return {boolean}
-*/
-no.Box.prototype.needUpdate = function(update) {
-    var current = this.current;
-    if (!current) { return true; }
-
-    var views = update.layout[ this.parent.id ][ this.id ];
-    var content = no.View.ids2keys(views, update.params);
-
-    return ( content.join('|') !== current.join('|') );
-};
-
-
-/**
-    @param {no.Update} update
-    @param {Object} trees
-*/
+/*
 no.Box.prototype.getUpdateTrees = function(update, trees) {
     var archive = this.archive;
     var params = update.params;
@@ -182,6 +172,7 @@ no.Box.prototype.getUpdateTrees = function(update, trees) {
         view.getUpdateTrees(update, trees);
     }
 };
+*/
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

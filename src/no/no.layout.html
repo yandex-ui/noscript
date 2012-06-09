@@ -26,17 +26,23 @@ no.Model.define('profile', {
         'author-login': true
     }
 });
-no.Model.define('recent-photos');
-no.Model.define('photo-image', {
+no.Model.define('recent-photos', {
+    params: {
+        'author-login': true
+    }
+});
+no.Model.define('photo', {
     params: {
         'author-login': true,
         'image-id': true
     }
 });
-no.Model.define('photo-comments', {
+no.Model.define('comments', {
     params: {
         'author-login': true,
-        'image-id': true
+        'image-id': true,
+        'page-size': 5,
+        'page': 0
     }
 });
 
@@ -58,10 +64,10 @@ no.View.define('photo', {
     }
 });
 no.View.define('photo-image', {
-    models: [ 'photo-image' ]
+    models: [ 'photo' ]
 });
 no.View.define('photo-comments', {
-    models: [ 'auth', 'photo-comments' ]
+    models: [ 'auth', 'comments' ]
 });
 
 var app = no.View.create('app');

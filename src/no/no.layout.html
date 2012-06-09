@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>no.layout</title>
+    <script src="jquery-1.7.1.js"></script>
+    <script src="no.js"></script>
+    <script src="no.object.js"></script>
+    <script src="no.array.js"></script>
+    <script src="no.events.js"></script>
+    <script src="no.promise.js"></script>
+    <script src="no.model.js"></script>
+    <script src="no.view.js"></script>
+    <script src="no.box.js"></script>
+    <script src="no.layout.js"></script>
+    <script src="no.request.js"></script>
+    <script src="no.update.js"></script>
+    <script src="no.http.js"></script>
+    <script src="layout.js"></script>
+</head>
+<body>
+<script>
+no.Model.define('auth');
+no.Model.define('index');
+no.Model.define('profile', {
+    params: {
+        'author-login': true
+    }
+});
+no.Model.define('recent-photos');
+no.Model.define('photo-image', {
+    params: {
+        'author-login': true,
+        'image-id': true
+    }
+});
+no.Model.define('photo-comments', {
+    params: {
+        'author-login': true,
+        'image-id': true
+    }
+});
+
+no.View.define('app', {
+    models: [ 'auth' ]
+});
+no.View.define('index');
+no.View.define('user');
+no.View.define('profile', {
+    models: [ 'profile' ]
+});
+no.View.define('recent-photos', {
+    models: [ 'recent-photos' ]
+});
+no.View.define('photo', {
+    params: {
+        'author-login': true,
+        'image-id': true
+    }
+});
+no.View.define('photo-image', {
+    models: [ 'photo-image' ]
+});
+no.View.define('photo-comments', {
+    models: [ 'auth', 'photo-comments' ]
+});
+
+var app = no.View.create('app');
+
+var update = new no.Update(app, no.layout.page('view-photo'), {
+    'author-login': 'nop',
+    'image-id': 42
+});
+update.start();
+
+</script>
+</body>
+</html>

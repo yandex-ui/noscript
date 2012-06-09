@@ -14,7 +14,7 @@ no.extend(no.View.prototype, no.Events);
 
 no.View.prototype.init = function(id, params) {
     this.id = id;
-    this.params = params;
+    this.params = params || {};
 
     this.info = no.View.info(id);
 
@@ -25,7 +25,7 @@ no.View.prototype.init = function(id, params) {
     var models = this.models = {};
     for (var i = 0, l = model_ids.length; i < l; i++) {
         var model_id = model_ids[i];
-        models[model_id] = no.Model.get( model_id, params, { force: true } );
+        models[model_id] = no.Model.create(model_id, params);
     }
 
     //  Создаем подблоки.
@@ -95,7 +95,7 @@ no.View.info = function(id) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.create = function(id, params) {
-    var ctor = _ctors[id] || no.View;
+    var ctor = _ctors[id];
     var view = new ctor();
     view.init(id, params);
 
@@ -113,7 +113,7 @@ no.View.prototype._addView = function(id, params) {
     var view = this._getView(id, params);
     if (!view) {
         view = no.View.create(id, params);
-        this.views[view.key] = view;
+        this.views[view.id] = view;
     }
     return view;
 };
@@ -122,7 +122,7 @@ no.View.prototype._addBox = function(id, params) {
     var box = this._getView(id, params);
     if (!box) {
         box = new no.Box(id, params);
-        this.views[box.key] = box;
+        this.views[box.id] = box;
     }
     return box;
 };
@@ -292,8 +292,8 @@ no.View.views2models = function(views) {
 
     for (var i = 0, l = views.length; i < l; i++) {
         var viewModels = views[i].models;
-        for (var j = 0, k = viewModels.length; j < k; j++) {
-            var model = viewModels[j];
+        for (var model_id in viewModels) {
+            var model = viewModels[model_id];
             var key = model.key;
             if ( !added[key] ) {
                 models.push(model);

@@ -21,36 +21,33 @@ var update_id = 0;
 no.Update.prototype.start = function() {
     var updated = this.updated = this.view._getUpdated( [], this.layout, this.params, true );
 
-    console.log(updated);
-
     var sync = [];
     var async = [];
     for (var i = 0, l = updated.length; i < l; i++) {
         var item = updated[i];
-        if (item.layout === 'async') {
+        //  FIXME: Убрать false, использовать только внятные константы.
+        if (item.layout === 'async' || item.layout === false) {
             async.push(item.view);
         } else {
             sync.push(item.view);
         }
     }
 
-    console.log(sync, async);
-
-    return;
-
     var that = this;
 
-    var promise = no.request( no.View.views2models(sync) ).then(function() {
-        that.update(that.view);
+    var promise = no.requestModels( no.View.views2models(sync) ).then(function(r) {
+        console.log('done', r);
+        //  that.update(that.view);
     });
 
     async.forEach(function(view) {
         var models = no.View.views2models( [ view ] );
         no.Promise.wait([
             promise,
-            no.request(models)
-        ]).then(function() {
-            that.update(view);
+            no.requestModels(models)
+        ]).then(function(r) {
+            console.log('done', r);
+            //  that.update(view);
         });
     });
 
@@ -63,6 +60,7 @@ no.Update.prototype.update = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+/*
 no.View.prototype._update = function() {
     var tree = this._templateTree(...);
     var html = Yater.run(tree, null, '');
@@ -99,6 +97,7 @@ no.View.prototype._templateTree = function(layout, models) {
 no.View.prototype._cleanup = function() {
 
 };
+*/
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 

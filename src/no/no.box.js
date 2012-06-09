@@ -10,7 +10,7 @@ no.Box = function(id, params) {
 
     //  NOTE: Нет специального метода no.Box.getKey --
     //  все ключи вычисляются только через no.View.getKey.
-    this.key = no.View.key(id, params);
+    this.key = no.View.getKey(id, params);
 
     this.node = null;
     this.active = null;

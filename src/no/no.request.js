@@ -1,5 +1,11 @@
 (function() {
 
+no.requestModels = function(models) {
+    var request = new Request(models);
+
+    return request.start();
+};
+
 no.request = function(items, params) {
     if (params) {
         items = normalizeItems(items, params);
@@ -82,6 +88,7 @@ Request.prototype.start = function() {
         }
     }
 
+    console.log(loading, requesting);
     this.request(loading, requesting);
 
     return this.promise;

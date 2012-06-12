@@ -129,28 +129,6 @@ no.View.prototype._addBox = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-
-/*
-//  Рекурсивно обходим все дерево блока и применяем к каждому потомку (блоку или боксу) переданный callback.
-//
-//  При этом сперва вызываем callback, а потом уже обрабатываем под-дерево.
-//  Если же callback возвращает null, то подблоки не обрабатываем.
-//
-no.View.prototype.walk = function(callback, params) {
-    var r = callback(this, params);
-    if (r === null) { return; }
-
-    r = (r == null) ? params : r;
-
-    var views = this._views;
-    for (var id in views) {
-       views[id].walk(callback, r);
-    }
-};
-*/
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 //  FIXME: Нужны три состояния:
 //
 //    * блок виден;
@@ -268,22 +246,21 @@ no.View.prototype.isModelsValid = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
-    if ( !this.isValid() ) {
-        //  Если это асинхронный блок, то он всегда toplevel.
-        toplevel = toplevel || (layout === false);
-        updated.push({
-            view: this,
-            layout: layout,
-            toplevel: toplevel
-        });
-        //  Все нижележащие блоки точно не toplevel.
-        toplevel = false;
-    }
+no.View.prototype._getRequestViews = function(updated, layout, params) {
+    //  В layout может быть объект, true (тоже самое, что и 'show'), 'hide' и 'async'.
+    if (layout !== 'hide') {
+        if  ( !this.isValid() ) {
+            if (layout === 'async') {
+                updated.async.push(this);
+            } else {
+                updated.sync.push(this);
+            }
+        }
 
-    var views = this.views;
-    for (var id in views) {
-        views[id]._getUpdated(updated, layout[id], params, toplevel);
+        var views = this.views;
+        for (var id in views) {
+            views[id]._getRequestViews(updated, layout[id], params);
+        }
     }
 
     return updated;
@@ -291,10 +268,29 @@ no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._getTemplateTree = function(layout, params) {
-    // console.log('isModelsValid', this.id, this.isModelsValid() );
-    if ( !this.isModelsValid() ) {
+no.View.prototype._getUpdateTree = function(tree, layout, params) {
+    if ( !this.isValid() ) {
+        tree.views[this.id] = this._getViewTree(tree.models, layout, params);
+    } else {
+        var views = this.views;
+        for (var id in views) {
+            views[id]._getUpdateTree(tree, layout[id], params);
+        }
+    }
+
+    return tree;
+};
+
+no.View.prototype._getViewTree = function(models, layout, params) {
+    if ( layout === 'hide' || ( layout === 'async' && !this.isModelsValid() ) ) {
         return false;
+    }
+
+    for (var id in this.models) {
+        var model = this.models[id];
+        if ( model.isValid() ) {
+            models[model.id] = model.getData();
+        }
     }
 
     if (typeof layout !== 'object') {
@@ -305,10 +301,36 @@ no.View.prototype._getTemplateTree = function(layout, params) {
 
     var views = this.views;
     for (var id in layout) {
-        tree[id] = views[id]._getTemplateTree(layout[id], params);
+        tree[id] = views[id]._getViewTree(models, layout[id], params);
     }
 
     return tree;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
+    if ( !this.isValid() ) {
+        var viewNode = no.byClass('view-' + this.id, node)[0];
+        if (viewNode) {
+            if (toplevel) {
+                no.replaceNode(this.node, viewNode);
+                toplevel = false;
+            }
+            this.node = viewNode;
+
+            if ( !viewNode.getAttribute('dummy') ) {
+                this.status = 'ok';
+            }
+        }
+    }
+
+    viewNode = viewNode || node;
+    var views = this.views;
+    for (var id in views) {
+        views[id]._updateHTML(viewNode, layout[id], params, toplevel);
+    }
+
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -333,21 +355,6 @@ no.View.views2models = function(views) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-
-no.View.prototype._show = function() {
-    var node = this.node;
-    if (node) {
-        node.style.display = '';
-    }
-};
-
-no.View.prototype._hide = function() {
-    var node = this.node;
-    if (node) {
-        node.style.display = 'none';
-    }
-};
-
 
 })();
 

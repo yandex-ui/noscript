@@ -57,33 +57,63 @@ no.Box.prototype.walk = function(callback, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype._getUpdated = function(updated, layout, params, toplevel) {
-    if (!toplevel) {
-        updated.push({
-            view: this,
-            layout: layout,
-            toplevel: toplevel
-        });
-    }
-
+no.Box.prototype._getRequestViews = function(updated, layout, params) {
     var views = this.views;
     for (var id in layout) {
         var view = this._addView(id, params);
-        view._getUpdated(updated, layout[id], params, toplevel);
+        view._getRequestViews(updated, layout[id], params);
     }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype._getTemplateTree = function(layout, params) {
+no.Box.prototype._getUpdateTree = function(tree, layout, params) {
+    var views = this.views;
+    for (var id in layout) {
+        var key = no.View.getKey(id, params);
+        views[key]._getUpdateTree(tree, layout[id], params);
+    }
+};
+
+no.Box.prototype._getViewTree = function(models, layout, params) {
     var tree = {};
 
     var views = this.views;
     for (var id in layout) {
         var key = no.View.getKey(id, params);
-        tree[id] = views[key]._getTemplateTree( layout[id], params );
+        tree[id] = views[key]._getViewTree(models, layout[id], params);
     }
 
     return tree;
+};
+
+no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
+    if (!this.node) {
+        this.node = no.byClass('box-' + this.id, node)[0];
+    }
+
+    var views = this.views;
+
+    var newActive = {};
+    for (var id in layout) {
+        var key = no.View.getKey(id, params);
+        newActive[key] = true;
+        views[key]._updateHTML(node, layout[id], params, toplevel);
+    }
+
+    var oldActive = this.active;
+    for (var key in oldActive) {
+        if ( !(key in newActive) ) {
+            views[key]._hide();
+        }
+    }
+
+    for (var key in newActive) {
+        if ( !(key in oldActive) ) {
+            views[key]._show();
+        }
+    }
+
+    this.active = newActive;
 };
 

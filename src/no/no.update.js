@@ -35,7 +35,7 @@ no.Update.prototype.start = function() {
     var that = this;
 
     var promise = no.requestModels( items2models(sync) ).then(function(r) {
-        that.update(sync);
+        that.update(updated);
     });
 
     async.forEach(function(item) {
@@ -45,7 +45,7 @@ no.Update.prototype.start = function() {
             promise,
             no.requestModels(models)
         ]).then(function(r) {
-            that.update(items);
+            that.update(updated);
         });
     });
 
@@ -62,16 +62,18 @@ function items2models(items) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype.update = function(items) {
+    console.log( this.view._getUpdated( [], this.layout, this.params, true ) );
+    // console.log('update', items);
     var layoutTree = {};
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
 
-        if (item.toplevel) {
+        if (item.toplevel && item.layout !== false) {
             var view = item.view;
             layoutTree[view.id] = view._getTemplateTree(item.layout, this.params);
         }
     }
-    console.dir(layoutTree);
+    // console.log('layoutTree', layoutTree);
     if ( no.object.isEmpty(layoutTree) ) {
         return;
     }
@@ -92,11 +94,21 @@ no.Update.prototype.update = function(items) {
         location: document.location
     };
 
-    console.log(tree);
+    // console.log(tree);
     var html = Yater.run(tree, null, '');
     var node = no.html2node(html);
     this.updateViews(items, node);
     // console.log(html);
+
+    /*
+    console.log('STATUSES');
+    for (var i = 0, l = items.length; i < l; i++) {
+        var item = items[i];
+        if (item.view instanceof no.View) {
+            console.log(item.view.id, item.view.status, item.view.isValid());
+        }
+    }
+    */
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -104,6 +116,7 @@ no.Update.prototype.update = function(items) {
 no.Update.prototype.updateViews = function(items, node) {
     for (var i = items.length; i--; ) {
         var item = items[i];
+        // console.log(i, item.view.id);
         item.view.update(node, item.layout, this.params, item.toplevel);
     }
 };
@@ -112,15 +125,21 @@ no.Update.prototype.updateViews = function(items, node) {
 
 no.View.prototype.update = function(node, layout, params, toplevel) {
     var viewNode = no.byClass('view-' + this.id, node)[0];
+    // console.log('View.update', this.id, viewNode);
     if (viewNode) {
-        if (toplevel) {
+        var loading = viewNode.getAttribute('loading');
+        // console.log(toplevel, loading);
+        if (toplevel && !loading) {
             //  FIXME: onhtmldestroy.
+            console.log(this.id);
             no.replaceNode(this.node, viewNode);
             toplevel = false;
         } else {
             this.node = viewNode;
         }
-        this.status = 'ok';
+        if (!loading) {
+            this.status = 'ok';
+        }
     }
 };
 

@@ -292,6 +292,7 @@ no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._getTemplateTree = function(layout, params) {
+    // console.log('isModelsValid', this.id, this.isModelsValid() );
     if ( !this.isModelsValid() ) {
         return false;
     }

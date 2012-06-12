@@ -99,3 +99,10 @@ no.todo = function() {
     throw new Error('Unimplemented');
 };
 
+no.html2node = function(html) {
+    var div = document.createElement('div');
+    div.innerHTML = html;
+
+    return div.firstChild;
+};
+

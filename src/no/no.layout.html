@@ -21,6 +21,9 @@
     <script src="/pheebs.yate.js"></script>
 </head>
 <body>
+
+<div class="view view-app loading"></div>
+
 <script>
 no.Model.define('auth');
 no.Model.define('index');
@@ -74,6 +77,7 @@ no.View.define('photo-comments', {
 });
 
 var app = no.View.create('app');
+app.node = no.byClass('view-app')[0];
 
 var update = new no.Update(app, no.layout.page('view-photo'), {
     'author-login': 'dkomanov',

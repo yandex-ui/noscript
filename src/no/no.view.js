@@ -291,7 +291,7 @@ no.View.prototype._getUpdated = function(updated, layout, params, toplevel) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._templateTree = function(layout, params) {
+no.View.prototype._getTemplateTree = function(layout, params) {
     if ( !this.isModelsValid() ) {
         return false;
     }
@@ -301,9 +301,10 @@ no.View.prototype._templateTree = function(layout, params) {
     }
 
     var tree = {};
+
     var views = this.views;
     for (var id in layout) {
-        tree[id] = views[id]._templateTree( layout[id], params );
+        tree[id] = views[id]._getTemplateTree(layout[id], params);
     }
 
     return tree;
@@ -331,6 +332,21 @@ no.View.views2models = function(views) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+no.View.prototype._show = function() {
+    var node = this.node;
+    if (node) {
+        node.style.display = '';
+    }
+};
+
+no.View.prototype._hide = function() {
+    var node = this.node;
+    if (node) {
+        node.style.display = 'none';
+    }
+};
+
 
 })();
 

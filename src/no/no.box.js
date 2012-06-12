@@ -13,7 +13,7 @@ no.Box = function(id, params) {
     this.key = no.View.getKey(id, params);
 
     this.node = null;
-    this.active = null;
+    this.active = {};
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -58,8 +58,15 @@ no.Box.prototype.walk = function(callback, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Box.prototype._getUpdated = function(updated, layout, params, toplevel) {
-    var views = this.views;
+    if (!toplevel) {
+        updated.push({
+            view: this,
+            layout: layout,
+            toplevel: toplevel
+        });
+    }
 
+    var views = this.views;
     for (var id in layout) {
         var view = this._addView(id, params);
         view._getUpdated(updated, layout[id], params, toplevel);
@@ -68,128 +75,15 @@ no.Box.prototype._getUpdated = function(updated, layout, params, toplevel) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype._templateTree = function(layout, params) {
+no.Box.prototype._getTemplateTree = function(layout, params) {
     var tree = {};
 
     var views = this.views;
     for (var id in layout) {
         var key = no.View.getKey(id, params);
-        var view = views[key];
-        tree[id] = view._templateTree( layout[id], params );
+        tree[id] = views[key]._getTemplateTree( layout[id], params );
     }
 
     return tree;
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-
-/*
-no.Box.prototype.update = function(node, update) {
-    if (!this.status) {
-        node = no.byClass('box-' + this.id, node)[0];
-        if (!node) { return; }
-
-        this.node = node;
-        this.status = true;
-    }
-
-    var params = update.params;
-    var archive = this.archive;
-
-    // Свежесозданный box. Создаем актуальный current -- список блоков, которые в нем лежат в данный момент.
-    // А это те блоки, которые сгенерились в html'е.
-    // Они могут быть:
-    //   - не все, что положены по layout'у;
-    //   - в неправильном порядке (из-за того, что хэши в javascript'е не упорядоченные, вообще говоря).
-    // Поэтому приходится смотреть, что же там сгенерилось и в каком порядке.
-    // Дальше, если порядок неправильный, блоки будут переставлены в нужном порядке дальше, в updateCurrent().
-
-    if (!this.current) {
-        var current = [];
-        var children = node.children; // FIXME: node.children не работает в FF3.0.
-
-        for (var i = 0, l = children.length; i < l; i++) {
-            var child = children[i];
-            var className = child.className;
-            var r = className.match(/\bview-(\S+)\b/);
-            if (r) {
-                var view_id = r[1];
-
-                var key = no.View.getKey(view_id, params);
-                current.push(key);
-
-                var view = archive[key] = this.subView(view_id, params);
-                view.update(this.node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
-            }
-        }
-
-        this.current = current;
-    }
-
-    this.updateCurrent(node, update);
-
-};
-
-no.Box.prototype.updateCurrent = function(node, update) {
-    var params = update.params;
-
-    var archive = this.archive;
-
-    var views = update.layout[ this.parent.id ][ this.id ];
-    var content = no.View.ids2keys(views, params);
-    var contentKeys = no.array.toObject(content);
-
-    var current = no.array.grep(this.current, function(key) { // Проходим по текущему контенту и прячем все блоки, которые не должны отображаться в текущем layout.
-        if (!(key in contentKeys)) {
-            archive[key].hide();
-            return false;
-        }
-        return true;
-    });
-
-    for (var i = 0, l = views.length; i < l; i++) {
-        var view_id = views[i];
-        var key = content[i];
-
-        var view = archive[key];
-        if (!view) {
-            view = archive[key] = this.subView(view_id, params);
-        }
-        if (view.needUpdate()) {
-            view.update(node, update);
-        }
-        view.show();
-
-        this.node.appendChild(view.node);
-    }
-
-    this.current = content;
-};
-*/
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-
-/*
-no.Box.prototype.getUpdateTrees = function(update, trees) {
-    var archive = this.archive;
-    var params = update.params;
-
-    var views = update.layout[ this.parent.id ][ this.id ];
-    var content = no.View.ids2keys(views, update.params);
-
-    for (var i = 0, l = content.length; i < l; i++) {
-        var view_id = views[i];
-        var key = content[i];
-        var view = archive[key];
-        if (!archive[key]) {
-            view = this.subView( view_id, params );
-        }
-        view.getUpdateTrees(update, trees);
-    }
-};
-*/
-
-// ----------------------------------------------------------------------------------------------------------------- //
 

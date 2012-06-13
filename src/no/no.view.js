@@ -246,6 +246,7 @@ no.View.prototype.isModelsValid = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Вызываем callback для всех подблоков.
 no.View.prototype._apply = function(callback) {
     var views = this.views;
     for (var id in views) {
@@ -255,27 +256,36 @@ no.View.prototype._apply = function(callback) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
+//  требующие перерисовки. Раскладываем их в две "кучки": sync и async.
 no.View.prototype._getRequestViews = function(updated, layout, params) {
-    //  В layout может быть объект, true (тоже самое, что и 'show'), 'hide' и 'async'.
-    if (layout !== 'hide') {
-        if  ( !this.isValid() ) {
-            if (layout === 'async') {
-                updated.async.push(this);
-            } else {
-                updated.sync.push(this);
-            }
+    if  ( !this.isValid() ) {
+        if (layout === false) {
+            updated.async.push(this);
+        } else {
+            updated.sync.push(this);
         }
-
-        this._apply(function(view, id) {
-            view._getRequestViews(updated, layout[id], params);
-        });
     }
+
+    this._apply(function(view, id) {
+        view._getRequestViews(updated, layout[id], params);
+    });
 
     return updated;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Строим дерево для шаблонизатора.
+//
+//  В tree.views будет дерево блоков, которые нужно сгенерить,
+//  причем на верхнем уровне будут т.н. toplevel-блоки --
+//  это невалидные блоки и выше их все блоки валидны.
+//  В частности, это значит, что если блок невалидный, то он будет перерисован
+//  со всеми своими подблоками.
+//
+//  В tree.models будут все модели, требуемые для этих блоков.
+//
 no.View.prototype._getUpdateTree = function(tree, layout, params) {
     if ( !this.isValid() ) {
         tree.views[this.id] = this._getViewTree(tree.models, layout, params);
@@ -288,22 +298,32 @@ no.View.prototype._getUpdateTree = function(tree, layout, params) {
     return tree;
 };
 
+//  Строим дерево блоков, попутно собираем все нужные для него модели.
 no.View.prototype._getViewTree = function(models, layout, params) {
-    if ( layout === 'hide' || ( layout === 'async' && !this.isModelsValid() ) ) {
+    //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
+    //  помечаем его как асинхронный (false).
+    //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
+    //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
+    if ( layout === false && !this.isModelsValid() ) {
         return false;
     }
 
+    //  Собираем все нужные модели.
     for (var id in this.models) {
         var model = this.models[id];
+        //  FIXME: Кажется, эта провека тут не нужна.
+        //  Нужно перед началом апдейта проверять, что все данные в наличии.
         if ( model.isValid() ) {
             models[model.id] = model.getData();
         }
     }
 
+    //  Это блок без подблоков и он не асинхронный.
     if (typeof layout !== 'object') {
         return true;
     }
 
+    //  Собираем дерево рекурсивно из подблоков.
     var tree = {};
     this._apply(function(view, id) {
         tree[id] = view._getViewTree(models, layout[id], params);
@@ -314,21 +334,33 @@ no.View.prototype._getViewTree = function(models, layout, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Обновляем (если нужно) ноду блока.
 no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
-    //  FIXME: hide: true
+    //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
+        //  Ищем новую ноду блока.
         var viewNode = no.byClass('view-' + this.id, node)[0];
         if (viewNode) {
+            //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
+            //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
+            //  автоматически попадут на нужное место.
             if (toplevel) {
                 //  FIXME: unbindEvents.
                 //  FIXME: onhtmldestroy.
+
+                //  Старая нода показывает место, где должен быть блок.
                 no.replaceNode(this.node, viewNode);
+                //  Все подблоки уже не toplevel.
                 toplevel = false;
             }
+            //  Запоминаем новую ноду.
             this.node = viewNode;
+
             //  FIXME: onhtmlinit.
             //  FIXME: bindEvents.
 
+            //  Если это не заглушка (заглушка генерится для асинхронных блоков,
+            //  для которых еще не пришли все модели), то блок отныне валиден.
             if ( !viewNode.getAttribute('dummy') ) {
                 this.status = 'ok';
             }
@@ -337,8 +369,11 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
 
     //  FIXME: onrepaint.
 
+    //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть
+    //  никаких подблоков. В этом случае, нужно брать viewNode.
     viewNode = viewNode || node;
 
+    //  Рекурсивно идем вниз по дереву.
     this._apply(function(view, id) {
         view._updateHTML(viewNode, layout[id], params, toplevel);
     });

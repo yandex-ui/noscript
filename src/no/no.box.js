@@ -34,16 +34,21 @@ no.Box.prototype._addView = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Ищем все новые блоки и блоки, требующие перерисовки.
 no.Box.prototype._getRequestViews = function(updated, layout, params) {
     var views = this.views;
     for (var id in layout) {
+        //  Согласно новому layout'у здесь должен быть view с id/params.
+        //  Создаем его (если он уже есть, он возьмется из this.views).
         var view = this._addView(id, params);
+        //  Идем вниз рекурсивно.
         view._getRequestViews(updated, layout[id], params);
     }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
 no.Box.prototype._getUpdateTree = function(tree, layout, params) {
     var views = this.views;
     for (var id in layout) {
@@ -52,7 +57,9 @@ no.Box.prototype._getUpdateTree = function(tree, layout, params) {
     }
 };
 
+//  Строим дерево блоков.
 no.Box.prototype._getViewTree = function(models, layout, params) {
+    //  Для бокса это всегда объект (возможно, пустой).
     var tree = {};
 
     var views = this.views;
@@ -66,38 +73,46 @@ no.Box.prototype._getViewTree = function(models, layout, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Обновляем бокс.
 no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
     if (!this.node) {
+        //  Ищем новую ноду бокса.
         this.node = no.byClass('box-' + this.id, node)[0];
     }
 
     var views = this.views;
 
-    var newActive = {};
+    //  this.active -- это объект (упорядоченный!), в котором лежат ключи
+    //  активных (видимых) в данный момент блоков.
     var oldActive = this.active;
+    var newActive = {};
 
+    //  Строим новый active.
     for (var id in layout) {
         var key = no.View.getKey(id, params);
         newActive[key] = true;
 
+        //  Достаем ранее созданный блок (в _getRequestViews).
         var view = views[key];
 
+        //  Обновляем его.
         view._updateHTML(node, layout[id], params, toplevel);
 
-        if ( layout[id] === 'hide' ) {
-            view._hide();
-        } else {
-            view._show();
-            this.node.appendChild(view.node);
-        }
+        //  Показываем его.
+        view._show();
+        //  Выстраиваем новые активные блоки в нужном порядке.
+        //  Плюс, если это новый блок, подклеиваем его к боксу.
+        this.node.appendChild(view.node);
     }
 
+    //  Прячем все блоки, которые были активны, но перестали после этого апдейта.
     for (var key in oldActive) {
         if ( !newActive[key] ) {
             views[key]._hide();
         }
     }
 
+    //  Запоминаем новый active.
     this.active = newActive;
 };
 

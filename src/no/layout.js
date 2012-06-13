@@ -28,7 +28,7 @@ no.layout.define('view-photo', {
                 'photo': {
                     'photo-image': true,
                     '@comments': {
-                        'photo-comments': 'async'
+                        'photo-comments': false
                     }
                 }
             }

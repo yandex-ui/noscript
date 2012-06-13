@@ -335,26 +335,5 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.views2models = function(views) {
-    var added = {};
-    var models = [];
-
-    for (var i = 0, l = views.length; i < l; i++) {
-        var viewModels = views[i].models;
-        for (var model_id in viewModels) {
-            var model = viewModels[model_id];
-            var key = model.key;
-            if ( !added[key] ) {
-                models.push(model);
-                added[key] = true;
-            }
-        }
-    }
-
-    return models;
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 })();
 

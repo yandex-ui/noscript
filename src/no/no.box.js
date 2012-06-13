@@ -34,29 +34,6 @@ no.Box.prototype._addView = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype.activate = function(views) {
-    //  TODO
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/*
-no.Box.prototype.walk = function(callback, params) {
-    var active = this.active;
-
-    if (active) {
-        var views = this.views;
-
-        for (var i = 0, l = active.length; i < l; i++) {
-            var view = views[ active[i] ];
-            view.walk(callback, params);
-        }
-    }
-};
-*/
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 no.Box.prototype._getRequestViews = function(updated, layout, params) {
     var views = this.views;
     for (var id in layout) {
@@ -95,22 +72,27 @@ no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
     var views = this.views;
 
     var newActive = {};
+    var oldActive = this.active;
+
     for (var id in layout) {
         var key = no.View.getKey(id, params);
         newActive[key] = true;
-        views[key]._updateHTML(node, layout[id], params, toplevel);
-    }
 
-    var oldActive = this.active;
-    for (var key in oldActive) {
-        if ( !(key in newActive) ) {
-            views[key]._hide();
+        var view = views[key];
+
+        view._updateHTML(node, layout[id], params, toplevel);
+
+        if ( layout[id] === 'hide' ) {
+            view._hide();
+        } else {
+            view._show();
+            this.node.appendChild(view.node);
         }
     }
 
-    for (var key in newActive) {
-        if ( !(key in oldActive) ) {
-            views[key]._show();
+    for (var key in oldActive) {
+        if ( !newActive[key] ) {
+            views[key]._hide();
         }
     }
 

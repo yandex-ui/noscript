@@ -134,11 +134,10 @@ no.View.prototype._hide = function() {
         return;
     }
 
-    var node = this.node;
-    if (node && this._visible === true) {
-        node.style.display = 'none';
+    if (this._visible === true) {
+        this.node.style.display = 'none';
         this._visible = false;
-        this._onhide();
+        this.onhide();
     }
 };
 
@@ -148,11 +147,10 @@ no.View. prototype._show = function() {
         return;
     }
 
-    var node = this.node;
-    if (node && this._visible !== true) {
-        node.style.display = '';
+    if (this._visible !== true) {
+        this.node.style.display = '';
         this._visible = true;
-        this._onshow();
+        this.onshow();
     }
 };
 
@@ -168,43 +166,11 @@ no.View.prototype.onhtmlinit = no.pe; // log('onhtmlinit');
 
 no.View.prototype.onhtmldestroy = no.pe; // log('onhtmldestroy');
 
-no.View.prototype.onshow = log('onshow');
+no.View.prototype.onshow = no.pe; // log('onshow');
 
-no.View.prototype.onhide = log('onhide');
+no.View.prototype.onhide = no.pe; // log('onhide');
 
 no.View.prototype.onrepaint = no.pe; // log('onrepaint');
-
-no.View.prototype._onhtmldestroy = function() {
-    if (!this._dummy) {
-        this._unbindEvents();
-        this.onhtmldestroy();
-    }
-};
-
-no.View.prototype._onhtmlinit = function() {
-    if (!this._dummy) {
-        this._bindEvents();
-        this.onhtmlinit();
-    }
-};
-
-no.View.prototype._onshow = function() {
-    if (!this._dummy) {
-        this.onshow();
-    }
-};
-
-no.View.prototype._onhide = function() {
-    if (!this._dummy) {
-        this.onhide();
-    }
-};
-
-no.View.prototype._onrepaint = function() {
-    if (!this._dummy) {
-        this.onrepaint();
-    }
-};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -391,7 +357,13 @@ no.View.prototype._getActiveViews = function(views) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем (если нужно) ноду блока.
-no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
+no.View.prototype._updateHTML = function(node, layout, params, options) {
+    var toplevel = options.toplevel;
+    var async = options.async;
+
+    var oldDummy = isDummy(this.node);
+    var newDummy;
+
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
@@ -402,7 +374,10 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
             if (toplevel) {
-                this._onhtmldestroy();
+                if (!oldDummy) {
+                    this._unbindEvents();
+                    this.onhtmldestroy();
+                }
 
                 //  Старая нода показывает место, где должен быть блок.
                 no.replaceNode(this.node, viewNode);
@@ -412,21 +387,25 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
             //  Запоминаем новую ноду.
             this.node = viewNode;
 
-            //  Флаг, является ли новая нода заглушкой.
-            this._dummy = !!viewNode.getAttribute('dummy');
+            this._dummy = newDummy = isDummy(viewNode);
 
-            this._onhtmlinit();
-
-            //  Если это не заглушка (заглушка генерится для асинхронных блоков,
-            //  для которых еще не пришли все модели), то блок отныне валиден.
-            if ( !viewNode.getAttribute('dummy') ) {
+            if (!newDummy) {
                 this.status = 'ok';
+
+                this._bindEvents();
+                this.onhtmlinit();
             }
+        } else {
+            //  FIXME: А что делать, если новой ноды не обнаружено?
         }
     }
 
-    //  FIXME: Не вызывать onrepaint для синхронных блоков в асинхронном апдейте.
-    this._onrepaint();
+    //  В асинхронном запросе вызываем onrepaint для блоков, которые были заглушкой.
+    //  В синхронном запросе вызывает onrepaint для всех блоков.
+    //  Кроме того, не вызываем onrepaint для все еще заглушек.
+    if ( !newDummy && ( (async && oldDummy) || !async) ) {
+        this.onrepaint();
+    }
 
     //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть
     //  никаких подблоков. В этом случае, нужно брать viewNode.
@@ -434,8 +413,15 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
 
     //  Рекурсивно идем вниз по дереву.
     this._apply(function(view, id) {
-        view._updateHTML(viewNode, layout[id], params, toplevel);
+        view._updateHTML(viewNode, layout[id], params, {
+            toplevel: toplevel,
+            async: async
+        });
     });
+
+    function isDummy(node) {
+        return node && !!node.getAttribute('dummy');
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

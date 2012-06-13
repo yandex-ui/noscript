@@ -38,7 +38,7 @@ no.Update.prototype.start = function() {
             promise,
             no.requestModels(models)
         ]).then(function(r) {
-            that._update();
+            that._update(true);
         });
     });
 
@@ -65,8 +65,7 @@ no.Update.prototype.start = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Update.prototype._update = function() {
-    console.log('_update');
+no.Update.prototype._update = function(async) {
     //  TODO: Проверить, что не начался уже более новый апдейт.
 
     var params = this.params;
@@ -86,7 +85,10 @@ no.Update.prototype._update = function() {
 
     var html = Yater.run(tree, null, '');
     var node = no.html2node(html);
-    this.view._updateHTML(node, layout, params, true);
+    this.view._updateHTML(node, layout, params, {
+        toplevel: true,
+        async: async
+    });
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

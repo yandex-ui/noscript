@@ -87,7 +87,7 @@ no.Box.prototype._getViewTree = function(models, layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем бокс.
-no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
+no.Box.prototype._updateHTML = function(node, layout, params, options) {
     if (!this.node) {
         //  Ищем новую ноду бокса.
         this.node = no.byClass('box-' + this.id, node)[0];
@@ -109,7 +109,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
         var view = views[key];
 
         //  Обновляем его.
-        view._updateHTML(node, layout[id], params, toplevel);
+        view._updateHTML(node, layout[id], params, options);
 
         //  Показываем его.
         view._show();

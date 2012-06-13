@@ -24,7 +24,7 @@ no.router = function(url) {
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
             var query = r[l + 1];
             if (query) {
-                no.extends( params, no.parseQuery(query) );
+                no.extend( params, no.parseQuery(query) );
             }
 
             return {

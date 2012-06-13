@@ -106,3 +106,15 @@ no.html2node = function(html) {
     return div.firstChild;
 };
 
+no.parseQuery = function(s) {
+    var o = {};
+
+    s.split('&').forEach(function(s) {
+        var p = s.split('=');
+        //  FIXME: decode-бла-бла.
+        o[ p[0] ] = p[1];
+    });
+
+    return o;
+};
+

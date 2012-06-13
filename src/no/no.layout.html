@@ -42,7 +42,7 @@
 </head>
 <body>
 
-<div class="view view-app loading"></div>
+<div class="view view-app" dummy="true"></div>
 
 <script>
 no.Model.define('auth');
@@ -98,6 +98,7 @@ no.View.define('photo-comments', {
 
 var app = no.View.create('app');
 app.node = no.byClass('view-app')[0];
+app._dummy = true;
 
 var update = new no.Update(app, no.layout.page('view-photo'), {
     'author-login': 'dkomanov',

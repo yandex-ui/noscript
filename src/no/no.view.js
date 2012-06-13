@@ -129,37 +129,82 @@ no.View.prototype._addBox = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  FIXME: Нужны три состояния:
-//
-//    * блок виден;
-//    * блок не виден потому, что один из его родителей не виден;
-//    * блок не виден потому, что он сам не виден.
-//
 no.View.prototype._hide = function() {
+    if (this._dummy) {
+        return;
+    }
+
     var node = this.node;
-    if (node) {
+    if (node && this._visible === true) {
         node.style.display = 'none';
+        this._visible = false;
+        this._onhide();
     }
 };
 
-no.View.prototype._show = function() {
+//  При создании блока у него this._visible === undefined.
+no.View. prototype._show = function() {
+    if (this._dummy) {
+        return;
+    }
+
     var node = this.node;
-    if (node) {
+    if (node && this._visible !== true) {
         node.style.display = '';
+        this._visible = true;
+        this._onshow();
     }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype.onhtmlinit = no.pe;
+function log(s) {
+    return function() {
+        console.log(s, this.id);
+    }
+};
 
-no.View.prototype.onhtmldestroy = no.pe;
+no.View.prototype.onhtmlinit = no.pe; // log('onhtmlinit');
 
-no.View.prototype.onshow = no.pe;
+no.View.prototype.onhtmldestroy = no.pe; // log('onhtmldestroy');
 
-no.View.prototype.onhide = no.pe;
+no.View.prototype.onshow = log('onshow');
 
-no.View.prototype.onrepaint = no.pe;
+no.View.prototype.onhide = log('onhide');
+
+no.View.prototype.onrepaint = no.pe; // log('onrepaint');
+
+no.View.prototype._onhtmldestroy = function() {
+    if (!this._dummy) {
+        this._unbindEvents();
+        this.onhtmldestroy();
+    }
+};
+
+no.View.prototype._onhtmlinit = function() {
+    if (!this._dummy) {
+        this._bindEvents();
+        this.onhtmlinit();
+    }
+};
+
+no.View.prototype._onshow = function() {
+    if (!this._dummy) {
+        this.onshow();
+    }
+};
+
+no.View.prototype._onhide = function() {
+    if (!this._dummy) {
+        this.onhide();
+    }
+};
+
+no.View.prototype._onrepaint = function() {
+    if (!this._dummy) {
+        this.onrepaint();
+    }
+};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -334,19 +379,30 @@ no.View.prototype._getViewTree = function(models, layout, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+no.View.prototype._getActiveViews = function(views) {
+    views.push(this);
+    this._apply(function(view) {
+        view._getActiveViews(views);
+    });
+
+    return views;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
 //  Обновляем (если нужно) ноду блока.
 no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
+    var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
-        var viewNode = no.byClass('view-' + this.id, node)[0];
+        viewNode = no.byClass('view-' + this.id, node)[0];
         if (viewNode) {
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
             if (toplevel) {
-                //  FIXME: unbindEvents.
-                //  FIXME: onhtmldestroy.
+                this._onhtmldestroy();
 
                 //  Старая нода показывает место, где должен быть блок.
                 no.replaceNode(this.node, viewNode);
@@ -356,8 +412,10 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
             //  Запоминаем новую ноду.
             this.node = viewNode;
 
-            //  FIXME: onhtmlinit.
-            //  FIXME: bindEvents.
+            //  Флаг, является ли новая нода заглушкой.
+            this._dummy = !!viewNode.getAttribute('dummy');
+
+            this._onhtmlinit();
 
             //  Если это не заглушка (заглушка генерится для асинхронных блоков,
             //  для которых еще не пришли все модели), то блок отныне валиден.
@@ -367,7 +425,8 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
         }
     }
 
-    //  FIXME: onrepaint.
+    //  FIXME: Не вызывать onrepaint для синхронных блоков в асинхронном апдейте.
+    this._onrepaint();
 
     //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть
     //  никаких подблоков. В этом случае, нужно брать viewNode.

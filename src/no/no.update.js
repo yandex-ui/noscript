@@ -66,6 +66,7 @@ no.Update.prototype.start = function() {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype._update = function() {
+    console.log('_update');
     //  TODO: Проверить, что не начался уже более новый апдейт.
 
     var params = this.params;

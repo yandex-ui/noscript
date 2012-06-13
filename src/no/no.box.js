@@ -34,6 +34,19 @@ no.Box.prototype._addView = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+no.Box.prototype._getActiveViews = function(views) {
+    var views = this.views;
+    var active = this.active;
+
+    for (var key in active) {
+        var view = views[key];
+        views.push(view);
+        view._getActiveViews(views);
+    }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
 //  Ищем все новые блоки и блоки, требующие перерисовки.
 no.Box.prototype._getRequestViews = function(updated, layout, params) {
     var views = this.views;
@@ -108,7 +121,11 @@ no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
     //  Прячем все блоки, которые были активны, но перестали после этого апдейта.
     for (var key in oldActive) {
         if ( !newActive[key] ) {
-            views[key]._hide();
+            var subviews = views[key]._getActiveViews();
+            //  FIXME: Может тут нужно в обратном порядке прятать блоки?
+            for (var i = 0, l = subviews.length; i < l; i++) {
+                subviews[i]._hide();
+            }
         }
     }
 

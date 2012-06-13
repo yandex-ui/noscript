@@ -34,14 +34,14 @@ no.Box.prototype._addView = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype._getActiveViews = function(views) {
+no.Box.prototype._getDescendants = function(descs) {
     var views = this.views;
     var active = this.active;
 
     for (var key in active) {
         var view = views[key];
-        views.push(view);
-        view._getActiveViews(views);
+        descs.push(view);
+        view._getDescendants(descs);
     }
 };
 
@@ -121,7 +121,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
     //  Прячем все блоки, которые были активны, но перестали после этого апдейта.
     for (var key in oldActive) {
         if ( !newActive[key] ) {
-            var subviews = views[key]._getActiveViews();
+            var subviews = views[key]._getDescendants( [] );
             //  FIXME: Может тут нужно в обратном порядке прятать блоки?
             for (var i = 0, l = subviews.length; i < l; i++) {
                 subviews[i]._hide();

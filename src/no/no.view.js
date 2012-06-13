@@ -345,10 +345,10 @@ no.View.prototype._getViewTree = function(models, layout, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._getActiveViews = function(views) {
+no.View.prototype._getDescendants = function(views) {
     views.push(this);
     this._apply(function(view) {
-        view._getActiveViews(views);
+        view._getDescendants(views);
     });
 
     return views;
@@ -380,7 +380,10 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
                 }
 
                 //  Старая нода показывает место, где должен быть блок.
-                no.replaceNode(this.node, viewNode);
+                //  Если старой ноды нет, то это блок, который вставляется в бокс.
+                if (this.node) {
+                    no.replaceNode(this.node, viewNode);
+                }
                 //  Все подблоки уже не toplevel.
                 toplevel = false;
             }

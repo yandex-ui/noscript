@@ -81,7 +81,7 @@ no.Update.prototype._update = function(async) {
     this.view._getUpdateTree(tree, layout, params);
 
     if ( no.object.isEmpty(tree.views) ) {
-        return;
+        // return;
     }
 
     // console.time('yate');

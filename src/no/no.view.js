@@ -246,6 +246,15 @@ no.View.prototype.isModelsValid = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+no.View.prototype._apply = function(callback) {
+    var views = this.views;
+    for (var id in views) {
+        callback(views[id], id);
+    }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
 no.View.prototype._getRequestViews = function(updated, layout, params) {
     //  В layout может быть объект, true (тоже самое, что и 'show'), 'hide' и 'async'.
     if (layout !== 'hide') {
@@ -257,10 +266,9 @@ no.View.prototype._getRequestViews = function(updated, layout, params) {
             }
         }
 
-        var views = this.views;
-        for (var id in views) {
-            views[id]._getRequestViews(updated, layout[id], params);
-        }
+        this._apply(function(view, id) {
+            view._getRequestViews(updated, layout[id], params);
+        });
     }
 
     return updated;
@@ -272,10 +280,9 @@ no.View.prototype._getUpdateTree = function(tree, layout, params) {
     if ( !this.isValid() ) {
         tree.views[this.id] = this._getViewTree(tree.models, layout, params);
     } else {
-        var views = this.views;
-        for (var id in views) {
-            views[id]._getUpdateTree(tree, layout[id], params);
-        }
+        this._apply(function(view, id) {
+            view._getUpdateTree(tree, layout[id], params);
+        });
     }
 
     return tree;
@@ -298,11 +305,9 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     }
 
     var tree = {};
-
-    var views = this.views;
-    for (var id in layout) {
-        tree[id] = views[id]._getViewTree(models, layout[id], params);
-    }
+    this._apply(function(view, id) {
+        tree[id] = view._getViewTree(models, layout[id], params);
+    });
 
     return tree;
 };
@@ -310,14 +315,19 @@ no.View.prototype._getViewTree = function(models, layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
+    //  FIXME: hide: true
     if ( !this.isValid() ) {
         var viewNode = no.byClass('view-' + this.id, node)[0];
         if (viewNode) {
             if (toplevel) {
+                //  FIXME: unbindEvents.
+                //  FIXME: onhtmldestroy.
                 no.replaceNode(this.node, viewNode);
                 toplevel = false;
             }
             this.node = viewNode;
+            //  FIXME: onhtmlinit.
+            //  FIXME: bindEvents.
 
             if ( !viewNode.getAttribute('dummy') ) {
                 this.status = 'ok';
@@ -325,12 +335,13 @@ no.View.prototype._updateHTML = function(node, layout, params, toplevel) {
         }
     }
 
-    viewNode = viewNode || node;
-    var views = this.views;
-    for (var id in views) {
-        views[id]._updateHTML(viewNode, layout[id], params, toplevel);
-    }
+    //  FIXME: onrepaint.
 
+    viewNode = viewNode || node;
+
+    this._apply(function(view, id) {
+        view._updateHTML(viewNode, layout[id], params, toplevel);
+    });
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

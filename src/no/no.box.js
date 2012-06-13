@@ -64,6 +64,8 @@ no.Box.prototype._getViewTree = function(models, layout, params) {
     return tree;
 };
 
+//  ---------------------------------------------------------------------------------------------------------------  //
+
 no.Box.prototype._updateHTML = function(node, layout, params, toplevel) {
     if (!this.node) {
         this.node = no.byClass('box-' + this.id, node)[0];

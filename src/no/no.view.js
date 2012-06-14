@@ -12,7 +12,7 @@ no.extend(no.View.prototype, no.Events);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype.init = function(id, params) {
+no.View.prototype._init = function(id, params) {
     this.id = id;
     this.params = params || {};
 
@@ -41,6 +41,8 @@ no.View.prototype.init = function(id, params) {
 
     this.node = null;
     this.status = 'none';
+
+    this.oninit();
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -79,6 +81,7 @@ no.View.define = function(id, info, ctor) {
     }
 
     var models = info.models = info.models || [];
+    info.events = info.events || {};
 
     var params = {};
     for (var i = 0, l = models.length; i < l; i++) {
@@ -102,7 +105,7 @@ no.View.info = function(id) {
 no.View.create = function(id, params) {
     var ctor = _ctors[id];
     var view = new ctor();
-    view.init(id, params);
+    view._init(id, params);
 
     return view;
 };
@@ -167,6 +170,12 @@ function log(s) {
     }
 };
 
+no.View.prototype.oninit = no.pe; // log('oninit');
+
+//  FIXME: Пока что блоки никогда не уничтожаются,
+//  поэтому этот метод не вызывается никогда.
+/// no.View.prototype.ondestroy = no.pe; // log('ondestroy');
+
 no.View.prototype.onhtmlinit = no.pe; // log('onhtmlinit');
 
 no.View.prototype.onhtmldestroy = no.pe; // log('onhtmldestroy');
@@ -192,7 +201,7 @@ no.View.prototype._bindEvents = function() {
     var attachedEvents = this._attachedEvents = [];
 
     var that = this;
-    var events = this.info.events = {};
+    var events = this.info.events;
 
     for (var event in events) {
         (function(event) {

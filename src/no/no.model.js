@@ -3,7 +3,7 @@
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
-//  Вся инициализация делается в init(), который вызывает фабрикой no.Model.create().
+//  Вся инициализация делается в _init(), который вызывает фабрикой no.Model.create().
 //
 no.Model = function() {};
 
@@ -23,7 +23,7 @@ var _keySuffix = 0;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.prototype.init = function(id, params, data) {
+no.Model.prototype._init = function(id, params, data) {
     this.id = id;
     this.params = params;
 
@@ -102,7 +102,7 @@ no.Model.create = function(id, params, data)  {
     if (!model) {
         var ctor = _ctors[id];
         model = new ctor();
-        model.init(id, params, data);
+        model._init(id, params, data);
 
         no.Model.store(model);
     } else if (data) {

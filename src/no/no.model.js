@@ -33,9 +33,11 @@ no.Model.prototype._init = function(id, params, data) {
     var info = this.info = _infos[id];
 
     this.key = no.Model.key(id, params, info);
+
+    this.timstamp = 0;
 };
 
-no.Model.prototype._reset = function() {
+no.Model.prototype._reset = function(status) {
     this.data = null;
     this.error = null;
     /*
@@ -46,8 +48,9 @@ no.Model.prototype._reset = function() {
             'failed'        данные загрузились с ошибкой, нужен retry
             'error'         данные загрузились с ошибкой, retry невозможен
             'ok'            данные загрузились успешно
+            'invalid'       модель вручную инвалидирована.
     */
-    this.status = 'none';
+    this.status = status || 'none';
     this.retries = 0;
     this.requests = 0;
 };
@@ -152,6 +155,10 @@ no.Model.key = function(id, params, info) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+no.Model.prototype.invalidate = function() {
+    this._reset('invalid');
+};
+
 no.Model.prototype.isValid = function() {
     return (this.status === 'ok');
 };
@@ -182,12 +189,11 @@ no.Model.prototype.set = function(path, value, options) {
     var data = this.data;
     if (!data) { return; }
 
-    options = options || {};
-
     //  Сохраняем новое значение и одновременно получаем старое значение.
     var oldValue = no.path(path, data, value);
 
-    if ( !( options.silent || no.object.isEqual(value, oldValue) ) ) {
+    if ( !( (options && options.silent) || no.object.isEqual(value, oldValue) ) ) {
+        //  FIXME: Может быть отправлять старое/новое значение?
         this.trigger('changed.' + path);
     }
 };
@@ -200,18 +206,14 @@ no.Model.prototype.getData = function() {
 
 //  Заменяет данные модели на data.
 //
-//  При этом по-дефолту на модели генерится событие 'changed' и обновляется ее timestamp.
-//  Это поведение можно поменять, передав объект options.
-//  Возможные флаги, которые могут быть в options:
+//  При этом по-дефолту на модели генерится событие 'changed'.
+//  Это поведение можно поменять, передав объект options:
 //
 //      {
 //          silent: true        //  Не генерить событие о том, что модель изменилась,
-//          notouch: true       //  Не обновлять timestamp модели.
 //      }
 //
 no.Model.prototype.setData = function(data, options) {
-    options || ( options = {} );
-
     if (data) {
         var old = this.data;
         this.data = this.preprocessData(data);
@@ -221,15 +223,15 @@ no.Model.prototype.setData = function(data, options) {
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
-        if (old != null && !options.silent) {
+        if (old != null && !(options && options.silent) ) {
             this.trigger('changed');
-        }
-
-        if (!options.notouch) {
-            this.timestamp = +new Date();
         }
     }
 
+};
+
+no.Model.prototype.getError = function() {
+    return this.error;
 };
 
 no.Model.prototype.setError = function(error) {
@@ -262,10 +264,6 @@ no.Model.prototype.getRequestParams = function() {
     }
 
     return reqParams;
-};
-
-no.Model.prototype.touch = function(timestamp) {
-    this.timestamp = timestamp || ( +new Date() );
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

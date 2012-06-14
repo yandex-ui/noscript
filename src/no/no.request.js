@@ -5,6 +5,9 @@
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.request = function(items, params) {
+    if (typeof items === 'string') {
+        items = [ items ];
+    }
     if (params) {
         items = normalizeItems(items, params);
     }

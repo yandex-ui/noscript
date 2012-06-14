@@ -74,7 +74,12 @@ no.Model.prototype._reset = function() {
 //
 no.Model.define = function(id, info, ctor) {
     info = info || {};
-    ctor = ctor || no.Model;
+    if (info.methods) {
+        //  Нужно унаследоваться от no.Model и добавить в прототип info.models.
+        ctor = no.inherits(function() {}, no.Model, info.methods);
+    } else {
+        ctor = ctor || no.Model;
+    }
 
     var params = info.params || (( info.params = {} ));
 

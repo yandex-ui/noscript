@@ -6,11 +6,17 @@ var no = {};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-no.inherits = function(child, parent) {
+no.inherits = function(ctor, base, mixin) {
     var F = function() {};
-    F.prototype = parent.prototype;
-    child.prototype = new F();
-    child.prototype.constructor = child;
+    F.prototype = base.prototype;
+    var proto = ctor.prototype = new F();
+    ctor.prototype.constructor = ctor;
+
+    if (mixin) {
+        no.extend(proto, mixin);
+    }
+
+    return ctor;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

@@ -71,7 +71,12 @@ var _ctors = {};
 
 no.View.define = function(id, info, ctor) {
     info = info || {};
-    ctor = ctor || no.View;
+    if (info.methods) {
+        //  Нужно унаследоваться от no.View и добавить в прототип info.models.
+        ctor = no.inherits(function() {}, no.View, info.methods);
+    } else {
+        ctor = ctor || no.View;
+    }
 
     var models = info.models = info.models || [];
 

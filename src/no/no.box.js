@@ -100,7 +100,9 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
     var oldActive = this.active;
     var layoutActive = {};
 
-    //  Строим новый active.
+    //  Строим новый active согласно layout'у.
+    //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
+    //  (включая синхронную и все асинхронные подапдейты).
     for (var id in layout) {
         var key = no.View.getKey(id, params);
         layoutActive[id] = key;
@@ -111,17 +113,21 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         //  Обновляем его.
         view._updateHTML(node, layout[id], params, options);
 
-        //  Выстраиваем новые активные блоки в нужном порядке.
-        //  Плюс, если это новый блок, подклеиваем его к боксу.
-        this.node.appendChild(view.node);
+        if (!view._isDummy) {
+            //  Выстраиваем новые активные блоки в нужном порядке.
+            //  Плюс, если это новый блок, подклеиваем его к боксу.
+            this.node.appendChild(view.node);
+        }
     }
 
+    //  Строим новый active, но уже не по layout'у,
+    //  а по актуальным блокам. В частности, заглушки в новый active не попадают.
+    //  Вместо них берем старые блоки, если они были.
     var newActive = {};
     for (var id in layoutActive) {
         var key = layoutActive[id];
-        var view = views[key];
 
-        if (view._isDummy) {
+        if (views[key]._isDummy) {
             key = oldActive[id];
             if (key) {
                 newActive[id] = key;
@@ -131,6 +137,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         }
     }
 
+    //  Прячем все блоки, которые были в старом active, но не попали в новый.
     for (var id in oldActive) {
         var key = oldActive[id];
         if (newActive[id] !== key) {
@@ -141,6 +148,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         }
     }
 
+    //  Показываем все блоки, которые видны в новом active.
     for (var id in newActive) {
         var key = newActive[id];
         views[key]._show();

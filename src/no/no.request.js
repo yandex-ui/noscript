@@ -18,9 +18,7 @@ no.request = function(items, params) {
             model = no.Model.create(item.id, item.params);
         }
 
-        if ( model.isDo() || !model.isValid() ) {
-            models.push(model);
-        }
+        models.push(model);
     }
 
     return no.request.models(models);
@@ -131,7 +129,7 @@ Request.prototype.request = function(loading, requesting) {
         });
 
     } else {
-        this.promise.resolve();
+        this.promise.resolve(this.models);
     }
 };
 

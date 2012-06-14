@@ -27,7 +27,7 @@ no.Update.prototype.start = function() {
     var that = this;
 
     var models = views2models(updated.sync);
-    var promise = no.requestModels(models)
+    var promise = no.request.models(models)
         .then(function(r) {
             that._update();
         });
@@ -36,7 +36,7 @@ no.Update.prototype.start = function() {
         var models = views2models( [ item ] );
         no.Promise.wait([
             promise,
-            no.requestModels(models)
+            no.request.models(models)
         ]).then(function(r) {
             that._update(true);
         });

@@ -113,7 +113,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         //  Обновляем его.
         view._updateHTML(node, layout[id], params, options);
 
-        if (!view._isDummy) {
+        if ( view.isOk() ) {
             //  Выстраиваем новые активные блоки в нужном порядке.
             //  Плюс, если это новый блок, подклеиваем его к боксу.
             this.node.appendChild(view.node);
@@ -127,7 +127,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
     for (var id in layoutActive) {
         var key = layoutActive[id];
 
-        if (views[key]._isDummy) {
+        if ( views[key].isLoading() ) {
             key = oldActive[id];
             if (key) {
                 newActive[id] = key;

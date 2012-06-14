@@ -130,7 +130,7 @@ no.View.prototype._addBox = function(id, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._hide = function() {
-    if (this._isDummy) {
+    if ( this.isLoading() ) {
         return;
     }
 
@@ -143,7 +143,7 @@ no.View.prototype._hide = function() {
 
 //  При создании блока у него this._visible === undefined.
 no.View. prototype._show = function() {
-    if (this._isDummy) {
+    if ( this.isLoading() ) {
         return;
     }
 
@@ -240,8 +240,16 @@ no.View.prototype._unbindEvents = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+no.View.prototype.isOk = function() {
+    return (this.status === 'ok');
+};
+
+no.View.prototype.isLoading = function() {
+    return (this.status === 'loading');
+};
+
 no.View.prototype.isValid = function() {
-    return ( this.status === 'ok' && this.isModelsValid() );
+    return ( this.isOk() && this.isModelsValid() );
 };
 
 no.View.prototype.isModelsValid = function() {
@@ -357,8 +365,12 @@ no.View.prototype._getDescendants = function(views) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._setNode = function(node) {
-    this.node = node;
-    this._isDummy = !!node.getAttribute('dummy');
+    if (node) {
+        this.node = node;
+        this.status = ( node.getAttribute('loading') ) ? 'loading' : 'ok';
+    } else {
+        this.status = 'none';
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -368,7 +380,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     var toplevel = options.toplevel;
     var async = options.async;
 
-    var wasDummy = this._isDummy;
+    var wasLoading = this.isLoading();
 
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
@@ -380,7 +392,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
             if (toplevel) {
-                if (!wasDummy) {
+                if (!wasLoading) {
                     this._unbindEvents();
                     this.onhtmldestroy();
                 }
@@ -394,16 +406,9 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
                 toplevel = false;
             }
             //  Запоминаем новую ноду.
-            /*
-            this.node = viewNode;
-
-            this._isDummy = isDummy(viewNode);
-            */
             this._setNode(viewNode);
 
-            if (!this._isDummy) {
-                this.status = 'ok';
-
+            if ( this.isOk() ) {
                 this._bindEvents();
                 this.onhtmlinit();
             }
@@ -415,7 +420,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     //  В асинхронном запросе вызываем onrepaint для блоков, которые были заглушкой.
     //  В синхронном запросе вызывает onrepaint для всех блоков.
     //  Кроме того, не вызываем onrepaint для все еще заглушек.
-    if ( !this._isDummy && ( (async && wasDummy) || !async) ) {
+    if ( this.isOk() && ( (async && wasLoading) || !async) ) {
         this.onrepaint();
     }
 

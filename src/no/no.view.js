@@ -130,11 +130,12 @@ no.View.prototype._addBox = function(id, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._hide = function() {
-    if (this._dummy) {
+    if (this._isDummy) {
         return;
     }
 
     if (this._visible === true) {
+        console.log('hide', this.id);
         this.node.style.display = 'none';
         this._visible = false;
         this.onhide();
@@ -143,11 +144,12 @@ no.View.prototype._hide = function() {
 
 //  При создании блока у него this._visible === undefined.
 no.View. prototype._show = function() {
-    if (this._dummy) {
+    if (this._isDummy) {
         return;
     }
 
     if (this._visible !== true) {
+        console.log('show', this.id);
         this.node.style.display = '';
         this._visible = true;
         this.onshow();
@@ -361,8 +363,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     var toplevel = options.toplevel;
     var async = options.async;
 
-    var oldDummy = isDummy(this.node);
-    var newDummy;
+    var wasDummy = isDummy(this.node);
 
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
@@ -374,7 +375,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
             if (toplevel) {
-                if (!oldDummy) {
+                if (!wasDummy) {
                     this._unbindEvents();
                     this.onhtmldestroy();
                 }
@@ -390,9 +391,9 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             //  Запоминаем новую ноду.
             this.node = viewNode;
 
-            this._dummy = newDummy = isDummy(viewNode);
+            this._isDummy = isDummy(viewNode);
 
-            if (!newDummy) {
+            if (!this._isDummy) {
                 this.status = 'ok';
 
                 this._bindEvents();
@@ -406,7 +407,9 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     //  В асинхронном запросе вызываем onrepaint для блоков, которые были заглушкой.
     //  В синхронном запросе вызывает onrepaint для всех блоков.
     //  Кроме того, не вызываем onrepaint для все еще заглушек.
-    if ( !newDummy && ( (async && oldDummy) || !async) ) {
+    //
+    //  FIXME: Может тут нужно просто проверять this.status === 'ok' ?
+    if ( !this._isDummy && ( (async && wasDummy) || !async) ) {
         this.onrepaint();
     }
 

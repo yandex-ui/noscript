@@ -38,8 +38,8 @@ no.Box.prototype._getDescendants = function(descs) {
     var views = this.views;
     var active = this.active;
 
-    for (var key in active) {
-        var view = views[key];
+    for (var id in active) {
+        var view = views[ active[id] ];
         descs.push(view);
         view._getDescendants(descs);
     }
@@ -98,12 +98,12 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
     //  this.active -- это объект (упорядоченный!), в котором лежат ключи
     //  активных (видимых) в данный момент блоков.
     var oldActive = this.active;
-    var newActive = {};
+    var layoutActive = {};
 
     //  Строим новый active.
     for (var id in layout) {
         var key = no.View.getKey(id, params);
-        newActive[key] = true;
+        layoutActive[id] = key;
 
         //  Достаем ранее созданный блок (в _getRequestViews).
         var view = views[key];
@@ -111,22 +111,39 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         //  Обновляем его.
         view._updateHTML(node, layout[id], params, options);
 
-        //  Показываем его.
-        view._show();
         //  Выстраиваем новые активные блоки в нужном порядке.
         //  Плюс, если это новый блок, подклеиваем его к боксу.
         this.node.appendChild(view.node);
     }
 
-    //  Прячем все блоки, которые были активны, но перестали после этого апдейта.
-    for (var key in oldActive) {
-        if ( !newActive[key] ) {
+    var newActive = {};
+    for (var id in layoutActive) {
+        var key = layoutActive[id];
+        var view = views[key];
+
+        if (view._isDummy) {
+            key = oldActive[id];
+            if (key) {
+                newActive[id] = key;
+            }
+        } else {
+            newActive[id] = key;
+        }
+    }
+
+    for (var id in oldActive) {
+        var key = oldActive[id];
+        if (newActive[id] !== key) {
             var subviews = views[key]._getDescendants( [] );
-            //  FIXME: Может тут нужно в обратном порядке прятать блоки?
             for (var i = 0, l = subviews.length; i < l; i++) {
                 subviews[i]._hide();
             }
         }
+    }
+
+    for (var id in newActive) {
+        var key = newActive[id];
+        views[key]._show();
     }
 
     //  Запоминаем новый active.

@@ -66,7 +66,6 @@ no.Update.prototype.start = function() {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype._update = function(async) {
-    console.log('update');
     //  TODO: Проверить, что не начался уже более новый апдейт.
 
     var params = this.params;
@@ -84,9 +83,7 @@ no.Update.prototype._update = function(async) {
         // return;
     }
 
-    // console.time('yate');
     var html = Yater.run(tree, null, '');
-    // console.timeEnd('yate');
     var node = no.html2node(html);
     this.view._updateHTML(node, layout, params, {
         toplevel: true,

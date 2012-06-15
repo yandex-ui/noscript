@@ -112,7 +112,10 @@ no.Model.create = function(id, params, data)  {
         no.Model.store(model);
     } else if (data) {
         //  Модель уже существует, а мы пытаемся создать такую же, но с непустой data.
-        throw Error('Model already exists');
+        //  FIXME: Все же непонятно, что нужно делать.
+        //  Может быть, нужно передавать { silent: true }?
+        model.setData(data);
+        /// throw Error('Model already exists');
     }
 
     return model;

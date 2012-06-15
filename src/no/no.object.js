@@ -48,25 +48,22 @@ no.object.isEqual = function(a, b) {
     if (a === b) { return true; }
     if (a == null || b == null) { return false; }
 
-    var ta = typeof a;
-    var tb = typeof b;
+    //  NOTE: Удивительно, но все попытки сравнивать массивы не через for in
+    //  приводят только к замедлению. По крайней мере, в FF.
 
-    if (ta !== tb) { return false; }
+    //  Проверяем, что в b нет "лишних" ключей (не входящих в a).
+    //
+    //  NOTE: Эту проверку лучше делать до сравнения значений (следующий for in).
+    //  Т.к. чтобы убедиться, что объекты одинаковые, в любом случае придется выполнить
+    //  оба цикла, а если объекты разные, то быстрее найти "лишний" ключ, чем
+    //  сравнить все значения.
+    //
+    for (var key in b) {
+        if ( !(key in a) ) { return false; }
+    }
 
-    if (ta === 'object') {
-        for (var key in a) {
-            if (!no.object.isEqual(a[key], b[key])) { return false; }
-        }
-        // Проверяем, что в b нет "лишних" ключей (не входящих в a).
-        for (var key in b) {
-            if (!(key in a)) { return false; }
-        }
-    } else {
-        var l = a.length;
-        if (b.length !== l) { return false; }
-        for (var i = 0; i < l; i++) {
-            if (!no.object.isEqual(a[i], b[i])) { return false }
-        }
+    for (var key in a) {
+        if ( !no.object.isEqual( a[key], b[key] ) ) { return false; }
     }
 
     return true;

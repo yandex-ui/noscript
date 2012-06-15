@@ -1,63 +1,87 @@
+//  TODO:
+//
+//    * Обрабатывать массив помимо true/false/object.
+//
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+//  no.layout
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+(function() {
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
 no.layout = {};
 
-// ----------------------------------------------------------------------------------------------------------------- //
+//  Хранилище layout'ов для всех страниц.
+var pageLayouts = {};
+//  Хранилище layout'ов для всех view.
+var viewLayouts = {};
 
-/**
-    @private
-    @type { Object.<string, !Object> }
-*/
-no.layout._raw = {};
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @private
-    @type { Object.<string, !Object> }
-*/
-no.layout._compiled = {};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {string} id
-    @param {!Object} layout
-*/
-no.layout.register = function(id, layout) {
-    no.layout._raw[id] = layout;
+no.layout.define = function(id, layout) {
+    pageLayouts[id] = compileLayout(layout);
+    extractViewLayouts('app', layout);
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+no.layout.page = function(id) {
+    return pageLayouts[id];
+};
 
-/**
-    @param {string} id
-    @return {!Object}
-*/
-no.layout.get = function(id) {
-    var compiled = no.layout._compiled[id];
+no.layout.view = function(id) {
+    return viewLayouts[id];
+};
 
-    if (!compiled) {
-        compiled = {};
-        var raw = no.layout._raw[id];
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-        var parent_id = raw[ '..' ];
-        if (parent_id) {
-            var parent = no.layout.get( parent_id );
-            no.extendRecursive( compiled, parent );
-            delete raw[ '..' ];
-        }
+function extractViewLayouts(id, layout) {
+    var isObject = (typeof layout === 'object');
+    //  Для боксов не нужно строить layout,
+    //  кроме того, не нужно строить layout повторно.
+    if ( !isBox(id) && !viewLayouts[id] ) {
+        var r = {};
 
-        for (var view_id in raw) {
-            var boxes = compiled[ view_id ] || (( compiled[ view_id ] = {} ));
-
-            var raw_boxes = raw[ view_id ];
-            for (var box_id in raw_boxes) {
-                boxes[ box_id ] = no.array( raw_boxes[ box_id ] );
+        if (isObject) {
+            for (var key in layout) {
+                r[ stripAt(key) ] = ( isBox(key) ) ? 'box' : 'view';
             }
         }
 
-        no.layout._compiled[id] = compiled;
+        viewLayouts[id] = r;
     }
 
-    return compiled;
+    if (isObject) {
+        for (var key in layout) {
+            extractViewLayouts( key, layout[key] );
+        }
+    }
+}
+
+function compileLayout(layout) {
+    if (typeof layout !== 'object') {
+        return layout;
+    }
+
+    var tree = {};
+    for (var key in layout) {
+        tree[ stripAt(key) ] = compileLayout( layout[key] );
+    }
+
+    return tree;
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+function isBox(s) {
+    return (s.substr(0, 1) === '@');
+}
+
+function stripAt(s) {
+    return ( isBox(s) ) ? s.substr(1) : s;
+}
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+})();
 

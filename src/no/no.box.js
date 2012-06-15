@@ -1,187 +1,160 @@
-/**
-    @constructor
-    @param {string} id
-    @param {!Object} params
-    @param {no.View} parent
-*/
-no.Box = function(id, params, parent) {
+//  ---------------------------------------------------------------------------------------------------------------  //
+//  no.Box
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Box = function(id, params) {
     this.id = id;
     this.params = params;
-    this.parent = parent;
 
-    /** @type { Object.<string, no.View> } */
-    this.archive = {};
+    this.views = {};
 
-    /** @type {Element} */
-    this.node;
+    //  NOTE: Нет специального метода no.Box.getKey --
+    //  все ключи вычисляются только через no.View.getKey.
+    this.key = no.View.getKey(id, params);
 
-    /** @type {boolean|undefined} */
-    this.status;
-
-    /** @type {Array.<string>} */
-    this.current;
+    this.node = null;
+    this.active = {};
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
-    @param {string} view_id
-    @return {no.View}
-*/
-no.Box.prototype.subView = function(view_id, params) {
-    return no.View.create( view_id, params, this );
+no.Box.prototype._getView = function(id, params) {
+    var key = no.View.getKey(id, params);
+    return this.views[key];
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+no.Box.prototype._addView = function(id, params) {
+    var view = this._getView(id, params);
+    if (!view) {
+        view = no.View.create(id, params);
+        this.views[view.key] = view;
+    }
+    return view;
+};
 
-/**
-    @param {Element} node
-    @param {no.Update} update
-*/
-no.Box.prototype.update = function(node, update) {
-    if (!this.status) {
-        node = no.byClass('box-' + this.id, node)[0];
-        if (!node) { return; }
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-        this.node = node;
-        this.status = true;
+no.Box.prototype._getDescendants = function(descs) {
+    var views = this.views;
+    var active = this.active;
+
+    for (var id in active) {
+        var view = views[ active[id] ];
+        descs.push(view);
+        view._getDescendants(descs);
+    }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+//  Ищем все новые блоки и блоки, требующие перерисовки.
+no.Box.prototype._getRequestViews = function(updated, layout, params) {
+    var views = this.views;
+    for (var id in layout) {
+        //  Согласно новому layout'у здесь должен быть view с id/params.
+        //  Создаем его (если он уже есть, он возьмется из this.views).
+        var view = this._addView(id, params);
+        //  Идем вниз рекурсивно.
+        view._getRequestViews(updated, layout[id], params);
+    }
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+//  Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
+no.Box.prototype._getUpdateTree = function(tree, layout, params) {
+    var views = this.views;
+    for (var id in layout) {
+        var key = no.View.getKey(id, params);
+        views[key]._getUpdateTree(tree, layout[id], params);
+    }
+};
+
+//  Строим дерево блоков.
+no.Box.prototype._getViewTree = function(models, layout, params) {
+    //  Для бокса это всегда объект (возможно, пустой).
+    var tree = {};
+
+    var views = this.views;
+    for (var id in layout) {
+        var key = no.View.getKey(id, params);
+        tree[id] = views[key]._getViewTree(models, layout[id], params);
     }
 
-    var params = update.params;
-    var archive = this.archive;
+    return tree;
+};
 
-    // Свежесозданный box. Создаем актуальный current -- список блоков, которые в нем лежат в данный момент.
-    // А это те блоки, которые сгенерились в html'е.
-    // Они могут быть:
-    //   - не все, что положены по layout'у;
-    //   - в неправильном порядке (из-за того, что хэши в javascript'е не упорядоченные, вообще говоря).
-    // Поэтому приходится смотреть, что же там сгенерилось и в каком порядке.
-    // Дальше, если порядок неправильный, блоки будут переставлены в нужном порядке дальше, в updateCurrent().
+//  ---------------------------------------------------------------------------------------------------------------  //
 
-    if (!this.current) {
-        var current = [];
-        var children = node.children; // FIXME: node.children не работает в FF3.0.
+//  Обновляем бокс.
+no.Box.prototype._updateHTML = function(node, layout, params, options) {
+    if (!this.node) {
+        //  Ищем новую ноду бокса.
+        this.node = no.byClass('box-' + this.id, node)[0];
+    }
 
-        for (var i = 0, l = children.length; i < l; i++) {
-            var child = children[i];
-            var className = child.className;
-            var r = className.match(/\bview-(\S+)\b/);
-            if (r) {
-                var view_id = r[1];
+    var views = this.views;
 
-                var key = no.View.getKey(view_id, params);
-                current.push(key);
+    //  this.active -- это объект (упорядоченный!), в котором лежат ключи
+    //  активных (видимых) в данный момент блоков.
+    var oldActive = this.active;
+    var layoutActive = {};
 
-                var view = archive[key] = this.subView(view_id, params);
-                view.update(this.node, update, false); // FIXME: Плохо, что child уже найден, а передаем мы node.
+    //  Строим новый active согласно layout'у.
+    //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
+    //  (включая синхронную и все асинхронные подапдейты).
+    for (var id in layout) {
+        var key = no.View.getKey(id, params);
+        layoutActive[id] = key;
+
+        //  Достаем ранее созданный блок (в _getRequestViews).
+        var view = views[key];
+
+        //  Обновляем его.
+        view._updateHTML(node, layout[id], params, options);
+
+        if ( view.isOk() ) {
+            //  Выстраиваем новые активные блоки в нужном порядке.
+            //  Плюс, если это новый блок, подклеиваем его к боксу.
+            this.node.appendChild(view.node);
+        }
+    }
+
+    //  Строим новый active, но уже не по layout'у,
+    //  а по актуальным блокам. В частности, заглушки в новый active не попадают.
+    //  Вместо них берем старые блоки, если они были.
+    var newActive = {};
+    for (var id in layoutActive) {
+        var key = layoutActive[id];
+
+        if ( views[key].isLoading() ) {
+            key = oldActive[id];
+            if (key) {
+                newActive[id] = key;
+            }
+        } else {
+            newActive[id] = key;
+        }
+    }
+
+    //  Прячем все блоки, которые были в старом active, но не попали в новый.
+    for (var id in oldActive) {
+        var key = oldActive[id];
+        if (newActive[id] !== key) {
+            var subviews = views[key]._getDescendants( [] );
+            for (var i = 0, l = subviews.length; i < l; i++) {
+                subviews[i]._hide();
             }
         }
-
-        this.current = current;
     }
 
-    this.updateCurrent(node, update);
-
-};
-
-/**
-    @param {Element} node
-    @param {no.Update} update
-*/
-no.Box.prototype.updateCurrent = function(node, update) {
-    var params = update.params;
-
-    var archive = this.archive;
-
-    var views = update.layout[ this.parent.id ][ this.id ];
-    var content = no.View.ids2keys(views, params);
-    var contentKeys = no.array.toObject(content);
-
-    var current = no.array.grep(this.current, function(key) { // Проходим по текущему контенту и прячем все блоки, которые не должны отображаться в текущем layout.
-        if (!(key in contentKeys)) {
-            archive[key].hide();
-            return false;
-        }
-        return true;
-    });
-
-    for (var i = 0, l = views.length; i < l; i++) {
-        var view_id = views[i];
-        var key = content[i];
-
-        var view = archive[key];
-        if (!view) {
-            view = archive[key] = this.subView(view_id, params);
-        }
-        if (view.needUpdate()) {
-            view.update(node, update);
-        }
-        view.show();
-
-        this.node.appendChild(view.node);
+    //  Показываем все блоки, которые видны в новом active.
+    for (var id in newActive) {
+        var key = newActive[id];
+        views[key]._show();
     }
 
-    this.current = content;
+    //  Запоминаем новый active.
+    this.active = newActive;
 };
-
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {function(no.View): (boolean|undefined)}
-*/
-no.Box.prototype.processTree = function(callback) {
-    var r = callback(this);
-    if (r === false) { return; }
-
-    var current = this.current;
-    if (current) {
-        var archive = this.archive;
-        for (var i = 0, l = current.length; i < l; i++) {
-            var view = archive[ current[i] ];
-            view.processTree(callback);
-        }
-    }
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {no.Update} update
-    @return {boolean}
-*/
-no.Box.prototype.needUpdate = function(update) {
-    var current = this.current;
-    if (!current) { return true; }
-
-    var views = update.layout[ this.parent.id ][ this.id ];
-    var content = no.View.ids2keys(views, update.params);
-
-    return ( content.join('|') !== current.join('|') );
-};
-
-
-/**
-    @param {no.Update} update
-    @param {Object} trees
-*/
-no.Box.prototype.getUpdateTrees = function(update, trees) {
-    var archive = this.archive;
-    var params = update.params;
-
-    var views = update.layout[ this.parent.id ][ this.id ];
-    var content = no.View.ids2keys(views, update.params);
-
-    for (var i = 0, l = content.length; i < l; i++) {
-        var view_id = views[i];
-        var key = content[i];
-        var view = archive[key];
-        if (!archive[key]) {
-            view = this.subView( view_id, params );
-        }
-        view.getUpdateTrees(update, trees);
-    }
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
 

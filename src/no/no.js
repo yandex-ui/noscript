@@ -6,11 +6,17 @@ var no = {};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
-no.inherits = function(child, parent) {
+no.inherits = function(ctor, base, mixin) {
     var F = function() {};
-    F.prototype = parent.prototype;
-    child.prototype = new F();
-    child.prototype.constructor = child;
+    F.prototype = base.prototype;
+    var proto = ctor.prototype = new F();
+    ctor.prototype.constructor = ctor;
+
+    if (mixin) {
+        no.extend(proto, mixin);
+    }
+
+    return ctor;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -97,5 +103,24 @@ no.replaceNode = function(oldNode, newNode) {
 
 no.todo = function() {
     throw new Error('Unimplemented');
+};
+
+no.html2node = function(html) {
+    var div = document.createElement('div');
+    div.innerHTML = html;
+
+    return div.firstChild;
+};
+
+no.parseQuery = function(s) {
+    var o = {};
+
+    s.split('&').forEach(function(s) {
+        var p = s.split('=');
+        //  FIXME: decode-бла-бла.
+        o[ p[0] ] = p[1];
+    });
+
+    return o;
 };
 

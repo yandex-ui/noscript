@@ -355,14 +355,7 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     }
 
     //  Собираем все нужные модели.
-    for (var id in this.models) {
-        var model = this.models[id];
-        //  FIXME: Кажется, эта провека тут не нужна.
-        //  Нужно перед началом апдейта проверять, что все данные в наличии.
-        if ( model.isValid() ) {
-            models[model.id] = model.getData();
-        }
-    }
+    no.extend( models, this._getModelsData() );
 
     //  Это блок без подблоков и он не асинхронный.
     if (typeof layout !== 'object') {
@@ -376,6 +369,20 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     });
 
     return tree;
+};
+
+no.View.prototype._getModelsData = function() {
+    var r = {};
+
+    var models = this.models;
+    for (var id in models) {
+        var data = models[id].getData();
+        if (data) {
+            r[id] = data;
+        }
+    }
+
+    return r;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

@@ -49,6 +49,8 @@ no.View.prototype._init = function(id, params) {
     //
     this.status = 'none';
 
+    this.timestamp = 0;
+
     this.oninit();
 };
 
@@ -276,9 +278,21 @@ no.View.prototype.isLoading = function() {
 };
 
 no.View.prototype.isValid = function() {
-    return ( this.isOk() && this.isModelsValid() );
+    if ( !this.isOk() ) { return false; }
+
+    var timestamp = this.timestamp;
+    var models = this.models;
+    for (var id in models) {
+        var model = models[id];
+        if ( !(model.isValid() && model.timestamp <= timestamp) ) {
+            return false;
+        }
+    }
+
+    return true;
 };
 
+//  FIXME: Убрать копипаст в isValid() и isModelsValid().
 no.View.prototype.isModelsValid = function() {
     var models = this.models;
     for (var id in models) {
@@ -446,6 +460,8 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
                 this._bindEvents();
                 this.onhtmlinit();
             }
+
+            this.timestamp = +new Date();
         } else {
             //  FIXME: А что делать, если новой ноды не обнаружено?
         }

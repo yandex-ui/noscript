@@ -55,6 +55,8 @@ no.Model.prototype._reset = function(status) {
     this.status = status || 'none';
     this.retries = 0;
     this.requests = 0;
+
+    this.timestamp = 0;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -242,9 +244,11 @@ no.Model.prototype.setData = function(data, options) {
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
-        if (old != null && !(options && options.silent) ) {
+        if ( old != null && !(options && options.silent) ) {
             this.trigger('changed');
         }
+
+        this.touch();
     }
 
 };
@@ -351,6 +355,12 @@ no.Model.prototype.extractError = function(result) {
 
 no.Model.prototype.isDo = function() {
     return this.info.isDo;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.Model.prototype.touch = function() {
+    this.timestamp = +new Date();
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

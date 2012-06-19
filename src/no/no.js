@@ -87,7 +87,7 @@ no.pe = function() {};
 //  FIXME: Мне не нравится использовать jQuery в noscript'е,
 //  со временем я хочу выпилить jQuery совсем.
 //  Пока что вот так странно.
-if (document.getElementsByClassName) {
+if ((typeof document !== 'undefined') && document.getElementsByClassName) {
 
     no.byClass = function(className, context) {
         context = context || document;

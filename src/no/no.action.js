@@ -1,9 +1,14 @@
-/**
- * Helper object for actions.
- */
-no.Action = {};
+(function() {
 
-no.Action._actions = {};
+//  ---------------------------------------------------------------------------------------------------------------  //
+//  no.action
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+no.action = {};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+var _actions = {};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -12,8 +17,8 @@ no.Action._actions = {};
  * @param {string} id Action id.
  * @param {function} action Action to be performed.
  */
-no.Action.register = function(id, action) {
-    no.Action._actions[id] = action;
+no.action.define = function(id, action) {
+    _actions[id] = action;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //
@@ -21,9 +26,18 @@ no.Action.register = function(id, action) {
 /**
  * @param {Node} node DOM node with @data-action attribute.
  */
-no.Action.runFromNode = function(node) {
-    var $node = $(node);
-    var data = $node.data();
-    var action = no.Action._actions[data.action];
-    action(data.action, data.params, node);
+no.action.run = function(node) {
+    var id = node.getAttribute('data-action');
+    var action = _actions[id];
+    if (action) {
+        var paramString = node.getAttribute('data-params');
+        //  FIXME: Не будет ли тут какого-то XSS?
+        var params = ( paramString.substr(0, 1) === '{' ) ? eval( '(' + paramString + ')' ) : paramString;
+        return action(id, params, node);
+    }
 };
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+})();
+

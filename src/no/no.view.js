@@ -252,7 +252,7 @@ no.View.prototype._bindEvents = function() {
 no.View.prototype._unbindEvents = function() {
     var $node = $(this.node);
 
-    var attachedEvents = this._attachedEvents = [];
+    var attachedEvents = this._attachedEvents;
 
     for (var event in attachedEvents) {
         $node.off(event.name, event.selector, event.handler);

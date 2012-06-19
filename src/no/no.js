@@ -82,12 +82,26 @@ no.pe = function() {};
 /**
     @param {string} className
     @param {Element} context
-    @return {Array.<Element>}
+    @return {(Element|undefined)}
 */
-no.byClass = function(className, context) {
-    context = context || document;
-    return context.getElementsByClassName(className); // FIXME: Поддержка старых браузеров.
-};
+//  FIXME: Мне не нравится использовать jQuery в noscript'е,
+//  со временем я хочу выпилить jQuery совсем.
+//  Пока что вот так странно.
+if (document.getElementsByClassName) {
+
+    no.byClass = function(className, context) {
+        context = context || document;
+        return context.getElementsByClassName(className);
+    };
+
+} else {
+
+    no.byClass = function(className, context) {
+        context = context || document;
+        return $(context).find('.' + className);
+    };
+
+}
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

@@ -9,12 +9,16 @@ no.Update = function(view, layout, params) {
     this.layout = layout;
     this.params = params;
 
-    this.id = update_id++;
+    this.id = ++update_id;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-var update_id = 0;
+/**
+ * Id последнего созданного update-а.
+ * @type {Number}
+ */
+var update_id = -1;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -29,7 +33,9 @@ no.Update.prototype.start = function() {
     var models = views2models(updated.sync);
     var promise = no.request.models(models)
         .then(function(r) {
-            that._update();
+            if (!that._expired()) {
+                that._update();
+            }
         });
 
     updated.async.forEach(function(item) {
@@ -38,7 +44,9 @@ no.Update.prototype.start = function() {
             promise,
             no.request.models(models)
         ]).then(function(r) {
-            that._update(true);
+            if (!that._expired()) {
+                that._update(true);
+            }
         });
     });
 
@@ -59,7 +67,7 @@ no.Update.prototype.start = function() {
         }
 
         return models;
-    };
+    }
 
 };
 
@@ -92,6 +100,18 @@ no.Update.prototype._update = function(async) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+/**
+ * @return {Boolean} true in case another update was created after current update.
+ * @private
+ */
+no.Update.prototype._expired = function() {
+    var expired = this.id < update_id;
+    return expired;
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
 
 })();
 

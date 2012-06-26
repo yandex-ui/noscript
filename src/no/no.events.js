@@ -2,44 +2,41 @@
 // no.events
 // ------------------------------------------------------------------------------------------------------------- //
 
-/**
-    Простейший pub/sub.
-
-    no.Events --- объект, который можно подмиксовать к любому другому объекту:
-
-        var foo = {};
-        no.extend( foo, no.Events );
-
-        foo.on('bar', function(e, data) {
-            console.log(e, data);
-        });
-
-        foo.trigger('bar', 42);
-
-    Или же:
-
-        function Foo() {}
-
-        no.extend( Foo.prototype, no.Events );
-
-        var foo = new Foo();
-
-        foo.on('bar', function(e, data) {
-            console.log(e, data);
-        });
-
-        foo.trigger('bar', 42);
-
-    Для общение с "космосом" есть специальный предопределенный объект no.events.
-    Через него нужно обмениваться сообщениями, не привязанными к какому-то конкретному инстансу объекта.
-
-        no.events.on('bar', function(e, data) {
-            console.log(e, data);
-        });
-
-        no.events.trigger('bar', 42);
-
-*/
+//    Простейший pub/sub.
+//
+//    `no.Events` --- объект, который можно подмиксовать к любому другому объекту:
+//
+//        var foo = {};
+//        no.extend( foo, no.Events );
+//
+//        foo.on('bar', function(e, data) {
+//            console.log(e, data);
+//        });
+//
+//        foo.trigger('bar', 42);
+//
+//    Или же:
+//
+//        function Foo() {}
+//
+//        no.extend( Foo.prototype, no.Events );
+//
+//        var foo = new Foo();
+//
+//        foo.on('bar', function(e, data) {
+//            console.log(e, data);
+//        });
+//
+//        foo.trigger('bar', 42);
+//
+//    Для общения с "космосом" есть специальный предопределенный объект `no.events`.
+//    Через него нужно обмениваться сообщениями, не привязанными к какому-то конкретному инстансу объекта.
+//
+//        no.events.on('bar', function(e, data) {
+//            console.log(e, data);
+//        });
+//
+//        no.events.trigger('bar', 42);
 
 no.Events = {};
 
@@ -90,15 +87,18 @@ no.Events.on = function(name, handler) {
 no.Events.off = function(name, handler) {
     if (handler) {
         var handlers = this._getEventHandlers(name);
-        var i = no.array.indexOf(handlers, handler); // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
+        // Ищем этот хэндлер среди уже забинженных обработчиков этого события.
+        var i = no.array.indexOf(handlers, handler);
 
         if (i !== -1) {
-            handlers.splice(i, 1); // Нашли и удаляем этот обработчик.
+            // Нашли и удаляем этот обработчик.
+            handlers.splice(i, 1);
         }
     } else {
         var handlers = this._eventHandlers;
         if (handlers) {
-            delete handlers[name]; // Удаляем всех обработчиков этого события.
+            // Удаляем всех обработчиков этого события.
+            delete handlers[name];
         }
     }
 };
@@ -113,8 +113,10 @@ no.Events.off = function(name, handler) {
     @param {*=} params
 */
 no.Events.trigger = function(name, params) {
-    var handlers = this._getEventHandlers(name).slice(); // Копируем список хэндлеров. Если вдруг внутри какого-то обработчика будет вызван off(),
-                                                         // то мы не потеряем вызов следующего обработчика.
+    // Копируем список хэндлеров.
+    // Если вдруг внутри какого-то обработчика будет вызван `off()`, то мы не потеряем вызов следующего обработчика.
+    var handlers = this._getEventHandlers(name).slice();
+
     for (var i = 0, l = handlers.length; i < l; i++) {
         handlers[i].call(this, name, params);
     }
@@ -123,6 +125,4 @@ no.Events.trigger = function(name, params) {
 // ------------------------------------------------------------------------------------------------------------- //
 
 // Создаем "космос" --- дефолтный канал для обмена сообщениями.
-
 no.events = no.extend( {}, no.Events );
-

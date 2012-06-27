@@ -1,0 +1,27 @@
+{
+    "author": {
+        "name": "Sergey Nikitin",
+        "email": "nik.pasaran@gmail.com",
+        "url": "https://github.com/pasaran"
+    },
+    "name": "noscript",
+    "description": "noscript",
+    "version": "0.0.0",
+    "homepage": "https://github.com/pasaran/noscript",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/pasaran/noscript.git"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "optionalDependencies": {},
+    "engines": {
+        "node": "*"
+    },
+    "main": "noscript",
+    "files": [
+        "lib",
+        "noscript.js"
+    ]
+}
+

@@ -12,7 +12,9 @@
         "type": "git",
         "url": "git://github.com/pasaran/noscript.git"
     },
-    "dependencies": {},
+    "dependencies": {
+        "nommon": "*"
+    },
     "devDependencies": {},
     "optionalDependencies": {},
     "engines": {

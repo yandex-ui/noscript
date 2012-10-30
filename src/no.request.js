@@ -4,42 +4,34 @@
 //  no.request
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+/**
+ * Делает запрос моделей с сервера.
+ * @param {Array|String} items Массив названий моделей.
+ * @param {Object} params Параметры моделей.
+ * @return {no.Promise}
+ */
 no.request = function(items, params) {
     if (typeof items === 'string') {
         items = [ items ];
-    }
-    if (params) {
-        items = normalizeItems(items, params);
     }
 
     var models = [];
     for (var i = 0, l = items.length; i < l; i++) {
         var item = items[i];
 
-        var model = no.Model.get(item.id, item.params);
-        if (!model) {
-            model = no.Model.create(item.id, item.params);
-        }
-
-        models.push(model);
+        // можно не использовать if (!model.get()) { model.create() }
+        // model.create все это умеет делать
+        models.push(no.Model.create(item, params));
     }
 
     return no.request.models(models);
-
-    function normalizeItems(items, params) {
-        var _items = [];
-
-        for (var i = 0, l = items.length; i < l; i++) {
-            _items.push({
-                id: items[i],
-                params: params
-            });
-        }
-
-        return _items;
-    }
 };
 
+/**
+ * Делает запрос моделей с сервера.
+ * @param {no.Model[]} models Массив моделей.
+ * @return {no.Promise}
+ */
 no.request.models = function(models) {
     var request = new Request(models);
 

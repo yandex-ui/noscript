@@ -1,0 +1,21 @@
+{
+    "browser": true,
+    "devel": true,
+    "jquery": true,
+    "globals": {
+        "no": false
+    },
+
+    "bitwise": true,
+    "curly": true,
+    "indent": 4,
+    "latedef": true,
+    "sub": true,
+    "newcap": true,
+    "noarg": true,
+    "noempty": true,
+    "nonew": true,
+    "onevar": false,
+    "undef": true,
+    "unused": true
+}

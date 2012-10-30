@@ -15,7 +15,12 @@
     "dependencies": {
         "nommon": "*"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "expect.js": "*",
+        "jshint": "*",
+        "mocha": "*",
+        "sinon": "*"
+    },
     "optionalDependencies": {},
     "engines": {
         "node": "*"

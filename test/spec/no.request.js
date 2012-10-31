@@ -117,4 +117,57 @@ describe('no.request.js', function() {
 
     });
 
+    describe('no.reques.models()', function(){
+        // sinon.useFakeXMLHttpRequest() гадит в window
+        mocha.setup({ignoreLeaks: true});
+
+        beforeEach(function() {
+            no.Model.define('test-model');
+
+            this.xhr = sinon.useFakeXMLHttpRequest();
+            var requests = this.requests = [];
+
+            this.xhr.onCreate = function (xhr) {
+                console.log('create request', xhr);
+                requests.push(xhr);
+            };
+        });
+
+        afterEach(function() {
+            this.xhr.restore();
+        });
+
+        it('should create http request for model without cache', function() {
+            var promise = no.request('test-model');
+            expect(this.requests.length).to.be(1);
+
+            /*
+            this.requests[0].respond(200, { "Content-Type": "application/json" },
+                                     '[{ "id": 12, "comment": "Hey there" }]');
+             */
+        });
+
+        it('should not create http request for model with cache', function() {
+            var model = no.Model.create('test-model');
+            model.setData(true);
+
+            no.request('test-model');
+            expect(this.requests.length).to.be(0);
+        });
+
+        it('should call promise immediatly for model with cache', function() {
+            var model = no.Model.create('test-model');
+            model.setData(true);
+
+            var result = false;
+            no.request('test-model').then(function() {
+                result = true;
+            });
+
+            expect(result).to.be.ok();
+        });
+
+        mocha.setup({ignoreLeaks: false});
+    });
+
 });

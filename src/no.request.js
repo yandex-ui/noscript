@@ -6,13 +6,24 @@
 
 /**
  * Делает запрос моделей с сервера.
- * @param {Array|String} items Массив названий моделей.
- * @param {Object} params Параметры моделей.
+ * Аргументы можно передавать в 3 форматах:
+ *   - string item, params - одна модель и опциональные параметры для нее
+ *   - array item[], params - массив моделей и опциональные единые для всех параметры
+ *   - array item[] - массив моделей вида {id: modelName, params: modelParams}
+ * @param {String|Array|Object} items Массив названий моделей.
+ * @param {Object} [params] Параметры моделей.
  * @return {no.Promise}
  */
 no.request = function(items, params) {
+    // приводим к формату №2
     if (typeof items === 'string') {
         items = [ items ];
+    }
+
+    // приводим №2 к формату №3
+    if (typeof items[0] === 'string') {
+        params = params || {};
+        items = normalizeItems(items, params);
     }
 
     var models = [];
@@ -21,7 +32,7 @@ no.request = function(items, params) {
 
         // можно не использовать if (!model.get()) { model.create() }
         // model.create все это умеет делать
-        models.push(no.Model.create(item, params));
+        models.push(no.Model.create(item.id, item.params));
     }
 
     return no.request.models(models);
@@ -187,7 +198,23 @@ function models2params(models) {
     return params;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+    /**
+     * Приводит запрашиваемые модели к формату №3 из no.request.
+     * @param items Массив названией моделей.
+     * @param params Параметры моделей.
+     * @return {Array}
+     */
+    function normalizeItems(items, params) {
+        var _items = [];
+        for (var i = 0, l = items.length; i < l; i++) {
+            _items.push({
+                id: items[i],
+                params: params
+            });
+        }
+
+        return _items;
+    }
 
 })();
 

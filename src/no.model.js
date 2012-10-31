@@ -25,6 +25,43 @@ var _keySuffix = 0;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+/**
+ * Статус модели "Ошибка"
+ * @constant
+ * @type {String}
+ */
+no.Model.prototype.STATUS_ERROR = 'error';
+
+/**
+ * Статус модели "Неудача".
+ * В этом статусе модель может быть перезапрошена с сервера.
+ * @constant
+ * @type {String}
+ */
+no.Model.prototype.STATUS_FAILED = 'failed';
+
+/**
+ * Статус модели "В процессе загрузки".
+ * @constant
+ * @type {String}
+ */
+no.Model.prototype.STATUS_LOADING = 'loading';
+
+/**
+ * Статус модели "Нет данных".
+ * @constant
+ * @type {String}
+ */
+no.Model.prototype.STATUS_NONE = 'none';
+
+/**
+ * Статус модели "Все хорошо".
+ * @constant
+ * @type {String}
+ */
+no.Model.prototype.STATUS_OK = 'ok';
+
+
 no.Model.prototype._init = function(id, params, data) {
     this.id = id;
     this.params = params;
@@ -52,7 +89,7 @@ no.Model.prototype._reset = function(status) {
             'ok'            данные загрузились успешно
             'invalid'       модель вручную инвалидирована.
     */
-    this.status = status || 'none';
+    this.status = status || this.STATUS_NONE;
     this.retries = 0;
     this.requests = 0;
 
@@ -181,7 +218,7 @@ no.Model.prototype.invalidate = function() {
 };
 
 no.Model.prototype.isValid = function() {
-    return (this.status === 'ok');
+    return (this.status === this.STATUS_OK);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -239,7 +276,7 @@ no.Model.prototype.setData = function(data, options) {
         var old = this.data;
         this.data = this.preprocessData(data);
         this.error = null;
-        this.status = 'ok';
+        this.status = this.STATUS_OK;
 
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
@@ -260,7 +297,7 @@ no.Model.prototype.getError = function() {
 no.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
-    this.status = 'failed';
+    this.status = this.STATUS_FAILED;
 };
 
 no.Model.prototype.preprocessData = function(data) {

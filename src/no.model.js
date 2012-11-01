@@ -26,7 +26,8 @@ var _keySuffix = 0;
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * Статус модели "Ошибка"
+ * Статус модели "Ошибка".
+ * Данные загрузились с ошибкой, retry невозможен.
  * @constant
  * @type {String}
  */
@@ -34,7 +35,7 @@ no.Model.prototype.STATUS_ERROR = 'error';
 
 /**
  * Статус модели "Неудача".
- * В этом статусе модель может быть перезапрошена с сервера.
+ * Данные загрузились с ошибкой, возможен retry.
  * @constant
  * @type {String}
  */
@@ -42,6 +43,7 @@ no.Model.prototype.STATUS_FAILED = 'failed';
 
 /**
  * Статус модели "В процессе загрузки".
+ * Данные загружаются в данный момент.
  * @constant
  * @type {String}
  */
@@ -49,6 +51,7 @@ no.Model.prototype.STATUS_LOADING = 'loading';
 
 /**
  * Статус модели "Нет данных".
+ * Данные еще не загружались.
  * @constant
  * @type {String}
  */
@@ -56,11 +59,19 @@ no.Model.prototype.STATUS_NONE = 'none';
 
 /**
  * Статус модели "Все хорошо".
+ * Данные загрузились успешно.
  * @constant
  * @type {String}
  */
 no.Model.prototype.STATUS_OK = 'ok';
 
+/**
+ * Статус модели "Не валиден".
+ * Модель вручную инвалидирована.
+ * @constant
+ * @type {String}
+ */
+no.Model.prototype.STATUS_INVALID = 'invalid';
 
 no.Model.prototype._init = function(id, params, data) {
     this.id = id;
@@ -79,16 +90,7 @@ no.Model.prototype._init = function(id, params, data) {
 no.Model.prototype._reset = function(status) {
     this.data = null;
     this.error = null;
-    /*
-        Возможные варианты status:
 
-            'none'          данные еще не загружались
-            'loading'       данные загружаются в данный момент
-            'failed'        данные загрузились с ошибкой, нужен retry
-            'error'         данные загрузились с ошибкой, retry невозможен
-            'ok'            данные загрузились успешно
-            'invalid'       модель вручную инвалидирована.
-    */
     this.status = status || this.STATUS_NONE;
     this.retries = 0;
     this.requests = 0;
@@ -214,7 +216,7 @@ no.Model.invalidate = function(id, filter) {
 };
 
 no.Model.prototype.invalidate = function() {
-    this._reset('invalid');
+    this._reset(this.STATUS_INVALID);
 };
 
 no.Model.prototype.isValid = function() {
@@ -330,12 +332,16 @@ no.Model.prototype.getRequestParams = function() {
 
 //  Работа с кэшем.
 
-//  Достаем модель из кэша.
+/**
+ * Возвращает модель из кеша.
+ * @param {String} id Название модели.
+ * @param {String|Object} key Ключ(string) или параметры(object) модели.
+ * @return {no.Model}
+ */
 no.Model.get = function(id, key) {
     key = (typeof key === 'string') ? key : no.Model.key(id, key);
 
-    var model = _cache[id][key];
-    return model;
+    return _cache[id][key];
 };
 
 //  Сохраняем модель в кэше.

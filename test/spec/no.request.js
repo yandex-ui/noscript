@@ -128,7 +128,6 @@ describe('no.request.js', function() {
             var requests = this.requests = [];
 
             this.xhr.onCreate = function (xhr) {
-                console.log('create request', xhr);
                 requests.push(xhr);
             };
         });
@@ -137,36 +136,212 @@ describe('no.request.js', function() {
             this.xhr.restore();
         });
 
-        it('should create http request for model without cache', function() {
-            var promise = no.request('test-model');
-            expect(this.requests.length).to.be(1);
+        describe('STATUS_NONE', function() {
 
-            /*
-            this.requests[0].respond(200, { "Content-Type": "application/json" },
-                                     '[{ "id": 12, "comment": "Hey there" }]');
-             */
-        });
+            beforeEach(function() {
+                no.Model.define('test-model-none');
 
-        it('should not create http request for model with cache', function() {
-            var model = no.Model.create('test-model');
-            model.setData(true);
-
-            no.request('test-model');
-            expect(this.requests.length).to.be(0);
-        });
-
-        it('should call promise immediatly for model with cache', function() {
-            var model = no.Model.create('test-model');
-            model.setData(true);
-
-            var result = false;
-            no.request('test-model').then(function() {
-                result = true;
+                this.model = no.Model.create('test-model-none');
+                this.promise = no.request('test-model-none');
             });
 
-            expect(result).to.be.ok();
+            afterEach(function() {
+                this.model.invalidate();
+            });
+
+            it('should create http request for model', function() {
+                expect(this.requests.length).to.be(1);
+            });
+
+            it('should not resolve promise immediatly', function() {
+                var result = false;
+                this.promise.then(function() {
+                    result = true;
+                });
+
+                expect(result).to.not.be.ok();
+            });
+
+            it('should increment retries', function() {
+                expect(this.model.retries).to.be(1);
+            });
+
+            it('should set statis to STATUS_LOADING', function() {
+                expect(this.model.status).to.be(this.model.STATUS_LOADING);
+            });
+
+            it('should resolve promise after response', function() {
+                var result = false;
+                this.promise.then(function() {
+                    result = true;
+                });
+
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify([
+                        {result: true}
+                    ])
+                );
+
+                expect(result).to.be.ok();
+            })
         });
 
+        describe('STATUS_OK', function() {
+
+            beforeEach(function() {
+                var model = no.Model.create('test-model');
+                model.setData(true);
+            });
+
+            it('should not create http request for model', function() {
+                no.request('test-model');
+                expect(this.requests.length).to.be(0);
+            });
+
+            it('should resolve promise immediatly for model', function() {
+                var result = false;
+                no.request('test-model').then(function() {
+                    result = true;
+                });
+
+                expect(result).to.be.ok();
+            });
+        });
+
+        describe('STATUS_ERROR', function() {
+
+            beforeEach(function() {
+                var model = no.Model.create('test-model');
+                model.status = model.STATUS_ERROR;
+            });
+
+            it('should not create http request for model', function() {
+                no.request('test-model');
+                expect(this.requests.length).to.be(0);
+            });
+
+            it('should resolve promise immediatly for model', function() {
+                var result = false;
+                no.request('test-model').then(function() {
+                    result = true;
+                });
+
+                expect(result).to.be.ok();
+            });
+        });
+
+        describe('STATUS_LOADING', function() {
+
+            beforeEach(function() {
+                var model = no.Model.create('test-model');
+                model.status = model.STATUS_LOADING;
+                model.promise = new no.Promise();
+            });
+
+            it('should not create http request for model', function() {
+                no.request('test-model');
+                expect(this.requests.length).to.be(0);
+            });
+
+            it('should not resolve promise immediatly for model', function() {
+                var result = false;
+                no.request('test-model').then(function() {
+                    result = true;
+                });
+
+                expect(result).to.not.be.ok();
+            });
+        });
+
+        describe('STATUS_FAILED', function() {
+
+            beforeEach(function() {
+                no.Model.define('test-model-failed');
+
+                this.model = no.Model.create('test-model-failed');
+                this.model.status = this.model.STATUS_FAILED;
+            });
+
+            afterEach(function() {
+                this.model.invalidate();
+            });
+
+            describe('common', function() {
+
+                beforeEach(function() {
+                    this.model.canRetry = sinon.spy(function() {
+                        return false;
+                    });
+
+                    this.promise = no.request.models([this.model]);
+                });
+
+                it('should call model.canRetry', function() {
+                    expect(this.model.canRetry.calledOnce).to.be.ok();
+                });
+
+                it('should call model.canRetry with no args', function() {
+                    expect(this.model.canRetry.calledWithExactly()).to.be.ok();
+                });
+            });
+
+            describe('cant retry', function() {
+
+                beforeEach(function() {
+                    this.model.canRetry = function() {
+                        return false;
+                    };
+                    this.promise = no.request.models([this.model]);
+                });
+
+                it('should not create http request', function() {
+                    expect(this.requests.length).to.be(0);
+                });
+
+                it('should set status to STATUS_ERROR', function() {
+                    expect(this.model.status).to.be(this.model.STATUS_ERROR);
+                });
+
+                it('should resolve promise immediatly', function() {
+                    var result = false;
+                    this.promise.then(function() {
+                        result = true;
+                    });
+
+                    expect(result).to.be.ok();
+                });
+            });
+
+            describe('can retry', function() {
+
+                beforeEach(function() {
+                    this.model.canRetry = function() {
+                        return true;
+                    };
+                    this.promise = no.request.models([this.model]);
+                });
+
+                it('should create http request', function() {
+                    expect(this.requests.length).to.be(1);
+                });
+
+                it('should set status to STATUS_LOADING', function() {
+                    expect(this.model.status).to.be(this.model.STATUS_LOADING);
+                });
+
+                it('should not resolve promise immediatly', function() {
+                    var result = false;
+                    this.promise.then(function() {
+                        result = true;
+                    });
+
+                    expect(result).to.not.be.ok();
+                });
+            });
+
+        });
         mocha.setup({ignoreLeaks: false});
     });
 

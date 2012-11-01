@@ -52,6 +52,11 @@ no.request.models = function(models) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 var Request = function(models) {
+    /**
+     * Массив запрашиваемых моделей
+     * @type {no.Model[]}
+     * @private
+     */
     this.models = models;
 
     this.promise = new no.Promise();
@@ -110,9 +115,7 @@ Request.prototype.request = function(loading, requesting) {
 
     if (loading.length) {
         //  Ждем все остальные модели, которые должны загрузиться (уже были запрошены).
-        var promises = no.array.map(loading, function(model) {
-            return model.promise;
-        });
+        var promises = no.array.map(loading, model2Promise);
         all.push( no.Promise.wait(promises) );
     }
 
@@ -216,5 +219,13 @@ function models2params(models) {
         return _items;
     }
 
-})();
+    /**
+     * Возвращает promise из model
+     * @param {no.Model} model Модель
+     * @return {no.Promise}
+     */
+    function model2Promise(model) {
+        return model.promise;
+    }
 
+})();

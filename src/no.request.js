@@ -49,6 +49,22 @@ no.request.models = function(models) {
     return request.start();
 };
 
+/**
+ * Дополнительные общие параметры запроса.
+ * Эти параметры добавляются в любой запрос.
+ * @public
+ * @type {Object}
+ */
+no.request.requestParams = {};
+
+/**
+ * Добавляет к params, параметры из no.request.requestParams.
+ * @param {Object} params Параметры запроса.
+ */
+no.request.addRequestParams = function(params) {
+    no.extend(params, this.requestParams);
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 var Request = function(models) {
@@ -110,6 +126,7 @@ Request.prototype.request = function(loading, requesting) {
     if (requesting.length) {
         //  Запрашиваем модели, которые нужно запросить.
         var params = models2params(requesting);
+        no.request.addRequestParams(params);
         all.push( no.http('/models/', params) ); // FIXME: Урл к серверной ручке.
     }
 

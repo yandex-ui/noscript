@@ -342,7 +342,48 @@ describe('no.request.js', function() {
             });
 
         });
+
         mocha.setup({ignoreLeaks: false});
+    });
+
+    describe('addRequestParams', function() {
+
+        beforeEach(function() {
+            sinon.spy(no, 'http', function(){
+                return new no.Promise();
+            });
+
+            no.Model.define('test-model-addRequestParams');
+
+            this.originalParams = {
+                a: 1,
+                b: 2
+            };
+            no.request.requestParams = no.extend({}, this.originalParams);
+            sinon.spy(no.request, 'addRequestParams');
+
+            no.request('test-model-addRequestParams');
+        });
+
+        afterEach(function() {
+            no.request.addRequestParams.restore();
+            no.http.restore();
+        });
+
+        it('request should call no.request.addRequestParams', function() {
+            expect(no.request.addRequestParams.calledOnce).to.be.ok();
+        });
+
+        it('request should add no.request.requestParams to xhr.params', function() {
+            for (var prop in no.request.requestParams) {
+                expect(no.http.getCall(0).args[1]).to.have.property(prop, no.request.requestParams[prop]);
+            }
+        });
+
+        it('request should not modify no.request.requestParams', function() {
+            expect(no.request.requestParams).to.eql(this.originalParams);
+        });
+
     });
 
 });

@@ -62,7 +62,7 @@ no.request.requestParams = {};
  * @param {Object} params Параметры запроса.
  */
 no.request.addRequestParams = function(params) {
-    no.extend(params, this.requestParams);
+    no.extend(params, no.request.requestParams);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

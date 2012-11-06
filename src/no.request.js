@@ -132,7 +132,7 @@ Request.prototype.request = function(loading, requesting) {
 
     if (loading.length) {
         //  Ждем все остальные модели, которые должны загрузиться (уже были запрошены).
-        var promises = no.array.map(loading, model2Promise);
+        var promises = loading.map(model2Promise);
         all.push( no.Promise.wait(promises) );
     }
 

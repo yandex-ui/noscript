@@ -349,7 +349,7 @@ describe('no.request.js', function() {
     describe('addRequestParams', function() {
 
         beforeEach(function() {
-            sinon.spy(no, 'http', function(){
+            sinon.stub(no, 'http', function() {
                 return new no.Promise();
             });
 
@@ -386,4 +386,7 @@ describe('no.request.js', function() {
 
     });
 
+
+    //TODO: STATUS_INVALID
+    //TODO: xhr response parsing
 });

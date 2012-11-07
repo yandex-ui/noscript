@@ -15,36 +15,28 @@
  * @return {no.Promise}
  */
 no.request = function(items, params) {
-    // приводим к формату №2
-    if (typeof items === 'string') {
-        items = [ items ];
-    }
+    return no.request.models(items2models(items, params));
+};
 
-    // приводим №2 к формату №3
-    if (typeof items[0] === 'string') {
-        params = params || {};
-        items = normalizeItems(items, params);
-    }
-
-    var models = [];
-    for (var i = 0, l = items.length; i < l; i++) {
-        var item = items[i];
-
-        // можно не использовать if (!model.get()) { model.create() }
-        // model.create все это умеет делать
-        models.push(no.Model.create(item.id, item.params));
-    }
-
-    return no.request.models(models);
+/**
+ * Делает запрос моделей с сервера, не учитывая их закешированности.
+ * @see no.request
+ * @param {String|Array|Object} items Массив названий моделей.
+ * @param {Object} [params] Параметры моделей.
+ * @return {no.Promise}
+ */
+no.forcedRequest = function(items, params) {
+    return no.request.models(items2models(items, params), true);
 };
 
 /**
  * Делает запрос моделей с сервера.
  * @param {no.Model[]} models Массив моделей.
+ * @param {Boolean} [forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.request.models = function(models) {
-    var request = new Request(models);
+no.request.models = function(models, forced) {
+    var request = new Request(models, forced);
 
     return request.start();
 };
@@ -65,15 +57,31 @@ no.request.addRequestParams = function(params) {
     no.extend(params, no.request.requestParams);
 };
 
+var REQUEST_ID = 0;
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-var Request = function(models) {
+var Request = function(models, forced) {
+    /**
+     * ID запроса.
+     * @type {Number}
+     * @private
+     */
+    this.id = REQUEST_ID++;
+
     /**
      * Массив запрашиваемых моделей
      * @type {no.Model[]}
      * @private
      */
     this.models = models;
+
+    /**
+     * Флаг, что запрос не должен учитывать закешированность моделей.
+     * @type {Boolean}
+     * @private
+     */
+    this.forced = forced;
 
     this.promise = new no.Promise();
 };
@@ -89,12 +97,29 @@ Request.prototype.start = function() {
         var model = models[i];
         var status = model.status;
 
-        if (status === model.STATUS_OK || status === model.STATUS_ERROR) {
+        if (
+            // если STATUS_OK и не force-запрос
+            (status === model.STATUS_OK && !this.forced) ||
+            // если STATUS_OK, force-запрос и он был получен этим запросом
+            (status === model.STATUS_OK && this.forced && model.requestID === this.id) ||
+            (status === model.STATUS_ERROR)
+        ) {
             //  Либо все загрузили успешно, либо кончились ретраи.
             //  Ничего не делаем в этом случае.
-        } else if (status === model.STATUS_LOADING) {
+
+        } else if (status === model.STATUS_LOADING && !this.forced) {
             //  Уже грузится.
             loading.push(model);
+
+        } else if (status === model.STATUS_LOADING && this.forced) {
+            // TODO: unit-тесты на это поведение
+            // Если запрос forced, но модель уже грузится
+            // retries увеличивать не надо
+            // новый promise создавать не надо, чтобы отрезолвить и первый запрос и этот
+            model.requestID = this.id;
+            // добавляем модель в запрос
+            requesting.push(model);
+
         } else {
             //  Проверяем, нужно ли (можно ли) запрашивает этот ключ.
             if (status === model.STATUS_FAILED) {
@@ -110,6 +135,8 @@ Request.prototype.start = function() {
             model.promise = new no.Promise();
             //  Ключ будет (пере)запрошен.
             model.status = model.STATUS_LOADING;
+            // сохраняем в моделе ID запроса, который ее запрашивает
+            model.requestID = this.id;
 
             requesting.push(model);
         }
@@ -122,18 +149,27 @@ Request.prototype.start = function() {
 
 Request.prototype.request = function(loading, requesting) {
     var all = [];
+    // promise от http-запроса
+    var httpRequest;
 
     if (requesting.length) {
         //  Запрашиваем модели, которые нужно запросить.
         var params = models2params(requesting);
         no.request.addRequestParams(params);
-        all.push( no.http('/models/', params) ); // FIXME: Урл к серверной ручке.
+        // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
+        // мог зарезолвится без завершения http-запроса
+        httpRequest = no.http('/models/', params); // FIXME: Урл к серверной ручке.
+
+        all = all.concat( requesting.map(model2Promise) );
+
+    } else {
+        // создаем фейковый зарезолвленный promise
+        httpRequest = new no.Promise().resolve();
     }
 
     if (loading.length) {
         //  Ждем все остальные модели, которые должны загрузиться (уже были запрошены).
-        var promises = loading.map(model2Promise);
-        all.push( no.Promise.wait(promises) );
+        all = all.concat( loading.map(model2Promise) );
     }
 
     //  Мы ждём какие-то данные:
@@ -142,17 +178,16 @@ Request.prototype.request = function(loading, requesting) {
     if (all.length) {
         var that = this;
 
-        //  В r должен быть массив из одного или двух элементов.
-        //  Если мы делали http-запрос, то в r[0] должен быть его результат.
-        no.Promise.wait(all).then(function(r) {
+        httpRequest.then(function(r) {
+            //  В r должен быть массив из одного или двух элементов.
             if (requesting.length) {
-                that.extract(requesting, r[0]);
+                that.extract(requesting, r);
             }
-
-            //  "Повторяем" запрос. Если какие-то ключи не пришли, они будут перезапрошены.
-            //  Если же все получено, то будет выполнен: that.promise.resolve();
-            that.start();
         });
+
+        // Ждем резолва всех моделей и "повторяем" запрос
+        // Если какие-то ключи не пришли, они будут перезапрошены.
+        no.Promise.wait(all).then(this.start.bind(this));
 
     } else {
         this.promise.resolve(this.models);
@@ -163,6 +198,11 @@ Request.prototype.extract = function(models, results) {
     for (var i = 0, l = models.length; i < l; i++) {
         var model = models[i];
         var result = results[i];
+
+        // если модель запрашиваем кто-то другой, то этот ответ игнорируем
+        if (model.requestID > this.id) {
+            continue;
+        }
 
         var data, error;
         if (!result) {
@@ -189,6 +229,7 @@ Request.prototype.extract = function(models, results) {
             model.setError(error);
         }
 
+        //TODO: store не надо делать, потому что no.Model.create уже это делает
         no.Model.store(model);
 
         model.promise.resolve();
@@ -243,6 +284,36 @@ function models2params(models) {
      */
     function model2Promise(model) {
         return model.promise;
+    }
+
+    /**
+     * Приводит аргументы из no.request к моделям.
+     * @param {String|Array|Object} items Массив названий моделей.
+     * @param {Object} [params] Параметры моделей.
+     * @return {no.Model[]}
+     */
+    function items2models(items, params) {
+        // приводим к формату №2
+        if (typeof items === 'string') {
+            items = [ items ];
+        }
+
+        // приводим №2 к формату №3
+        if (typeof items[0] === 'string') {
+            params = params || {};
+            items = normalizeItems(items, params);
+        }
+
+        var models = [];
+        for (var i = 0, l = items.length; i < l; i++) {
+            var item = items[i];
+
+            // можно не использовать if (!model.get()) { model.create() }
+            // model.create все это умеет делать
+            models.push(no.Model.create(item.id, item.params));
+        }
+
+        return models;
     }
 
 })();

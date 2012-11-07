@@ -117,6 +117,24 @@ describe('no.request.js', function() {
 
     });
 
+    describe('no.forcedRequest', function() {
+
+        beforeEach(function() {
+            no.Model.define('test-forcedRequest');
+            sinon.stub(no.request, 'models');
+        });
+
+        afterEach(function() {
+            no.request.models.restore();
+        });
+
+        it('should call no.request.models with "forced" flag', function() {
+            no.forcedRequest('test-forcedRequest');
+
+            expect(no.request.models.getCall(0).args[1]).to.be(true);
+        });
+    });
+
     describe('no.reques.models()', function(){
         // sinon.useFakeXMLHttpRequest() гадит в window
         mocha.setup({ignoreLeaks: true});
@@ -153,7 +171,7 @@ describe('no.request.js', function() {
                 expect(this.requests.length).to.be(1);
             });
 
-            it('should not resolve promise immediatly', function() {
+            it('should not resolve promise immediately', function() {
                 var result = false;
                 this.promise.then(function() {
                     result = true;
@@ -166,8 +184,12 @@ describe('no.request.js', function() {
                 expect(this.model.retries).to.be(1);
             });
 
-            it('should set statis to STATUS_LOADING', function() {
+            it('should set status to STATUS_LOADING', function() {
                 expect(this.model.status).to.be(this.model.STATUS_LOADING);
+            });
+
+            it('should set requestID', function() {
+                expect(this.model.requestID).to.be.ok();
             });
 
             it('should resolve promise after response', function() {
@@ -185,7 +207,7 @@ describe('no.request.js', function() {
                 );
 
                 expect(result).to.be.ok();
-            })
+            });
         });
 
         describe('STATUS_OK', function() {
@@ -195,18 +217,61 @@ describe('no.request.js', function() {
                 model.setData(true);
             });
 
-            it('should not create http request for model', function() {
-                no.request('test-model');
-                expect(this.requests.length).to.be(0);
-            });
-
-            it('should resolve promise immediatly for model', function() {
-                var result = false;
-                no.request('test-model').then(function() {
-                    result = true;
+            describe('regular', function() {
+                it('should not create http request for model', function() {
+                    no.request('test-model');
+                    expect(this.requests.length).to.be(0);
                 });
 
-                expect(result).to.be.ok();
+                it('should resolve promise immediately for model', function() {
+                    var result = false;
+                    no.request('test-model').then(function() {
+                        result = true;
+                    });
+
+                    expect(result).to.be.ok();
+                });
+            });
+
+            describe('forced', function() {
+
+                beforeEach(function() {
+                    this.requestPromise = no.forcedRequest('test-model');
+                });
+
+                afterEach(function() {
+                    delete this.requestPromise;
+                });
+
+                it('should create http request for model', function() {
+                    expect(this.requests.length).to.be(1);
+                });
+
+                it('should not resolve promise immediately', function() {
+                    var result = false;
+                    this.requestPromise.then(function() {
+                        result = true;
+                    });
+
+                    expect(result).to.not.be.ok();
+                });
+
+                it('should resolve promise after response', function() {
+                    var result = false;
+                    this.requestPromise.then(function() {
+                        result = true;
+                    });
+
+                    this.requests[0].respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify([
+                            {result: true}
+                        ])
+                    );
+
+                    expect(result).to.be.ok();
+                });
             });
         });
 
@@ -222,7 +287,7 @@ describe('no.request.js', function() {
                 expect(this.requests.length).to.be(0);
             });
 
-            it('should resolve promise immediatly for model', function() {
+            it('should resolve promise immediately for model', function() {
                 var result = false;
                 no.request('test-model').then(function() {
                     result = true;
@@ -240,18 +305,44 @@ describe('no.request.js', function() {
                 model.promise = new no.Promise();
             });
 
-            it('should not create http request for model', function() {
-                no.request('test-model');
-                expect(this.requests.length).to.be(0);
-            });
-
-            it('should not resolve promise immediatly for model', function() {
-                var result = false;
-                no.request('test-model').then(function() {
-                    result = true;
+            describe('regular', function() {
+                it('should not create http request for model', function() {
+                    no.request('test-model');
+                    expect(this.requests.length).to.be(0);
                 });
 
-                expect(result).to.not.be.ok();
+                it('should not resolve promise immediately for model', function() {
+                    var result = false;
+                    no.request('test-model').then(function() {
+                        result = true;
+                    });
+
+                    expect(result).to.not.be.ok();
+                });
+            });
+
+            describe('forced', function() {
+
+                beforeEach(function() {
+                    this.requestPromise = no.forcedRequest('test-model');
+                });
+
+                afterEach(function() {
+                    delete this.requestPromise;
+                });
+
+                it('should create http request for model', function() {
+                    expect(this.requests.length).to.be(1);
+                });
+
+                it('should not resolve promise immediately for model', function() {
+                    var result = false;
+                    this.requestPromise.then(function() {
+                        result = true;
+                    });
+
+                    expect(result).to.not.be.ok();
+                });
             });
         });
 
@@ -304,7 +395,7 @@ describe('no.request.js', function() {
                     expect(this.model.status).to.be(this.model.STATUS_ERROR);
                 });
 
-                it('should resolve promise immediatly', function() {
+                it('should resolve promise immediately', function() {
                     var result = false;
                     this.promise.then(function() {
                         result = true;
@@ -331,7 +422,7 @@ describe('no.request.js', function() {
                     expect(this.model.status).to.be(this.model.STATUS_LOADING);
                 });
 
-                it('should not resolve promise immediatly', function() {
+                it('should not resolve promise immediately', function() {
                     var result = false;
                     this.promise.then(function() {
                         result = true;
@@ -387,6 +478,122 @@ describe('no.request.js', function() {
     });
 
 
+    describe('requests combinations', function() {
+        // ключ + forced. первый не парсится второй, все ресолвит
+
+        describe('two equal requests', function() {
+
+            beforeEach(function() {
+                no.Model.define('test-model-two-equal-requests');
+
+                var promises = this.promises = [];
+
+                sinon.stub(no, 'http', function() {
+                    var promise = new no.Promise();
+                    promises.push(promise);
+                    return promise;
+                });
+
+                this.request1 = no.request('test-model-two-equal-requests');
+                this.request2 = no.request('test-model-two-equal-requests');
+
+                this.promises[0].resolve([{result: true}]);
+            });
+
+            afterEach(function() {
+                delete this.request1;
+                delete this.request2;
+                delete this.promises;
+                no.http.restore();
+            });
+
+            it('resolve first request', function() {
+                var res = false;
+                this.request1.then(function() {
+                    res = true;
+                });
+                expect(res).to.be(true);
+            });
+
+            it('resolve second request', function() {
+                var res = false;
+                this.request2.then(function() {
+                    res = true;
+                });
+                expect(res).to.be(true);
+            });
+        });
+
+        describe('regular + force requests', function() {
+            beforeEach(function() {
+                no.Model.define('test-model-two-equal-requests');
+
+                var promises = this.promises = [];
+
+                sinon.stub(no, 'http', function() {
+                    var promise = new no.Promise();
+                    promises.push(promise);
+                    return promise;
+                });
+
+                this.request1 = no.request('test-model-two-equal-requests');
+                this.request2 = no.forcedRequest('test-model-two-equal-requests');
+            });
+
+            afterEach(function() {
+                delete this.request1;
+                delete this.request2;
+                delete this.promises;
+                no.http.restore();
+            });
+
+            it('should create two requests', function() {
+                expect(this.promises.length).to.be(2)
+            });
+
+            it('should not resolve first promise after first response', function() {
+                this.promises[0].resolve([
+                    {result: true}
+                ]);
+
+                expect(promiseIsResolved(this.request1)).to.be(false);
+            });
+
+            it('should not resolve second promise after first response', function() {
+                this.promises[0].resolve([
+                    {result: true}
+                ]);
+
+                expect(promiseIsResolved(this.request2)).to.be(false);
+            });
+
+            it('should resolve first promise after second response', function() {
+                this.promises[1].resolve([
+                    {result: 'second response1'}
+                ]);
+
+                expect(promiseIsResolved(this.request1)).to.be(true);
+            });
+
+            it('should resolve second promise after second response', function() {
+                this.promises[1].resolve([
+                    {result: 'second response2'}
+                ]);
+
+                expect(promiseIsResolved(this.request2)).to.be(true);
+            });
+        });
+    });
+
     //TODO: STATUS_INVALID
     //TODO: xhr response parsing
+
+    function promiseIsResolved(promise) {
+        var res = false;
+        promise.then(function() {
+            res = true;
+        });
+
+        return res;
+    }
 });

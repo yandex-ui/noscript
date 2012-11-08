@@ -84,7 +84,7 @@ no.Model.prototype._init = function(id, params, data) {
 
     this.key = no.Model.key(id, params, info);
 
-    this.timstamp = 0;
+    this.timestamp = 0;
 };
 
 no.Model.prototype._reset = function(status) {

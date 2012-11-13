@@ -166,8 +166,8 @@ describe('no.request.js', function() {
                 expect(this.model.retries).to.be(1);
             });
 
-            it('should set statis to STATUS_LOADING', function() {
-                expect(this.model.status).to.be(this.model.STATUS_LOADING);
+            it('should set status to STATUS_LOADING', function() {
+                expect(this.model.status).to.be('loading');
             });
 
             it('should resolve promise after response', function() {
@@ -214,7 +214,7 @@ describe('no.request.js', function() {
 
             beforeEach(function() {
                 var model = no.Model.create('test-model');
-                model.status = model.STATUS_ERROR;
+                model.status = 'error';
             });
 
             it('should not create http request for model', function() {
@@ -236,7 +236,7 @@ describe('no.request.js', function() {
 
             beforeEach(function() {
                 var model = no.Model.create('test-model');
-                model.status = model.STATUS_LOADING;
+                model.status = 'loading';
                 model.promise = new no.Promise();
             });
 
@@ -261,7 +261,7 @@ describe('no.request.js', function() {
                 no.Model.define('test-model-failed');
 
                 this.model = no.Model.create('test-model-failed');
-                this.model.status = this.model.STATUS_FAILED;
+                this.model.status = 'failed';
             });
 
             afterEach(function() {
@@ -301,7 +301,7 @@ describe('no.request.js', function() {
                 });
 
                 it('should set status to STATUS_ERROR', function() {
-                    expect(this.model.status).to.be(this.model.STATUS_ERROR);
+                    expect(this.model.status).to.be('error');
                 });
 
                 it('should resolve promise immediatly', function() {
@@ -328,7 +328,7 @@ describe('no.request.js', function() {
                 });
 
                 it('should set status to STATUS_LOADING', function() {
-                    expect(this.model.status).to.be(this.model.STATUS_LOADING);
+                    expect(this.model.status).to.be('loading');
                 });
 
                 it('should not resolve promise immediatly', function() {

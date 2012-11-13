@@ -89,29 +89,18 @@ Request.prototype.start = function() {
         var model = models[i];
         var status = model.status;
 
-        if (status === model.STATUS_OK || status === model.STATUS_ERROR) {
+        if ( model.isDone() ) {
             //  Либо все загрузили успешно, либо кончились ретраи.
             //  Ничего не делаем в этом случае.
-        } else if (status === model.STATUS_LOADING) {
+        } else if ( model.isLoading() ) {
             //  Уже грузится.
             loading.push(model);
-        } else {
-            //  Проверяем, нужно ли (можно ли) запрашивает этот ключ.
-            if (status === model.STATUS_FAILED) {
-                if (!model.canRetry()) {
-                    //  Превышен лимит перезапросов или же модель говорит, что с такой ошибкой перезапрашиваться не нужно.
-                    model.status = model.STATUS_ERROR;
-                    continue;
-                }
-            }
-
-            model.retries++;
-
-            model.promise = new no.Promise();
-            //  Ключ будет (пере)запрошен.
-            model.status = model.STATUS_LOADING;
-
+        } else if ( model.canRetry() ) {
+            model.beforeRetry();
             requesting.push(model);
+        } else {
+            //  Не удалось получить модель.
+            model.fail();
         }
     }
 

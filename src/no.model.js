@@ -25,53 +25,58 @@ var _keySuffix = 0;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-/**
- * Статус модели "Ошибка".
- * Данные загрузились с ошибкой, retry невозможен.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_ERROR = 'error';
+var STATUS = {
+    /**
+     * Статус модели "Ошибка".
+     * Данные загрузились с ошибкой, retry невозможен.
+     * @constant
+     * @type {String}
+     */
+    ERROR: 'error',
 
-/**
- * Статус модели "Неудача".
- * Данные загрузились с ошибкой, возможен retry.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_FAILED = 'failed';
+    /**
+     * Статус модели "Неудача".
+     * Данные загрузились с ошибкой, возможен retry.
+     * @constant
+     * @type {String}
+     */
+    FAILED: 'failed',
 
-/**
- * Статус модели "В процессе загрузки".
- * Данные загружаются в данный момент.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_LOADING = 'loading';
+    /**
+     * Статус модели "В процессе загрузки".
+     * Данные загружаются в данный момент.
+     * @constant
+     * @type {String}
+     */
+    LOADING: 'loading',
 
-/**
- * Статус модели "Нет данных".
- * Данные еще не загружались.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_NONE = 'none';
+    /**
+     * Статус модели "Нет данных".
+     * Данные еще не загружались.
+     * @constant
+     * @type {String}
+     */
+    NONE: 'none',
 
-/**
- * Статус модели "Все хорошо".
- * Данные загрузились успешно.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_OK = 'ok';
+    /**
+     * Статус модели "Все хорошо".
+     * Данные загрузились успешно.
+     * @constant
+     * @type {String}
+     */
+    OK: 'ok',
 
-/**
- * Статус модели "Не валиден".
- * Модель вручную инвалидирована.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_INVALID = 'invalid';
+    /**
+     * Статус модели "Не валиден".
+     * Модель вручную инвалидирована.
+     * @constant
+     * @type {String}
+     */
+    INVALID: 'invalid'
+};
+
+// -------------------------------------------------------------------------- //
+
 
 no.Model.prototype._init = function(id, params, data) {
     this.id = id;
@@ -91,7 +96,7 @@ no.Model.prototype._reset = function(status) {
     this.data = null;
     this.error = null;
 
-    this.status = status || this.STATUS_NONE;
+    this.status = status || STATUS.NONE;
     this.retries = 0;
     this.requests = 0;
 
@@ -216,11 +221,32 @@ no.Model.invalidate = function(id, filter) {
 };
 
 no.Model.prototype.invalidate = function() {
-    this._reset(this.STATUS_INVALID);
+    this._reset(STATUS.INVALID);
 };
 
 no.Model.prototype.isValid = function() {
-    return (this.status === this.STATUS_OK);
+    return (this.status === STATUS.OK);
+};
+
+//  Модель уже настолько готова, что либо получена, либо все попытки получить её не увенчались успехом.
+no.Model.prototype.isDone = function() {
+    return (this.status === STATUS.OK) || (this.status === STATUS.ERROR);
+};
+
+no.Model.prototype.isLoading = function() {
+    return (this.status === STATUS.LOADING);
+};
+
+//  Подготовка модели к перезапросу.
+no.Model.prototype.beforeRetry = function() {
+    this.retries++;
+    this.promise = new no.Promise();
+    this.status = STATUS.LOADING;
+};
+
+//  Превышен лимит перезапросов или же модель говорит, что с такой ошибкой перезапрашиваться не нужно.
+no.Model.prototype.fail = function() {
+    this.status = STATUS.ERROR;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -278,7 +304,7 @@ no.Model.prototype.setData = function(data, options) {
         var old = this.data;
         this.data = this.preprocessData(data);
         this.error = null;
-        this.status = this.STATUS_OK;
+        this.status = STATUS.OK;
 
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
@@ -299,7 +325,7 @@ no.Model.prototype.getError = function() {
 no.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
-    this.status = this.STATUS_FAILED;
+    this.status = STATUS.FAILED;
 };
 
 no.Model.prototype.preprocessData = function(data) {

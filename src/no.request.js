@@ -57,6 +57,130 @@ no.request.addRequestParams = function(params) {
     no.extend(params, no.request.requestParams);
 };
 
+
+no.request.Manager = {
+
+    /**
+     * @enum {Number}
+     */
+    STATUS: {
+        LOADING: 0,
+        FAILED: 1,
+        DONE: 2
+    },
+
+    _keys: {},
+
+    /**
+     * Добавляет запрос модели.
+     * @param {no.Model} model Модель.
+     * @param {Number} requestId ID запроса.
+     * @param {Boolean} forced Флаг принудительного запроса.
+     * @return {Boolean|no.Model} Если true - модель надо запросить, false - ничег не надо делать, no.Model - дождаться ресолва промиса возвращенной модели.
+     */
+    add: function(model, requestId, forced) {
+        var REQUEST_STATUS = this.STATUS;
+
+        var modelKey = model.key;
+        var request = this._keys[modelKey];
+
+        // если уже кто-то запрашивает такой ключ
+        if (request) {
+            if (request.status === REQUEST_STATUS.LOADING) {
+                if (model.isDo()) {
+                    // если do-запрос с статусе loading, то request.model !== model, потому что do-модели не сохраняются
+                    // поэтому тут надо вернуть модель из request, резолвить будем ее и ссылаться будем на нее
+                    return request.model;
+
+                } else {
+                    if (forced) {
+                        // Если запрос forced, но модель уже грузится
+                        // retries увеличивать не надо
+                        // новый promise создавать не надо, чтобы отрезолвить и первый запрос и этот
+                        request.model.requestID = requestId;
+                        return true;
+
+                    } else {
+                        return request.model;
+                    }
+                }
+
+            } else if (request.status === REQUEST_STATUS.FAILED) {
+                if (request.model.canRetry()) {
+                    this._createRequest(model, requestId);
+                    return true;
+
+                } else {
+                    model.status = model.STATUS_ERROR;
+                    model.retries = 0;
+                    // убираем этот запрос, он больше не будет запрашиваться
+                    this.done(model, true);
+                    return false;
+                }
+
+            } else {
+                model.status = model.STATUS_OK;
+                model.retries = 0;
+                return false;
+            }
+
+        } else {
+            if (model.isValid() && !forced) {
+                // если модель валидна и запрос не форсирован - ничего не деалем
+                return false;
+
+            } else {
+                // модель не валидна или запрос форсирован - надо запросить
+                this._createRequest(model, requestId);
+                return true;
+            }
+        }
+    },
+
+    /**
+     * Выставляет статус запроса модели в завимости от результата.
+     * @param {no.Model} model Модель
+     * @param {Boolean} [force=false] Принудительно выставить DONE.
+     */
+    done: function(model, force) {
+        var request = this._keys[model.key];
+        // хотя такого не может быть, но вдруг его нет
+        if (request) {
+            if (model.isValid() || force) {
+                request.status = this.STATUS.DONE;
+
+            } else {
+                request.status = this.STATUS.FAILED;
+            }
+        }
+    },
+
+    /**
+     * Удаляет модель из запросов. Вызывается после завершения no.request.model.
+     * @param {no.Model[]} models Массив запрашиваемых моделей.
+     */
+    clean: function(models) {
+        for (var i = 0, j = models.length; i < j; i++) {
+            delete this._keys[models[i].key];
+        }
+    },
+
+    /**
+     * Записывает информацию о запросе.
+     * @param {no.Model} model Запрашиваемая модель.
+     * @param {Number} requestId ID запроса.
+     * @private
+     */
+    _createRequest: function(model, requestId) {
+        // модель надо запросить
+        this._keys[model.key] = {
+            status: this.STATUS.LOADING,
+            model: model
+        };
+        model.prepareRequest(requestId);
+    }
+};
+
 var REQUEST_ID = 0;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -95,50 +219,13 @@ Request.prototype.start = function() {
     var models = this.models;
     for (var i = 0, l = models.length; i < l; i++) {
         var model = models[i];
-        var status = model.status;
 
-        if (
-            // если STATUS_OK и не force-запрос
-            (status === model.STATUS_OK && !this.forced) ||
-            // если STATUS_OK, force-запрос и он был получен этим запросом
-            (status === model.STATUS_OK && this.forced && model.requestID === this.id) ||
-            (status === model.STATUS_ERROR)
-        ) {
-            //  Либо все загрузили успешно, либо кончились ретраи.
-            //  Ничего не делаем в этом случае.
+        var addRequest = no.request.Manager.add(model, this.id, this.forced);
+        if (addRequest === true) {
+            requesting.push(model);
 
-        } else if (status === model.STATUS_LOADING && !this.forced) {
-            //  Уже грузится.
+        } else if (addRequest instanceof no.Model) {
             loading.push(model);
-
-        } else if (status === model.STATUS_LOADING && this.forced) {
-            // TODO: unit-тесты на это поведение
-            // Если запрос forced, но модель уже грузится
-            // retries увеличивать не надо
-            // новый promise создавать не надо, чтобы отрезолвить и первый запрос и этот
-            model.requestID = this.id;
-            // добавляем модель в запрос
-            requesting.push(model);
-
-        } else {
-            //  Проверяем, нужно ли (можно ли) запрашивает этот ключ.
-            if (status === model.STATUS_FAILED) {
-                if (!model.canRetry()) {
-                    //  Превышен лимит перезапросов или же модель говорит, что с такой ошибкой перезапрашиваться не нужно.
-                    model.status = model.STATUS_ERROR;
-                    continue;
-                }
-            }
-
-            model.retries++;
-
-            model.promise = new no.Promise();
-            //  Ключ будет (пере)запрошен.
-            model.status = model.STATUS_LOADING;
-            // сохраняем в моделе ID запроса, который ее запрашивает
-            model.requestID = this.id;
-
-            requesting.push(model);
         }
     }
 
@@ -190,6 +277,11 @@ Request.prototype.request = function(loading, requesting) {
         no.Promise.wait(all).then(this.start.bind(this));
 
     } else {
+        // у всех моделей есть какой-то статус (ERROR или OK)
+        // вызываем чистку менеджера
+        no.request.Manager.clean(this.models);
+
+        // и резолвим весь no.request
         this.promise.resolve(this.models);
     }
 };
@@ -229,8 +321,11 @@ Request.prototype.extract = function(models, results) {
             model.setError(error);
         }
 
-        //TODO: store не надо делать, потому что no.Model.create уже это делает
         no.Model.store(model);
+
+        // сообщаем менеджеру о завершении запроса этой модели
+        // это не означает, что завершится весь no.request
+        no.request.Manager.done(model);
 
         model.promise.resolve();
     }

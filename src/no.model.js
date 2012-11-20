@@ -27,27 +27,11 @@ var _keySuffix = 0;
 
 /**
  * Статус модели "Ошибка".
- * Данные загрузились с ошибкой, retry невозможен.
+ * Данные загрузились с ошибкой.
  * @constant
  * @type {String}
  */
 no.Model.prototype.STATUS_ERROR = 'error';
-
-/**
- * Статус модели "Неудача".
- * Данные загрузились с ошибкой, возможен retry.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_FAILED = 'failed';
-
-/**
- * Статус модели "В процессе загрузки".
- * Данные загружаются в данный момент.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_LOADING = 'loading';
 
 /**
  * Статус модели "Нет данных".
@@ -67,7 +51,7 @@ no.Model.prototype.STATUS_OK = 'ok';
 
 /**
  * Статус модели "Не валиден".
- * Модель вручную инвалидирована.
+ * Данные есть, но кто-то пометил их невалидными.
  * @constant
  * @type {String}
  */
@@ -299,7 +283,7 @@ no.Model.prototype.getError = function() {
 no.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
-    this.status = this.STATUS_FAILED;
+    this.status = this.STATUS_ERROR;
 };
 
 no.Model.prototype.preprocessData = function(data) {
@@ -407,6 +391,19 @@ no.Model.prototype.touch = function() {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+/**
+ * Подготавливает модель к запросу.
+ * @param {Number} requestID ID запроса.
+ * @return {no.Model}
+ */
+no.Model.prototype.prepareRequest = function(requestID) {
+    this.requestID = requestID;
+    this.retries++;
+    this.promise = new no.Promise();
+
+    return this;
+};
 
 })();
 

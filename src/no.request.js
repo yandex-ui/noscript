@@ -12,10 +12,12 @@
  *   - array item[] - массив моделей вида {id: modelName, params: modelParams}
  * @param {String|Array|Object} items Массив названий моделей.
  * @param {Object} [params] Параметры моделей.
+ * @param {Object} [options] Опции запроса.
+ * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.request = function(items, params) {
-    return no.request.models(items2models(items, params));
+no.request = function(items, params, options) {
+    return no.request.models(items2models(items, params), options);
 };
 
 /**
@@ -23,20 +25,24 @@ no.request = function(items, params) {
  * @see no.request
  * @param {String|Array|Object} items Массив названий моделей.
  * @param {Object} [params] Параметры моделей.
+ * @param {Object} [options] Опции запроса.
+ * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.forcedRequest = function(items, params) {
-    return no.request.models(items2models(items, params), true);
+no.forcedRequest = function(items, params, options) {
+    options.forced = true;
+    return no.request.models(items2models(items, params), options);
 };
 
 /**
  * Делает запрос моделей с сервера.
  * @param {no.Model[]} models Массив моделей.
- * @param {Boolean} [forced=false] Не учитывать закешированность моделей при запросе.
+ * @param {Object} [options] Опции запроса.
+ * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.request.models = function(models, forced) {
-    var request = new Request(models, forced);
+no.request.models = function(models, options) {
+    var request = new Request(models, options);
 
     return request.start();
 };
@@ -185,7 +191,7 @@ var REQUEST_ID = 0;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-var Request = function(models, forced) {
+var Request = function(models, options) {
     /**
      * ID запроса.
      * @type {Number}
@@ -201,11 +207,11 @@ var Request = function(models, forced) {
     this.models = models;
 
     /**
-     * Флаг, что запрос не должен учитывать закешированность моделей.
-     * @type {Boolean}
+     * Опции запроса.
+     * @type {Object}
      * @private
      */
-    this.forced = forced;
+    this.options = options;
 
     this.promise = new no.Promise();
 };
@@ -220,7 +226,7 @@ Request.prototype.start = function() {
     for (var i = 0, l = models.length; i < l; i++) {
         var model = models[i];
 
-        var addRequest = no.request.Manager.add(model, this.id, this.forced);
+        var addRequest = no.request.Manager.add(model, this.id, this.options.forced);
         if (addRequest === true) {
             requesting.push(model);
 

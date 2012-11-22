@@ -1,47 +1,3 @@
-/*
-
-    no.layout.define('app', {
-        'app': {
-            'head': true,
-            '@left': {
-                'folders': true,
-                'labels': true
-            },
-            '@right': {}
-        }
-    });
-
-    no.layout.define('messages', {
-        'app @right': {
-            'messages': true
-        }
-    }, 'app');
-
-    no.layout.define('setup', {
-        'app @left': {
-            'setup-menu': true
-        },
-        'app @right': {
-            'setup-{ .tab }': true
-        },
-        //  Или же через функцию, более явно.
-        'app @right': function(params) {
-            if (params.tab) {
-                return {
-                    'setup-{ .tab }': true
-                };
-            }
-
-            return {
-                'setup-index': true
-            };
-        },
-        'app @right setup-{ .tab } @content': {
-            'setup-menu': true
-        }
-    }, 'app');
-
-*/
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 //  no.layout
@@ -55,16 +11,6 @@ no.layout = {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Константы для модуля no.layout.
-
-no.L = {};
-
-no.L.VIEW = 'view';
-no.L.BOX = 'box';
-no.L.ASYNC = 'async';
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 //  Хранилище "сырых" layout'ов.
 var _pages = {};
 
@@ -74,56 +20,124 @@ var _views = {};
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.layout.define = function(id, layout, parent_id) {
+    if ( _pages[id] ) {
+        throw Error('Cannot redefine layout of ' + id);
+    }
+
     _pages[id] = {
         layout: layout,
         parent_id: parent_id
     }
 };
 
+//  Возвращает layout страницы с заданным id и params.
+//
 no.layout.page = function(id, params) {
-    var raw = _pages[id];
+    return clean( get(id, params) );
 
-    var layout = compile(raw.layout, params);
+    //  Достаем layout, компилируем его.
+    //  Если нужно, наследуемся от родителя.
+    function get(id, params) {
+        var raw = _pages[id];
 
-    if (raw.parent_id) {
-        var parent = no.layout.page(raw.parent_id, params);
+        var layout = compile(raw.layout, params);
 
-        layout = inherit(layout, parent);
+        if (raw.parent_id) {
+            var parent = get(raw.parent_id, params);
+
+            layout = inherit(layout, parent);
+        }
+
+        extractViews(layout);
+
+        return layout;
     }
 
-    extractViews(layout);
+    //  Вычищаем из ключей @ и &.
+    function clean(layout) {
+        var result = {};
 
-    return layout;
+        for (var key in layout) {
+            var value = layout[key];
+
+            var ch = key.slice(-1);
+            if (ch === '@' || ch === '&') {
+                key = key.slice(0, -1);
+            }
+
+            result[key] = clean(value);
+        }
+
+        return result;
+    }
 };
 
+//  Возвращает layout блока с заданным id.
+//
 no.layout.view = function(id) {
-    if (!id) {
-        return _views;
-    }
-
     return _views[id];
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+//  Компилирует layout в зависимости от параметров params.
+//  Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
+//
 function compile(layout, params) {
+    //  Рекурсивно компилируем значение каждого ключа и создаем новый объект result.
     var result = {};
 
     for (var raw_key in layout) {
+        //  Ключ может быть с интерполяцией, так что вычисляем его.
         var key = no.jpath.string(raw_key)(params);
 
         var raw_value = layout[raw_key];
         var value;
+
+        //  Интерпретируем значение, соответствующее ключу.
         switch (typeof raw_value) {
+            //  Это функция, ее нужно вызвать и скомпилировать результат.
             case 'function':
                 value = compile( raw_value(params) );
                 break;
 
+            //  Это объект.
             case 'object':
-                value = compile(raw_value, params);
+                if ( Array.isArray(raw_value) ) {
+                    //  Массив вида [ 'folders', 'labels' ] является шоткатом для:
+                    //
+                    //      {
+                    //          'folders': true,
+                    //          'labels': true
+                    //      }
+                    //
+                    //  Преобразуем массив в объект.
+                    var o = {};
+                    for (var i = 0, l = raw_value.length; i < l; i++) {
+                        o[ raw_value[i] ] = true;
+                    }
+                    //  Компилируем то, что получилось.
+                    value = compile(o, params);
+                } else {
+                    //  Обычный объект просто рекурсивно компилируем.
+                    value = compile(raw_value, params);
+                }
                 break;
 
-            default:
+            case 'string':
+                //  Строка 'folders' является шоткатом для:
+                //
+                //  {
+                //      'folders': true
+                //  }
+                //
+                var o = {};
+                o[raw_value] = true;
+                value = compile(o, params);
+                break;
+
+            case 'boolean':
+                //  FIXME: Тут по идее может быть только true.
                 value = raw_value;
         }
 
@@ -133,22 +147,31 @@ function compile(layout, params) {
     return result;
 }
 
+//  Наследуем layout от parent'а.
+//
 function inherit(layout, parent) {
     var result = no.object.clone(parent);
 
     for (var key in layout) {
+        //  В ключе должен быть "путь" вида 'app left@ message content@'.
         var parts = key.split(/\s+/);
         var l = parts.length;
 
+        //  Путь должен заканчиваться на бокс.
+        //  Т.е. на строку вида 'foo@'.
+        //  Потому что можно переопределять только содержимое боксов.
+        //  Изменять лэйаут блоков нельзя.
         if ( !isBox( parts[l - 1] ) ) {
-            throw Error('Cannot overwrite view layout');
+            throw Error('Cannot overwrite view layout "' + parts[l - 1] + '"');
         }
 
         var lvalue = result;
         for (var i = 0; i < l - 1; i++) {
             lvalue = lvalue[ parts[i] ];
+            if (!lvalue) {
+                throw Error( 'Path "' + parts.slice(0, i).join(' ') + '" is undefined in this layout and cannot be extended' );
+            }
         }
-
         lvalue[ parts[l - 1] ] = layout[key];
     }
 
@@ -161,43 +184,64 @@ function extractViews(layout) {
     }
 
     for (var id in layout) {
-        if ( isBox(id) ) {
-            continue;
-        }
-
-        if ( _views[id] ) {
-            //  FIXME: Попытка переопределить лэйаут блока.
-        }
-
         var value = layout[id];
 
-        var r = {};
-        for (var key in value) {
-            if ( isBox(key) ) {
-                r[key] = no.L.BOX;
-            } else {
-                var value2 = value[key];
+        if ( !isBox(id) ) {
+            var view = obj2layout(value);
 
-                if (value2 === true || value2 === no.L.VIEW || typeof value2 === 'object') {
-                    r[key] = no.L.VIEW;
-                } else if (value2 === false || value2 === no.L.ASYNC) {
-                    r[key] = no.L.ASYNC;
-                } else {
-                    // FIXME: Ошибка.
+            var oldView = _views[id];
+            if (oldView) {
+                var oldKey = layout2key(oldView);
+                var key = layout2key(view);
+                if (oldKey !== key) {
+                    throw Error( 'Cannot redefine layout of ' + id + ' ( "' + oldKey + '" -> "' + key + '" )' );
                 }
             }
-
-            extractViews(value2);
+            _views[id] = view;
         }
 
-        _views[id] = r;
+        extractViews(value);
+    }
+
+    function obj2layout(obj) {
+        var layout = {};
+
+        for (var key in obj) {
+            var ch = key.slice(-1);
+            if (ch === '@') {
+                layout[ key.slice(0, -1) ] = no.L.BOX;
+            } else if (ch === '&') {
+                layout[ key.slice(0, -1) ] = no.L.ASYNC;
+            } else {
+                layout[ key ] = no.L.VIEW;
+            }
+        }
+
+        return layout;
+    }
+
+    function layout2key(layout) {
+        var r = [];
+        var keys = Object.keys(layout).sort();
+
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = layout[key];
+
+            if (value === no.L.BOX) {
+                key += '@';
+            }
+            r.push(key);
+        }
+
+        return r.join(' ');
     }
 }
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 function isBox(s) {
-    return (s.substr(0, 1) === '@');
+    return ( s.substr(-1) === '@' );
 }
 
 //  ---------------------------------------------------------------------------------------------------------------  //

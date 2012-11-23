@@ -102,6 +102,10 @@ no.Model.prototype._reset = function(status) {
 //      });
 //
 no.Model.define = function(id, info, ctor) {
+    if (id in _infos) {
+        throw "Model can't be redefined!";
+    }
+
     info = info || {};
     if (info.methods) {
         //  Нужно унаследоваться от no.Model и добавить в прототип info.models.

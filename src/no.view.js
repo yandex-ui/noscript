@@ -116,12 +116,16 @@ var _ctors = {};
  *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
  * @param {String} id Название View.
  * @param {Object} info Декларация View.
- * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
+ * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View. Если указан, то ctor не используется.
  * @param {Array} [info.models] Массив моделей, от которых зависит View.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Function} [ctor] Конструктор блока.
  */
 no.View.define = function(id, info, ctor) {
+    if (id in _infos) {
+        throw "View can't be redefined!";
+    }
+
     info = info || {};
     if (info.methods) {
         //  Нужно унаследоваться от no.View и добавить в прототип info.methods.

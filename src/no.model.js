@@ -113,7 +113,7 @@ no.Model.define = function(id, info, ctor) {
 
     var params = info.params || (( info.params = {} ));
 
-    info.pNames = no.object.keys(params);
+    info.pNames = Object.keys(params);
 
     //  Для do-моделей отдельные правила кэширования и построения ключей.
     info.isDo = /^do-/.test(id);

@@ -64,9 +64,8 @@ no.Model.prototype._init = function(id, params, data) {
     this._reset();
     this.setData(data);
 
-    var info = this.info = _infos[id];
-
-    this.key = no.Model.key(id, params, info);
+    this.info = no.Model.info(id);
+    this.key = no.Model.key(id, params, this.info);
 
     this.timestamp = 0;
 };
@@ -111,12 +110,9 @@ no.Model.define = function(id, info, ctor) {
         ctor = ctor || no.Model;
     }
 
-    var params = info.params || (( info.params = {} ));
-
-    info.pNames = Object.keys(params);
-
-    //  Для do-моделей отдельные правила кэширования и построения ключей.
-    info.isDo = /^do-/.test(id);
+    info.params = info.params || {};
+    // часть дополнительной обработки производится в no.Model.info
+    // т.о. получаем lazy-определение
 
     _infos[id] = info;
     _ctors[id] = ctor;
@@ -149,13 +145,20 @@ no.Model.create = function(id, params, data)  {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Model.info = function(id) {
-    return _infos[id];
+    var info = _infos[id];
+    // если есть декларация, но еще нет pNames, то надо завершить определение Model
+    if (info && !info.pNames) {
+        info.pNames = Object.keys(info.params);
+        //  Для do-моделей отдельные правила кэширования и построения ключей.
+        info.isDo = /^do-/.test(id);
+    }
+    return info;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Model.key = function(id, params, info) {
-    info || ( info = _infos[id] );
+    info = info || no.Model.info(id);
 
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {

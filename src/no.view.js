@@ -12,6 +12,20 @@ no.extend(no.View.prototype, no.Events);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+/**
+ * Закешированный $(document)
+ * @type {jQuery}
+ * @private
+ */
+no.View.prototype._$document = $(document);
+
+/**
+ * Закешированный $(window)
+ * @type {jQuery}
+ * @private
+ */
+no.View.prototype._$window = $(window);
+
 no.View.prototype._init = function(id, params) {
     this.id = id;
     this.params = params || {};
@@ -51,6 +65,13 @@ no.View.prototype._init = function(id, params) {
 
     this.timestamp = 0;
 
+    /**
+     * jquery-namespace для событий.
+     * @type {String}
+     * @private
+     */
+    this._eventNS = '.no-view-' + this.id;
+
     this.oninit();
 };
 
@@ -80,6 +101,26 @@ no.View.getKey = function(id, params, info) {
 var _infos = {};
 var _ctors = {};
 
+/**
+ * Определяет новый блок.
+ * @description
+ * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
+ * "eventDecl" записывается в виде "eventName[ selector]".
+ * "selector" опционален, если его нет, то события регистрируется на ноду View.
+ * "handler" может быть строка (тогда она заменится на метод прототипа) или функция.
+ * Все хендлеры биндятся на экземпляр View.
+ * Разделение на типы событий происходит автоматически по следующим правилам (в порядке приоритета):
+ *   - если selector === "window" || selector == "document", то обработчик регистрируется по событию show
+ *   - если eventName === "resize", то обработчик регистрируется по событию show
+ *   - если eventName === "scroll", то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)
+ *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
+ * @param {String} id Название View.
+ * @param {Object} info Декларация View.
+ * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
+ * @param {Array} [info.models] Массив моделей, от которых зависит View.
+ * @param {Object} [info.events] DOM-события, на которые подписывается View.
+ * @param {Function} [ctor] Конструктор блока.
+ */
 no.View.define = function(id, info, ctor) {
     info = info || {};
     if (info.methods) {
@@ -112,6 +153,50 @@ no.View.info = function(id) {
             no.extend(params, info.params);
         }
         info.pNames = Object.keys(params);
+
+        /**
+         * События, которые вешаются на htmlinit, снимаются на htmldestroy
+         * @type {Object}
+         */
+        info.initEvents = {
+            'bind': [],
+            'delegate': []
+        };
+
+        /**
+         * События, которые вешаются на show, снимаются на hide
+         * @type {Array}
+         */
+        info.showEvents = [];
+
+        // парсим события View
+        if (info.events) {
+            for (var eventDecl in info.events) {
+                var parts = eventDecl.split(' ');
+                // первый элемент - событие
+                var eventName = parts.shift();
+                // осталоное - селектор
+                var eventSelector = parts.join(' ');
+
+                if (eventName) {
+                    var arr = [eventName, eventSelector, info.events[eventDecl]];
+                    // глобальные события и resize вешаем на show
+                    if (eventSelector === 'window' || eventSelector === 'document' || eventName === 'resize') {
+                        info.showEvents.push(arr);
+
+                    } else if (eventName === 'scroll') {
+                        // событие scroll не баблится, поэтому его надо вешать через $.find().on()
+                        info.initEvents['bind'].push(arr);
+
+                    } else {
+                        info.initEvents['delegate'].push(arr);
+                    }
+                }
+            }
+        }
+
+        // больше не нужен
+        delete info.events;
     }
     return info;
 };
@@ -159,6 +244,7 @@ no.View.prototype._hide = function() {
     }
 
     if (this._visible === true) {
+        this._unbindShowEvents();
         this.node.style.display = 'none';
         this._visible = false;
         this.onhide();
@@ -166,12 +252,13 @@ no.View.prototype._hide = function() {
 };
 
 //  При создании блока у него this._visible === undefined.
-no.View. prototype._show = function() {
+no.View.prototype._show = function() {
     if ( this.isLoading() ) {
         return;
     }
 
     if (this._visible !== true) {
+        this._bindShowEvents();
         this.node.style.display = '';
         this._visible = true;
         this.onshow();
@@ -204,68 +291,131 @@ no.View.prototype.onrepaint = no.pe; // log('onrepaint');
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  При описании view можно задать поле events в виде:
-//
-//  events: {
-//      'click a.foo': 'doFoo',
-//      'keyup': function(e) { ... }
-//  }
-//
-no.View.prototype._bindEvents = function() {
+/**
+ * Копирует массив деклараций событий и возвращает такой же массив, но забинженными на этот инстанс обработчиками.
+ * @param {Array} events
+ * @return {Array} Копия events c забинженными обработчиками.
+ * @private
+ */
+no.View.prototype._bindEventHandlers = function(events) {
+    var bindedEvents = [].concat(events);
+
+    for (var i = 0, j = bindedEvents.length; i < j; i++) {
+        var event = bindedEvents[i];
+        var method = event[2];
+        if (typeof method === 'string') {
+            method = this[method];
+        }
+        event[2] = method.bind(this);
+    }
+
+    return bindedEvents;
+};
+
+/**
+ * Возващает обработчики событий, которые надо навесить после создания ноды.
+ * @return {Array}
+ * @private
+ */
+no.View.prototype._getInitEvents = function() {
+    if (!this._initEvents) {
+        var infoInitEvents = this.info.initEvents;
+        // копируем информацию из info в View и биндим обработчики на этот инстанс
+        this._initEvents = {
+            'bind': this._bindEventHandlers(infoInitEvents['bind']),
+            'delegate': this._bindEventHandlers(infoInitEvents['delegate'])
+        }
+    }
+    return this._initEvents;
+};
+
+/**
+ * Возващает обработчики событий, которые надо навесить после показа ноды.
+ * @return {Array}
+ * @private
+ */
+no.View.prototype._getShowEvents = function() {
+    if (!this._showEvents) {
+        // копируем информацию из info в View и биндим обработчики на этот инстанс
+        this._showEvents = this._bindEventHandlers(this.info.showEvents)
+    }
+    return this._showEvents;
+};
+
+/**
+ * Регистрирует обработчики событий после создания ноды.
+ * @private
+ */
+no.View.prototype._bindInitEvents = function() {
     var $node = $(this.node);
+    var i, j, event;
 
-    var attachedEvents = this._attachedEvents = [];
+    var initEvents = this._getInitEvents();
+    var delegateEvents = initEvents['delegate'];
+    for (i = 0, j = delegateEvents.length; i < j; i++) {
+        event = delegateEvents[i];
+        if (event[1]) { //selector
+            $node.on(event[0] + this._eventNS, event[1], event[2]);
+        } else {
+            $node.on(event[0] + this._eventNS, event[2]);
+        }
+    }
 
-    var that = this;
-    var events = this.info.events;
-
-    for (var event in events) {
-        (function(event) {
-            // Метод -- это либо строка с именем нужного метода, либо же функция.
-            var method = events[event];
-            if (typeof method === 'string') {
-                method = that[method];
-            }
-
-            // Делим строку с event на имя события и опциональный селектор.
-            var parts = event.split(/\s/);
-            var name = parts.shift();
-            var selector = parts.join(' ');
-
-            var handler = function() {
-                //  FIXME: Откуда это взялось?!
-                // Не теряем остальные аргументы.
-                var args = Array.prototype.slice.call(arguments, 0);
-                return method.apply(that, args);
-            };
-
-            // Вешаем событие.
-            if (selector) {
-                $node.on(name, selector, handler);
-            } else {
-                $node.on(name, handler);
-            }
-
-            // Запоминаем, что повесили, чтобы знать потом, что удалять в _unbindEvents.
-            attachedEvents.push({
-                name: name,
-                selector: selector,
-                handler: handler
-            });
-        }(event));
+    var bindEvents = initEvents['bind'];
+    for (i = 0, j = bindEvents.length; i < j; i++) {
+        event = bindEvents[i];
+        if (event[1]) { //selector
+            $node.find(event[1]).on(event[0] + this._eventNS, event[2]);
+        } else {
+            $node.on(event[0] + this._eventNS, event[2]);
+        }
     }
 };
 
-no.View.prototype._unbindEvents = function() {
+/**
+ * Удаляет обработчики событий перед удалением ноды.
+ * @private
+ */
+no.View.prototype._unbindInitEvents = function() {
     var $node = $(this.node);
+    var i, j, event;
 
-    var attachedEvents = this._attachedEvents;
+    var initEvents = this._getInitEvents();
+    $node.off(this._eventNS);
 
-    for (var event in attachedEvents) {
-        $node.off(event.name, event.selector, event.handler);
+    var bindEvents = initEvents['bind'];
+    for (i = 0, j = bindEvents.length; i < j; i++) {
+        event = bindEvents[i];
+        if (event[1]) { //selector
+            $node.find(event[1]).off(this._eventNS);
+        }
     }
+};
 
-    this._attachedEvents = null;
+/**
+ * Регистрирует обработчики событий после показа ноды.
+ * @private
+ */
+no.View.prototype._bindShowEvents = function() {
+
+    var i, j, event;
+
+    var showEvents = this._getShowEvents();
+    for (i = 0, j = showEvents.length; i < j; i++) {
+        event = showEvents[i];
+        // event[1] - window или document, для них уже есть переменные в прототипе
+        this['_$' + event[1]].on(event[0] + this._eventNS, event[2])
+    }
+};
+
+/**
+ * Удаляет обработчики событий перед скрытия ноды.
+ * @private
+ */
+no.View.prototype._unbindShowEvents = function() {
+    // по массиву можно не ходить, просто анбиндим все по неймспейсу
+    this._$document.off(this._eventNS);
+    this._$window.off(this._eventNS);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -448,7 +598,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             //  автоматически попадут на нужное место.
             if (toplevel) {
                 if (!wasLoading) {
-                    this._unbindEvents();
+                    this._unbindInitEvents();
                     this.onhtmldestroy();
                 }
 
@@ -464,7 +614,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             this._setNode(viewNode);
 
             if ( this.isOk() ) {
-                this._bindEvents();
+                this._bindInitEvents();
                 this.onhtmlinit();
             }
 

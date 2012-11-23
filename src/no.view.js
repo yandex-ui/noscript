@@ -83,30 +83,37 @@ var _ctors = {};
 no.View.define = function(id, info, ctor) {
     info = info || {};
     if (info.methods) {
-        //  Нужно унаследоваться от no.View и добавить в прототип info.models.
+        //  Нужно унаследоваться от no.View и добавить в прототип info.methods.
         ctor = no.inherits(function() {}, no.View, info.methods);
     } else {
         ctor = ctor || no.View;
     }
 
-    var models = info.models = info.models || [];
+    info.models = info.models || [];
     info.events = info.events || {};
 
-    var params = {};
-    for (var i = 0, l = models.length; i < l; i++) {
-        no.extend( params, no.Model.info( models[i] ).params );
-    }
-    if (info.params) {
-        no.extend(params, info.params);
-    }
-    info.pNames = no.object.keys(params);
+    // часть дополнительной обработки производится в no.View.info
+    // т.о. получаем lazy-определение
 
     _infos[id] = info;
     _ctors[id] = ctor;
 };
 
 no.View.info = function(id) {
-    return _infos[id];
+    var info = _infos[id];
+    // если есть декларация, но еще нет pNames, то надо завершить определение View
+    if (info && !info.pNames) {
+        var params = {};
+        var models = info.models;
+        for (var i = 0, l = models.length; i < l; i++) {
+            no.extend( params, no.Model.info( models[i] ).params );
+        }
+        if (info.params) {
+            no.extend(params, info.params);
+        }
+        info.pNames = Object.keys(params);
+    }
+    return info;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

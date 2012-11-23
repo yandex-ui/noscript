@@ -434,26 +434,31 @@ no.View.prototype.isLoading = function() {
     return (this.status === 'loading');
 };
 
+/**
+ * Возвращает true, если блок валиден.
+ * @return {Boolean}
+ */
 no.View.prototype.isValid = function() {
     if ( !this.isOk() ) { return false; }
 
-    var timestamp = this.timestamp;
+    return this.isModelsValid(this.timestamp);
+};
+
+/**
+ * Возвращает true, если все модели валидны.
+ * @param {Number} [timestamp] Также проверяем, что кеш модели не свежее переданного timestamp.
+ * @return {Boolean}
+ */
+no.View.prototype.isModelsValid = function(timestamp) {
     var models = this.models;
     for (var id in models) {
         var model = models[id];
-        if ( !(model.isValid() && model.timestamp <= timestamp) ) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-//  FIXME: Убрать копипаст в isValid() и isModelsValid().
-no.View.prototype.isModelsValid = function() {
-    var models = this.models;
-    for (var id in models) {
-        if ( !models[id].isValid() ) {
+        if (
+            // модель не валидна
+            !model.isValid() ||
+            // или ее кеш более свежий
+            (timestamp && model.timestamp > timestamp)
+        ) {
             return false;
         }
     }

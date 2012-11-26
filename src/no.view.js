@@ -125,6 +125,9 @@ var _ctors = {};
  * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View. Если указан, то ctor не используется.
  * @param {Array} [info.models] Массив моделей, от которых зависит View.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
+ * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
+ * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
+ * @param {Object} [info.noevents.show] События, на которые надо подписаться при показе DOM-элемента.
  * @param {Function} [ctor] Конструктор блока.
  */
 no.View.define = function(id, info, ctor) {

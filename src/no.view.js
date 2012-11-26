@@ -194,7 +194,8 @@ no.View.info = function(id) {
                 if (eventSelector === 'window' || eventSelector === 'document' || eventName === 'resize') {
                     info.showEvents.push(arr);
 
-                } else if (eventName === 'scroll') {
+                } else if (eventName === 'scroll' && eventSelector) {
+                    // bind-события могут быть только с селектором
                     // событие scroll не баблится, поэтому его надо вешать через $.find().on()
                     info.initEvents['bind'].push(arr);
 
@@ -398,12 +399,7 @@ no.View.prototype._bindInitEvents = function() {
     var bindEvents = initEvents['bind'];
     for (i = 0, j = bindEvents.length; i < j; i++) {
         event = bindEvents[i];
-        if (event[1]) { //selector
-            $node.find(event[1]).on(event[0] + this._eventNS, event[2]);
-        } else {
-            //TODO: вроде бы такого варианта не может быть
-            $node.on(event[0] + this._eventNS, event[2]);
-        }
+        $node.find(event[1]).on(event[0] + this._eventNS, event[2]);
     }
 
     var localNoevents = initEvents['no-local'];

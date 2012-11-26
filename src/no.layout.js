@@ -84,6 +84,34 @@ no.layout.view = function(id) {
 //  Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
 //
 function compile(layout, params) {
+    if (typeof layout === 'string') {
+        //  Строка 'folders' является шоткатом для:
+        //
+        //  {
+        //      'folders': true
+        //  }
+        //
+        var t = {};
+        t[layout] = true;
+        layout = t;
+
+    } else if ( Array.isArray(layout) ) {
+        //  Массив вида [ 'folders', 'labels' ] является шоткатом для:
+        //
+        //      {
+        //          'folders': true,
+        //          'labels': true
+        //      }
+        //
+        //  Преобразуем массив в объект.
+        var t = {};
+        for (var i = 0, l = layout.length; i < l; i++) {
+            t[ layout[i] ] = true;
+        }
+        layout = t;
+
+    }
+
     //  Рекурсивно компилируем значение каждого ключа и создаем новый объект result.
     var result = {};
 
@@ -98,42 +126,13 @@ function compile(layout, params) {
         switch (typeof raw_value) {
             //  Это функция, ее нужно вызвать и скомпилировать результат.
             case 'function':
-                value = compile( raw_value(params) );
+                value = compile( raw_value(params), params );
                 break;
 
             //  Это объект.
             case 'object':
-                if ( Array.isArray(raw_value) ) {
-                    //  Массив вида [ 'folders', 'labels' ] является шоткатом для:
-                    //
-                    //      {
-                    //          'folders': true,
-                    //          'labels': true
-                    //      }
-                    //
-                    //  Преобразуем массив в объект.
-                    var o = {};
-                    for (var i = 0, l = raw_value.length; i < l; i++) {
-                        o[ raw_value[i] ] = true;
-                    }
-                    //  Компилируем то, что получилось.
-                    value = compile(o, params);
-                } else {
-                    //  Обычный объект просто рекурсивно компилируем.
-                    value = compile(raw_value, params);
-                }
-                break;
-
             case 'string':
-                //  Строка 'folders' является шоткатом для:
-                //
-                //  {
-                //      'folders': true
-                //  }
-                //
-                var o = {};
-                o[raw_value] = true;
-                value = compile(o, params);
+                value = compile(raw_value, params);
                 break;
 
             case 'boolean':

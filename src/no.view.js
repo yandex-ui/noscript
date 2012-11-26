@@ -749,7 +749,7 @@ function parseNoeventsDeclaration(events) {
 
     if (events) {
         for (var event in events) {
-            var handler = events[i];
+            var handler = events[event];
             var parts = event.split(' ');
             if (parts[0] === '*') {
                 parts.shift();

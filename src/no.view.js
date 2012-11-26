@@ -4,6 +4,12 @@
 //  no.View
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+/**
+ * Создает View. Конструктор не используется напрямую, View создаются через no.View.create.
+ * @class Класс, реализующий View
+ * @constructor
+ * @augments no.Events
+ */
 no.View = function() {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -136,6 +142,7 @@ no.View.define = function(id, info, ctor) {
 
     info.models = info.models || [];
     info.events = info.events || {};
+    info.noevents = info.noevents || {};
 
     // часть дополнительной обработки производится в no.View.info
     // т.о. получаем lazy-определение
@@ -174,33 +181,44 @@ no.View.info = function(id) {
         info.showEvents = [];
 
         // парсим события View
-        if (info.events) {
-            for (var eventDecl in info.events) {
-                var parts = eventDecl.split(' ');
-                // первый элемент - событие
-                var eventName = parts.shift();
-                // осталоное - селектор
-                var eventSelector = parts.join(' ');
+        for (var eventDecl in info.events) {
+            var parts = eventDecl.split(' ');
+            // первый элемент - событие
+            var eventName = parts.shift();
+            // осталоное - селектор
+            var eventSelector = parts.join(' ');
 
-                if (eventName) {
-                    var arr = [eventName, eventSelector, info.events[eventDecl]];
-                    // глобальные события и resize вешаем на show
-                    if (eventSelector === 'window' || eventSelector === 'document' || eventName === 'resize') {
-                        info.showEvents.push(arr);
+            if (eventName) {
+                var arr = [eventName, eventSelector, info.events[eventDecl]];
+                // глобальные события и resize вешаем на show
+                if (eventSelector === 'window' || eventSelector === 'document' || eventName === 'resize') {
+                    info.showEvents.push(arr);
 
-                    } else if (eventName === 'scroll') {
-                        // событие scroll не баблится, поэтому его надо вешать через $.find().on()
-                        info.initEvents['bind'].push(arr);
+                } else if (eventName === 'scroll') {
+                    // событие scroll не баблится, поэтому его надо вешать через $.find().on()
+                    info.initEvents['bind'].push(arr);
 
-                    } else {
-                        info.initEvents['delegate'].push(arr);
-                    }
+                } else {
+                    info.initEvents['delegate'].push(arr);
                 }
             }
         }
 
-        // больше не нужен
+        /**
+         * Декларации подписок на кастомные события при создании View.
+         * @type {Object}
+         */
+        info.initNoevents = parseNoeventsDeclaration(info.noevents.init);
+
+        /**
+         * Декларации подписок на кастомные события при показе View.
+         * @type {Object}
+         */
+        info.showNoevents = parseNoeventsDeclaration(info.noevents.show);
+
+        // больше не нужны
         delete info.events;
+        delete info.noevents;
     }
     return info;
 };
@@ -298,19 +316,20 @@ no.View.prototype.onrepaint = no.pe; // log('onrepaint');
 /**
  * Копирует массив деклараций событий и возвращает такой же массив, но забинженными на этот инстанс обработчиками.
  * @param {Array} events
+ * @param {Number} handlerPos Позиция хендлера в массиве.
  * @return {Array} Копия events c забинженными обработчиками.
  * @private
  */
-no.View.prototype._bindEventHandlers = function(events) {
+no.View.prototype._bindEventHandlers = function(events, handlerPos) {
     var bindedEvents = [].concat(events);
 
     for (var i = 0, j = bindedEvents.length; i < j; i++) {
         var event = bindedEvents[i];
-        var method = event[2];
+        var method = event[handlerPos];
         if (typeof method === 'string') {
             method = this[method];
         }
-        event[2] = method.bind(this);
+        event[handlerPos] = method.bind(this);
     }
 
     return bindedEvents;
@@ -324,10 +343,15 @@ no.View.prototype._bindEventHandlers = function(events) {
 no.View.prototype._getInitEvents = function() {
     if (!this._initEvents) {
         var infoInitEvents = this.info.initEvents;
+        var infoInitNoevents = this.info.initNoevents;
+
         // копируем информацию из info в View и биндим обработчики на этот инстанс
         this._initEvents = {
-            'bind': this._bindEventHandlers(infoInitEvents['bind']),
-            'delegate': this._bindEventHandlers(infoInitEvents['delegate'])
+            'bind': this._bindEventHandlers(infoInitEvents['bind'], 2),
+            'delegate': this._bindEventHandlers(infoInitEvents['delegate'], 2),
+
+            'no-global': this._bindEventHandlers(infoInitNoevents['global'], 1),
+            'no-local': this._bindEventHandlers(infoInitNoevents['local'], 1)
         }
     }
     return this._initEvents;
@@ -340,8 +364,14 @@ no.View.prototype._getInitEvents = function() {
  */
 no.View.prototype._getShowEvents = function() {
     if (!this._showEvents) {
+        var infoShowNoevents = this.info.showNoevents;
         // копируем информацию из info в View и биндим обработчики на этот инстанс
-        this._showEvents = this._bindEventHandlers(this.info.showEvents)
+        this._showEvents = {
+            'dom': this._bindEventHandlers(this.info.showEvents, 2),
+
+            'no-global': this._bindEventHandlers(infoShowNoevents['global'], 1),
+            'no-local': this._bindEventHandlers(infoShowNoevents['local'], 1)
+        }
     }
     return this._showEvents;
 };
@@ -353,8 +383,8 @@ no.View.prototype._getShowEvents = function() {
 no.View.prototype._bindInitEvents = function() {
     var $node = $(this.node);
     var i, j, event;
-
     var initEvents = this._getInitEvents();
+
     var delegateEvents = initEvents['delegate'];
     for (i = 0, j = delegateEvents.length; i < j; i++) {
         event = delegateEvents[i];
@@ -371,8 +401,21 @@ no.View.prototype._bindInitEvents = function() {
         if (event[1]) { //selector
             $node.find(event[1]).on(event[0] + this._eventNS, event[2]);
         } else {
+            //TODO: вроде бы такого варианта не может быть
             $node.on(event[0] + this._eventNS, event[2]);
         }
+    }
+
+    var localNoevents = initEvents['no-local'];
+    for (i = 0, j = localNoevents.length; i < j; i++) {
+        event = localNoevents[i];
+        this.on(event[0], event[1]);
+    }
+
+    var globalNoevents = initEvents['no-global'];
+    for (i = 0, j = globalNoevents.length; i < j; i++) {
+        event = globalNoevents[i];
+        no.events.on(event[0], event[1]);
     }
 };
 
@@ -394,6 +437,18 @@ no.View.prototype._unbindInitEvents = function() {
             $node.find(event[1]).off(this._eventNS);
         }
     }
+
+    var localNoevents = initEvents['no-local'];
+    for (i = 0, j = localNoevents.length; i < j; i++) {
+        event = localNoevents[i];
+        this.off(event[0], event[1]);
+    }
+
+    var globalNoevents = initEvents['no-global'];
+    for (i = 0, j = globalNoevents.length; i < j; i++) {
+        event = globalNoevents[i];
+        no.events.off(event[0], event[1]);
+    }
 };
 
 /**
@@ -401,14 +456,26 @@ no.View.prototype._unbindInitEvents = function() {
  * @private
  */
 no.View.prototype._bindShowEvents = function() {
-
     var i, j, event;
-
     var showEvents = this._getShowEvents();
-    for (i = 0, j = showEvents.length; i < j; i++) {
-        event = showEvents[i];
+
+    var domEvents = showEvents['dom'];
+    for (i = 0, j = domEvents.length; i < j; i++) {
+        event = domEvents[i];
         // event[1] - window или document, для них уже есть переменные в прототипе
         this['_$' + event[1]].on(event[0] + this._eventNS, event[2])
+    }
+
+    var localNoevents = showEvents['no-local'];
+    for (i = 0, j = localNoevents.length; i < j; i++) {
+        event = localNoevents[i];
+        this.on(event[0], event[1]);
+    }
+
+    var globalNoevents = showEvents['no-global'];
+    for (i = 0, j = globalNoevents.length; i < j; i++) {
+        event = globalNoevents[i];
+        no.events.on(event[0], event[1]);
     }
 };
 
@@ -420,6 +487,21 @@ no.View.prototype._unbindShowEvents = function() {
     // по массиву можно не ходить, просто анбиндим все по неймспейсу
     this._$document.off(this._eventNS);
     this._$window.off(this._eventNS);
+
+    var i, j, event;
+    var showEvents = this._getShowEvents();
+
+    var localNoevents = showEvents['no-local'];
+    for (i = 0, j = localNoevents.length; i < j; i++) {
+        event = localNoevents[i];
+        this.off(event[0], event[1]);
+    }
+
+    var globalNoevents = showEvents['no-global'];
+    for (i = 0, j = globalNoevents.length; i < j; i++) {
+        event = globalNoevents[i];
+        no.events.off(event[0], event[1]);
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -654,6 +736,34 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+/**
+ * Парсит декларации кастомных событий View.
+ * @param {Object} events
+ * @return {Object}
+ */
+function parseNoeventsDeclaration(events) {
+    var result = {
+        'global': [],
+        'local': []
+    };
+
+    if (events) {
+        for (var event in events) {
+            var handler = events[i];
+            var parts = event.split(' ');
+            if (parts[0] === '*') {
+                parts.shift();
+                result.global.push([parts.join(' '), handler]);
+
+            } else {
+                result.local.push([event, handler]);
+            }
+        }
+    }
+
+    return result;
+}
 
 })();
 

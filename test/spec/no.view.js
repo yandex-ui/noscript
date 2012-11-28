@@ -228,4 +228,73 @@ describe('no.View', function() {
             expect(this.bindedEventArr[1][1]()).to.be(this.view);
         });
     });
+
+    describe('no.View._getEvents', function() {
+
+        beforeEach(function() {
+            this.view = new no.View();
+
+            this.bindArr = [1];
+            this.delegateArr = [2];
+            this.localArr = [3];
+            this.globalArr = [4];
+
+            this.view.info = {
+                initEvents: {
+                    'bind': this.bindArr,
+                    'delegate': this.delegateArr
+                },
+                initNoevents: {
+                    'local': this.localArr,
+                    'global': this.globalArr
+                }
+            };
+
+            sinon.stub(this.view, '_bindEventHandlers', function() {
+                return [];
+            });
+
+            this.result = this.view._getEvents('init');
+        });
+
+        afterEach(function() {
+            this.view._bindEventHandlers.restore();
+            delete this.view;
+
+            delete this.bindArr;
+            delete this.delegateArr;
+            delete this.localArr;
+            delete this.globalArr;
+            delete this.result;
+        });
+
+        it('should return properly object', function() {
+            expect(this.result).to.be.eql({
+                'bind': [],
+                'delegate': [],
+                'no-local': [],
+                'no-global': []
+            });
+        });
+
+        it('should call _bindEventHandlers 4 times', function() {
+            expect(this.view._bindEventHandlers.callCount).to.be(4)
+        });
+
+        it('should call _bindEventHandlers for delegated events', function() {
+            expect(this.view._bindEventHandlers.calledWithExactly(this.delegateArr, 2)).to.be.ok()
+        });
+
+        it('should call _bindEventHandlers for bind events', function() {
+            expect(this.view._bindEventHandlers.calledWithExactly(this.bindArr, 2)).to.be.ok()
+        });
+
+        it('should call _bindEventHandlers for local no.events', function() {
+            expect(this.view._bindEventHandlers.calledWithExactly(this.localArr, 1)).to.be.ok()
+        });
+
+        it('should call _bindEventHandlers for global no.events', function() {
+            expect(this.view._bindEventHandlers.calledWithExactly(this.globalArr, 1)).to.be.ok()
+        });
+    });
 });

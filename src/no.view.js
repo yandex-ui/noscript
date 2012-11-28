@@ -40,6 +40,8 @@ no.View.prototype._init = function(id, params) {
 
     this.key = no.View.getKey(id, params, this.info);
 
+    this.views = {};
+
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
@@ -50,7 +52,6 @@ no.View.prototype._init = function(id, params) {
 
     //  Создаем подблоки.
     var view_ids = no.layout.view(id);
-    var views = this.views = {};
     for (var view_id in view_ids) {
         if (view_ids[view_id] === 'box') {
             this._addBox(view_id, params);
@@ -300,7 +301,7 @@ no.View.prototype._hide = function() {
     }
 
     if (this._visible === true) {
-        this._unbindShowEvents();
+        this._unbindEvents('show');
         this.node.style.display = 'none';
         this._visible = false;
         this.onhide();
@@ -314,7 +315,7 @@ no.View.prototype._show = function() {
     }
 
     if (this._visible !== true) {
-        this._bindShowEvents();
+        this._bindEvents('show');
         this.node.style.display = '';
         this._visible = true;
         this.onshow();
@@ -370,78 +371,72 @@ no.View.prototype._bindEventHandlers = function(events, handlerPos) {
 };
 
 /**
- * Возващает обработчики событий, которые надо навесить после создания ноды.
- * @return {Array}
+ * Возващает обработчики событий для View.
+ * @param {String} type Тип обработчиков: 'init' или 'show'.
+ * @return {Object}
  * @private
  */
-no.View.prototype._getInitEvents = function() {
-    if (!this._initEvents) {
-        var infoInitEvents = this.info.initEvents;
-        var infoInitNoevents = this.info.initNoevents;
+no.View.prototype._getEvents = function(type) {
+    // this._initEvents
+    var eventProp = '_' + type + 'Events';
+
+    if (!this[eventProp]) {
+        var eventsInfo = this.info[type + 'Events'];
+        var noeventsInfo = this.info[type + 'Noevents'];
 
         // копируем информацию из info в View и биндим обработчики на этот инстанс
-        this._initEvents = {
-            'bind': this._bindEventHandlers(infoInitEvents['bind'], 2),
-            'delegate': this._bindEventHandlers(infoInitEvents['delegate'], 2),
+        this[eventProp] = {
+            'bind': this._bindEventHandlers(eventsInfo['bind'], 2),
+            'delegate': this._bindEventHandlers(eventsInfo['delegate'], 2),
 
-            'no-global': this._bindEventHandlers(infoInitNoevents['global'], 1),
-            'no-local': this._bindEventHandlers(infoInitNoevents['local'], 1)
+            'no-global': this._bindEventHandlers(noeventsInfo['global'], 1),
+            'no-local': this._bindEventHandlers(noeventsInfo['local'], 1)
         }
     }
-    return this._initEvents;
-};
-
-/**
- * Возващает обработчики событий, которые надо навесить после показа ноды.
- * @return {Array}
- * @private
- */
-no.View.prototype._getShowEvents = function() {
-    if (!this._showEvents) {
-        var infoShowNoevents = this.info.showNoevents;
-        // копируем информацию из info в View и биндим обработчики на этот инстанс
-        this._showEvents = {
-            'dom': this._bindEventHandlers(this.info.showEvents, 2),
-
-            'no-global': this._bindEventHandlers(infoShowNoevents['global'], 1),
-            'no-local': this._bindEventHandlers(infoShowNoevents['local'], 1)
-        }
-    }
-    return this._showEvents;
+    return this[eventProp];
 };
 
 /**
  * Регистрирует обработчики событий после создания ноды.
  * @private
  */
-no.View.prototype._bindInitEvents = function() {
+no.View.prototype._bindEvents = function(type) {
     var $node = $(this.node);
     var i, j, event;
-    var initEvents = this._getInitEvents();
+    var events = this._getEvents(type);
 
-    var delegateEvents = initEvents['delegate'];
+    var delegateEvents = events['delegate'];
     for (i = 0, j = delegateEvents.length; i < j; i++) {
         event = delegateEvents[i];
+
+        // если надо переопределяем $target на глобальные объекты
+        var $target = $node;
+        if (event[0] === 'window') {
+            $target = this._$document;
+
+        } else if (event[0] === 'document') {
+            $target = this._$window;
+        }
         if (event[1]) { //selector
-            $node.on(event[0] + this._eventNS, event[1], event[2]);
+            $target.on(event[0] + this._eventNS, event[1], event[2]);
         } else {
-            $node.on(event[0] + this._eventNS, event[2]);
+            $target.on(event[0] + this._eventNS, event[2]);
         }
     }
 
-    var bindEvents = initEvents['bind'];
+    var bindEvents = events['bind'];
     for (i = 0, j = bindEvents.length; i < j; i++) {
         event = bindEvents[i];
         $node.find(event[1]).on(event[0] + this._eventNS, event[2]);
     }
 
-    var localNoevents = initEvents['no-local'];
+    var localNoevents = events['no-local'];
     for (i = 0, j = localNoevents.length; i < j; i++) {
         event = localNoevents[i];
         this.on(event[0], event[1]);
     }
 
-    var globalNoevents = initEvents['no-global'];
+    var globalNoevents = events['no-global'];
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
         no.events.on(event[0], event[1]);
@@ -452,81 +447,29 @@ no.View.prototype._bindInitEvents = function() {
  * Удаляет обработчики событий перед удалением ноды.
  * @private
  */
-no.View.prototype._unbindInitEvents = function() {
+no.View.prototype._unbindEvents = function(type) {
     var $node = $(this.node);
     var i, j, event;
 
-    var initEvents = this._getInitEvents();
+    var events = this._getEvents(type);
+
     $node.off(this._eventNS);
-
-    var bindEvents = initEvents['bind'];
-    for (i = 0, j = bindEvents.length; i < j; i++) {
-        event = bindEvents[i];
-        if (event[1]) { //selector
-            $node.find(event[1]).off(this._eventNS);
-        }
-    }
-
-    var localNoevents = initEvents['no-local'];
-    for (i = 0, j = localNoevents.length; i < j; i++) {
-        event = localNoevents[i];
-        this.off(event[0], event[1]);
-    }
-
-    var globalNoevents = initEvents['no-global'];
-    for (i = 0, j = globalNoevents.length; i < j; i++) {
-        event = globalNoevents[i];
-        no.events.off(event[0], event[1]);
-    }
-};
-
-/**
- * Регистрирует обработчики событий после показа ноды.
- * @private
- */
-no.View.prototype._bindShowEvents = function() {
-    var i, j, event;
-    var showEvents = this._getShowEvents();
-
-    var domEvents = showEvents['dom'];
-    for (i = 0, j = domEvents.length; i < j; i++) {
-        event = domEvents[i];
-        // event[1] - window или document, для них уже есть переменные в прототипе
-        this['_$' + event[1]].on(event[0] + this._eventNS, event[2])
-    }
-
-    var localNoevents = showEvents['no-local'];
-    for (i = 0, j = localNoevents.length; i < j; i++) {
-        event = localNoevents[i];
-        this.on(event[0], event[1]);
-    }
-
-    var globalNoevents = showEvents['no-global'];
-    for (i = 0, j = globalNoevents.length; i < j; i++) {
-        event = globalNoevents[i];
-        no.events.on(event[0], event[1]);
-    }
-};
-
-/**
- * Удаляет обработчики событий перед скрытия ноды.
- * @private
- */
-no.View.prototype._unbindShowEvents = function() {
-    // по массиву можно не ходить, просто анбиндим все по неймспейсу
     this._$document.off(this._eventNS);
     this._$window.off(this._eventNS);
 
-    var i, j, event;
-    var showEvents = this._getShowEvents();
+    var bindEvents = events['bind'];
+    for (i = 0, j = bindEvents.length; i < j; i++) {
+        event = bindEvents[i];
+        $node.find(event[1]).off(this._eventNS);
+    }
 
-    var localNoevents = showEvents['no-local'];
+    var localNoevents = events['no-local'];
     for (i = 0, j = localNoevents.length; i < j; i++) {
         event = localNoevents[i];
         this.off(event[0], event[1]);
     }
 
-    var globalNoevents = showEvents['no-global'];
+    var globalNoevents = events['no-global'];
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
         no.events.off(event[0], event[1]);
@@ -718,7 +661,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             //  автоматически попадут на нужное место.
             if (toplevel) {
                 if (!wasLoading) {
-                    this._unbindInitEvents();
+                    this._unbindEvents('init');
                     this.onhtmldestroy();
                 }
 
@@ -734,7 +677,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             this._setNode(viewNode);
 
             if ( this.isOk() ) {
-                this._bindInitEvents();
+                this._bindEvents('init');
                 this.onhtmlinit();
             }
 

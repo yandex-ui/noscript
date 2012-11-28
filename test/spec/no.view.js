@@ -183,4 +183,49 @@ describe('no.View', function() {
             });
         });
     });
+
+    describe('no.View._bindEventHandlers', function() {
+
+        beforeEach(function() {
+            this.view = new no.View();
+            this.view.myTestFunc = function() {return this};
+
+            this.eventArr = [
+                [ '1', function(){return this} ],
+                [ '2', 'myTestFunc' ]
+            ];
+
+            this.bindedEventArr = this.view._bindEventHandlers(this.eventArr, 1);
+        });
+
+        afterEach(function() {
+            delete this.view;
+            delete this.eventArr;
+            delete this.bindedEventArr;
+        });
+
+        it('should return array copy', function() {
+            expect(this.bindedEventArr !== this.eventArr).to.be.ok();
+        });
+
+        it('should return array with same length', function() {
+            expect(this.bindedEventArr.length).to.be(this.eventArr.length);
+        });
+
+        it('should process handler as function', function() {
+            expect(this.bindedEventArr[0][1]).to.be.a('function');
+        });
+
+        it('should return binded function', function() {
+            expect(this.bindedEventArr[0][1]()).to.be(this.view);
+        });
+
+        it('should return prototype method if handler is string', function() {
+            expect(this.bindedEventArr[1][1]).to.be.a('function');
+        });
+
+        it('should return binded prototype method if handler is string', function() {
+            expect(this.bindedEventArr[1][1]()).to.be(this.view);
+        });
+    });
 });

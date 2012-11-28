@@ -764,35 +764,5 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     });
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
- * Парсит декларации кастомных событий View.
- * @param {Object} events
- * @return {Object}
- */
-function parseNoeventsDeclaration(events) {
-    var result = {
-        'global': [],
-        'local': []
-    };
-
-    if (events) {
-        for (var event in events) {
-            var handler = events[event];
-            var parts = event.split(' ');
-            if (parts[0] === '*') {
-                parts.shift();
-                result.global.push([parts.join(' '), handler]);
-
-            } else {
-                result.local.push([event, handler]);
-            }
-        }
-    }
-
-    return result;
-}
-
 })();
 

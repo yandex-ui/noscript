@@ -26,22 +26,34 @@ describe('no.View', function() {
             events: {
                 'scroll window': no.pe,
                 'scroll document': no.pe,
+
+                'scroll@init window': no.pe,
+                'scroll@init document': no.pe,
+
                 'resize window': no.pe,
                 'resize document': no.pe,
-                'scroll .foo': no.pe,
+
+                'resize@init window': no.pe,
+                'resize@init document': no.pe,
+
+                'scroll .foo-init': no.pe,
                 'scroll': no.pe,
                 'click': no.pe,
-                'click .bar': no.pe
-            },
-            noevents: {
-                'init': {
-                    '* myglobalinitevent': no.pe,
-                    'mylocalinitevent': no.pe
-                },
-                'show': {
-                    '* myglobalshowevent': no.pe,
-                    'mylocalshowevent': no.pe
-                }
+                'click .bar-init': no.pe,
+
+                'scroll@show .foo-show': no.pe,
+                'scroll@show': no.pe,
+                'click@show': no.pe,
+                'click@show .bar-show': no.pe,
+
+                'my-global-init-event-short': no.pe,
+                'my-local-init-event-short .': no.pe,
+
+                'my-global-init-event@init': no.pe,
+                'my-local-init-event@init .': no.pe,
+
+                'my-global-show-event@show': no.pe,
+                'my-local-show-event@show .': no.pe
             }
         });
 
@@ -67,30 +79,54 @@ describe('no.View', function() {
                 expect(this.viewInfo.initEvents['delegate']).to.be.a('array');
             });
 
-            it('"showEvents" should be the array', function() {
-                expect(this.viewInfo.showEvents).to.be.a('array');
+            it('"showEvents" should be the object', function() {
+                expect(this.viewInfo.showEvents).to.be.a('object');
+            });
+
+            it('"showEvents.bind" should be the array', function() {
+                expect(this.viewInfo.showEvents['bind']).to.be.a('array');
+            });
+
+            it('"showEvents.delegate" should be the array', function() {
+                expect(this.viewInfo.showEvents['delegate']).to.be.a('array');
             });
 
             it('should parse delegated init events properly', function() {
                 expect(this.viewInfo.initEvents['delegate']).to.be.eql([
+                    ['scroll', 'window', no.pe],
+                    ['scroll', 'document', no.pe],
+
+                    ['resize', 'window', no.pe],
+                    ['resize', 'document', no.pe],
+
                     ['scroll', '', no.pe],
                     ['click', '', no.pe],
-                    ['click', '.bar', no.pe]
+                    ['click', '.bar-init', no.pe]
                 ]);
             });
 
             it('should parse bind init events properly', function() {
                 expect(this.viewInfo.initEvents['bind']).to.be.eql([
-                    ['scroll', '.foo', no.pe]
+                    ['scroll', '.foo-init', no.pe]
                 ]);
             });
 
             it('should parse show events properly', function() {
-                expect(this.viewInfo.showEvents).to.be.eql([
+                expect(this.viewInfo.showEvents['delegate']).to.be.eql([
                     ['scroll', 'window', no.pe],
                     ['scroll', 'document', no.pe],
                     ['resize', 'window', no.pe],
-                    ['resize', 'document', no.pe]
+                    ['resize', 'document', no.pe],
+
+                    ['scroll', '', no.pe],
+                    ['click', '', no.pe],
+                    ['click', '.bar-show', no.pe]
+                ]);
+            });
+
+            it('should parse show events properly', function() {
+                expect(this.viewInfo.showEvents['bind']).to.be.eql([
+                    ['scroll', '.foo-show', no.pe]
                 ]);
             });
         });
@@ -122,25 +158,27 @@ describe('no.View', function() {
 
             it('should parse global init noevents properly', function() {
                 expect(this.viewInfo.initNoevents['global']).to.be.eql([
-                    ['myglobalinitevent', no.pe]
+                    ['my-global-init-event-short', no.pe],
+                    ['my-global-init-event', no.pe]
                 ]);
             });
 
             it('should parse local init noevents properly', function() {
                 expect(this.viewInfo.initNoevents['local']).to.be.eql([
-                    ['mylocalinitevent', no.pe]
+                    ['my-local-init-event-short', no.pe],
+                    ['my-local-init-event', no.pe]
                 ]);
             });
 
             it('should parse global show noevents properly', function() {
                 expect(this.viewInfo.showNoevents['global']).to.be.eql([
-                    ['myglobalshowevent', no.pe]
+                    ['my-global-show-event', no.pe]
                 ]);
             });
 
             it('should parse local show noevents properly', function() {
                 expect(this.viewInfo.showNoevents['local']).to.be.eql([
-                    ['mylocalshowevent', no.pe]
+                    ['my-local-show-event', no.pe]
                 ]);
             });
         });

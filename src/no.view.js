@@ -179,50 +179,80 @@ no.View.info = function(id) {
 
         /**
          * События, которые вешаются на show, снимаются на hide
-         * @type {Array}
+         * @type {Object}
          */
-        info.showEvents = [];
-
-        // парсим события View
-        for (var eventDecl in info.events) {
-            var parts = eventDecl.split(' ');
-            // первый элемент - событие
-            var eventName = parts.shift();
-            // осталоное - селектор
-            var eventSelector = parts.join(' ');
-
-            if (eventName) {
-                var arr = [eventName, eventSelector, info.events[eventDecl]];
-                // глобальные события и resize вешаем на show
-                if (eventSelector === 'window' || eventSelector === 'document' || eventName === 'resize') {
-                    info.showEvents.push(arr);
-
-                } else if (eventName === 'scroll' && eventSelector) {
-                    // bind-события могут быть только с селектором
-                    // событие scroll не баблится, поэтому его надо вешать через $.find().on()
-                    info.initEvents['bind'].push(arr);
-
-                } else {
-                    info.initEvents['delegate'].push(arr);
-                }
-            }
-        }
+        info.showEvents = {
+            'bind': [],
+            'delegate': []
+        };
 
         /**
          * Декларации подписок на кастомные события при создании View.
          * @type {Object}
          */
-        info.initNoevents = parseNoeventsDeclaration(info.noevents.init);
+        info.initNoevents = {
+            'global': [],
+            'local': []
+        };
 
         /**
          * Декларации подписок на кастомные события при показе View.
          * @type {Object}
          */
-        info.showNoevents = parseNoeventsDeclaration(info.noevents.show);
+        info.showNoevents = {
+            'global': [],
+            'local': []
+        };
+
+        // парсим события View
+        for (var eventDecl in info.events) {
+            var declParts = eventDecl.split(' ');
+
+            // первый элемент - событие
+            var eventParts = declParts.shift().split('@');
+            var when = eventParts.length > 1 ? eventParts.pop() : '';
+            // нормализуем when
+            when = when && (when === 'init' || when === 'show') ? when : '';
+
+            var eventName = eventParts.join('@');
+
+            // осталоное - селектор
+            var eventSelector = declParts.join(' ');
+
+            if (eventName) {
+                var handler = info.events[eventDecl];
+                var naviteEvent = no.V.DOM_EVENTS.indexOf(eventName) > -1;
+
+                if (naviteEvent) {
+                    var arr = [eventName, eventSelector, info.events[eventDecl]];
+
+                    // глобальные селекторы всегда delegate
+                    var globalSelector = eventSelector === 'window' || eventSelector === 'document';
+                    // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
+                    var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
+
+                    if (!when) {
+                        when = globalSelector ? 'show' : 'init';
+                    }
+
+                    // info.initEvents.delegate.push(arr)
+                    info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
+
+                } else {
+                    when = when || 'init';
+                    // если есть селектор, то это локальное событие
+                    if (eventSelector) {
+                        info[when + 'Noevents'].local.push([eventName, handler]);
+
+                    } else {
+                        info[when + 'Noevents'].global.push([eventName, handler]);
+                    }
+                }
+            }
+        }
 
         // больше не нужны
         delete info.events;
-        delete info.noevents;
     }
     return info;
 };

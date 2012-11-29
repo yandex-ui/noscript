@@ -19,6 +19,13 @@ no.extend(no.View.prototype, no.Events);
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
+ * @see no.V.STATUS
+ * @enum {Number}
+ * @borrows no.V.STATUS as no.View.prototype.STATUS
+ */
+no.View.prototype.STATUS = no.V.STATUS;
+
+/**
  * Закешированный $(document)
  * @type {jQuery}
  * @private
@@ -61,14 +68,14 @@ no.View.prototype._init = function(id, params) {
     }
 
     this.node = null;
-    //  Варианты для status:
-    //
-    //    * none            --  у блок еще нет никакой ноды.
-    //    * loading         --  у блока есть заглушка, данные для полноценного блока загружаются.
-    //    * ok              --  все хорошо, нода блока построена и актуальна.
-    //    * invalid         --  блока помечен как невалидный, при следующем апдейте он должен перерисоваться.
-    //
-    this.status = 'none';
+
+    /**
+     * Статус View.
+     * @see no.V.STATUS
+     * @type {Number}
+     * @private
+     */
+    this.status = this.STATUS.NONE;
 
     this.timestamp = 0;
 
@@ -479,17 +486,17 @@ no.View.prototype._unbindEvents = function(type) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype.invalidate = function() {
-    this.status = 'invalid';
+    this.status = this.STATUS.INVALID;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype.isOk = function() {
-    return (this.status === 'ok');
+    return (this.status === this.STATUS.OK);
 };
 
 no.View.prototype.isLoading = function() {
-    return (this.status === 'loading');
+    return (this.status === this.STATUS.LOADING);
 };
 
 /**
@@ -497,9 +504,7 @@ no.View.prototype.isLoading = function() {
  * @return {Boolean}
  */
 no.View.prototype.isValid = function() {
-    if ( !this.isOk() ) { return false; }
-
-    return this.isModelsValid(this.timestamp);
+    return this.isOk() && this.isModelsValid(this.timestamp);
 };
 
 /**
@@ -633,11 +638,12 @@ no.View.prototype._getDescendants = function(views) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._setNode = function(node) {
+    var STATUS = this.STATUS;
     if (node) {
         this.node = node;
-        this.status = ( node.getAttribute('loading') ) ? 'loading' : 'ok';
+        this.status = ( node.getAttribute('loading') ) ? STATUS.LOADING : STATUS.OK;
     } else {
-        this.status = 'none';
+        this.status = STATUS.NONE;
     }
 };
 

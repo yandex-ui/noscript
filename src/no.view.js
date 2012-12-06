@@ -229,9 +229,9 @@ no.View.info = function(id) {
 
             if (eventName) {
                 var handler = info.events[eventDecl];
-                var naviteEvent = no.V.DOM_EVENTS.indexOf(eventName) > -1;
+                var nativeEvent = no.V.DOM_EVENTS.indexOf(eventName) > -1;
 
-                if (naviteEvent) {
+                if (nativeEvent) {
                     var arr = [eventName, eventSelector, info.events[eventDecl]];
 
                     // глобальные селекторы всегда delegate

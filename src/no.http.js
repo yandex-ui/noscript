@@ -5,13 +5,15 @@
 /**
     @param {string} url
     @param {Object} params
+    @param {String} type
     @return {no.Promise}
 */
-no.http = function(url, params) {
+no.http = function(url, params, type) {
     var promise = new no.Promise();
 
     $.ajax({
         url: url,
+        type: type || 'POST',
         data: params,
         dataType: 'json',
         success: function(data) {

@@ -22,3 +22,15 @@ no.object.clone = function(obj) {
     return obj;
 };
 
+/**
+    @param {!Object} obj
+    @return {boolean} Определяет, пустой ли объект или нет.
+*/
+no.object.isEmpty = function(obj) {
+    for (var key in obj) {
+        return false;
+    }
+
+    return true;
+};
+

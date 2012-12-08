@@ -33,6 +33,7 @@ no.Update.prototype.start = function() {
     var models = views2models(updated.sync);
     var promise = no.request.models(models)
         .then(function(r) {
+            //TODO: check errors
             if (!that._expired()) {
                 that._update();
             }
@@ -91,7 +92,7 @@ no.Update.prototype._update = function(async) {
         // return;
     }
 
-    var html = Yater.run(tree, null, '');
+    var html = no.tmpl(tree, null, '');
     var node = no.html2node(html);
     this.view._updateHTML(node, layout, params, {
         toplevel: true,

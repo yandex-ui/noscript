@@ -138,6 +138,16 @@ no.parseQuery = function(s) {
     return o;
 };
 
+/**
+ *
+ * @param mode
+ * @param json
+ * @param v
+ */
+no.tmpl = function(mode, json, v) {
+    no.todo();
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 if (typeof window === 'undefined') {

@@ -63,6 +63,11 @@ no.request.addRequestParams = function(params) {
     no.extend(params, no.request.requestParams);
 };
 
+/**
+ * Урл до сервера.
+ * @type {String}
+ */
+no.request.URL = '/models/';
 
 no.request.Manager = {
 
@@ -211,7 +216,7 @@ var Request = function(models, options) {
      * @type {Object}
      * @private
      */
-    this.options = options;
+    this.options = options || {};
 
     this.promise = new no.Promise();
 };
@@ -248,10 +253,11 @@ Request.prototype.request = function(loading, requesting) {
     if (requesting.length) {
         //  Запрашиваем модели, которые нужно запросить.
         var params = models2params(requesting);
+        var modelsNames = requesting.map(models2name);
         no.request.addRequestParams(params);
         // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
         // мог зарезолвится без завершения http-запроса
-        httpRequest = no.http('/models/', params); // FIXME: Урл к серверной ручке.
+        httpRequest = no.http(no.request.URL + '?_m=' + modelsNames.join(','), params, 'POST'); // FIXME: Урл к серверной ручке.
 
         all = all.concat( requesting.map(model2Promise) );
 
@@ -415,6 +421,10 @@ function models2params(models) {
         }
 
         return models;
+    }
+
+    function models2name(model) {
+        return model.id;
     }
 
 })();

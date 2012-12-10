@@ -169,7 +169,11 @@ no.View.info = function(id) {
         var params = {};
         var models = info.models;
         for (var i = 0, l = models.length; i < l; i++) {
-            no.extend( params, no.Model.info( models[i] ).params );
+            var modelInfo = no.Model.info(models[i]);
+            if (!modelInfo) {
+                throw 'Model "' + models[i] + '" is not defined!';
+            }
+            no.extend( params, modelInfo.params );
         }
         if (info.params) {
             no.extend(params, info.params);

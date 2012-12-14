@@ -375,7 +375,7 @@ no.Model.prototype.canRetry = function(error) {
 
 no.Model.prototype.extractData = function(result) {
     if (result) {
-        return result.result;
+        return result.data;
     }
 };
 

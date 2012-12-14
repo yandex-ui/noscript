@@ -144,7 +144,7 @@ no.parseQuery = function(s) {
  * @param json
  * @param v
  */
-no.tmpl = function(mode, json, v) {
+no.tmpl = function(json, mode, v) {
     no.todo();
 };
 

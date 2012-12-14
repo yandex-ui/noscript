@@ -1,12 +1,35 @@
 (function() {
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-//  no.Update
-//  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Создает no.Update
+ * @class no.Update
+ * @param {no.View} view Корневой view.
+ * @param {Object} layout Layout для этого view, результат от no.layout.page()
+ * @param {Object} params Параметры, результат от no.router()
+ * @constructor
+ * @example
+ * var route = no.router('/folder/123/message/456');
+ * var layout = no.layout.page(route.page, route.params);
+ * var update = new no.Update(AppBlock, layout, route.params);
+ * update.start();
+ */
 no.Update = function(view, layout, params) {
+    /**
+     * Корневой view.
+     * @private
+     * @type {no.View}
+     */
     this.view = view;
-    this.layout = layout;
+
+    // ищем layout от view
+    if (this.view.id in layout) {
+        this.layout = layout[this.view.id];
+
+    } else {
+        // если его нет - ругаемся
+        throw 'no.Update: cant find view layout';
+    }
+
     this.params = params;
 
     this.id = ++update_id;
@@ -39,6 +62,7 @@ no.Update.prototype.start = function() {
             }
         });
 
+    //TODO: для lazy-view просто делать запрос и ничего не ждать, после окончания главного update, запускать локальные update на каждом lazy-view
     updated.async.forEach(function(item) {
         var models = views2models( [ item ] );
         no.Promise.wait([

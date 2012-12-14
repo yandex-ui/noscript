@@ -112,6 +112,7 @@ no.Update.prototype._update = function(async) {
     };
     this.view._getUpdateTree(tree, layout, params);
 
+    //TODO: detect if empty
     if ( no.object.isEmpty(tree.views) ) {
         // return;
     }

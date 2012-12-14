@@ -298,7 +298,10 @@ Request.prototype.request = function(loading, requesting) {
     }
 };
 
-Request.prototype.extract = function(models, results) {
+Request.prototype.extract = function(models, response) {
+    // response - это объект, чтобы дать возможность напихать туда сервисных данных
+    // ответы хендлеров приходят в массиве response.models
+    var results = (response && response.models) || [];
     for (var i = 0, l = models.length; i < l; i++) {
         var model = models[i];
         var result = results[i];

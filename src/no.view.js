@@ -47,8 +47,6 @@ no.View.prototype._init = function(id, params) {
 
     this.key = no.View.getKey(id, params, this.info);
 
-    this.views = {};
-
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
@@ -57,16 +55,7 @@ no.View.prototype._init = function(id, params) {
         models[model_id] = no.Model.create(model_id, params);
     }
 
-    //  Создаем подблоки.
-    var view_ids = no.layout.view(id);
-    for (var view_id in view_ids) {
-        if (view_ids[view_id] === 'box') {
-            this._addBox(view_id, params);
-        } else {
-            this._addView(view_id, params);
-        }
-    }
-
+    this.views = null;
     this.node = null;
 
     /**
@@ -273,6 +262,9 @@ no.View.info = function(id) {
 
 no.View.create = function(id, params) {
     var ctor = _ctors[id];
+    if (!ctor) {
+        throw 'no.View "' + id + '" is not declared!';
+    }
     var view = new ctor();
     view._init(id, params);
 
@@ -547,17 +539,31 @@ no.View.prototype._apply = function(callback) {
 
 //  Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
 //  требующие перерисовки. Раскладываем их в две "кучки": sync и async.
-no.View.prototype._getRequestViews = function(updated, layout, params) {
+no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     if  ( !this.isValid() ) {
-        if (layout === false) {
+        if (pageLayout === false) {
             updated.async.push(this);
         } else {
             updated.sync.push(this);
         }
     }
 
+    // Если views еще не определены (первая отрисовка)
+    if (!this.views) {
+        this.views = {};
+        // Создаем подблоки
+        var viewLayout = no.layout.view(this.id);
+        for (var view_id in viewLayout) {
+            if (viewLayout[view_id] === no.L.BOX) {
+                this._addBox(view_id, params);
+            } else {
+                this._addView(view_id, params);
+            }
+        }
+    }
+
     this._apply(function(view, id) {
-        view._getRequestViews(updated, layout[id], params);
+        view._getRequestViews(updated, pageLayout[id], params);
     });
 
     return updated;

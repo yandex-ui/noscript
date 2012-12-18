@@ -90,7 +90,7 @@ no.Box.prototype._getViewTree = function(models, layout, params) {
 no.Box.prototype._updateHTML = function(node, layout, params, options) {
     if (!this.node) {
         //  Ищем новую ноду бокса.
-        this.node = no.byClass('box-' + this.id, node)[0];
+        this.node = no.byClass('view-' + this.id, node)[0];
     }
 
     var views = this.views;

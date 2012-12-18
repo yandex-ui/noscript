@@ -1,7 +1,7 @@
 /**
  * Find best page for url.
  * @param {string} url
- * @return {{ page: string, params: Object }}
+ * @return {{ page: string, params: Object }}|Boolean
 */
 no.router = function(url) {
 
@@ -13,6 +13,10 @@ no.router = function(url) {
 
         var r = route.regexp.exec(url);
         if (r) {
+            if (route.redirect) {
+                no.page.redirect(route.redirect);
+                return false;
+            }
             var tokens = route.tokens;
             var params = {};
 
@@ -47,12 +51,20 @@ no.router = function(url) {
  * Inititialize no.router, compiles defined routes.
  */
 no.router.init = function() {
+    var redirectRegExp = /^->\s*(.*)/;
     var _routes = [];
 
     var routes = no.router.routes;
     for (var i = 0, l = routes.length; i < l; i += 2) {
         var compiled = no.router.compile( routes[i] );
-        compiled.page = routes[i + 1];
+
+        var page = routes[i + 1];
+        var pageMatch = redirectRegExp.exec(page);
+        if (pageMatch) {
+            compiled.redirect = pageMatch[1];
+        } else {
+            compiled.page = page;
+        }
 
         _routes.push( compiled );
     }

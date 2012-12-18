@@ -24,6 +24,9 @@ no.page.go = function(url) {
     }
 
     var route = no.router(url);
+    if (route === false) {
+        return;
+    }
     var layout = no.layout.page(route.page, route.params);
 
     no.events.trigger('no:page-before-load', [no.page.current, route]);
@@ -35,6 +38,11 @@ no.page.go = function(url) {
 
     var update = new no.Update(no.MAIN_VIEW, layout, route.params);
     update.start();
+};
+
+no.page.redirect = function(url) {
+    window.history.replaceState(null, 'mail', url);
+    no.page.go(url);
 };
 
 /**

@@ -23,6 +23,7 @@ describe('no.router', function() {
 
         beforeEach(function() {
             no.router.routes = [
+                '/', '-> /inbox',
                 '/inbox', 'messages',
                 '/message/{mid:int}', 'message'
             ];
@@ -34,20 +35,28 @@ describe('no.router', function() {
             no.router.routes = [];
         });
 
+        it('/ regexp check', function(){
+            expect(no.router.routes[0].regexp.toString()).to.be('/^\/?(?:\\?(.*))?$/')
+        });
+
+        it('/ redirect check', function(){
+            expect(no.router.routes[0].redirect).to.be.eql('/inbox')
+        });
+
         it('/inbox regexp check', function(){
-            expect(no.router.routes[0].regexp.toString()).to.be('/^\/inbox\/?(?:\\?(.*))?$/')
+            expect(no.router.routes[1].regexp.toString()).to.be('/^\/inbox\/?(?:\\?(.*))?$/')
         });
 
         it('/inbox tokens check', function(){
-            expect(no.router.routes[0].tokens).to.be.eql([])
+            expect(no.router.routes[1].tokens).to.be.eql([])
         });
 
         it('/message/{mid:int} regexp check', function(){
-            expect(no.router.routes[1].regexp.toString()).to.be('/^/message/([0-9]+)/?(?:\\?(.*))?$/')
+            expect(no.router.routes[2].regexp.toString()).to.be('/^/message/([0-9]+)/?(?:\\?(.*))?$/')
         });
 
         it('/message/{mid:int} tokens check', function(){
-            expect(no.router.routes[1].tokens).to.be.eql(['mid'])
+            expect(no.router.routes[2].tokens).to.be.eql(['mid'])
         });
 
     });

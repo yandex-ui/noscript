@@ -1,13 +1,14 @@
 /**
-    @param {string} url
-    @return {{ page: string, params: Object }}
+ * Find best page for url.
+ * @param {string} url
+ * @return {{ page: string, params: Object }}
 */
 no.router = function(url) {
 
     var routes = no.router.routes;
 
     // Применяем поочередно все "реврайты", пока не найдем подходящий.
-    for (var i = 0, l = routes.length; i < l; i++) {
+    for (var i = 0, j = routes.length; i < j; i++) {
         var route = routes[i];
 
         var r = route.regexp.exec(url);
@@ -17,8 +18,8 @@ no.router = function(url) {
 
             // Вытаскиваем параметры из основной части урла. Имена параметров берем из массива tokens.
             var l = tokens.length;
-            for (var i = 0; i < l; i++) {
-                params[ tokens[i] ] = r[ i + 1 ];
+            for (var k = 0; k < l; k++) {
+                params[ tokens[k] ] = r[ k + 1 ];
             }
 
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
@@ -42,8 +43,9 @@ no.router = function(url) {
 
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
-
+/**
+ * Inititialize no.router, compiles defined routes.
+ */
 no.router.init = function() {
     var _routes = [];
 
@@ -59,17 +61,23 @@ no.router.init = function() {
 };
 
 /**
-    @param {string} route
-    @return {{ regexp: RegExp, tokens: Array.<string> }}
+ * Compile route.
+ * @param {String} route
+ * @return {{ regexp: RegExp, tokens: Array.<string> }}
 */
 no.router.compile = function(route) {
     var regexp = route.replace(/\/$/, ''); // Отрезаем последний слэш, он ниже добавится как необязательный.
 
     var tokens = [];
     regexp = regexp.replace(/{(.*?)}/g, function(_, token) { // Заменяем {name} на кусок регэкспа соответствующего типу токена name.
-        var type = no.router.types[ token ] || 'id';
-        var rx_part = no.router.regexps[ type ];
-        tokens.push(token); // Запоминаем имя токена, оно нужно при парсинге урлов.
+        var tokenParts = token.split(':');
+
+        var type = tokenParts[1] || 'id';
+        var rx_part = no.router.regexps[type];
+        if (!rx_part) {
+            throw "Can't find regexp for '" + type +"'!";
+        }
+        tokens.push(tokenParts[0]); // Запоминаем имя токена, оно нужно при парсинге урлов.
 
         return '(' + rx_part + ')';
     });
@@ -82,5 +90,18 @@ no.router.compile = function(route) {
     };
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
+/**
+ * Маршруты.
+ * Этот массив должен быть объявлен в проекте.
+ * @type {Array}
+ */
+no.router.routes = [];
 
+/**
+ * Регулярные выражения для проверки типов параметров.
+ * @type {Object}
+ */
+no.router.regexps = {
+    'id': '[A-Za-z_][A-Za-z0-9_-]*',
+    'int': '[0-9]+'
+};

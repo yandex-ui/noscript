@@ -112,7 +112,8 @@ no.action.init = function() {
                 //TODO: HISTORY_API_SUPPORT: hash или не хеш
                 //могут быть ссылки <a href="#hash" target="_blank"/>
                 if (target.getAttribute('target') != '_blank') {
-                    returnValue = Page.go(target.hash);
+                    window.history.pushState(null, 'mail', href);
+                    returnValue = no.page.go(href);
                 }
             }
 

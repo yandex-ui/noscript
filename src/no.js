@@ -148,6 +148,28 @@ no.tmpl = function(json, mode, v) {
     no.todo();
 };
 
+/**
+ * Производит первоначальную инициализацию.
+ */
+no.init = function() {
+    no.action.init();
+    no.initMainView();
+};
+
+/**
+ * Инициализирует корневой View.
+ */
+no.initMainView = function() {
+    var mainView = no.View.create('app');
+    mainView.node = document.getElementById('app');
+
+    /**
+     * Корневой View.
+     * @type {no.View}
+     */
+    no.MAIN_VIEW = mainView;
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 if (typeof window === 'undefined') {

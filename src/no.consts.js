@@ -67,6 +67,11 @@ no.V.DOM_EVENTS = [
     'mouseup',
     'resize',
     'scroll',
-    'submit'
+    'submit',
+//TODO: сделать прозрачные (mousedown/touchstart/MSPointerDown) константы в зависимости от окружения
+// пример тут https://github.com/nolimits4web/Swiper/blob/master/dist/idangerous.swiper-1.7.js
+    'touchstart',
+    'touchmove',
+    'touchend'
 ];
 

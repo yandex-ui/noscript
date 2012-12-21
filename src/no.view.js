@@ -408,6 +408,9 @@ no.View.prototype._bindEvents = function(type) {
     var i, j, event;
     var events = this._getEvents(type);
 
+    // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
+    var eventNS = this._eventNS + '-' + type;
+
     var delegateEvents = events['delegate'];
     for (i = 0, j = delegateEvents.length; i < j; i++) {
         event = delegateEvents[i];
@@ -421,16 +424,16 @@ no.View.prototype._bindEvents = function(type) {
             $target = this._$window;
         }
         if (event[1]) { //selector
-            $target.on(event[0] + this._eventNS, event[1], event[2]);
+            $target.on(event[0] + eventNS, event[1], event[2]);
         } else {
-            $target.on(event[0] + this._eventNS, event[2]);
+            $target.on(event[0] + eventNS, event[2]);
         }
     }
 
     var bindEvents = events['bind'];
     for (i = 0, j = bindEvents.length; i < j; i++) {
         event = bindEvents[i];
-        $node.find(event[1]).on(event[0] + this._eventNS, event[2]);
+        $node.find(event[1]).on(event[0] + eventNS, event[2]);
     }
 
     var localNoevents = events['no-local'];
@@ -454,16 +457,18 @@ no.View.prototype._unbindEvents = function(type) {
     var $node = $(this.node);
     var i, j, event;
 
+    // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
+    var eventNS = this._eventNS + '-' + type;
     var events = this._getEvents(type);
 
-    $node.off(this._eventNS);
-    this._$document.off(this._eventNS);
-    this._$window.off(this._eventNS);
+    $node.off(eventNS);
+    this._$document.off(eventNS);
+    this._$window.off(eventNS);
 
     var bindEvents = events['bind'];
     for (i = 0, j = bindEvents.length; i < j; i++) {
         event = bindEvents[i];
-        $node.find(event[1]).off(this._eventNS);
+        $node.find(event[1]).off(eventNS);
     }
 
     var localNoevents = events['no-local'];
@@ -648,6 +653,7 @@ no.View.prototype._getDescendants = function(views) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._setNode = function(node) {
+    console.log('_setNode', node);
     var STATUS = this.STATUS;
     if (node) {
         this.node = node;

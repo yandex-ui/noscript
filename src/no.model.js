@@ -66,8 +66,6 @@ no.Model.prototype._init = function(id, params, data) {
 
     this.info = no.Model.info(id);
     this.key = no.Model.key(id, params, this.info);
-
-    this.timestamp = 0;
 };
 
 no.Model.prototype._reset = function(status) {
@@ -76,7 +74,6 @@ no.Model.prototype._reset = function(status) {
 
     this.status = status || this.STATUS_NONE;
     this.retries = 0;
-    this.requests = 0;
 
     this.timestamp = 0;
 };

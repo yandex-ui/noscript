@@ -8,7 +8,7 @@ describe('no.Model', function() {
                 var define = function() { no.Model.define('dm1'); };
                 define();
 
-                expect(define).to.throwException(/Model can't be redefined!/);
+                expect(define).to.throwException(/Model 'dm1' can't be redefined!/);
             });
 
         });
@@ -81,7 +81,6 @@ describe('no.Model', function() {
 
                 expect(this.model.status).to.be(this.model.STATUS_NONE);
                 expect(this.model.retries).to.be(0);
-                expect(this.model.requests).to.be(0);
 
                 expect(this.model.timestamp).to.be(0);
             });
@@ -111,8 +110,6 @@ describe('no.Model', function() {
                 expect(model.info).to.be( no.Model.info('m1') );
                 expect(model.key)
                     .to.be( no.Model.key('m1', {p1: 1, p2: 2, p3: 3, p4: 4}), model.info );
-
-                expect(model.timestamp).to.be(0);
             });
 
         });

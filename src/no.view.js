@@ -653,7 +653,6 @@ no.View.prototype._getDescendants = function(views) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._setNode = function(node) {
-    console.log('_setNode', node);
     var STATUS = this.STATUS;
     if (node) {
         this.node = node;

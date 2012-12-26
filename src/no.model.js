@@ -189,15 +189,18 @@ no.Model.key = function(id, params, info) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Инвалидируем все модели с заданным id,
-//  удовлетворяющие фильтру filter (функция, принимающая
-//  параметром модель и возвращающая boolean).
+/**
+ * Инвалидирует все модели с заданным id, удовлетворяющие filter.
+ * @static
+ * @param {String} id ID модели.
+ * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
+ */
 no.Model.invalidate = function(id, filter) {
     var models = _cache[id];
 
     for (var key in models) {
         var model = models[key];
-        if ( filter(model) ) {
+        if (!filter || filter(model)) {
             model.invalidate();
         }
     }

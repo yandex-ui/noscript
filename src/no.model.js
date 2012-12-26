@@ -122,7 +122,7 @@ no.Model.prototype._bindEvents = function() {
 //
 no.Model.define = function(id, info, ctor) {
     if (id in _infos) {
-        throw "Model can't be redefined!";
+        throw "Model '"+ id +"' can't be redefined!";
     }
 
     info = info || {};

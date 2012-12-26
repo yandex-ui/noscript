@@ -67,7 +67,7 @@ no.Model.prototype._init = function(id, params, data) {
     this.info = no.Model.info(id);
     this.key = no.Model.key(id, params, this.info);
 
-    this.timestamp = 0;
+    this._bindEvents();
 };
 
 no.Model.prototype._reset = function(status) {
@@ -76,9 +76,28 @@ no.Model.prototype._reset = function(status) {
 
     this.status = status || this.STATUS_NONE;
     this.retries = 0;
-    this.requests = 0;
 
     this.timestamp = 0;
+};
+
+/**
+ * Регистрирует обработчики событий.
+ * @private
+ */
+no.Model.prototype._bindEvents = function() {
+    for (var event in this.info.events) {
+        var callbacks = this.info.events[event];
+        // приводим обработчики к массиву
+        if (!Array.isArray(callbacks)) {
+            callbacks = [callbacks];
+        }
+
+        for (var i = 0, j = callbacks.length; i < j; i++) {
+            // сразу биндим обработчики в this
+            this.on(event, callbacks[i].bind(this));
+            //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
+        }
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -103,7 +122,7 @@ no.Model.prototype._reset = function(status) {
 //
 no.Model.define = function(id, info, ctor) {
     if (id in _infos) {
-        throw "Model can't be redefined!";
+        throw "Model '"+ id +"' can't be redefined!";
     }
 
     info = info || {};
@@ -114,7 +133,6 @@ no.Model.define = function(id, info, ctor) {
         ctor = ctor || no.Model;
     }
 
-    info.params = info.params || {};
     // часть дополнительной обработки производится в no.Model.info
     // т.о. получаем lazy-определение
 
@@ -152,8 +170,25 @@ no.Model.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pNames, то надо завершить определение Model
     if (info && !info.pNames) {
+        /**
+         * Параметры моделей.
+         * @type {Object}
+         */
+        info.params = info.params || {};
+
+        /**
+         * Обработчики событий.
+         * @type {Object}
+         */
+        info.events = info.events || {};
+
         info.pNames = Object.keys(info.params);
-        //  Для do-моделей отдельные правила кэширования и построения ключей.
+
+        /**
+         * Флаг do-модели. Модель, которая изменяет данные.
+         * Для do-моделей отдельные правила кэширования и построения ключей.
+         * @type {Boolean}
+         */
         info.isDo = /^do-/.test(id);
     }
     return info;
@@ -192,15 +227,18 @@ no.Model.key = function(id, params, info) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Инвалидируем все модели с заданным id,
-//  удовлетворяющие фильтру filter (функция, принимающая
-//  параметром модель и возвращающая boolean).
+/**
+ * Инвалидирует все модели с заданным id, удовлетворяющие filter.
+ * @static
+ * @param {String} id ID модели.
+ * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
+ */
 no.Model.invalidate = function(id, filter) {
     var models = _cache[id];
 
     for (var key in models) {
         var model = models[key];
-        if ( filter(model) ) {
+        if (!filter || filter(model)) {
             model.invalidate();
         }
     }
@@ -228,24 +266,29 @@ no.Model.prototype.get = function(path) {
     }
 };
 
-//  Сохраняет value по пути path.
-//
-//  Возможные флаги, которые могут быть в options:
-//
-//      {
-//          silent: true        //  Не генерить событие о том, что модель изменилась,
-//      }
-//
-no.Model.prototype.set = function(path, value, options) {
+/**
+ * Сохраняет value по пути jpath.
+ * @param {String} jpath jpath до значения.
+ * @param {*} value Новое значение.
+ * @param {Object} [options] Флаги.
+ * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
+ */
+no.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;
-    if (!data) { return; }
+    if (this.status != this.STATUS_OK || !data) {
+        return;
+    }
 
     //  Сохраняем новое значение и одновременно получаем старое значение.
-    var oldValue = no.path(path, data, value);
+    var oldValue = no.path(jpath, data, value);
 
     if ( !( (options && options.silent) || no.object.isEqual(value, oldValue) ) ) {
-        //  FIXME: Может быть отправлять старое/новое значение?
-        this.trigger('changed.' + path);
+        //TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
+        this.trigger('changed.' + jpath, {
+            'new': value,
+            'old': oldValue,
+            'jpath': jpath
+        });
     }
 };
 
@@ -255,18 +298,14 @@ no.Model.prototype.getData = function() {
     return this.data;
 };
 
-//  Заменяет данные модели на data.
-//
-//  При этом по-дефолту на модели генерится событие 'changed'.
-//  Это поведение можно поменять, передав объект options:
-//
-//      {
-//          silent: true        //  Не генерить событие о том, что модель изменилась,
-//      }
-//
+/**
+ * Устанавливает новые данные модели.
+ * @param {*} data Новые данные.
+ * @param {Object} [options] Флаги.
+ * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
+ */
 no.Model.prototype.setData = function(data, options) {
     if (data) {
-        var old = this.data;
         this.data = this.preprocessData(data);
         this.error = null;
         this.status = this.STATUS_OK;
@@ -274,7 +313,7 @@ no.Model.prototype.setData = function(data, options) {
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
-        if ( old != null && !(options && options.silent) ) {
+        if (!options || !options.silent) {
             this.trigger('changed');
         }
 
@@ -411,6 +450,19 @@ no.Model.prototype.prepareRequest = function(requestID) {
 
     return this;
 };
+
+if(window['mocha']) {
+    /**
+     * Удаляет определение модели.
+     * Используется только в юнит-тестах.
+     * @param {String} id ID модели.
+     */
+    no.Model.undefine = function(id) {
+        delete _cache[id];
+        delete _ctors[id];
+        delete _infos[id];
+    };
+}
 
 })();
 

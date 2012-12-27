@@ -75,7 +75,7 @@ no.View.prototype._init = function(id, params) {
      */
     this._eventNS = '.no-view-' + this.id;
 
-    this.oninit();
+    this.trigger('init');
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -307,49 +307,26 @@ no.View.prototype._hide = function() {
         this._unbindEvents('show');
         this.node.style.display = 'none';
         this._visible = false;
-        this.onhide();
+        this.trigger('hide');
     }
 };
 
-//  При создании блока у него this._visible === undefined.
+/**
+ * Показывает View
+ * @private
+ */
 no.View.prototype._show = function() {
     if ( this.isLoading() ) {
         return;
     }
-
+    // При создании блока у него this._visible === undefined.
     if (this._visible !== true) {
         this._bindEvents('show');
         this.node.style.display = '';
         this._visible = true;
-        this.onshow();
+        this.trigger('show');
     }
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-function log(s) {
-    return function() {
-        console.log(s, this.id);
-    }
-};
-
-no.View.prototype.oninit = no.pe; // log('oninit');
-
-//  FIXME: Пока что блоки никогда не уничтожаются,
-//  поэтому этот метод не вызывается никогда.
-/// no.View.prototype.ondestroy = no.pe; // log('ondestroy');
-
-no.View.prototype.onhtmlinit = no.pe; // log('onhtmlinit');
-
-no.View.prototype.onhtmldestroy = no.pe; // log('onhtmldestroy');
-
-no.View.prototype.onshow = no.pe; // log('onshow');
-
-no.View.prototype.onhide = no.pe; // log('onhide');
-
-no.View.prototype.onrepaint = no.pe; // log('onrepaint');
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
  * Копирует массив деклараций событий и возвращает такой же массив, но забинженными на этот инстанс обработчиками.
@@ -683,7 +660,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             if (toplevel) {
                 if (!wasLoading) {
                     this._unbindEvents('init');
-                    this.onhtmldestroy();
+                    this.trigger('htmldestroy');
                 }
 
                 //  Старая нода показывает место, где должен быть блок.
@@ -699,7 +676,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
 
             if ( this.isOk() ) {
                 this._bindEvents('init');
-                this.onhtmlinit();
+                this.trigger('htmlinit');
             }
 
             this.timestamp = +new Date();
@@ -712,7 +689,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     //  В синхронном запросе вызывает onrepaint для всех блоков.
     //  Кроме того, не вызываем onrepaint для все еще заглушек.
     if ( this.isOk() && ( (async && wasLoading) || !async) ) {
-        this.onrepaint();
+        this.trigger('repaint', params);
     }
 
     //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть

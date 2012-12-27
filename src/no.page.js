@@ -53,7 +53,9 @@ no.page.urlPrepare = function(url) {
     return url;
 };
 
+/*
 window.addEventListener('popstate', function(e) {
     no.page.go();
     e.preventDefault();
 }, false);
+*/

@@ -4,9 +4,12 @@
 //  no.Model
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
-//  Вся инициализация делается в _init(), который вызывает фабрикой no.Model.create().
-//
+/**
+ * @class Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
+ * Вся инициализация делается в _init(), который вызывает фабрикой no.Model.create().
+ * @constructor
+ * @namespace
+ */
 no.Model = function() {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -126,11 +129,17 @@ no.Model.define = function(id, info, ctor) {
     }
 
     info = info || {};
+
+    var noModel = no.Model;
+    if (info.uniq) {
+        noModel = no.ModelUniq;
+    }
+
     if (info.methods) {
         //  Нужно унаследоваться от no.Model и добавить в прототип info.models.
-        ctor = no.inherits(function() {}, no.Model, info.methods);
+        ctor = no.inherits(function() {}, noModel, info.methods);
     } else {
-        ctor = ctor || no.Model;
+        ctor = ctor || noModel;
     }
 
     // часть дополнительной обработки производится в no.Model.info
@@ -145,6 +154,7 @@ no.Model.define = function(id, info, ctor) {
 
 //  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
 no.Model.create = function(id, params, data)  {
+    params = params || {};
     var model = no.Model.get(id, params);
 
     if (!model) {
@@ -369,6 +379,9 @@ no.Model.prototype.getRequestParams = function() {
  * @return {no.Model}
  */
 no.Model.get = function(id, key) {
+    if (!(id in _infos)) {
+        throw 'Model "' + id + '" is not defined!';
+    }
     key = (typeof key === 'string') ? key : no.Model.key(id, key);
 
     return _cache[id][key];
@@ -463,6 +476,164 @@ if(window['mocha']) {
         delete _infos[id];
     };
 }
+
+
+/**
+ * Это набор хэлперов для модели, делающего групповые запросы,
+ * т.е. в качестве параметра у него есть массив
+ * хэлперы позволяют каждый последующий раз искать в массиве значения,
+ * которые ранее не грузились (уникальные) и грузить только их
+ */
+no.ModelUniq = function(){};
+no.extend(no.ModelUniq.prototype, no.Model.prototype);
+
+no.ModelUniq.prototype.__superInit = no.ModelUniq.prototype._init;
+
+no.ModelUniq.prototype._init = function(id) {
+    // добавляем дефолтное событие changed
+    var info = no.Model.info(id);
+    info.events.changed = info.events.changed || [];
+    var onchangedCallbacks = info.events.changed;
+
+    var cb = function() {
+        //TODO: по-хорошему надо записывать все данные в один кеш и брать всегда все оттуда, а не ходить по всем экземплярам и собирать данные
+        //Как только собрался кэш запоминаем какие ключи у нас есть
+        var that = this;
+        var uniq = this.params[this.uniqName];
+        if (!this.uniqCached) { this.uniqCached = {}; }
+
+        $.each(uniq, function(i, v){ that.uniqCached[v] = true; });
+    };
+
+    if (Array.isArray(onchangedCallbacks)) {
+        onchangedCallbacks.unshift(cb);
+    } else {
+        info.events.changed = [cb, info.events.changed];
+    }
+
+    this.__superInit.apply(this, arguments);
+};
+
+/**
+ * Имя значения в params, которое является массивом
+ * @private
+ * @type String
+ */
+no.ModelUniq.prototype.uniqName = '';
+
+/**
+ * Название массива в кэше,
+ * в котором дожны храниться уникальные значения
+ * @private
+ * @type String
+ */
+no.ModelUniq.prototype.uniqPath = '';
+
+/**
+ * Кэш с уже загруженными значениями
+ * @private
+ * @type Object
+ */
+no.ModelUniq.prototype.uniqCached = null;
+
+/**
+ * Хэлпер, который помогает вырезать из параметров уже загруженные значения
+ * @param {Object} params
+ * @param {Object} cached ссылка, на объект, в который будет сложена закэшированная часть параметров
+ * @type Object
+ */
+no.ModelUniq.prototype.uniq = function(params, cached) {
+    var that = this;
+    var name = this.uniqName;
+    var copy = $.extend({}, params, true);
+    if (!this.uniqCached) { this.uniqCached = {}; }
+
+    // создаём ту же структуру, что и в оригинальных параметрах
+    if (cached) {
+        for (var k in params) {
+            cached[k] = k == name ? [] : params[k];
+        }
+    }
+
+    copy[name] = $.map([].concat(copy[name]), function(v) {
+        if (that.uniqCached[v]) {
+            if (cached) {
+                cached[name].push(v);
+            }
+
+            return null;
+
+        } else {
+            return v;
+        }
+    });
+
+    if (!copy[name].length) {
+        delete copy[name];
+    }
+
+    if (cached && !cached[name].length) {
+        delete cached[name];
+    }
+
+    return copy;
+};
+
+/**
+ * Из ключа кэша делает массив по параметру, уникальность которого достигаем
+ * @private
+ * @param {String} key
+ * @type Array
+ */
+no.ModelUniq.prototype.uniqFromKey = function(key) {
+    return ((key.split(this.uniqName + '=')[1] || '').split('&')[0] || '').split(',');
+};
+
+/**
+ * Вырезает из кэша xml для конкретного значения
+ * @private
+ * @abstract
+ * @param {Node} xml
+ * @param {String} uniq
+ * @type Node
+ */
+no.ModelUniq.prototype.uniqFromJSON = function(xml, uniq) {
+    no.todo();
+};
+
+/**
+ * Возвращает кэш по параметрам
+ * @return {*}
+ */
+no.ModelUniq.prototype.getData = function(params) {
+    var that = this;
+    var path = this.uniqPath;
+    var uniqs = [].concat(params[this.uniqName]);
+    var data = {};
+    data[path] = [];
+
+    var modelsCache = _cache[this.id];
+    for (var key in modelsCache) {
+        var model = modelsCache[key];
+
+        var arrKey = that.uniqFromKey(key);
+
+        for (var i = 0, j = uniqs.length; i < j; i++) {
+            // если требуемое значение есть в кэше
+            if ($.inArray(uniqs[i], arrKey) > -1) {
+                // извлекаем значение из кэша по ключу
+                var value = that.uniqFromJSON(model.data, uniqs[i]);
+                if (value) {
+                    data[path].push(value);
+                }
+                uniqs.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    return data;
+};
 
 })();
 

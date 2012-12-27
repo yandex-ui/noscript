@@ -156,6 +156,11 @@ no.init = function() {
     no.router.init();
 
     no.initMainView();
+
+    window.addEventListener('popstate', function(e) {
+        no.page.go();
+        e.preventDefault();
+    }, false);
 };
 
 /**

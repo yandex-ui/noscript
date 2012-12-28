@@ -62,10 +62,11 @@ no.Model.prototype._init = function(id, params, data) {
     this.params = params;
 
     this._reset();
-    this.setData(data);
 
     this.info = no.Model.info(id);
     this.key = no.Model.key(id, params, this.info);
+
+    this.setData(data);
 
     this._bindEvents();
 };
@@ -98,6 +99,34 @@ no.Model.prototype._bindEvents = function() {
             //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
         }
     }
+};
+
+/**
+ * При установке data в составной моделе
+ * инициализирует все составляющие модели
+ */
+no.Model.prototype._splitData = function(data) {
+    var info = this.info.split;
+    var models = this.splitModels = [];
+
+    var items = no.path(info.items, data);
+
+    items.forEach(function(item) {
+        var id = no.path(info.id, item);
+
+        var params = {};
+        for (var key in info.params) {
+            params[key] = no.path(info.params[key], item);
+        }
+
+        var model = no.Model.create(info.model_id, params, item);
+
+        model.on('change', function() {
+            console.log('model change', arguments);
+        });
+
+        models.push(model);
+    });
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -190,6 +219,8 @@ no.Model.info = function(id) {
          * @type {Boolean}
          */
         info.isDo = /^do-/.test(id);
+
+        info.isSplit = !!info.split;
     }
     return info;
 };
@@ -306,7 +337,14 @@ no.Model.prototype.getData = function() {
  */
 no.Model.prototype.setData = function(data, options) {
     if (data) {
-        this.data = this.preprocessData(data);
+        data = this.preprocessData(data);
+
+        if ( this.isSplit() ) {
+            this._splitData(data);
+        } else {
+            this.data = data;
+        }
+
         this.error = null;
         this.status = this.STATUS_OK;
 
@@ -430,6 +468,10 @@ no.Model.prototype.isDo = function() {
     return this.info.isDo;
 };
 
+no.Model.prototype.isSplit = function() {
+    return this.info.isSplit;
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Model.prototype.touch = function() {
@@ -461,6 +503,13 @@ if(window['mocha']) {
         delete _cache[id];
         delete _ctors[id];
         delete _infos[id];
+    };
+
+    no.Model.privats = {
+        _ctors: _ctors,
+        _infos: _infos,
+        _cache: _cache,
+        _keySuffix: _keySuffix
     };
 }
 

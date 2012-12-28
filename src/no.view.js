@@ -336,15 +336,20 @@ no.View.prototype._show = function() {
  * @private
  */
 no.View.prototype._bindEventHandlers = function(events, handlerPos) {
-    var bindedEvents = [].concat(events);
+    var bindedEvents = [];
 
-    for (var i = 0, j = bindedEvents.length; i < j; i++) {
-        var event = bindedEvents[i];
+    for (var i = 0, j = events.length; i < j; i++) {
+        var event = events[i];
         var method = event[handlerPos];
         if (typeof method === 'string') {
             method = this[method];
         }
-        event[handlerPos] = method.bind(this);
+
+        // копируем события из info, чтобы не испортить оригинальные данные
+        var eventCopy = [].concat(event);
+        eventCopy[handlerPos] = method.bind(this);
+
+        bindedEvents.push(eventCopy);
     }
 
     return bindedEvents;

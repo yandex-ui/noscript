@@ -1,22 +1,27 @@
 /**
  * Find best page for url.
  * @param {string} url
- * @return {{ page: string, params: Object }}|Boolean
+ * @return {{ page: string, params: Object }|Boolean}
 */
 no.router = function(url) {
 
-    var routes = no.router.routes;
+    var routesDef = no.router._routes;
 
-    // Применяем поочередно все "реврайты", пока не найдем подходящий.
+    if (url in routesDef.redirect) {
+        no.page.redirect(routesDef.redirect[url]);
+        return false;
+    }
+
+    if (url in routesDef.rewriteUrl) {
+        url = routesDef.rewriteUrl[url];
+    }
+
+    var routes = routesDef.route;
     for (var i = 0, j = routes.length; i < j; i++) {
         var route = routes[i];
 
         var r = route.regexp.exec(url);
         if (r) {
-            if (route.redirect) {
-                no.page.redirect(route.redirect);
-                return false;
-            }
             var tokens = route.tokens;
             var params = {};
 
@@ -30,6 +35,11 @@ no.router = function(url) {
             var query = r[l + 1];
             if (query) {
                 no.extend( params, no.parseQuery(query) );
+            }
+
+            // реврайты параметров для этой страницы
+            if (route.page in routesDef.rewriteParams) {
+                params = routesDef.rewriteParams[route.page](params);
             }
 
             return {
@@ -51,25 +61,24 @@ no.router = function(url) {
  * Inititialize no.router, compiles defined routes.
  */
 no.router.init = function() {
-    var redirectRegExp = /^->\s*(.*)/;
-    var _routes = [];
-
     var routes = no.router.routes;
-    for (var i = 0, l = routes.length; i < l; i += 2) {
-        var compiled = no.router.compile( routes[i] );
 
-        var page = routes[i + 1];
-        var pageMatch = redirectRegExp.exec(page);
-        if (pageMatch) {
-            compiled.redirect = pageMatch[1];
-        } else {
-            compiled.page = page;
-        }
+    var _routes = {};
+    _routes.redirect = routes.redirect || {};
+    _routes.rewriteUrl = routes.rewriteUrl || {};
+    _routes.rewriteParams = routes.rewriteParams || {};
 
-        _routes.push( compiled );
+    var rawRoutes = routes.route || {};
+
+    var compiledRoutes = [];
+    for (var route in rawRoutes) {
+        var compiled = no.router.compile(route);
+        compiled.page = rawRoutes[route];
+        compiledRoutes.push(compiled);
     }
+    _routes.route = compiledRoutes;
 
-    no.router.routes = _routes;
+    no.router._routes = _routes;
 };
 
 /**
@@ -103,11 +112,18 @@ no.router.compile = function(route) {
 };
 
 /**
+ * Скомпилированные данные.
+ * @type {Object}
+ * @private
+ */
+no.router._routes = null;
+
+/**
  * Маршруты.
  * Этот массив должен быть объявлен в проекте.
- * @type {Array}
+ * @type {Object}
  */
-no.router.routes = [];
+no.router.routes = {};
 
 /**
  * Регулярные выражения для проверки типов параметров.

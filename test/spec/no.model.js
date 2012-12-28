@@ -1,5 +1,10 @@
 describe('no.Model', function() {
 
+    afterEach(function() {
+        // чистим кэш созданных моделей после каждого теста
+        no.Model.privats.cache = {};
+    });
+
     describe('static', function() {
 
         describe('define', function() {
@@ -58,9 +63,39 @@ describe('no.Model', function() {
 
         });
 
+        describe('create', function() {
+
+            it('should init model key', function() {
+                var model = no.Model.create('m1', {p1: 1, p3: 3});
+
+                expect(model.key)
+                    .to.be('model=m1&p1=1&p2=2&p3=3&p4=foo');
+            });
+
+            it('should init model info', function() {
+                var model = no.Model.create('m1', {p1: 1, p3: 4});
+
+                expect(model.info)
+                    .to.have.keys(['params', 'events', 'pNames', 'isDo', 'isSplit']);
+            });
+
+            it('should update data in existing model', function() {
+                var old = no.Model.create('m1', {p1: 1, p3: 5});
+
+                sinon.spy(old, 'setData');
+
+                var model = no.Model.create('m1', {p1: 1, p3: 5}, {foo: 1});
+
+                expect(model).to.be(old);
+
+                expect(old.setData.calledWith({foo: 1})).to.be.ok();
+            });
+
+        });
+
         describe('info', function() {
 
-            it('should return pNames in info', function() {
+            it('should return pNames property', function() {
                 expect( no.Model.info('m1').pNames )
                     .to.eql(['p1', 'p2', 'p3', 'p4']);
             });
@@ -73,6 +108,31 @@ describe('no.Model', function() {
             it('should return isDo=false for non-do models', function() {
                 expect( no.Model.info('m1').isDo )
                     .to.be(false);
+            });
+
+            it('should return isSplit=true for split models', function() {
+                expect( no.Model.info('split1').isSplit)
+                    .to.be(true);
+            });
+
+            it('should return isSplit=false for non-split models', function() {
+                expect( no.Model.info('m1').isSplit)
+                    .to.be(false);
+            });
+
+            it('should initialize \'params\' property', function() {
+                expect( no.Model.info('m0').params)
+                    .to.eql({});
+            });
+
+            it('should return \'params\' property', function() {
+                expect( no.Model.info('m1').params)
+                    .to.eql({p1: null, p2: 2, p3: null, p4: 'foo'});
+            });
+
+            it('should initialize \'events\' property', function() {
+                expect( no.Model.info('m0').events)
+                    .to.eql({});
             });
 
         });
@@ -194,7 +254,7 @@ describe('no.Model', function() {
         describe('setData', function() {
 
             beforeEach(function() {
-                this.model = no.Model.create('m1', {p1: 1, p4: Math.random()});
+                this.model = no.Model.create('m1', {p1: 1, p3: Math.random()});
                 this.data = {foo: 'bar'};
             });
 
@@ -283,13 +343,32 @@ describe('no.Model', function() {
 
         describe('getData', function() {
 
+            beforeEach(function() {
+                this.data = JSON.parse(JSON.stringify(no.Model.TESTDATA.split1));
+                this.model = no.Model.create('split1', {p1: 1, p2: 2}, this.data);
+            })
+
             it('should return model\'s data', function() {
                 var data = {foo: 'bar'};
-                var model = no.Model.create('m1', {p1: 1, p4: 2});
+                var model = no.Model.create('m1', {p1: 1, p3: 2});
                 model.setData(data);
 
                 expect( model.getData() )
                     .to.be(data);
+            });
+
+            it('should return data of splitted model', function() {
+                expect( this.model.getData() )
+                    .to.eql(this.data);
+            });
+
+            it('should return right data after submodel change', function() {
+                this.model.splitModels[0].setData({id: 1, value: 'foo', newvalue: 'boo'});
+
+                this.data.item[0].newvalue = 'boo';
+
+                expect( this.model.getData() )
+                    .to.eql(this.data);
             });
 
         });

@@ -1,3 +1,5 @@
+no.Model.define('m0');
+
 no.Model.define('m1', {
     params: {
         p1: null,

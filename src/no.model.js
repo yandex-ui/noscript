@@ -107,6 +107,7 @@ no.Model.prototype._bindEvents = function() {
  */
 no.Model.prototype._splitData = function(data) {
     var info = this.info.split;
+    // TODO: возможно тут нужно удалять старые модели
     var models = this.splitModels = [];
 
     var items = no.path(info.items, data);
@@ -174,6 +175,7 @@ no.Model.define = function(id, info, ctor) {
 
 //  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
 no.Model.create = function(id, params, data)  {
+    // не очевидно, но тут будут созданы и key и info
     var model = no.Model.get(id, params);
 
     if (!model) {
@@ -326,7 +328,22 @@ no.Model.prototype.set = function(jpath, value, options) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Model.prototype.getData = function() {
-    return this.data;
+    var result = this.data;
+
+    // если это составная модель —
+    // нужно склеить все данные
+    // из моделей её состовляющих
+    if ( this.isSplit() ) {
+        // массив с хранилищем данных моделей
+        var items = no.path(this.info.split.items, this.data);
+        // удаляем все старые данные
+        items.splice(0, items.length);
+        // пишем новые
+        this.splitModels.forEach(function(model) {
+            items.push( model.getData() );
+        });
+    }
+    return result;
 };
 
 /**
@@ -337,12 +354,12 @@ no.Model.prototype.getData = function() {
  */
 no.Model.prototype.setData = function(data, options) {
     if (data) {
-        data = this.preprocessData(data);
+        this.data = this.preprocessData(data);
 
+        // если это составная модель —
+        // нужно нужно разбить её на модели
         if ( this.isSplit() ) {
             this._splitData(data);
-        } else {
-            this.data = data;
         }
 
         this.error = null;

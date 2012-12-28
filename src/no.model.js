@@ -514,6 +514,20 @@ no.ModelUniq.prototype._init = function(id) {
     this.__superInit.apply(this, arguments);
 };
 
+no.ModelUniq.prototype._superIsValid = no.Model.prototype.isValid;
+/**
+ * Исходя из ключа определяет, есть ли у нас уже запрашиваемая информация
+ */
+no.ModelUniq.prototype.isValid = function() {
+    // если в ключе не присутсвует наш уникальный параметр
+    // значит запрашивать 'ничего' не планируется,
+    // а 'ничего' у нас закэшировано и так
+    if (this.key.indexOf('&' + this.uniqName + '=') == -1) {
+        return true;
+    }
+    return this._superIsValid();
+};
+
 /**
  * Имя значения в params, которое является массивом
  * @private

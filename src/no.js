@@ -156,6 +156,11 @@ no.init = function() {
     no.router.init();
 
     no.initMainView();
+
+    window.addEventListener('popstate', function(e) {
+        no.page.go();
+        e.preventDefault();
+    }, false);
 };
 
 /**
@@ -172,7 +177,24 @@ no.initMainView = function() {
     no.MAIN_VIEW = mainView;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+no._ENTITIFY_REGEXP = /[<>"]/g;
+
+/**
+ * Преобразует специальные символы в HTML сущности.
+ * @param {String} s Строка
+ * @see http://jsperf.com/entityify-test
+ */
+no.entityify = function(s) {
+    s = String(s);
+    var chars = {
+        '<' : '&lt;',
+        '>' : '&gt;',
+        '"' : '&quot;'
+    };
+    return s.replace(no._ENTITIFY_REGEXP, function(c){
+        return chars[c];
+    });
+};
 
 if (typeof window === 'undefined') {
     module.exports = no;

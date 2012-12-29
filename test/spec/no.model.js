@@ -2,7 +2,9 @@ describe('no.Model', function() {
 
     afterEach(function() {
         // чистим кэш созданных моделей после каждого теста
-        no.Model.privats.cache = {};
+        for (var key in no.Model.privats._cache) {
+            no.Model.privats._cache[key] = {};
+        }
     });
 
     describe('static', function() {
@@ -236,11 +238,17 @@ describe('no.Model', function() {
         describe('_splitData', function() {
 
             beforeEach(function() {
-                this.data = no.Model.TESTDATA.split1;
+                this.data = JSON.parse(JSON.stringify(no.Model.TESTDATA.split1));
                 this.model = no.Model.create('split1', {p1: 1, p2: Math.random()});
+
+                //sinon.spy(this.model._splitData, 'callback');
 
                 this.model._splitData(this.data);
                 this.models = this.model.splitModels;
+            });
+
+            afterEach(function() {
+                //this.model._splitData.callback.restore();
             });
 
             it('should create nested models', function() {
@@ -258,6 +266,33 @@ describe('no.Model', function() {
                 expect(this.models[0].params).to.eql({id: 1, foo: 'foo'});
                 expect(this.models[1].params).to.eql({id: 2, foo: 'bar'});
                 expect(this.models[2].params).to.eql({id: 3, foo: 'baz'});
+            });
+
+            it('should trigger collections \'changed\' on submodel\'s \'changed\'', function() {
+                console.log('test1-------------------------------------------->');
+                this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
+                //expect(this.model._splitData.callback.callCount).to.be(1);
+            });
+
+            it('should not duplicate \'changed\' bindings', function() {
+                console.log('test2-------------------------------------------->');
+                this.model._splitData(this.data);
+                this.model._splitData(this.data);
+                this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
+                //expect(this.model._splitData.callback.callCount).to.be(1);
+            });
+
+            it('should not trigger if submodel not it collection now', function() {
+                console.log('test3-------------------------------------------->');
+                var data = this.data;
+                data.item = data.item.slice(1, 3);
+                var model = this.models[0];
+
+                this.model._splitData(data);
+
+                model.setData({id: 1, foo: 'foo', bar: 'bar'});
+
+                //expect(this.model._splitData.callback.called).not.to.be.ok();
             });
 
         });

@@ -109,29 +109,53 @@ no.Model.prototype._bindEvents = function() {
  * инициализирует все составляющие модели
  */
 no.Model.prototype._splitData = function(data) {
+    var that = this;
     var info = this.info.split;
-    // TODO: возможно тут нужно удалять старые модели
-    var models = this.splitModels = [];
+    var newModels = [];
+    var oldModels = this.splitModels || [];
+
+    // нужно сохранить ссылку на callback,
+    // чтобы можно было его анбиндить
+    if (!this._splitData.callback) {
+        this._splitData.callback = function() {
+            console.log('callback of', that.key, 'by', arguments[1]);
+            return that.trigger.apply(that, arguments);
+        }
+    }
+    var callback = this._splitData.callback;
 
     var items = no.path(info.items, data);
 
-    items.forEach(function(item) {
-        var id = no.path(info.id, item);
+    // анбиндим все старые модели
+    // если они останутся в коллекции
+    // мы забиндим их снова
+    oldModels.forEach(function(model) {
+        console.log('off', model.key);
+        model.off('changed', callback);
+    });
 
+    items.forEach(function(item) {
+        // собираем параметры для новой модели
         var params = {};
         for (var key in info.params) {
             params[key] = no.path(info.params[key], item);
         }
 
+        // создаём новую модель
+        // или устанавливаем новые данные для существующией
         var model = no.Model.create(info.model_id, params, item);
 
-        model.on('change', function() {
-            console.log('model change', arguments);
-        });
+        // при изменении вложенной модели
+        // тригерим нотификацию в модель-коллекцию
+        console.log('on', model.key);
+        model.on('changed', callback);
 
-        models.push(model);
+        newModels.push(model);
     });
-};
+
+    // сохраняем новый массив моделей коллекции
+    this.splitModels = newModels;
+}
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -379,7 +403,7 @@ no.Model.prototype.setData = function(data, options) {
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
         if (!options || !options.silent) {
-            this.trigger('changed');
+            this.trigger('changed', this.key);
         }
 
         this.touch();

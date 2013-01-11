@@ -1,7 +1,9 @@
-//  ---------------------------------------------------------------------------------------------------------------  //
-//  no.Box
-//  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * @class Box - это тип View, который умеет выбирать какие View показывать.
+ * @param id
+ * @param params
+ * @constructor
+ */
 no.Box = function(id, params) {
     this.id = id;
     this.params = params;
@@ -49,7 +51,6 @@ no.Box.prototype._getDescendants = function(descs) {
 
 //  Ищем все новые блоки и блоки, требующие перерисовки.
 no.Box.prototype._getRequestViews = function(updated, layout, params) {
-    var views = this.views;
     for (var id in layout) {
         //  Согласно новому layout'у здесь должен быть view с id/params.
         //  Создаем его (если он уже есть, он возьмется из this.views).

@@ -39,9 +39,14 @@ no.View.prototype._$document = $(document);
  */
 no.View.prototype._$window = $(window);
 
-no.View.prototype._init = function(id, params) {
+no.View.prototype._init = function(id, params, async) {
     this.id = id;
     this.params = params || {};
+    /**
+     * Флаг того, что блок асинхронный.
+     * @type {Boolean}
+     */
+    this.async = async;
 
     this.info = no.View.info(id);
 
@@ -259,44 +264,45 @@ no.View.info = function(id) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-
-no.View.create = function(id, params) {
+/**
+ * Фабрика no.View
+ * @param {String} id
+ * @param {Object} params
+ * @param {Boolean} [async=false]
+ * @return {no.View}
+ */
+no.View.create = function(id, params, async) {
     var ctor = _ctors[id];
     if (!ctor) {
         throw 'no.View "' + id + '" is not declared!';
     }
+    /**
+     * @type {no.View}
+     */
     var view = new ctor();
-    view._init(id, params);
+    view._init(id, params, async);
 
     return view;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._getView = function(id, params) {
-    var key = no.View.getKey(id, params);
-    return this.views[key];
+no.View.prototype._getView = function(id) {
+    return this.views[id];
 };
 
-no.View.prototype._addView = function(id, params) {
-    var view = this._getView(id, params);
+no.View.prototype._addView = function(id, params, type) {
+    var view = this._getView(id);
     if (!view) {
-        view = no.View.create(id, params);
+        if (type === no.L.BOX) {
+            view = new no.Box(id, params);
+        } else {
+            view = no.View.create(id, params, type === no.L.ASYNC);
+        }
         this.views[view.id] = view;
     }
     return view;
 };
-
-no.View.prototype._addBox = function(id, params) {
-    var box = this._getView(id, params);
-    if (!box) {
-        box = new no.Box(id, params);
-        this.views[box.id] = box;
-    }
-    return box;
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._hide = function() {
     if ( this.isLoading() ) {
@@ -524,15 +530,32 @@ no.View.prototype._apply = function(callback) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
-//  требующие перерисовки. Раскладываем их в две "кучки": sync и async.
+/**
+ * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
+ * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
+ * @param updated
+ * @param pageLayout
+ * @param params
+ * @return {*}
+ * @private
+ */
 no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
-    if  ( !this.isValid() ) {
-        if (pageLayout === false) {
-            updated.async.push(this);
-        } else {
+    if (this.async) {
+        var hasValidModels = this.isModelsValid();
+        var hasValidStatus = this.isOk();
+        if (hasValidModels && !hasValidStatus) {
+            // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его
             updated.sync.push(this);
+
+        } else if (!hasValidModels) {
+            // если асинхронный блок имеет невалидные модели, то его не надо рисовать
+            updated.async.push(this);
+            // прекращаем обработку
+            return updated;
         }
+    } else if (!this.isValid()) {
+        // если обычный блок не валиден
+        updated.sync.push(this);
     }
 
     // Если views еще не определены (первая отрисовка)
@@ -541,11 +564,7 @@ no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
         // Создаем подблоки
         var viewLayout = no.layout.view(this.id);
         for (var view_id in viewLayout) {
-            if (viewLayout[view_id] === no.L.BOX) {
-                this._addBox(view_id, params);
-            } else {
-                this._addView(view_id, params);
-            }
+            this._addView(view_id, params, viewLayout[view_id]);
         }
     }
 
@@ -586,7 +605,7 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     //  помечаем его как асинхронный (false).
     //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
     //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
-    if ( layout === false && !this.isModelsValid() ) {
+    if ( this.async && !this.isModelsValid() ) {
         return false;
     }
 

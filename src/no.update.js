@@ -62,38 +62,22 @@ no.Update.prototype.start = function() {
             }
         });
 
-    //TODO: для lazy-view просто делать запрос и ничего не ждать, после окончания главного update, запускать локальные update на каждом lazy-view
-    updated.async.forEach(function(item) {
-        var models = views2models( [ item ] );
+    // Для каждого lazy-view запрашиваем его модели.
+    // Когда они приходят, запускаем точно такой же update.
+    updated.async.forEach(function(view) {
+        var models = views2models( [ view ] );
         no.Promise.wait([
             promise,
             no.request.models(models)
         ]).then(function(r) {
+            //TODO: смотреть, что не запустился другой update
             if (!that._expired()) {
-                that._update(true);
+                var fakeLayout = {};
+                fakeLayout[that.view.id] = that.layout;
+                new no.Update(that.view, fakeLayout, that.params).start();
             }
         });
     });
-
-    function views2models(views) {
-        var added = {};
-        var models = [];
-
-        for (var i = 0, l = views.length; i < l; i++) {
-            var viewModels = views[i].models;
-            for (var model_id in viewModels) {
-                var model = viewModels[model_id];
-                var key = model.key;
-                if ( !added[key] ) {
-                    models.push(model);
-                    added[key] = true;
-                }
-            }
-        }
-
-        return models;
-    }
-
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -138,6 +122,24 @@ no.Update.prototype._expired = function() {
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
+function views2models(views) {
+    var added = {};
+    var models = [];
+
+    for (var i = 0, l = views.length; i < l; i++) {
+        var viewModels = views[i].models;
+        for (var model_id in viewModels) {
+            var model = viewModels[model_id];
+            var key = model.key;
+            if ( !added[key] ) {
+                models.push(model);
+                added[key] = true;
+            }
+        }
+    }
+
+    return models;
+}
 
 })();
 

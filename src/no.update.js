@@ -46,6 +46,8 @@ var update_id = -1;
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype.start = function() {
+    var resultPromise = new no.Promise();
+
     var updated = this.view._getRequestViews({
         sync: [],
         async: []
@@ -57,8 +59,12 @@ no.Update.prototype.start = function() {
     var promise = no.request.models(models)
         .then(function(r) {
             //TODO: check errors
-            if (!that._expired()) {
+            if (that._expired()) {
+                resultPromise.reject();
+            } else {
                 that._update();
+                //TODO: надо как-то закидывать ссылки на промисы от асинхронных view
+                resultPromise.resolve();
             }
         });
 
@@ -78,6 +84,8 @@ no.Update.prototype.start = function() {
             }
         });
     });
+
+    return resultPromise;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

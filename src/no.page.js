@@ -7,6 +7,7 @@ no.page = {};
 /**
  * Осуществляем переход по ссылке.
  * @param {String} [url=location.pathname + location.search]
+ * @return {no.Promise}
  */
 no.page.go = function(url) {
     //TODO: return promise
@@ -20,12 +21,12 @@ no.page.go = function(url) {
 
     // возможность заблокировать переход
     if (url === false) {
-        return;
+        return new no.Promise().reject();
     }
 
     var route = no.router(url);
     if (route === false) {
-        return;
+        return new no.Promise().reject();
     }
     var layout = no.layout.page(route.page, route.params);
 
@@ -37,7 +38,7 @@ no.page.go = function(url) {
     no.page.current = route;
 
     var update = new no.Update(no.MAIN_VIEW, layout, route.params);
-    update.start();
+    return update.start();
 };
 
 no.page.redirect = function(url) {

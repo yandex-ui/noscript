@@ -65,10 +65,11 @@ no.Model.prototype._init = function(id, params, data) {
     this.params = params;
 
     this._reset();
-    this.setData(data);
 
     this.info = no.Model.info(id);
     this.key = no.Model.key(id, params, this.info);
+
+    this.setData(data);
 
     this._bindEvents();
 };
@@ -102,6 +103,59 @@ no.Model.prototype._bindEvents = function() {
         }
     }
 };
+
+/**
+ * При установке data в составной моделе
+ * инициализирует все составляющие модели
+ */
+no.Model.prototype._splitData = function(data) {
+    var that = this;
+    var info = this.info.split;
+    var newModels = [];
+    var oldModels = this.splitModels || [];
+
+    // нужно сохранить ссылку на callback,
+    // чтобы можно было его анбиндить
+    if (!this._splitData.callback) {
+        this._splitData.callback = function() {
+            console.log('callback of', that.key, 'by', arguments[1]);
+            return that.trigger.apply(that, arguments);
+        }
+    }
+    var callback = this._splitData.callback;
+
+    var items = no.path(info.items, data);
+
+    // анбиндим все старые модели
+    // если они останутся в коллекции
+    // мы забиндим их снова
+    oldModels.forEach(function(model) {
+        console.log('off', model.key);
+        model.off('changed', callback);
+    });
+
+    items.forEach(function(item) {
+        // собираем параметры для новой модели
+        var params = {};
+        for (var key in info.params) {
+            params[key] = no.path(info.params[key], item);
+        }
+
+        // создаём новую модель
+        // или устанавливаем новые данные для существующией
+        var model = no.Model.create(info.model_id, params, item);
+
+        // при изменении вложенной модели
+        // тригерим нотификацию в модель-коллекцию
+        console.log('on', model.key);
+        model.on('changed', callback);
+
+        newModels.push(model);
+    });
+
+    // сохраняем новый массив моделей коллекции
+    this.splitModels = newModels;
+}
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -155,6 +209,7 @@ no.Model.define = function(id, info, ctor) {
 //  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
 no.Model.create = function(id, params, data)  {
     params = params || {};
+    // не очевидно, но тут будут созданы и key и info
     var model = no.Model.get(id, params);
 
     if (!model) {
@@ -200,6 +255,8 @@ no.Model.info = function(id) {
          * @type {Boolean}
          */
         info.isDo = /^do-/.test(id);
+
+        info.isSplit = !!info.split;
     }
     return info;
 };
@@ -305,7 +362,22 @@ no.Model.prototype.set = function(jpath, value, options) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Model.prototype.getData = function() {
-    return this.data;
+    var result = this.data;
+
+    // если это составная модель —
+    // нужно склеить все данные
+    // из моделей её состовляющих
+    if ( this.isSplit() ) {
+        // массив с хранилищем данных моделей
+        var items = no.path(this.info.split.items, this.data);
+        // удаляем все старые данные
+        items.splice(0, items.length);
+        // пишем новые
+        this.splitModels.forEach(function(model) {
+            items.push( model.getData() );
+        });
+    }
+    return result;
 };
 
 /**
@@ -317,6 +389,13 @@ no.Model.prototype.getData = function() {
 no.Model.prototype.setData = function(data, options) {
     if (data) {
         this.data = this.preprocessData(data);
+
+        // если это составная модель —
+        // нужно нужно разбить её на модели
+        if ( this.isSplit() ) {
+            this._splitData(data);
+        }
+
         this.error = null;
         this.status = this.STATUS_OK;
 
@@ -324,7 +403,7 @@ no.Model.prototype.setData = function(data, options) {
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
         if (!options || !options.silent) {
-            this.trigger('changed');
+            this.trigger('changed', this.key);
         }
 
         this.touch();
@@ -443,6 +522,10 @@ no.Model.prototype.isDo = function() {
     return this.info.isDo;
 };
 
+no.Model.prototype.isSplit = function() {
+    return this.info.isSplit;
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Model.prototype.touch = function() {
@@ -474,6 +557,13 @@ if(window['mocha']) {
         delete _cache[id];
         delete _ctors[id];
         delete _infos[id];
+    };
+
+    no.Model.privats = {
+        _ctors: _ctors,
+        _infos: _infos,
+        _cache: _cache,
+        _keySuffix: _keySuffix
     };
 }
 

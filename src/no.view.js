@@ -138,12 +138,10 @@ no.View.define = function(id, info, ctor) {
     }
 
     info = info || {};
-    if (info.methods) {
-        //  Нужно унаследоваться от no.View и добавить в прототип info.methods.
-        ctor = no.inherits(function() {}, no.View, info.methods);
-    } else {
-        ctor = ctor || no.View;
-    }
+
+    ctor = ctor || function() {};
+    // Нужно унаследоваться от no.View и добавить в прототип info.methods.
+    ctor = no.inherits(ctor, no.View, info.methods);
 
     info.models = info.models || [];
     info.events = info.events || {};

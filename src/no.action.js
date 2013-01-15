@@ -26,7 +26,7 @@ var _inited = false;
  */
 no.action.define = function(id, action) {
     if (id in _actions) {
-        throw 'No.action cant be redefined!';
+        throw "No.action can't be redefined!";
     }
     _actions[id] = action;
 };

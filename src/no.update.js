@@ -27,7 +27,7 @@ no.Update = function(view, layout, params) {
 
     } else {
         // если его нет - ругаемся
-        throw 'no.Update: cant find view layout';
+        throw "no.Update: can't find view layout";
     }
 
     this.params = params;

@@ -117,7 +117,7 @@ no.action.init = function() {
                 }
             }
 
-            return (returnValue === undefined) ? false : returnValue;
+            return (returnValue === undefined || returnValue instanceof no.Promise) ? false : returnValue;
         });
 
     //TODO: no-submit

@@ -105,7 +105,7 @@ no.Model.prototype._bindEvents = function() {
 };
 
 /**
- * При установке data в составной моделе
+ * При установке data в составной модели
  * инициализирует все составляющие модели
  */
 no.Model.prototype._splitData = function(data) {
@@ -187,9 +187,11 @@ no.Model.define = function(id, info, ctor) {
     }
 
     if (info.methods) {
-        //  Нужно унаследоваться от no.Model и добавить в прототип info.models.
+        //  Нужно унаследоваться от no.Model и добавить в прототип info.methods.
+        // @chestozo: а тут не надо вместо пустой функции передать первым аргументом ctor?
         ctor = no.inherits(function() {}, noModel, info.methods);
     } else {
+        // @chestozo: тут тоже кажется, надо бы: (ctor && no.inherits(ctor, noModel)) || noModel ?
         ctor = ctor || noModel;
     }
 
@@ -219,6 +221,8 @@ no.Model.create = function(id, params, data)  {
         //  Модель уже существует, а мы пытаемся создать такую же, но с непустой data.
         //  FIXME: Все же непонятно, что нужно делать.
         //  Может быть, нужно передавать { silent: true }?
+        //  @chestozo: а может просто передавать в create() ещё один аргумент check типа boolean.
+        //  @chestozo: Если он true и модель есть — exception. Если не передали — silent: true?
         model.setData(data);
         /// throw Error('Model already exists');
     }
@@ -264,6 +268,7 @@ no.Model.key = function(id, params, info) {
     info = info || no.Model.info(id);
 
     //  Для do-моделей ключ строим особым образом.
+    //  @chestozo: может дописывать model.id? в целях debug'а ?
     if (info.isDo) {
         return 'do-' + _keySuffix++;
     }
@@ -323,10 +328,10 @@ no.Model.prototype.isValid = function() {
 //      var foo = model.get('foo'); // model.data.foo.
 //      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
 //
-no.Model.prototype.get = function(path) {
+no.Model.prototype.get = function(jpath) {
     var data = this.data;
     if (data) {
-        return no.path(path, data);
+        return no.path(jpath, data);
     }
 };
 
@@ -339,7 +344,7 @@ no.Model.prototype.get = function(path) {
  */
 no.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;
-    if (this.status != this.STATUS_OK || !data) {
+    if ( !this.isValid() || !data ) {
         return;
     }
 
@@ -347,7 +352,8 @@ no.Model.prototype.set = function(jpath, value, options) {
     var oldValue = no.path(jpath, data, value);
 
     if ( !( (options && options.silent) || no.object.isEqual(value, oldValue) ) ) {
-        //TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
+        // TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
+        // @chestozo: может `:` ?
         this.trigger('changed.' + jpath, {
             'new': value,
             'old': oldValue,
@@ -368,6 +374,7 @@ no.Model.prototype.getData = function() {
         // массив с хранилищем данных моделей
         var items = no.path(this.info.split.items, this.data);
         // удаляем все старые данные
+        // @chestozo: какой смысл это делать, если в итоге мы получаем здесь пустой массив?
         items.splice(0, items.length);
         // пишем новые
         this.models.forEach(function(model) {
@@ -399,6 +406,7 @@ no.Model.prototype.setData = function(data, options) {
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
+        //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
         if (!options || !options.silent) {
             this.trigger('changed', this.key);
         }
@@ -544,6 +552,7 @@ no.Model.prototype.prepareRequest = function(requestID) {
     return this;
 };
 
+// @chestozo: куда-то хочется вынести это...
 if(window['mocha']) {
     /**
      * Удаляет определение модели.
@@ -572,6 +581,8 @@ if(window['mocha']) {
  * которые ранее не грузились (уникальные) и грузить только их
  */
 no.ModelUniq = function(){};
+
+// @chestozo: почему не no.inherits?
 no.extend(no.ModelUniq.prototype, no.Model.prototype);
 
 no.ModelUniq.prototype.__superInit = no.ModelUniq.prototype._init;
@@ -609,6 +620,7 @@ no.ModelUniq.prototype.isValid = function() {
     // если в ключе не присутсвует наш уникальный параметр
     // значит запрашивать 'ничего' не планируется,
     // а 'ничего' у нас закэшировано и так
+    // @chestozo: сложная логика какая-то
     if (this.key.indexOf('&' + this.uniqName + '=') == -1) {
         return true;
     }
@@ -624,7 +636,7 @@ no.ModelUniq.prototype.uniqName = '';
 
 /**
  * Название массива в кэше,
- * в котором дожны храниться уникальные значения
+ * в котором должны храниться уникальные значения
  * @private
  * @type String
  */

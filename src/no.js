@@ -1,5 +1,5 @@
 /**
- * noscrpt
+ * noscript
  * @namespace
  */
 var no = {};

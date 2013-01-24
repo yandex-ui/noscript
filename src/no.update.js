@@ -70,6 +70,8 @@ no.Update.prototype.start = function() {
 
     // Для каждого lazy-view запрашиваем его модели.
     // Когда они приходят, запускаем точно такой же update.
+    // @chestozo: т.е. мы начинаем запрашивать данные async view до того, как мы разобрались с sync view?
+    // @chestozo: Вроде бы раньше мы ждали данных для sync'ов. Потому что, к примеру, эти данные использовались для запроса async'ов.
     updated.async.forEach(function(view) {
         var models = views2models( [ view ] );
         no.Promise.wait([

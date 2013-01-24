@@ -197,7 +197,7 @@ describe('no.Model', function() {
                 expect(this.model.data).to.be(null);
                 expect(this.model.error).to.be(null);
 
-                expect(this.model.status).to.be(this.model.STATUS_NONE);
+                expect(this.model.status).to.be(this.model.STATUS.NONE);
                 expect(this.model.retries).to.be(0);
 
                 expect(this.model.timestamp).to.be(0);
@@ -326,7 +326,7 @@ describe('no.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.status)
-                    .to.be(this.model.STATUS_OK);
+                    .to.be(this.model.STATUS.OK);
             });
 
             it('should touch model', function() {

@@ -2,22 +2,6 @@
  * noscrpt
  * @namespace
  */
-var no = {};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-no.inherits = function(ctor, base, mixin) {
-    var F = function() {};
-    F.prototype = base.prototype;
-    var proto = ctor.prototype = new F();
-    ctor.prototype.constructor = ctor;
-
-    if (mixin) {
-        no.extend(proto, mixin);
-    }
-
-    return ctor;
-};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

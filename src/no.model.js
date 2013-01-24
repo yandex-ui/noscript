@@ -29,36 +29,11 @@ var _keySuffix = 0;
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * Статус модели "Ошибка".
- * Данные загрузились с ошибкой.
- * @constant
- * @type {String}
+ * @see no.M.STATUS
+ * @enum {String}
+ * @borrows no.M.STATUS as no.Model.prototype.STATUS
  */
-no.Model.prototype.STATUS_ERROR = 'error';
-
-/**
- * Статус модели "Нет данных".
- * Данные еще не загружались.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_NONE = 'none';
-
-/**
- * Статус модели "Все хорошо".
- * Данные загрузились успешно.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_OK = 'ok';
-
-/**
- * Статус модели "Не валиден".
- * Данные есть, но кто-то пометил их невалидными.
- * @constant
- * @type {String}
- */
-no.Model.prototype.STATUS_INVALID = 'invalid';
+no.Model.prototype.STATUS = no.M.STATUS;
 
 no.Model.prototype._init = function(id, params, data) {
     this.id = id;
@@ -78,7 +53,7 @@ no.Model.prototype._reset = function(status) {
     this.data = null;
     this.error = null;
 
-    this.status = status || this.STATUS_NONE;
+    this.status = status || this.STATUS.NONE;
     this.retries = 0;
 
     this.timestamp = 0;
@@ -309,11 +284,11 @@ no.Model.invalidate = function(id, filter) {
 };
 
 no.Model.prototype.invalidate = function() {
-    this._reset(this.STATUS_INVALID);
+    this._reset(this.STATUS.INVALID);
 };
 
 no.Model.prototype.isValid = function() {
-    return (this.status === this.STATUS_OK);
+    return (this.status === this.STATUS.OK);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -339,7 +314,7 @@ no.Model.prototype.get = function(path) {
  */
 no.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;
-    if (this.status != this.STATUS_OK || !data) {
+    if (this.status != this.STATUS.OK || !data) {
         return;
     }
 
@@ -394,7 +369,7 @@ no.Model.prototype.setData = function(data, options) {
         }
 
         this.error = null;
-        this.status = this.STATUS_OK;
+        this.status = this.STATUS.OK;
 
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
@@ -415,7 +390,7 @@ no.Model.prototype.getError = function() {
 no.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
-    this.status = this.STATUS_ERROR;
+    this.status = this.STATUS.ERROR;
 };
 
 no.Model.prototype.preprocessData = function(data) {

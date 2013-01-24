@@ -122,7 +122,7 @@ no.request.Manager = {
                     return true;
 
                 } else {
-                    model.status = model.STATUS_ERROR;
+                    model.status = model.STATUS.ERROR;
                     model.retries = 0;
                     // убираем этот запрос, он больше не будет запрашиваться
                     this.done(model, true);
@@ -130,7 +130,7 @@ no.request.Manager = {
                 }
 
             } else {
-                model.status = model.STATUS_OK;
+                model.status = model.STATUS.OK;
                 model.retries = 0;
                 return false;
             }

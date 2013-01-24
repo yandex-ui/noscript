@@ -117,9 +117,8 @@ no.Model.prototype._splitData = function(data) {
     // нужно сохранить ссылку на callback,
     // чтобы можно было его анбиндить
     if (!this._splitData.callback) {
-        this._splitData.callback = function() {
-            console.log('callback of', that.key, 'by', arguments[1]);
-            return that.trigger.apply(that, arguments);
+        this._splitData.callback = function(evt, data) {
+            return that.trigger(evt, data);
         }
     }
     var callback = this._splitData.callback;
@@ -130,7 +129,6 @@ no.Model.prototype._splitData = function(data) {
     // если они останутся в коллекции
     // мы забиндим их снова
     oldModels.forEach(function(model) {
-        console.log('off', model.key);
         model.off('changed', callback);
     });
 
@@ -147,7 +145,6 @@ no.Model.prototype._splitData = function(data) {
 
         // при изменении вложенной модели
         // тригерим нотификацию в модель-коллекцию
-        console.log('on', model.key);
         model.on('changed', callback);
 
         newModels.push(model);

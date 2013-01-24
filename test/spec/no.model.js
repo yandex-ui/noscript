@@ -236,19 +236,17 @@ describe('no.Model', function() {
         });
 
         describe('_splitData', function() {
+            // пришлось поизвращаться, чтобы sinon заработал
+            var callback;
 
             beforeEach(function() {
+                callback = sinon.spy();
                 this.data = JSON.parse(JSON.stringify(no.Model.TESTDATA.split1));
                 this.model = no.Model.create('split1', {p1: 1, p2: Math.random()});
-
-                //sinon.spy(this.model._splitData, 'callback');
+                this.model.trigger = function() { callback(); }
 
                 this.model._splitData(this.data);
                 this.models = this.model.splitModels;
-            });
-
-            afterEach(function() {
-                //this.model._splitData.callback.restore();
             });
 
             it('should create nested models', function() {
@@ -269,21 +267,18 @@ describe('no.Model', function() {
             });
 
             it('should trigger collections \'changed\' on submodel\'s \'changed\'', function() {
-                console.log('test1-------------------------------------------->');
                 this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
-                //expect(this.model._splitData.callback.callCount).to.be(1);
+                expect(callback.callCount).to.be(1);
             });
 
             it('should not duplicate \'changed\' bindings', function() {
-                console.log('test2-------------------------------------------->');
                 this.model._splitData(this.data);
                 this.model._splitData(this.data);
                 this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
-                //expect(this.model._splitData.callback.callCount).to.be(1);
+                expect(callback.callCount).to.be(1);
             });
 
-            it('should not trigger if submodel not it collection now', function() {
-                console.log('test3-------------------------------------------->');
+            it('should not trigger if submodel not in collection now', function() {
                 var data = this.data;
                 data.item = data.item.slice(1, 3);
                 var model = this.models[0];
@@ -292,7 +287,7 @@ describe('no.Model', function() {
 
                 model.setData({id: 1, foo: 'foo', bar: 'bar'});
 
-                //expect(this.model._splitData.callback.called).not.to.be.ok();
+                expect(callback.called).not.to.be.ok();
             });
 
         });

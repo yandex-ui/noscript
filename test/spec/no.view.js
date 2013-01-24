@@ -24,36 +24,36 @@ describe('no.View', function() {
 
         no.View.define('test-view-info-events-parse', {
             events: {
-                'scroll window': no.pe,
-                'scroll document': no.pe,
+                'scroll window': no.nop,
+                'scroll document': no.nop,
 
-                'scroll@init window': no.pe,
-                'scroll@init document': no.pe,
+                'scroll@init window': no.nop,
+                'scroll@init document': no.nop,
 
-                'resize window': no.pe,
-                'resize document': no.pe,
+                'resize window': no.nop,
+                'resize document': no.nop,
 
-                'resize@init window': no.pe,
-                'resize@init document': no.pe,
+                'resize@init window': no.nop,
+                'resize@init document': no.nop,
 
-                'scroll .foo-init': no.pe,
-                'scroll': no.pe,
-                'click': no.pe,
-                'click .bar-init': no.pe,
+                'scroll .foo-init': no.nop,
+                'scroll': no.nop,
+                'click': no.nop,
+                'click .bar-init': no.nop,
 
-                'scroll@show .foo-show': no.pe,
-                'scroll@show': no.pe,
-                'click@show': no.pe,
-                'click@show .bar-show': no.pe,
+                'scroll@show .foo-show': no.nop,
+                'scroll@show': no.nop,
+                'click@show': no.nop,
+                'click@show .bar-show': no.nop,
 
-                'my-global-init-event-short': no.pe,
-                'my-local-init-event-short .': no.pe,
+                'my-global-init-event-short': no.nop,
+                'my-local-init-event-short .': no.nop,
 
-                'my-global-init-event@init': no.pe,
-                'my-local-init-event@init .': no.pe,
+                'my-global-init-event@init': no.nop,
+                'my-local-init-event@init .': no.nop,
 
-                'my-global-show-event@show': no.pe,
-                'my-local-show-event@show .': no.pe
+                'my-global-show-event@show': no.nop,
+                'my-local-show-event@show .': no.nop
             }
         });
 
@@ -93,40 +93,40 @@ describe('no.View', function() {
 
             it('should parse delegated init events properly', function() {
                 expect(this.viewInfo.initEvents['delegate']).to.be.eql([
-                    ['scroll', 'window', no.pe],
-                    ['scroll', 'document', no.pe],
+                    ['scroll', 'window', no.nop],
+                    ['scroll', 'document', no.nop],
 
-                    ['resize', 'window', no.pe],
-                    ['resize', 'document', no.pe],
+                    ['resize', 'window', no.nop],
+                    ['resize', 'document', no.nop],
 
-                    ['scroll', '', no.pe],
-                    ['click', '', no.pe],
-                    ['click', '.bar-init', no.pe]
+                    ['scroll', '', no.nop],
+                    ['click', '', no.nop],
+                    ['click', '.bar-init', no.nop]
                 ]);
             });
 
             it('should parse bind init events properly', function() {
                 expect(this.viewInfo.initEvents['bind']).to.be.eql([
-                    ['scroll', '.foo-init', no.pe]
+                    ['scroll', '.foo-init', no.nop]
                 ]);
             });
 
             it('should parse show events properly', function() {
                 expect(this.viewInfo.showEvents['delegate']).to.be.eql([
-                    ['scroll', 'window', no.pe],
-                    ['scroll', 'document', no.pe],
-                    ['resize', 'window', no.pe],
-                    ['resize', 'document', no.pe],
+                    ['scroll', 'window', no.nop],
+                    ['scroll', 'document', no.nop],
+                    ['resize', 'window', no.nop],
+                    ['resize', 'document', no.nop],
 
-                    ['scroll', '', no.pe],
-                    ['click', '', no.pe],
-                    ['click', '.bar-show', no.pe]
+                    ['scroll', '', no.nop],
+                    ['click', '', no.nop],
+                    ['click', '.bar-show', no.nop]
                 ]);
             });
 
             it('should parse show events properly', function() {
                 expect(this.viewInfo.showEvents['bind']).to.be.eql([
-                    ['scroll', '.foo-show', no.pe]
+                    ['scroll', '.foo-show', no.nop]
                 ]);
             });
         });
@@ -158,27 +158,27 @@ describe('no.View', function() {
 
             it('should parse global init noevents properly', function() {
                 expect(this.viewInfo.initNoevents['global']).to.be.eql([
-                    ['my-global-init-event-short', no.pe],
-                    ['my-global-init-event', no.pe]
+                    ['my-global-init-event-short', no.nop],
+                    ['my-global-init-event', no.nop]
                 ]);
             });
 
             it('should parse local init noevents properly', function() {
                 expect(this.viewInfo.initNoevents['local']).to.be.eql([
-                    ['my-local-init-event-short', no.pe],
-                    ['my-local-init-event', no.pe]
+                    ['my-local-init-event-short', no.nop],
+                    ['my-local-init-event', no.nop]
                 ]);
             });
 
             it('should parse global show noevents properly', function() {
                 expect(this.viewInfo.showNoevents['global']).to.be.eql([
-                    ['my-global-show-event', no.pe]
+                    ['my-global-show-event', no.nop]
                 ]);
             });
 
             it('should parse local show noevents properly', function() {
                 expect(this.viewInfo.showNoevents['local']).to.be.eql([
-                    ['my-local-show-event', no.pe]
+                    ['my-local-show-event', no.nop]
                 ]);
             });
         });

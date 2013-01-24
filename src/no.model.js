@@ -112,7 +112,7 @@ no.Model.prototype._splitData = function(data) {
     var that = this;
     var info = this.info.split;
     var newModels = [];
-    var oldModels = this.splitModels || [];
+    var oldModels = this.models || [];
 
     // нужно сохранить ссылку на callback,
     // чтобы можно было его анбиндить
@@ -151,7 +151,7 @@ no.Model.prototype._splitData = function(data) {
     });
 
     // сохраняем новый массив моделей коллекции
-    this.splitModels = newModels;
+    this.models = newModels;
 }
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -253,7 +253,7 @@ no.Model.info = function(id) {
          */
         info.isDo = /^do-/.test(id);
 
-        info.isSplit = !!info.split;
+        info.isCollection = !!info.split;
     }
     return info;
 };
@@ -364,13 +364,13 @@ no.Model.prototype.getData = function() {
     // если это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
-    if ( this.isSplit() ) {
+    if ( this.isCollection() ) {
         // массив с хранилищем данных моделей
         var items = no.path(this.info.split.items, this.data);
         // удаляем все старые данные
         items.splice(0, items.length);
         // пишем новые
-        this.splitModels.forEach(function(model) {
+        this.models.forEach(function(model) {
             items.push( model.getData() );
         });
     }
@@ -389,7 +389,7 @@ no.Model.prototype.setData = function(data, options) {
 
         // если это составная модель —
         // нужно нужно разбить её на модели
-        if ( this.isSplit() ) {
+        if ( this.isCollection() ) {
             this._splitData(data);
         }
 
@@ -519,8 +519,8 @@ no.Model.prototype.isDo = function() {
     return this.info.isDo;
 };
 
-no.Model.prototype.isSplit = function() {
-    return this.info.isSplit;
+no.Model.prototype.isCollection = function() {
+    return this.info.isCollection;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

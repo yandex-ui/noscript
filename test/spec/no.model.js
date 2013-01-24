@@ -78,7 +78,7 @@ describe('no.Model', function() {
                 var model = no.Model.create('m1', {p1: 1, p3: 4});
 
                 expect(model.info)
-                    .to.have.keys(['params', 'events', 'pNames', 'isDo', 'isSplit']);
+                    .to.have.keys(['params', 'events', 'pNames', 'isDo', 'isCollection']);
             });
 
             it('should update data in existing model', function() {
@@ -112,13 +112,13 @@ describe('no.Model', function() {
                     .to.be(false);
             });
 
-            it('should return isSplit=true for split models', function() {
-                expect( no.Model.info('split1').isSplit)
+            it('should return isCollection=true for split models', function() {
+                expect( no.Model.info('split1').isCollection)
                     .to.be(true);
             });
 
-            it('should return isSplit=false for non-split models', function() {
-                expect( no.Model.info('m1').isSplit)
+            it('should return isCollection=false for non-split models', function() {
+                expect( no.Model.info('m1').isCollection)
                     .to.be(false);
             });
 
@@ -246,7 +246,7 @@ describe('no.Model', function() {
                 this.model.trigger = function() { callback(); }
 
                 this.model._splitData(this.data);
-                this.models = this.model.splitModels;
+                this.models = this.model.models;
             });
 
             it('should create nested models', function() {
@@ -404,7 +404,7 @@ describe('no.Model', function() {
             });
 
             it('should return right data after submodel change', function() {
-                this.model.splitModels[0].setData({id: 1, value: 'foo', newvalue: 'boo'});
+                this.model.models[0].setData({id: 1, value: 'foo', newvalue: 'boo'});
 
                 this.data.item[0].newvalue = 'boo';
 

@@ -4,18 +4,19 @@
 
 /**
     @param {string} url
-    @param {Object} params
-    @param {String} type
+    @param {object} params
+    @param {string='POST'} type
+    @param {string='json'} dataType
     @return {no.Promise}
 */
-no.http = function(url, params, type) {
+no.http = function(url, params, type, dataType) {
     var promise = new no.Promise();
 
     $.ajax({
         url: url,
         type: type || 'POST',
         data: params,
-        dataType: 'json',
+        dataType: dataType || 'json',
         success: function(data) {
             promise.resolve(data);
         },

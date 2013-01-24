@@ -30,6 +30,7 @@ no.request = function(items, params, options) {
  * @return {no.Promise}
  */
 no.forcedRequest = function(items, params, options) {
+    options = options || {};
     options.forced = true;
     return no.request.models(items2models(items, params), options);
 };
@@ -369,65 +370,65 @@ function models2params(models) {
     return params;
 };
 
-    /**
-     * Приводит запрашиваемые модели к формату №3 из no.request.
-     * @param items Массив названией моделей.
-     * @param params Параметры моделей.
-     * @return {Array}
-     */
-    function normalizeItems(items, params) {
-        var _items = [];
-        for (var i = 0, l = items.length; i < l; i++) {
-            _items.push({
-                id: items[i],
-                params: params
-            });
-        }
-
-        return _items;
+/**
+ * Приводит запрашиваемые модели к формату №3 из no.request.
+ * @param items Массив названией моделей.
+ * @param params Параметры моделей.
+ * @return {Array}
+ */
+function normalizeItems(items, params) {
+    var _items = [];
+    for (var i = 0, l = items.length; i < l; i++) {
+        _items.push({
+            id: items[i],
+            params: params
+        });
     }
 
-    /**
-     * Возвращает promise из model
-     * @param {no.Model} model Модель
-     * @return {no.Promise}
-     */
-    function model2Promise(model) {
-        return model.promise;
+    return _items;
+}
+
+/**
+ * Возвращает promise из model
+ * @param {no.Model} model Модель
+ * @return {no.Promise}
+ */
+function model2Promise(model) {
+    return model.promise;
+}
+
+/**
+ * Приводит аргументы из no.request к моделям.
+ * @param {String|Array|Object} items Массив названий моделей.
+ * @param {Object} [params] Параметры моделей.
+ * @return {no.Model[]}
+ */
+function items2models(items, params) {
+    // приводим к формату №2
+    if (typeof items === 'string') {
+        items = [ items ];
     }
 
-    /**
-     * Приводит аргументы из no.request к моделям.
-     * @param {String|Array|Object} items Массив названий моделей.
-     * @param {Object} [params] Параметры моделей.
-     * @return {no.Model[]}
-     */
-    function items2models(items, params) {
-        // приводим к формату №2
-        if (typeof items === 'string') {
-            items = [ items ];
-        }
-
-        // приводим №2 к формату №3
-        if (typeof items[0] === 'string') {
-            params = params || {};
-            items = normalizeItems(items, params);
-        }
-
-        var models = [];
-        for (var i = 0, l = items.length; i < l; i++) {
-            var item = items[i];
-
-            // можно не использовать if (!model.get()) { model.create() }
-            // model.create все это умеет делать
-            models.push(no.Model.create(item.id, item.params));
-        }
-
-        return models;
+    // приводим №2 к формату №3
+    if (typeof items[0] === 'string') {
+        params = params || {};
+        items = normalizeItems(items, params);
     }
 
-    function models2name(model) {
-        return model.id;
+    var models = [];
+    for (var i = 0, l = items.length; i < l; i++) {
+        var item = items[i];
+
+        // можно не использовать if (!model.get()) { model.create() }
+        // model.create все это умеет делать
+        models.push(no.Model.create(item.id, item.params));
     }
+
+    return models;
+}
+
+function models2name(model) {
+    return model.id;
+}
 
 })();

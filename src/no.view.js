@@ -113,7 +113,7 @@ var _ctors = {};
  * Определяет новый блок.
  * @description
  * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
- * "eventDecl" записывается в виде "eventName[ selector]".
+ * "eventDecl" записывается в виде "eventName [ selector ]".
  * "selector" опционален, если его нет, то события регистрируется на ноду View.
  * "handler" может быть строка (тогда она заменится на метод прототипа) или функция.
  * Все хендлеры биндятся на экземпляр View.
@@ -124,7 +124,7 @@ var _ctors = {};
  *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
  * @param {String} id Название View.
  * @param {Object} info Декларация View.
- * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View. Если указан, то ctor не используется.
+ * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
  * @param {Array} [info.models] Массив моделей, от которых зависит View.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
@@ -220,7 +220,7 @@ no.View.info = function(id) {
 
             var eventName = eventParts.join('@');
 
-            // осталоное - селектор
+            // остальное - селектор
             var eventSelector = declParts.join(' ');
 
             if (eventName) {
@@ -303,12 +303,14 @@ no.View.prototype._addView = function(id, params, type) {
 };
 
 no.View.prototype._hide = function() {
+    // @chestozo: а если оно потом догрузится -- не покажется ли?
     if ( this.isLoading() ) {
         return;
     }
 
     if (this._visible === true) {
         this._unbindEvents('show');
+        // @chestozo: у нас же мега класс есть для этого )
         this.node.style.display = 'none';
         this._visible = false;
         this.trigger('hide');
@@ -320,6 +322,7 @@ no.View.prototype._hide = function() {
  * @private
  */
 no.View.prototype._show = function() {
+    // @chestozo: то же самое, как оно покажется после того, как прогрузится?
     if ( this.isLoading() ) {
         return;
     }
@@ -333,7 +336,7 @@ no.View.prototype._show = function() {
 };
 
 /**
- * Копирует массив деклараций событий и возвращает такой же массив, но забинженными на этот инстанс обработчиками.
+ * Копирует массив деклараций событий и возвращает такой же массив, но с забинженными на этот инстанс обработчиками.
  * @param {Array} events
  * @param {Number} handlerPos Позиция хендлера в массиве.
  * @return {Array} Копия events c забинженными обработчиками.
@@ -403,6 +406,7 @@ no.View.prototype._bindEvents = function(type) {
 
         // если надо переопределяем $target на глобальные объекты
         var $target = $node;
+        // @chestozo: а тут всё правильно? Если window - то document?
         if (event[0] === 'window') {
             $target = this._$document;
 
@@ -523,6 +527,7 @@ no.View.prototype._apply = function(callback) {
     var views = this.views;
     for (var id in views) {
         callback(views[id], id);
+        // @chestozo: а не надо тут вызвать: views[id]._apply(callback) ?
     }
 };
 
@@ -543,7 +548,7 @@ no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
         var hasValidStatus = this.isOk();
         if (hasValidModels && !hasValidStatus) {
             // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его
-            updated.sync.push(this);
+            updated.async.push(this);
 
         } else if (!hasValidModels) {
             // если асинхронный блок имеет невалидные модели, то его не надо рисовать

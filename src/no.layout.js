@@ -138,6 +138,7 @@ function compile(layout, params) {
             case 'boolean':
                 //  FIXME: Тут по идее может быть только true.
                 value = raw_value;
+                break;
         }
 
         result[key] = value;
@@ -230,6 +231,7 @@ function extractViews(layout) {
             if (value === no.L.BOX) {
                 key += '@';
             }
+            // @chestozo: а async?
             r.push(key);
         }
 

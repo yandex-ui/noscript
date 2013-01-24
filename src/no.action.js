@@ -56,6 +56,7 @@ no.action.getParams = function(node) {
     var paramString = node.getAttribute('data-params');
     if (paramString.charAt(0) === '{') {
         try {
+            // @chestozo: может обернём в какой-нибудь no.json? no.json.parse()?
             return JSON.parse(paramString);
         } catch(e) {}
     }
@@ -79,8 +80,10 @@ no.action.init = function() {
      * @example <a href=" javascripT://w3.org/%0a%61%6c%65%72%74%28document.cookie%29">test</a>
      * @type {RegExp}
      */
+    // @chestozo: может все regexp'ы в константы вынести?
     var HREF_JS_REGEXP = /^\s*javascript:/i;
 
+    // @chestozo: может быть делать это через наше рутовое view: app ?
     $("body")
         .on("click dblclick", "a, .no-action", function(e) {
             var target = e.currentTarget;
@@ -91,6 +94,7 @@ no.action.init = function() {
 
             //TODO: "no-action" как-то буэээ
             if (action && (action in _actions) && $target.hasClass('no-action')) {
+                // @chestozo: может просто ноду передавать, а params внутри run будут вытягиваться?
                 returnValue = no.action.run(action, no.action.getParams(target), target, e);
 
             } else if (e.type === 'click') {
@@ -100,11 +104,13 @@ no.action.init = function() {
                 if (HREF_JS_REGEXP.test(href)) {
                     return false;
                 }
+                // @chestozo: чего это такое? )
                 if (href.indexOf('conf:sip:') == 0 || href.indexOf('meet:sip:') == 0) {
                     return true;
                 }
 
                 // если host ссылки не равен нашему хосту
+                // @chestozo: мы ограничиваем action'ы только нашим хостом? почему?
                 if (target.host != window.location.host) {
                     return true;
                 }
@@ -112,6 +118,7 @@ no.action.init = function() {
                 //TODO: HISTORY_API_SUPPORT: hash или не хеш
                 //могут быть ссылки <a href="#hash" target="_blank"/>
                 if (target.getAttribute('target') != '_blank') {
+                    // @chestozo: mail )
                     window.history.pushState(null, 'mail', href);
                     returnValue = no.page.go(href);
                 }

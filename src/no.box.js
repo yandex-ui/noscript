@@ -117,6 +117,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         if ( view.isOk() ) {
             //  Выстраиваем новые активные блоки в нужном порядке.
             //  Плюс, если это новый блок, подклеиваем его к боксу.
+            //  @chestozo: а точно тут мы не перепутаем порядок блоков?
             this.node.appendChild(view.node);
         }
     }

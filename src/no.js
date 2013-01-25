@@ -157,6 +157,7 @@ no.init = function() {
 
     no.initMainView();
 
+    // @chestozo: предлагаю заюзать обёртку над history API )
     window.addEventListener('popstate', function(e) {
         e.preventDefault();
         no.page.go();

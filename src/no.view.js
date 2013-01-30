@@ -141,7 +141,7 @@ no.View.define = function(id, info, ctor) {
 
     ctor = ctor || function() {};
     // Нужно унаследоваться от no.View и добавить в прототип info.methods.
-    ctor = no.inherits(ctor, no.View, info.methods);
+    ctor = no.inherit(ctor, no.View, info.methods);
 
     info.models = info.models || [];
     info.events = info.events || {};

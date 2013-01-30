@@ -2,42 +2,6 @@
  * noscrpt
  * @namespace
  */
-var no = {};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-no.inherits = function(ctor, base, mixin) {
-    var F = function() {};
-    F.prototype = base.prototype;
-    var proto = ctor.prototype = new F();
-    ctor.prototype.constructor = ctor;
-
-    if (mixin) {
-        no.extend(proto, mixin);
-    }
-
-    return ctor;
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    @param {!Object} dest
-    @param {...!Object} srcs
-    @return {!Object}
-*/
-no.extend = function(dest) {
-    var srcs = [].slice.call(arguments, 1);
-
-    for (var i = 0, l = srcs.length; i < l; i++) {
-        var src = srcs[i];
-        for (var key in src) {
-            dest[key] = src[key];
-        }
-    }
-
-    return dest;
-};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -69,13 +33,6 @@ no.extendRecursive = function(dest, src) {
 
     return dest;
 };
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-/**
-    Пустая функция. No operation.
-*/
-no.pe = function() {};
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

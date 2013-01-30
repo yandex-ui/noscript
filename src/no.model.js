@@ -163,7 +163,7 @@ no.Model.define = function(id, info, ctor) {
 
     if (info.methods) {
         //  Нужно унаследоваться от no.Model и добавить в прототип info.models.
-        ctor = no.inherits(function() {}, noModel, info.methods);
+        ctor = no.inherit(function() {}, noModel, info.methods);
     } else {
         ctor = ctor || noModel;
     }

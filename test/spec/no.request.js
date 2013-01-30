@@ -154,7 +154,7 @@ describe('no.request.js', function() {
             this.xhr.restore();
         });
 
-        describe('STATUS_NONE', function() {
+        describe('STATUS.NONE', function() {
 
             beforeEach(function() {
                 no.Model.define('test-model-none');
@@ -210,7 +210,7 @@ describe('no.request.js', function() {
             });
         });
 
-        describe('STATUS_OK', function() {
+        describe('STATUS.OK', function() {
 
             beforeEach(function() {
                 var model = no.Model.create('test-model');
@@ -275,11 +275,11 @@ describe('no.request.js', function() {
             });
         });
 
-        describe('STATUS_ERROR', function() {
+        describe('STATUS.ERROR', function() {
 
             beforeEach(function() {
                 var model = no.Model.create('test-model');
-                model.status = model.STATUS_ERROR;
+                model.status = model.STATUS.ERROR;
             });
 
             it('should not create http request for model', function() {
@@ -391,8 +391,8 @@ describe('no.request.js', function() {
                     expect(this.requests.length).to.be(0);
                 });
 
-                it('should set status to STATUS_ERROR', function() {
-                    expect(this.model.status).to.be(this.model.STATUS_ERROR);
+                it('should set status to STATUS.ERROR', function() {
+                    expect(this.model.status).to.be(this.model.STATUS.ERROR);
                 });
 
                 it('should resolve promise immediately', function() {
@@ -585,7 +585,7 @@ describe('no.request.js', function() {
         });
     });
 
-    //TODO: STATUS_INVALID
+    //TODO: STATUS.INVALID
     //TODO: xhr response parsing
 
     function promiseIsResolved(promise) {

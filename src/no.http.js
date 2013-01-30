@@ -3,28 +3,26 @@
 // ------------------------------------------------------------------------------------------------------------- //
 
 /**
+    Creates and executes ajax request (a POST request with json return data type by default).
     @param {string} url
-    @param {object} params
-    @param {string='POST'} type
-    @param {string='json'} dataType
+    @param {object} params Request parameters.
+    @param {object=} options Standart jQuery.ajax settings object.
     @return {no.Promise}
 */
-no.http = function(url, params, type, dataType) {
-    var promise = new no.Promise();
+no.http = function(url, params, options) {
+    options = no.extend({ type: 'POST', dataType: 'json' }, options || {});
+    options.url = url;
+    options.data = params;
 
-    $.ajax({
-        url: url,
-        type: type || 'POST',
-        data: params,
-        dataType: dataType || 'json',
-        success: function(data) {
+    var promise = new no.Promise();
+    $.ajax(options)
+        .done(function(data) {
             promise.resolve(data);
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var error = errorThrown || textStatus || 'some error';
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            var error = errorThrown || textStatus || 'unknown error';
             promise.resolve({ error: error });
-        }
-    });
+        });
 
     return promise;
 };

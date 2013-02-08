@@ -99,11 +99,17 @@ no.View.getKey = function(id, params, info) {
         var group = pGroups[g];
         var pNames = group.pNames || [];
         var pFilters = group.pFilters || {};
+        var pOptional = group.pOptional || {};
 
         for (var i = 0, l = pNames.length; i < l; i++) {
             var pName = pNames[i];
             var pValue = params[pName];
             var pFilter = pFilters[pName];
+            var isOptional = pOptional[pName] != null;
+
+            if (pValue == null && isOptional) {
+                continue;
+            }
 
             if ( pValue == null || (pFilter && pValue != pFilter) ) {
                 key = null;
@@ -281,9 +287,11 @@ no.View._initInfoParams = function(info) {
         for (var i = 0; i < groups.length; i++) {
             var group = groups[i];
             // Если в params задано значение параметра -- это фильтр.
+            // Опциональные параметры это параметры моделей с дефолтным значением.
             pGroups.push({
                 pNames: Object.keys(group),
-                pFilters: group
+                pFilters: group,
+                pOptional: {}
             });
         }
 
@@ -303,7 +311,8 @@ no.View._initInfoParams = function(info) {
         info.pGroups = [
             {
                 pNames: Object.keys(params),
-                pFilters: {}
+                pFilters: {},
+                pOptional: params
             }
         ];
     }

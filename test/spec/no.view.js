@@ -301,21 +301,34 @@ describe('no.View', function() {
     describe('no.View.info.params вычисление ключа view', function() {
 
         describe('Ключ строится по параметрам моделей: view.info.params == null', function() {
+            no.Model.define('user', { params: { login: null, uid: null } });
             no.Model.define('photo', { params: { login: null, id: null } });
-            no.Model.define('photo-tags', { params: { id: null, one_more: null, per_page: 10 } });
-            no.View.define('photo', {
-                models: [ 'photo', 'photo-tags' ]
+            no.Model.define('album', { params: { login: null, album_id: null, per_page: 10 } });
+
+            no.View.define('photo', { models: [ 'user', 'photo', 'album' ] });
+
+            it('не хватает параметров для суммарного набора параметров моделей', function() {
+                expect(no.View.getKey('photo', { login: 'nop' })).to.be(null);
             });
 
-            it('Ключ view строится по параметрам моделей', function() {
-                var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
-                expect( no.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&one_more=xx&per_page=10');
+            it('параметры есть и их достаточно', function() {
+                expect(no.View.getKey('photo', { login: 'nop', uid: 123, id: 7, album_id: 2, per_page: 20 })).to.be('view=photo&login=nop&uid=123&id=7&album_id=2&per_page=20');
             });
 
-            it('Умолчательное значение параметра модели должно добавляться к ключу view', function() {
-                // Потому что это ключ для модели, а следовательно, для данных и для того, что отображается во view.
-                var params = { login: 'a', id: 4, one_more: 'xx' };
-                expect( no.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&one_more=xx&per_page=10');
+            it('дефолтные параметры заданы у моделей, но не переданы в урле', function() {
+                expect(no.View.getKey('photo', { login: 'nop', uid: 123, id: 7, album_id: 2 })).to.be('view=photo&login=nop&uid=123&id=7&album_id=2');
+            });
+
+            // Ещё модель с пересекающимся параметром с дефолтным значением (per_page)
+            no.Model.define('search', { params: { query: null, per_page: 20, more: false } });
+            no.View.define('search', { models: [ 'album', 'search' ] });
+
+            it('дефолтное значение параметра задано у нескольких моделей, но не передано', function() {
+                expect(no.View.getKey('search', { login: 'nop', album_id: 2, query: 'girls' })).to.be('view=search&login=nop&album_id=2&query=girls');
+            });
+
+            it('дефолтное значение параметра задано у нескольких моделей и передано', function() {
+                expect(no.View.getKey('search', { login: 'nop', album_id: 2, query: 'girls', per_page: 5 })).to.be('view=search&login=nop&album_id=2&per_page=5&query=girls');
             });
         });
 

@@ -139,9 +139,14 @@ no.View.define = function(id, info, ctor) {
 
     info = info || {};
 
-    ctor = ctor || function() {};
-    // Нужно унаследоваться от no.View и добавить в прототип info.methods.
-    ctor = no.inherits(ctor, no.View, info.methods);
+    // Если задан ctor значит это полноценный конструктор view, а это значит, что должен быть уже унаследован от no.View.
+    if (ctor) {
+        // TODO не работает проверка ctor instanceof no.View
+        ctor = no.inherits(function() {}, ctor, info.methods);
+    }
+    else {
+        ctor = no.inherits(function() {}, no.View, info.methods);
+    }
 
     info.models = info.models || [];
     info.events = info.events || {};

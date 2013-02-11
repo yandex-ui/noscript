@@ -1,5 +1,34 @@
 describe('no.View', function() {
 
+    describe('Наследование от другого view', function() {
+        var MegaView = function() {};
+
+        no.inherits(MegaView, no.View);
+
+        MegaView.prototype.superMethod = function() {};
+
+        no.View.define('mega', {
+            methods: {
+                oneMore: function() {}
+            }
+        }, MegaView);
+
+        var v = no.View.create('mega', {});
+
+        it('удалось создать view', function() {
+            expect(v).to.be.ok();
+        });
+        it('методы наследуются от базового view', function() {
+            expect(v.superMethod).to.be.ok();
+        });
+        it('методы no.View на месте', function() {
+            expect(v.isOk).to.be.ok();
+        });
+        it('методы из info.methods тоже не потерялись', function() {
+            expect(v.oneMore).to.be.ok();
+        });
+    });
+
     describe('no.View.define', function() {
 
         beforeEach(function() {

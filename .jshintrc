@@ -11,11 +11,12 @@
     "indent": 4,
     "latedef": true,
     "sub": true,
-    "newcap": true,
+    "newcap": false,
     "noarg": true,
     "noempty": true,
     "nonew": true,
     "onevar": false,
     "undef": true,
-    "unused": true
+    "unused": false,
+    "white": false
 }

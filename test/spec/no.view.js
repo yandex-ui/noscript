@@ -2,30 +2,63 @@ describe('no.View', function() {
 
     describe('Наследование от другого view', function() {
         var MegaView = function() {};
-
         no.inherits(MegaView, no.View);
-
         MegaView.prototype.superMethod = function() {};
 
         no.View.define('mega', {
             methods: {
                 oneMore: function() {}
+            },
+            ctor: function() {
+                this.check_me = 'present';
             }
         }, MegaView);
 
+        // Наследование второго порядка.
+        var ExtendedMegaView = function() {};
+        no.inherits(ExtendedMegaView, MegaView);
+        ExtendedMegaView.prototype.newMethod = function() {};
+
+        no.View.define('extended', {
+            methods: {
+                justToCheck: function() {}
+            },
+            ctor: function() {
+                this.check_me_also = 'also present';
+            }
+        }, ExtendedMegaView);
+
         var v = no.View.create('mega', {});
+        var v2 = no.View.create('extended', {});
 
         it('удалось создать view', function() {
             expect(v).to.be.ok();
+            expect(v2).to.be.ok();
         });
-        it('методы наследуются от базового view', function() {
+        it('методы наследуются от базовых view', function() {
             expect(v.superMethod).to.be.ok();
+            expect(v2.superMethod).to.be.ok();
+            expect(v2.newMethod).to.be.ok();
         });
         it('методы no.View на месте', function() {
             expect(v.isOk).to.be.ok();
+            expect(v2.isOk).to.be.ok();
         });
         it('методы из info.methods тоже не потерялись', function() {
             expect(v.oneMore).to.be.ok();
+            expect(v2.justToCheck).to.be.ok();
+        });
+        it('метод из базового info.methods на месте', function() {
+            // NOTE А вот метод из базового info.methods мы потеряли. Так и надо?
+            expect(v2.oneMore).to.be.ok();
+        });
+        it('info.ctor вызывается при создании инстанса view', function() {
+            expect(v.check_me).to.be('present');
+            expect(v2.check_me_also).to.be('also present');
+        });
+        it('базовый конструктор тоже вызывается', function() {
+            // NOTE тут сейчас тоже fail: цепочки конструкторов не создаётся
+            expect(v2.check_me).to.be('present');
         });
     });
 

@@ -130,23 +130,19 @@ var _ctors = {};
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
  * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
  * @param {Object} [info.noevents.show] События, на которые надо подписаться при показе DOM-элемента.
- * @param {Function} [ctor] Конструктор блока.
+ * @param {Function} [info.ctor] Конструктор блока.
+ * @param {Function} [baseView] Базовый класс view.
  */
-no.View.define = function(id, info, ctor) {
+no.View.define = function(id, info, baseView) {
     if (id in _infos) {
         throw "View can't be redefined!";
     }
 
     info = info || {};
 
-    // Если задан ctor значит это полноценный конструктор view, а это значит, что должен быть уже унаследован от no.View.
-    if (ctor) {
-        // TODO не работает проверка ctor instanceof no.View
-        ctor = no.inherits(function() {}, ctor, info.methods);
-    }
-    else {
-        ctor = no.inherits(function() {}, no.View, info.methods);
-    }
+    baseView = baseView || no.View;
+    var ctor = info.ctor || function() {};
+    ctor = no.inherits(ctor, baseView, info.methods);
 
     info.models = info.models || [];
     info.events = info.events || {};

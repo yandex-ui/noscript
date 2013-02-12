@@ -547,7 +547,8 @@ if(window['mocha']) {
  * которые ранее не грузились (уникальные) и грузить только их
  */
 no.ModelUniq = function(){};
-no.extend(no.ModelUniq.prototype, no.Model.prototype);
+
+no.inherits(no.ModelUniq, no.Model);
 
 no.ModelUniq.prototype.__superInit = no.ModelUniq.prototype._init;
 

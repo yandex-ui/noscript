@@ -4,19 +4,76 @@ describe('no.View', function() {
 
         beforeEach(function() {
             sinon.spy(no.View, 'define');
+
+            this.view = no.View.define('test-view-define');
         });
 
         afterEach(function() {
             no.View.define.restore();
+            no.View.undefine('test-view-define');
         });
 
         it('should throw exception if I define View twice', function() {
-            no.View.define('test-view-define-twice');
             try {
-                no.View.define('test-view-define-twice');
+                no.View.define('test-view-define');
             } catch(e) {}
 
             expect(no.View.define.getCall(1).threw()).to.be.ok();
+        });
+
+        it('should return new view', function() {
+            expect(this.view).to.be.ok();
+        });
+
+        it('instance of new view should be no.View', function() {
+            var instance = no.View.create('test-view-define', {});
+            expect(instance instanceof no.View).to.be.ok();
+        });
+    });
+
+    describe('Наследование от другого view', function() {
+
+        beforeEach(function() {
+
+            var parentMegaView = no.View.define('parentMegaView', {
+                methods: {
+                    superMethod: function() {}
+                }
+            });
+
+            no.View.define('childMegaView', {
+                methods: {
+                    oneMore: function() {}
+                }
+            }, parentMegaView);
+
+            this.view = no.View.create('childMegaView', {});
+        });
+
+        afterEach(function() {
+            delete this.view;
+            no.View.undefine('parentMegaView');
+            no.View.undefine('childMegaView');
+        });
+
+        it('наследуемый view должен быть no.View', function() {
+            expect(this.view instanceof no.View).to.be.ok();
+        });
+
+        it('методы наследуются от базового view', function() {
+            expect(this.view.superMethod).to.be.ok();
+        });
+
+        it('методы от базового view не ушли в no.View', function() {
+            expect(no.View.prototype.superMethod).to.not.be.ok();
+        });
+
+        it('методы no.View на месте', function() {
+            expect(this.view.isOk).to.be.ok();
+        });
+
+        it('методы из info.methods тоже не потерялись', function() {
+            expect(this.view.oneMore).to.be.ok();
         });
     });
 

@@ -110,7 +110,7 @@ var _infos = {};
 var _ctors = {};
 
 /**
- * Определяет новый блок.
+ * Определяет новый View.
  * @description
  * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
  * "eventDecl" записывается в виде "eventName[ selector]".
@@ -124,24 +124,26 @@ var _ctors = {};
  *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
  * @param {String} id Название View.
  * @param {Object} info Декларация View.
+ * @param {Function} [info.ctor] Конструтор.
  * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View. Если указан, то ctor не используется.
  * @param {Array} [info.models] Массив моделей, от которых зависит View.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
  * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
  * @param {Object} [info.noevents.show] События, на которые надо подписаться при показе DOM-элемента.
- * @param {Function} [ctor] Конструктор блока.
+ * @param {Function} [base=no.View] Базовый View для наследования
+ * @return {Function} Созданный View.
  */
-no.View.define = function(id, info, ctor) {
+no.View.define = function(id, info, base) {
     if (id in _infos) {
         throw "View can't be redefined!";
     }
 
     info = info || {};
 
-    ctor = ctor || function() {};
+    var ctor = info.ctor || function() {};
     // Нужно унаследоваться от no.View и добавить в прототип info.methods.
-    ctor = no.inherits(ctor, no.View, info.methods);
+    ctor = no.inherits(ctor, base || no.View, info.methods);
 
     info.models = info.models || [];
     info.events = info.events || {};
@@ -152,6 +154,8 @@ no.View.define = function(id, info, ctor) {
 
     _infos[id] = info;
     _ctors[id] = ctor;
+
+    return ctor;
 };
 
 no.View.info = function(id) {
@@ -726,6 +730,24 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
         });
     });
 };
+
+
+if (window['mocha']) {
+    /**
+     * Удаляет определение view.
+     * Используется только в юнит-тестах.
+     * @param {String} id ID view.
+     */
+    no.View.undefine = function(id) {
+        delete _ctors[id];
+        delete _infos[id];
+    };
+
+    no.View.privats = {
+        _ctors: _ctors,
+        _infos: _infos
+    };
+}
 
 })();
 

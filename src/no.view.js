@@ -682,7 +682,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
-        viewNode = no.byClass('view-' + this.id, node)[0];
+        viewNode = no.byClass('ns-view-' + this.id, node)[0];
         if (viewNode) {
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки

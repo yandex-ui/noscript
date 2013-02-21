@@ -10,7 +10,7 @@ match / {
 }
 
 match .* view {
-    <div class="view-{ name() }">
+    <div class="ns-view-{ name() }">
         if .async {
             apply . view-lazy-content
         } else {

@@ -30,46 +30,14 @@ no.layout.define = function(id, layout, parent_id) {
     }
 };
 
-//  Возвращает layout страницы с заданным id и params.
-//
+/**
+ * Возвращает layout страницы с заданным id и params.
+ * @param {String} id
+ * @param {Object} params
+ * @return {Object}
+ */
 no.layout.page = function(id, params) {
-    return clean( get(id, params) );
-
-    //  Достаем layout, компилируем его.
-    //  Если нужно, наследуемся от родителя.
-    function get(id, params) {
-        var raw = _pages[id];
-
-        var layout = compile(raw.layout, params);
-
-        if (raw.parent_id) {
-            var parent = get(raw.parent_id, params);
-
-            layout = inherit(layout, parent);
-        }
-
-        extractViews(layout);
-
-        return layout;
-    }
-
-    //  Вычищаем из ключей @ и &.
-    function clean(layout) {
-        var result = {};
-
-        for (var key in layout) {
-            var value = layout[key];
-
-            var ch = key.slice(-1);
-            if (ch === '@' || ch === '&') {
-                key = key.slice(0, -1);
-            }
-
-            result[key] = clean(value);
-        }
-
-        return result;
-    }
+    return cleanLayout( getLayout(id, params) );
 };
 
 //  Возвращает layout блока с заданным id.
@@ -84,6 +52,7 @@ no.layout.view = function(id) {
 //  Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
 //
 function compile(layout, params) {
+    var t = {};
     if (typeof layout === 'string') {
         //  Строка 'folders' является шоткатом для:
         //
@@ -91,7 +60,6 @@ function compile(layout, params) {
         //      'folders': true
         //  }
         //
-        var t = {};
         t[layout] = true;
         layout = t;
 
@@ -104,7 +72,6 @@ function compile(layout, params) {
         //      }
         //
         //  Преобразуем массив в объект.
-        var t = {};
         for (var i = 0, l = layout.length; i < l; i++) {
             t[ layout[i] ] = true;
         }
@@ -244,6 +211,47 @@ function isBox(s) {
 }
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+/**
+ * Достаем layout, компилируем его.
+ * Если нужно, наследуемся от родителя.
+ * @param {String} id
+ * @param {Object} params
+ * @return {Object}
+ */
+function getLayout(id, params) {
+    var raw = _pages[id];
+
+    var layout = compile(raw.layout, params);
+
+    if (raw.parent_id) {
+        var parent = getLayout(raw.parent_id, params);
+
+        layout = inherit(layout, parent);
+    }
+
+    extractViews(layout);
+
+    return layout;
+}
+
+//  Вычищаем из ключей @ и &.
+function cleanLayout(layout) {
+    var result = {};
+
+    for (var key in layout) {
+        var value = layout[key];
+
+        var ch = key.slice(-1);
+        if (ch === '@' || ch === '&') {
+            key = key.slice(0, -1);
+        }
+
+        result[key] = cleanLayout(value);
+    }
+
+    return result;
+}
 
 })();
 

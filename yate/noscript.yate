@@ -1,0 +1,28 @@
+// common yate templates for noscript
+
+key model(/.models.*, "{ name() }") { . }
+params = /.params
+
+match / {
+    <div class="ns-root">
+        apply .views.* view
+    </div>
+}
+
+match .* view {
+    <div class="view-{ name() }">
+        if .async {
+            apply . view-lazy-content
+        } else {
+            apply . view-content
+        }
+    </div>
+}
+
+match .* view-content {
+    apply .views.* view
+}
+
+match .* view-lazy-content {
+    "lazy view!"
+}

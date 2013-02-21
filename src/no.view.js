@@ -606,7 +606,10 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
     //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
     if ( this.async && !this.isModelsValid() ) {
-        return false;
+        return {
+            async: true,
+            views: {}
+        };
     }
 
     //  Собираем все нужные модели.
@@ -618,9 +621,12 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     }
 
     //  Собираем дерево рекурсивно из подблоков.
-    var tree = {};
+    var tree = {
+        async: false,
+        views: {}
+    };
     this._apply(function(view, id) {
-        tree[id] = view._getViewTree(models, layout[id].views, params);
+        tree.views[id] = view._getViewTree(models, layout[id].views, params);
     });
 
     return tree;

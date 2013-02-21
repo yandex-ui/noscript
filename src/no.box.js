@@ -74,12 +74,15 @@ no.Box.prototype._getUpdateTree = function(tree, layout, params) {
 //  Строим дерево блоков.
 no.Box.prototype._getViewTree = function(models, layout, params) {
     //  Для бокса это всегда объект (возможно, пустой).
-    var tree = {};
+    var tree = {
+        box: true,
+        views: {}
+    };
 
     var views = this.views;
     for (var id in layout) {
         var key = no.View.getKey(id, params);
-        tree[id] = views[key]._getViewTree(models, layout[id].views, params);
+        tree.views[id] = views[key]._getViewTree(models, layout[id].views, params);
     }
 
     return tree;

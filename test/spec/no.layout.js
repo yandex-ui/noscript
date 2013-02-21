@@ -131,6 +131,88 @@ describe('no.layout', function() {
 
     });
 
+    describe('lazy views', function() {
+
+        it('lazy view in box', function() {
+            no.layout.define('lazy1', {
+                'app left@': 'long-generated-view&'
+            }, 'app');
+
+            expect( no.layout.page('lazy1') ).to.eql({
+                'app': {
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'long-generated-view': {
+                                    'type': no.L.ASYNC,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {}
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
+                }
+            });
+        });
+
+        it('lazy view in box', function() {
+            no.layout.define('lazy2', {
+                'app left@': {
+                    'regular-view': {
+                        'lazy-view&': true
+                    }
+                }
+            }, 'app');
+
+            expect( no.layout.page('lazy2') ).to.eql({
+                'app': {
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'regular-view': {
+                                    'type': no.L.VIEW,
+                                    'views': {
+                                        'lazy-view': {
+                                            'type': no.L.ASYNC,
+                                            'views': {}
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {}
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
+                }
+            });
+        });
+    });
+
     describe('dynamic layouts', function() {
 
         it('setup', function() {

@@ -37,6 +37,9 @@ no.layout.define = function(id, layout, parent_id) {
  */
 no.layout.page = function(id, params) {
     var raw = _pages[id];
+    if (!raw) {
+        throw 'Layout ' + id + ' is undefined';
+    }
 
     var layout = compile(raw.layout, params);
 
@@ -107,10 +110,8 @@ function compile(layout, params) {
                 value = {};
         }
 
-        var isItBox = isBox(key);
-
         result[cleanKey(key)] = {
-            'type': isItBox ? no.L.BOX : no.L.VIEW,
+            'type': getViewType(key),
             'views': value
         };
     }
@@ -132,7 +133,7 @@ function inherit(layout, parent) {
         //  Т.е. на строку вида 'foo@'.
         //  Потому что можно переопределять только содержимое боксов.
         //  Изменять лэйаут блоков нельзя.
-        if ( !isBox( parts[l - 1] ) ) {
+        if ( getViewType( parts[l - 1] ) !== no.L.BOX ) {
             throw Error('Cannot overwrite view layout "' + parts[l - 1] + '"');
         }
 
@@ -149,8 +150,15 @@ function inherit(layout, parent) {
     return result;
 }
 
-function isBox(s) {
-    return ( s.substr(-1) === '@' );
+function getViewType(s) {
+    var lastChar = s.substr(-1);
+    if (lastChar === '@') {
+        return no.L.BOX;
+    } else if (lastChar === '&') {
+        return no.L.ASYNC;
+    }
+
+    return no.L.VIEW;
 }
 
 function cleanKey(key) {

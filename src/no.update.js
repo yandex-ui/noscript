@@ -51,7 +51,7 @@ no.Update.prototype.start = function() {
     var updated = this.view._getRequestViews({
         sync: [],
         async: []
-    }, this.layout, this.params);
+    }, this.layout.views, this.params);
 
     var that = this;
 
@@ -102,7 +102,7 @@ no.Update.prototype._update = function(async) {
         params: params,
         location: document.location
     };
-    this.view._getUpdateTree(tree, layout, params);
+    this.view._getUpdateTree(tree, layout.views, params);
 
     //TODO: detect if empty
     if ( no.object.isEmpty(tree.views) ) {
@@ -111,7 +111,7 @@ no.Update.prototype._update = function(async) {
 
     var html = no.tmpl(tree, null, '');
     var node = no.html2node(html);
-    this.view._updateHTML(node, layout, params, {
+    this.view._updateHTML(node, layout.views, params, {
         toplevel: true,
         async: async
     });

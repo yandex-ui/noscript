@@ -56,7 +56,7 @@ no.Box.prototype._getRequestViews = function(updated, layout, params) {
         //  Создаем его (если он уже есть, он возьмется из this.views).
         var view = this._addView(id, params);
         //  Идем вниз рекурсивно.
-        view._getRequestViews(updated, layout[id], params);
+        view._getRequestViews(updated, layout[id].views, params);
     }
 };
 
@@ -67,7 +67,7 @@ no.Box.prototype._getUpdateTree = function(tree, layout, params) {
     var views = this.views;
     for (var id in layout) {
         var key = no.View.getKey(id, params);
-        views[key]._getUpdateTree(tree, layout[id], params);
+        views[key]._getUpdateTree(tree, layout[id].views, params);
     }
 };
 
@@ -79,7 +79,7 @@ no.Box.prototype._getViewTree = function(models, layout, params) {
     var views = this.views;
     for (var id in layout) {
         var key = no.View.getKey(id, params);
-        tree[id] = views[key]._getViewTree(models, layout[id], params);
+        tree[id] = views[key]._getViewTree(models, layout[id].views, params);
     }
 
     return tree;
@@ -112,7 +112,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         var view = views[key];
 
         //  Обновляем его.
-        view._updateHTML(node, layout[id], params, options);
+        view._updateHTML(node, layout[id].views, params, options);
 
         if ( view.isOk() ) {
             //  Выстраиваем новые активные блоки в нужном порядке.

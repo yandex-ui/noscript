@@ -539,7 +539,6 @@ no.View.prototype._apply = function(callback) {
  * @param pageLayout
  * @param params
  * @return {*}
- * @private
  */
 no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     if (this.async) {
@@ -564,14 +563,13 @@ no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     if (!this.views) {
         this.views = {};
         // Создаем подблоки
-        var viewLayout = no.layout.view(this.id);
-        for (var view_id in viewLayout) {
-            this._addView(view_id, params, viewLayout[view_id]);
+        for (var view_id in pageLayout) {
+            this._addView(view_id, params, pageLayout[view_id].type);
         }
     }
 
     this._apply(function(view, id) {
-        view._getRequestViews(updated, pageLayout[id], params);
+        view._getRequestViews(updated, pageLayout[id].views, params);
     });
 
     return updated;
@@ -594,7 +592,7 @@ no.View.prototype._getUpdateTree = function(tree, layout, params) {
         tree.views[this.id] = this._getViewTree(tree.models, layout, params);
     } else {
         this._apply(function(view, id) {
-            view._getUpdateTree(tree, layout[id], params);
+            view._getUpdateTree(tree, layout[id].views, params);
         });
     }
 
@@ -622,7 +620,7 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     //  Собираем дерево рекурсивно из подблоков.
     var tree = {};
     this._apply(function(view, id) {
-        tree[id] = view._getViewTree(models, layout[id], params);
+        tree[id] = view._getViewTree(models, layout[id].views, params);
     });
 
     return tree;
@@ -724,7 +722,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
 
     //  Рекурсивно идем вниз по дереву.
     this._apply(function(view, id) {
-        view._updateHTML(viewNode, layout[id], params, {
+        view._updateHTML(viewNode, layout[id].views, params, {
             toplevel: toplevel,
             async: async
         });

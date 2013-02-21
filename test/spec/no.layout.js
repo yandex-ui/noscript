@@ -15,22 +15,27 @@ describe('no.layout', function() {
 
             expect( no.layout.page('app') ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {},
-                    'right': {},
-                    'footer': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {}
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {}
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
                 }
             });
-
-            expect( no.layout.view('app') ).to.eql({
-                'header': no.L.VIEW,
-                'left': no.L.BOX,
-                'right': no.L.BOX,
-                'footer': no.L.VIEW
-            });
-
-            expect( no.layout.view('header') ).to.eql({});
-
         });
 
     });
@@ -45,13 +50,34 @@ describe('no.layout', function() {
 
             expect( no.layout.page('mailbox' ) ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {
-                        'folders': {},
-                        'labels': {}
-                    },
-                    'right': {},
-                    'footer': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'folders': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                },
+                                'labels': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {}
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
                 }
             });
 
@@ -65,15 +91,39 @@ describe('no.layout', function() {
 
             expect( no.layout.page('messages' ) ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {
-                        'folders': {},
-                        'labels': {}
-                    },
-                    'right': {
-                        'messages': {}
-                    },
-                    'footer': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'folders': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                },
+                                'labels': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'messages': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
                 }
             });
 
@@ -100,26 +150,51 @@ describe('no.layout', function() {
 
             expect( no.layout.page('setup', { tab: 'interface' }) ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {
-                        'setup-menu': {}
-                    },
-                    'right': {
-                        'setup-interface': {
-                            'content': {
-                                'setup-submenu': {},
-                                'setup-blocks': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'setup-menu': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
                             }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'setup-interface': {
+                                    'type': no.L.VIEW,
+                                    'views': {
+                                        'content': {
+                                            'type': no.L.BOX,
+                                            'views': {
+                                                'setup-submenu': {
+                                                    'type': no.L.VIEW,
+                                                    'views': {}
+                                                },
+                                                'setup-blocks': {
+                                                    'type': no.L.VIEW,
+                                                    'views': {}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
                         }
-                    },
-                    'footer': {}
+                    }
                 }
             });
-
-            expect( no.layout.view('setup-interface') ).to.eql({
-                'content': no.L.BOX
-            });
-
         });
 
         it('setup-filters', function() {
@@ -132,25 +207,51 @@ describe('no.layout', function() {
 
             expect( no.layout.page('setup-filters', { tab: 'filters' }) ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {
-                        'setup-menu': {}
-                    },
-                    'right': {
-                        'setup-filters': {
-                            'content': {
-                                'setup-blocks': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'setup-menu': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
                             }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'setup-filters': {
+                                    'type': no.L.VIEW,
+                                    'views': {
+                                        'content': {
+                                            'type': no.L.BOX,
+                                            'views': {
+                                                'setup-blocks': {
+                                                    'type': no.L.VIEW,
+                                                    'views': {}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
                         }
-                    },
-                    'footer': {}
+                    }
                 }
             });
-
         });
 
 
-        it('message', function() {
+        it('choose box from params', function() {
 
             no.layout.define('message', {
                 'app right@': function(params) {
@@ -160,32 +261,79 @@ describe('no.layout', function() {
 
             expect( no.layout.page('message', { ids: "1234567890" }) ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {
-                        'folders': {},
-                        'labels': {}
-                    },
-                    'right': {
-                        'message': {}
-                    },
-                    'footer': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'folders': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                },
+                                'labels': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'message': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
                 }
             });
 
             expect( no.layout.page('message', { current_folder: "9876543210" }) ).to.eql({
                 'app': {
-                    'header': {},
-                    'left': {
-                        'folders': {},
-                        'labels': {}
-                    },
-                    'right': {
-                        'messages': {}
-                    },
-                    'footer': {}
+                    'type': no.L.VIEW,
+                    'views': {
+                        'header': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        },
+                        'left': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'folders': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                },
+                                'labels': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'right': {
+                            'type': no.L.BOX,
+                            'views': {
+                                'messages': {
+                                    'type': no.L.VIEW,
+                                    'views': {}
+                                }
+                            }
+                        },
+                        'footer': {
+                            'type': no.L.VIEW,
+                            'views': {}
+                        }
+                    }
                 }
             });
-
         });
 
     });

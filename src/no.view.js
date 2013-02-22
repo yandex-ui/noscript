@@ -589,7 +589,7 @@ no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
 //
 no.View.prototype._getUpdateTree = function(tree, layout, params) {
     if ( !this.isValid() ) {
-        tree.views[this.id] = this._getViewTree(tree.models, layout, params);
+        tree.views[this.id] = this._getViewTree(layout, params);
     } else {
         this._apply(function(view, id) {
             view._getUpdateTree(tree, layout[id].views, params);
@@ -599,21 +599,30 @@ no.View.prototype._getUpdateTree = function(tree, layout, params) {
     return tree;
 };
 
-//  Строим дерево блоков, попутно собираем все нужные для него модели.
-no.View.prototype._getViewTree = function(models, layout, params) {
+/**
+ * Строим дерево блоков.
+ * @param layout
+ * @param params
+ * @return {Object}
+ */
+no.View.prototype._getViewTree = function(layout, params) {
+    var tree = {
+        async: false,
+        // всегда собираем данные, в том числе закешированные модели для async-view
+        models: this._getModelsData(),
+        // добавляем собственные параметры блока
+        params: this.params,
+        views: {}
+    };
+
     //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
     //  помечаем его как асинхронный (false).
     //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
     //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
     if ( this.async && !this.isModelsValid() ) {
-        return {
-            async: true,
-            views: {}
-        };
+        tree.async = true;
+        return tree;
     }
-
-    //  Собираем все нужные модели.
-    no.extend( models, this._getModelsData() );
 
     //  Это блок без подблоков и он не асинхронный.
     if (typeof layout !== 'object') {
@@ -621,12 +630,8 @@ no.View.prototype._getViewTree = function(models, layout, params) {
     }
 
     //  Собираем дерево рекурсивно из подблоков.
-    var tree = {
-        async: false,
-        views: {}
-    };
     this._apply(function(view, id) {
-        tree.views[id] = view._getViewTree(models, layout[id].views, params);
+        tree.views[id] = view._getViewTree(layout[id].views, params);
     });
 
     return tree;

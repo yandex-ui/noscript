@@ -97,15 +97,15 @@ no.Update.prototype._update = function(async) {
     var layout = this.layout;
 
     var tree = {
-        views: {},
-        models: {},
-        params: params,
-        location: document.location
+        'location': document.location,
+        'layout-params': params,
+        'views': {}
     };
     this.view._getUpdateTree(tree, layout.views, params);
 
     //TODO: detect if empty
     if ( no.object.isEmpty(tree.views) ) {
+        no.todo();
         // return;
     }
 

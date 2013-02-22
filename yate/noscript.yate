@@ -2,8 +2,12 @@
  * @fileOverview Common yate templates for noscript
  */
 
-key model(/.models.*, "{ name() }") { . }
-params = /.params
+layout-params = /.layout-params
+
+// функция для получения моделей
+func model(name) {
+    /.models.*[ name() == name ]
+}
 
 match / {
     <div class="ns-root">
@@ -11,10 +15,16 @@ match / {
     </div>
 }
 
+// делает chroot для view и генерит обертку с помощью ns-build-view
+// @private
+match .* ns-view {
+    apply document(.) ns-build-view
+}
+
 // Главная мода для каждой view
 // Генерит <div class="ns-view-<viewname>"> ... </div>
 // Содержимое view определяется модой ns-view-content
-match .* ns-view {
+match .* ns-build-view {
     <div class="ns-view-{ name() }">
         @class += apply . ns-view-add-class
         if .async {
@@ -32,7 +42,7 @@ match .* ns-view-add-class {
 
 // Содержимое view
 match .* ns-view-content {
-    apply .views.* ns-view
+    apply /.views.* ns-view
 }
 
 // Содержимое view при lazy-инициализации

@@ -9,6 +9,7 @@ func model(name) {
     /.models.*[ name() == name ]
 }
 
+// @private
 match / {
     <div class="ns-root">
         apply .views.* ns-view
@@ -24,6 +25,7 @@ match .* ns-view {
 // Главная мода для каждой view
 // Генерит <div class="ns-view-<viewname>"> ... </div>
 // Содержимое view определяется модой ns-view-content
+// @private
 match .* ns-build-view {
     <div class="ns-view-{ name() }">
         @class += apply . ns-view-add-class
@@ -36,16 +38,19 @@ match .* ns-build-view {
 }
 
 // Возможность добавить к блоку view какой-либо класс
+// @public
 match .* ns-view-add-class {
     // по умолчанию ничего к классу не добавляем
 }
 
 // Содержимое view
+// @public
 match .* ns-view-content {
     apply /.views.* ns-view
 }
 
 // Содержимое view при lazy-инициализации
+// @public
 match .* ns-view-lazy-content {
     "lazy view!"
 }

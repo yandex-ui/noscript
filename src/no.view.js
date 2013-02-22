@@ -90,18 +90,43 @@ no.View.getKey = function(id, params, info) {
     //  в частности, для боксов.
     info = info || no.View.info(id) || {};
 
-    var key = 'view=' + id;
+    var key;
+    var pGroups = info.pGroups || [];
+    for (var g = 0; g < pGroups.length; g++) {
 
-    var pNames = info.pNames || [];
-    for (var i = 0, l = pNames.length; i < l; i++) {
-        var pName = pNames[i];
-        var pValue = params[pName];
-        if (pValue != null) {
+        key = 'view=' + id;
+
+        var group = pGroups[g];
+        var pNames = group.pNames || [];
+        var pFilters = group.pFilters || {};
+        var pOptional = group.pOptional || {};
+
+        for (var i = 0, l = pNames.length; i < l; i++) {
+            var pName = pNames[i];
+            var pValue = params[pName];
+            var pFilter = pFilters[pName];
+            var isOptional = pOptional[pName] != null;
+
+            if (pValue == null && isOptional) {
+                continue;
+            }
+
+            if ( pValue == null || (pFilter && pValue != pFilter) ) {
+                key = null;
+                break;
+            }
+
             key += '&' + pName + '=' + pValue;
+        }
+
+        if (key) {
+            return key;
         }
     }
 
-    return key;
+    // Не очень понятно, как реагировать на то, что для view нельзя построить ключ.
+    // throw "We could not create key for view: " + id;
+    return null;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -160,21 +185,9 @@ no.View.define = function(id, info, base) {
 
 no.View.info = function(id) {
     var info = _infos[id];
-    // если есть декларация, но еще нет pNames, то надо завершить определение View
-    if (info && !info.pNames) {
-        var params = {};
-        var models = info.models;
-        for (var i = 0, l = models.length; i < l; i++) {
-            var modelInfo = no.Model.info(models[i]);
-            if (!modelInfo) {
-                throw 'Model "' + models[i] + '" is not defined!';
-            }
-            no.extend( params, modelInfo.params );
-        }
-        if (info.params) {
-            no.extend(params, info.params);
-        }
-        info.pNames = Object.keys(params);
+    // если есть декларация, но еще нет pGroups, то надо завершить определение View
+    if (info && !info.pGroups) {
+        no.View._initInfoParams(info);
 
         /**
          * События, которые вешаются на htmlinit, снимаются на htmldestroy
@@ -263,6 +276,50 @@ no.View.info = function(id) {
         delete info.events;
     }
     return info;
+};
+
+no.View._initInfoParams = function(info) {
+    if (info.params) {
+        var groups;
+        var pGroups = [];
+        if ( !Array.isArray(info.params) ) {
+            groups = [ info.params ];
+        } else {
+            groups = info.params;
+        }
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            // Если в params задано значение параметра -- это фильтр.
+            // Опциональные параметры это параметры моделей с дефолтным значением.
+            pGroups.push({
+                pNames: Object.keys(group),
+                pFilters: group,
+                pOptional: {}
+            });
+        }
+
+        info.pGroups = pGroups;
+    } else {
+        var params = {};
+        var models = info.models;
+        for (var i = 0, l = models.length; i < l; i++) {
+            var modelInfo = no.Model.info(models[i]);
+            if (!modelInfo) {
+                throw 'Model "' + models[i] + '" is not defined!';
+            }
+            no.extend( params, modelInfo.params );
+        }
+
+        // Когда параметры строятся из параметров моделей нет фильтров параметров.
+        info.pGroups = [
+            {
+                pNames: Object.keys(params),
+                pFilters: {},
+                pOptional: params
+            }
+        ];
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -384,7 +441,7 @@ no.View.prototype._getEvents = function(type) {
 
             'no-global': this._bindEventHandlers(noeventsInfo['global'], 1),
             'no-local': this._bindEventHandlers(noeventsInfo['local'], 1)
-        }
+        };
     }
     return this[eventProp];
 };

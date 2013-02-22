@@ -1,28 +1,41 @@
-// common yate templates for noscript
+/*
+ * @fileOverview Common yate templates for noscript
+ */
 
 key model(/.models.*, "{ name() }") { . }
 params = /.params
 
 match / {
     <div class="ns-root">
-        apply .views.* view
+        apply .views.* ns-view
     </div>
 }
 
-match .* view {
+// Главная мода для каждой view
+// Генерит <div class="ns-view-<viewname>"> ... </div>
+// Содержимое view определяется модой ns-view-content
+match .* ns-view {
     <div class="ns-view-{ name() }">
+        @class += apply . ns-view-add-class
         if .async {
-            apply . view-lazy-content
+            apply . ns-view-lazy-content
         } else {
-            apply . view-content
+            apply . ns-view-content
         }
     </div>
 }
 
-match .* view-content {
-    apply .views.* view
+// Возможность добавить к блоку view какой-либо класс
+match .* ns-view-add-class {
+    // по умолчанию ничего к классу не добавляем
 }
 
-match .* view-lazy-content {
+// Содержимое view
+match .* ns-view-content {
+    apply .views.* ns-view
+}
+
+// Содержимое view при lazy-инициализации
+match .* ns-view-lazy-content {
     "lazy view!"
 }

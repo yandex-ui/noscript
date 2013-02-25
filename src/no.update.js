@@ -103,14 +103,13 @@ no.Update.prototype._update = function(async) {
     };
     this.view._getUpdateTree(tree, layout.views, params);
 
-    //TODO: detect if empty
-    if ( no.object.isEmpty(tree.views) ) {
-        no.todo();
-        // return;
+    // если пустое дерево, то ничего не реднерим,
+    // но кидаем события и скрываем/открываем блоки
+    if (!no.object.isEmpty(tree.views)) {
+        var html = no.tmpl(tree, null, '');
+        var node = no.html2node(html);
     }
 
-    var html = no.tmpl(tree, null, '');
-    var node = no.html2node(html);
     this.view._updateHTML(node, layout.views, params, {
         toplevel: true,
         async: async

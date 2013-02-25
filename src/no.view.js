@@ -608,12 +608,18 @@ no.View.prototype._getUpdateTree = function(tree, layout, params) {
 no.View.prototype._getViewTree = function(layout, params) {
     var tree = {
         async: false,
+        // фейковое дерево, чтобы удобно матчится в yate
+        tree: {},
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
         // добавляем собственные параметры блока
         params: this.params,
         views: {}
     };
+
+    // добавляем название view, чтобы можно было писать
+    // match .view-name ns-view-content
+    tree.tree[this.id] = true;
 
     //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
     //  помечаем его как асинхронный (false).

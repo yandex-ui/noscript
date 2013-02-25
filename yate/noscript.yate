@@ -19,7 +19,7 @@ match / {
 // делает chroot для view и генерит обертку с помощью ns-build-view
 // @private
 match .* ns-view {
-    apply document(.) ns-build-view
+    apply document(.).tree.* ns-build-view
 }
 
 // Главная мода для каждой view

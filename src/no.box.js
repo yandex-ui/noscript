@@ -76,8 +76,11 @@ no.Box.prototype._getViewTree = function(layout, params) {
     //  Для бокса это всегда объект (возможно, пустой).
     var tree = {
         box: true,
+        tree: {},
         views: {}
     };
+
+    tree.tree[this.id] = true;
 
     var views = this.views;
     for (var id in layout) {

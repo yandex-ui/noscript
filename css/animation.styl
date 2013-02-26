@@ -1,0 +1,42 @@
+.slide.move-from-right
+.slide.move-from-left
+.slide.move-to-left
+.slide.move-to-right
+	animation-timing-function: ease-out;
+	animation-duration: 1000ms;
+
+.slide.move-to-left
+	transform: translateX(-100%);
+	animation-name: slideouttoleft;
+
+.slide.move-to-right
+	transform: translateX(100%);
+	animation-name: slideouttoright;
+
+.slide.move-from-right
+	transform: translateX(0);
+	animation-name: slideinfromright;
+
+.slide.move-from-left
+	transform: translateX(0);
+	animation-name: slideinfromleft;
+
+@keyframes slideouttoleft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+@keyframes slideouttoright {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+@keyframes slideinfromright {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideinfromleft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}

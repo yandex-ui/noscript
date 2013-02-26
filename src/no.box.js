@@ -144,11 +144,20 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         }
     }
 
+    //FIXME: это прототип!!!
+
+    //TODO: ставить класс ns-should-transition
+    //TODO: определять слева или справа
+
+    var hiddenView;
+    var visibleView;
+
     //  Прячем все блоки, которые были в старом active, но не попали в новый.
     for (var id in oldActive) {
         var key = oldActive[id];
         if (newActive[id] !== key) {
             var subviews = views[key]._getDescendants( [] );
+            hiddenView = views[key].node;
             for (var i = 0, l = subviews.length; i < l; i++) {
                 subviews[i]._hide();
             }
@@ -159,6 +168,35 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
     for (var id in newActive) {
         var key = newActive[id];
         views[key]._show();
+        visibleView = views[key].node;
+    }
+
+    if (visibleView && hiddenView) {
+        var oldPage = Number((hiddenView.className.match(/ns-page-(\d+)/) || [])[1]);
+        var newPage = Number((visibleView.className.match(/ns-page-(\d+)/) || [])[1]);
+        if (oldPage && newPage) {
+            var oldClassName = 'ns-view-active slide';
+            var newClassName = 'ns-view-active slide';
+            if (oldPage > newPage) {
+                oldClassName += ' move-to-right';
+                newClassName += ' move-from-left';
+
+            } else {
+                oldClassName += ' move-to-left';
+                newClassName += ' move-from-right';
+            }
+
+            $(visibleView).addClass(newClassName);
+            $(hiddenView).addClass(oldClassName);
+
+            $(visibleView).one( 'webkitAnimationEnd animationend', function() {
+                $(this).removeClass(newClassName);
+            });
+
+            $(hiddenView).one( 'webkitAnimationEnd animationend', function() {
+                $(this).removeClass(oldClassName);
+            });
+        }
     }
 
     //  Запоминаем новый active.

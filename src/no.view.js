@@ -313,7 +313,7 @@ no.View.prototype._hide = function() {
 
     if (this._visible === true) {
         this._unbindEvents('show');
-        this.node.style.display = 'none';
+        this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
         this._visible = false;
         this.trigger('hide');
     }
@@ -330,7 +330,7 @@ no.View.prototype._show = function() {
     // При создании блока у него this._visible === undefined.
     if (this._visible !== true) {
         this._bindEvents('show');
-        this.node.style.display = '';
+        this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
         this._visible = true;
         this.trigger('show');
     }

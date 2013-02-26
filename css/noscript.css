@@ -1,0 +1,20 @@
+.ns-view-hidden
+{
+    display: none;
+}
+
+.ns-view-active.ns-view-hidden,
+.ns-view-visible
+{
+    display: block;
+}
+
+.ns-view-active
+{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+}

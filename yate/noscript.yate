@@ -29,7 +29,7 @@ match .* ns-view {
 match .* ns-build-view {
     <div class="ns-view-{ name() }">
         @class += apply . ns-view-add-class
-        if .async {
+        if /.async {
             apply . ns-view-lazy-content
         } else {
             apply . ns-view-content

@@ -4,10 +4,11 @@
 
 layout-params = /.layout-params
 
-// функция для получения моделей
-func model(name) {
-    /.models.*[ name() == name ]
-}
+models = /.models
+
+//  Ключ для получения моделей по имени.
+//
+key model( models.*, name() ) { . }
 
 // @private
 match / {

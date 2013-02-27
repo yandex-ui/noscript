@@ -612,8 +612,11 @@ no.View.prototype._getViewTree = function(layout, params) {
         tree: {},
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
-        // добавляем собственные параметры блока
+        //  добавляем собственные параметры блока
+        //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,
+        //  FIXME: Не должно ли оно приходить в параметрах Update'а?
+        page: no.page.current,
         views: {}
     };
 

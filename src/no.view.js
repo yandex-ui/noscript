@@ -287,20 +287,20 @@ no.View.info = function(id) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 /**
  * Фабрика no.View
- * @param {String} id
- * @param {Object} params
- * @param {Boolean} [async=false]
+ * @param {String} id ID view.
+ * @param {Object} [params] Параметры view.
+ * @param {Boolean} [async=false] Может ли view бы асинхронным.
  * @return {no.View}
  */
 no.View.create = function(id, params, async) {
-    var ctor = _ctors[id];
-    if (!ctor) {
+    var Ctor = _ctors[id];
+    if (!Ctor) {
         throw 'no.View "' + id + '" is not declared!';
     }
     /**
      * @type {no.View}
      */
-    var view = new ctor();
+    var view = new Ctor();
     view._init(id, params, async);
 
     return view;

@@ -80,6 +80,12 @@ no.View.prototype._init = function(id, params, async) {
      */
     this._eventNS = '.no-view-' + this.id;
 
+    // события, которые надо забиндить сразу при создании блока
+    for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
+        var event = this.info.createEvents[i];
+        this.on(event[0], event[1]);
+    }
+
     this.trigger('init');
 };
 
@@ -177,6 +183,12 @@ no.View.info = function(id) {
         info.pNames = Object.keys(params);
 
         /**
+         * События, которые надо повесить сразу при создании view
+         * @type {Array}
+         */
+        info.createEvents = [];
+
+        /**
          * События, которые вешаются на htmlinit, снимаются на htmldestroy
          * @type {Object}
          */
@@ -248,12 +260,19 @@ no.View.info = function(id) {
 
                 } else {
                     when = when || 'init';
-                    // если есть селектор, то это локальное событие
-                    if (eventSelector) {
-                        info[when + 'Noevents'].local.push([eventName, handler]);
+
+                    // событие тригерится при создании блока, поэтому вешать его надо сразу
+                    if (eventName == 'init') {
+                        info.createEvents.push([eventName, handler]);
 
                     } else {
-                        info[when + 'Noevents'].global.push([eventName, handler]);
+                        // если есть селектор, то это локальное событие
+                        if (eventSelector) {
+                            info[when + 'Noevents'].local.push([eventName, handler]);
+
+                        } else {
+                            info[when + 'Noevents'].global.push([eventName, handler]);
+                        }
                     }
                 }
             }

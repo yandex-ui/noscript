@@ -660,6 +660,10 @@ no.View.prototype._getModelsData = function() {
     return r;
 };
 
+no.View.prototype.getModel = function(id) {
+    return this.models[id].getData();
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.View.prototype._getDescendants = function(views) {

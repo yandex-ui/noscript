@@ -174,5 +174,20 @@ function cleanKey(key) {
     return key;
 }
 
+if (window['mocha']) {
+    /**
+     * Удаляет определение layout.
+     * Используется только в юнит-тестах.
+     * @param {String} [id] Layout ID.
+     */
+    no.layout.undefine = function(id) {
+        if (id) {
+            delete _pages[id];
+        } else {
+            _pages = {};
+        }
+    };
+}
+
 })();
 

@@ -758,11 +758,16 @@ if (window['mocha']) {
     /**
      * Удаляет определение view.
      * Используется только в юнит-тестах.
-     * @param {String} id ID view.
+     * @param {String} [id] ID view.
      */
     no.View.undefine = function(id) {
-        delete _ctors[id];
-        delete _infos[id];
+        if (id) {
+            delete _ctors[id];
+            delete _infos[id];
+        } else {
+            _ctors = {};
+            _infos = {};
+        }
     };
 
     no.View.privats = {

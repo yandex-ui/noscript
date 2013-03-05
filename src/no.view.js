@@ -752,6 +752,11 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
         }
     }
 
+    if ( this.isOk() ) {
+        this._show();
+        events.push('show');
+    }
+
     //  В асинхронном запросе вызываем onrepaint для блоков, которые были заглушкой.
     //  В синхронном запросе вызывает onrepaint для всех блоков.
     //  Кроме того, не вызываем onrepaint для все еще заглушек.

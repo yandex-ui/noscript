@@ -156,10 +156,12 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
     }
 
     //  Показываем все блоки, которые видны в новом active.
+    /*
     for (var id in newActive) {
         var key = newActive[id];
         views[key]._show();
     }
+    */
 
     //  Запоминаем новый active.
     this.active = newActive;

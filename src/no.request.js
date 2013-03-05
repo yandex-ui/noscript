@@ -192,6 +192,12 @@ no.request.Manager = {
     }
 };
 
+if (window['mocha']) {
+    no.request.clean = function() {
+        no.request.Manager._keys = {};
+    }
+}
+
 var REQUEST_ID = 0;
 
 //  ---------------------------------------------------------------------------------------------------------------  //

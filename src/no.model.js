@@ -523,12 +523,18 @@ if(window['mocha']) {
     /**
      * Удаляет определение модели.
      * Используется только в юнит-тестах.
-     * @param {String} id ID модели.
+     * @param {String} [id] ID модели.
      */
     no.Model.undefine = function(id) {
-        delete _cache[id];
-        delete _ctors[id];
-        delete _infos[id];
+        if (id) {
+            delete _cache[id];
+            delete _ctors[id];
+            delete _infos[id];
+        } else {
+            _cache = {};
+            _ctors = {};
+            _infos = {};
+        }
     };
 
     no.Model.privats = {

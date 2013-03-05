@@ -21,13 +21,24 @@ describe('no.View.events', function() {
         for (var i = 0, j = defs.length - 1; i < j; i++) {
             var def = defs[i];
             var defNext = defs[i + 1];
-            (function(view, event, nextView, nextEvent) {
+            (function(view, event, pos, nextView, nextEvent, nextPos) {
                 it('should trigger "'+event+'" for "'+view+'" before "'+nextEvent+'" for "'+nextView+'" ', function() {
                     var spyName = view + '-' + event + '-spy';
                     var nextSpyName = nextView + '-' + nextEvent + '-spy';
-                    expect(this.events[spyName].calledBefore(this.events[nextSpyName])).to.be.ok();
+
+                    var spy = this.events[spyName];
+                    if (typeof pos == 'number') {
+                        spy = spy.getCall(pos);
+                    }
+
+                    var nextSpy = this.events[nextSpyName];
+                    if (typeof nextPos == 'number') {
+                        nextSpy = nextSpy.getCall(nextPos);
+                    }
+
+                    expect(spy.calledBefore(nextSpy)).to.be.ok();
                 });
-            })(def[0], def[1], defNext[0], defNext[1]);
+            })(def[0], def[1], def[2], defNext[0], defNext[1], defNext[2]);
 
         }
     }
@@ -42,17 +53,21 @@ describe('no.View.events', function() {
 
         no.layout.define('content1', {
             'app content@': {
-                'content1': true
+                'content1': {
+                    'content1-inner': true
+                }
             }
         }, 'app');
 
         no.layout.define('content2', {
             'app content@': {
-                'content2': true
+                'content2': {
+                    'content2-inner': true
+                }
             }
         }, 'app');
 
-        var views = ['app', 'head', 'content1', 'content2'];
+        var views = ['app', 'head', 'content1', 'content1-inner', 'content2', 'content2-inner'];
         var events = ['init', 'htmlinit', 'show', 'repaint', 'hide', 'htmldestroy'];
 
         this.events = {};
@@ -120,7 +135,9 @@ describe('no.View.events', function() {
                 ['app', 'init', 'calledOnce'],
                 ['head', 'init', 'calledOnce'],
                 ['content1', 'init', 'calledOnce'],
-                ['content2', 'init', 'calledOnce', false]
+                ['content1-inner', 'init', 'calledOnce'],
+                ['content2', 'init', 'calledOnce', false],
+                ['content2-inner', 'init', 'calledOnce', false]
             ]);
         });
 
@@ -129,7 +146,9 @@ describe('no.View.events', function() {
                 ['app', 'htmlinit', 'calledOnce'],
                 ['head', 'htmlinit', 'calledOnce'],
                 ['content1', 'htmlinit', 'calledOnce'],
-                ['content2', 'htmlinit', 'calledOnce', false]
+                ['content1-inner', 'htmlinit', 'calledOnce'],
+                ['content2', 'htmlinit', 'calledOnce', false],
+                ['content2-inner', 'htmlinit', 'calledOnce', false]
             ]);
         });
 
@@ -138,7 +157,9 @@ describe('no.View.events', function() {
                 ['app', 'show', 'calledOnce'],
                 ['head', 'show', 'calledOnce'],
                 ['content1', 'show', 'calledOnce'],
-                ['content2', 'show', 'calledOnce', false]
+                ['content1-inner', 'show', 'calledOnce'],
+                ['content2', 'show', 'calledOnce', false],
+                ['content2-inner', 'show', 'calledOnce', false]
             ]);
         });
 
@@ -147,7 +168,9 @@ describe('no.View.events', function() {
                 ['app', 'repaint', 'calledOnce'],
                 ['head', 'repaint', 'calledOnce'],
                 ['content1', 'repaint', 'calledOnce'],
-                ['content2', 'repaint', 'calledOnce', false]
+                ['content1-inner', 'repaint', 'calledOnce'],
+                ['content2', 'repaint', 'calledOnce', false],
+                ['content2-inner', 'repaint', 'calledOnce', false]
             ]);
         });
 
@@ -156,7 +179,9 @@ describe('no.View.events', function() {
                 ['app', 'hide', 'calledOnce', false],
                 ['head', 'hide', 'calledOnce', false],
                 ['content1', 'hide', 'calledOnce', false],
-                ['content2', 'hide', 'calledOnce', false]
+                ['content1-inner', 'hide', 'calledOnce', false],
+                ['content2', 'hide', 'calledOnce', false],
+                ['content2-inner', 'hide', 'calledOnce', false]
             ]);
         });
 
@@ -165,20 +190,25 @@ describe('no.View.events', function() {
                 ['app', 'htmldestroy', 'calledOnce', false],
                 ['head', 'htmldestroy', 'calledOnce', false],
                 ['content1', 'htmldestroy', 'calledOnce', false],
-                ['content2', 'htmldestroy', 'calledOnce', false]
+                ['content1-inner', 'htmldestroy', 'calledOnce', false],
+                ['content2', 'htmldestroy', 'calledOnce', false],
+                ['content2-inner', 'htmldestroy', 'calledOnce', false]
             ]);
         });
 
         describe('order', function() {
             genOrderTests([
+                ['content1-inner', 'htmlinit'],
                 ['content1', 'htmlinit'],
                 ['head', 'htmlinit'],
                 ['app', 'htmlinit'],
 
+                ['content1-inner', 'show'],
                 ['content1', 'show'],
                 ['head', 'show'],
                 ['app', 'show'],
 
+                ['content1-inner', 'repaint'],
                 ['content1', 'repaint'],
                 ['head', 'repaint'],
                 ['app', 'repaint']
@@ -198,42 +228,58 @@ describe('no.View.events', function() {
         });
 
         genTests([
+
+            ['content2-inner', 'init', 'calledOnce'],
+            ['content2-inner', 'htmlinit', 'calledOnce'],
+            ['content2-inner', 'show', 'calledOnce'],
+            ['content2-inner', 'repaint', 'calledOnce'],
+
             ['content2', 'init', 'calledOnce'],
             ['content2', 'htmlinit', 'calledOnce'],
             ['content2', 'show', 'calledOnce'],
             ['content2', 'repaint', 'calledOnce'],
 
             ['app', 'show', 'calledOnce'],
+            ['content1-inner', 'hide', 'calledOnce'],
             ['content1', 'hide', 'calledOnce'],
 
             ['app', 'repaint', 'calledTwice'],
             ['head', 'repaint', 'calledTwice'],
             ['content1', 'repaint', 'calledOnce'],
-            ['content2', 'repaint', 'calledOnce']
+            ['content1-inner', 'repaint', 'calledOnce'],
+            ['content2', 'repaint', 'calledOnce'],
+            ['content2-inner', 'repaint', 'calledOnce']
         ]);
 
         describe('order', function() {
             genOrderTests([
-                ['content1', 'htmlinit'],
-                ['head', 'htmlinit'],
-                ['app', 'htmlinit'],
+                ['content1-inner', 'htmlinit', 0],
+                ['content1', 'htmlinit', 0],
+                ['head', 'htmlinit', 0],
+                ['app', 'htmlinit', 0],
 
-                ['content1', 'show'],
-                ['head', 'show'],
-                ['app', 'show'],
+                ['content1-inner', 'show', 0],
+                ['content1', 'show', 0],
+                ['head', 'show', 0],
+                ['app', 'show', 0],
 
-                ['content1', 'repaint'],
-                ['head', 'repaint'],
-                ['app', 'repaint'],
+                ['content1-inner', 'repaint', 0],
+                ['content1', 'repaint', 0],
+                ['head', 'repaint', 0],
+                ['app', 'repaint', 0],
 
-                ['content1', 'hide'],
+                ['content1-inner', 'hide', 0],
+                ['content1', 'hide', 0],
 
-                ['content2', 'htmlinit'],
-                ['content2', 'show'],
+                ['content2-inner', 'htmlinit', 0],
+                ['content2', 'htmlinit', 0],
+                ['content2-inner', 'show', 0],
+                ['content2', 'show', 0],
 
-                ['content2', 'repaint'],
-                ['head', 'repaint'],
-                ['app', 'repaint']
+                ['content2-inner', 'repaint', 0],
+                ['content2', 'repaint', 0],
+                ['head', 'repaint', 1],
+                ['app', 'repaint', 1]
             ]);
         });
     });

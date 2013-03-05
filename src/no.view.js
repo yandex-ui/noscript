@@ -491,10 +491,15 @@ no.View.prototype._unbindEvents = function(type) {
     }
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Инвалидует себя и своих потомков.
+ */
 no.View.prototype.invalidate = function() {
-    this.status = this.STATUS.INVALID;
+    // рекурсивно инвалидируем себя и потомков
+    var views = this._getDescendants();
+    for (var i = 0, j = views.length; i < j; i++) {
+        views[i].status = this.STATUS.INVALID;
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -681,9 +686,14 @@ no.View.prototype.getModel = function(id) {
     return this.models[id].getData();
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Возвращает массив всех вложенных view, включая себя
+ * @param {Array} [views=[]] Начальный массив.
+ * @return {Array}
+ * @private
+ */
 no.View.prototype._getDescendants = function(views) {
+    views = views || [];
     views.push(this);
     this._apply(function(view) {
         view._getDescendants(views);
@@ -726,13 +736,18 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 if (this.node) {
-                    // вызываем htmldestory только если нода была заменена
-                    this._unbindEvents('init');
-                    events['htmldestroy'].push(this);
                     no.replaceNode(this.node, viewNode);
                 }
                 //  Все подблоки уже не toplevel.
                 toplevel = false;
+            }
+            // вызываем htmldestory только если нода была заменена
+            if (this.node) {
+                this._hide();
+                this._unbindEvents('init');
+
+                events['hide'].push(this);
+                events['htmldestroy'].push(this);
             }
             //  Запоминаем новую ноду.
             this._setNode(viewNode);

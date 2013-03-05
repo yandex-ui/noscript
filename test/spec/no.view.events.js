@@ -284,6 +284,77 @@ describe('no.View.events', function() {
         });
     });
 
+    describe('redraw view', function() {
+
+        beforeEach(function() {
+            var layout = no.layout.page('content1', {});
+            new no.Update(this.APP, layout, {}).start();
+
+            /**
+             * @type {no.View}
+             */
+            var vContent1 = this.events['content1-init-spy'].getCall(0).thisValue;
+            vContent1.invalidate();
+
+            layout = no.layout.page('content1', {});
+            new no.Update(this.APP, layout, {}).start();
+        });
+
+        describe('events', function() {
+            genTests([
+                ['content1-inner', 'hide', 'calledOnce'],
+                ['content1', 'hide', 'calledOnce'],
+
+                ['content1-inner', 'htmldestroy', 'calledOnce'],
+                ['content1', 'htmldestroy', 'calledOnce'],
+
+                ['content1-inner', 'htmlinit', 'calledTwice'],
+                ['content1', 'htmlinit', 'calledTwice'],
+
+                ['content1-inner', 'show', 'calledTwice'],
+                ['content1', 'show', 'calledTwice'],
+
+                ['content1-inner', 'repaint', 'calledTwice'],
+                ['content1', 'repaint', 'calledTwice']
+            ]);
+        });
+
+        describe('order', function() {
+            genOrderTests([
+                ['content1-inner', 'htmlinit', 0],
+                ['content1', 'htmlinit', 0],
+                ['head', 'htmlinit', 0],
+                ['app', 'htmlinit', 0],
+
+                ['content1-inner', 'show', 0],
+                ['content1', 'show', 0],
+                ['head', 'show', 0],
+                ['app', 'show', 0],
+
+                ['content1-inner', 'repaint', 0],
+                ['content1', 'repaint', 0],
+                ['head', 'repaint', 0],
+                ['app', 'repaint', 0],
+
+                ['content1-inner', 'hide', 0],
+                ['content1', 'hide', 0],
+
+                ['content1-inner', 'htmldestroy', 0],
+                ['content1', 'htmldestroy', 0],
+
+                ['content1-inner', 'htmlinit', 1],
+                ['content1', 'htmlinit', 1],
+                ['content1-inner', 'show', 1],
+                ['content1', 'show', 1],
+
+                ['content1-inner', 'repaint', 1],
+                ['content1', 'repaint', 1],
+                ['head', 'repaint', 1],
+                ['app', 'repaint', 1]
+            ]);
+        });
+    });
+
     //TODO: порядок вызова событий
     //TODO: вызывается для всех дочерних блоков
     //TODO: view update test

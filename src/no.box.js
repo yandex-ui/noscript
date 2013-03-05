@@ -25,10 +25,10 @@ no.Box.prototype._getView = function(id, params) {
     return this.views[key];
 };
 
-no.Box.prototype._addView = function(id, params) {
+no.Box.prototype._addView = function(id, params, type) {
     var view = this._getView(id, params);
     if (!view) {
-        view = no.View.create(id, params);
+        view = no.View.create(id, params, type === no.L.ASYNC);
         this.views[view.key] = view;
     }
     return view;
@@ -54,7 +54,7 @@ no.Box.prototype._getRequestViews = function(updated, layout, params) {
     for (var id in layout) {
         //  Согласно новому layout'у здесь должен быть view с id/params.
         //  Создаем его (если он уже есть, он возьмется из this.views).
-        var view = this._addView(id, params);
+        var view = this._addView(id, params, layout[id].type);
         //  Идем вниз рекурсивно.
         view._getRequestViews(updated, layout[id].views, params);
     }

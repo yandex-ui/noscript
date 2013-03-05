@@ -43,6 +43,13 @@ no.Update = function(view, layout, params) {
  */
 var update_id = -1;
 
+/**
+ * Порядок событий для View.
+ * @type {Array}
+ * @private
+ */
+no.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'show', 'repaint'];
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.Update.prototype.start = function() {
@@ -110,10 +117,26 @@ no.Update.prototype._update = function(async) {
         var node = no.html2node(html);
     }
 
+    var viewEvents = {
+        'hide': [],
+        'htmldestroy': [],
+        'htmlinit': [],
+        'show': [],
+        'repaint': []
+    };
+
     this.view._updateHTML(node, layout.views, params, {
         toplevel: true,
         async: async
-    });
+    }, viewEvents);
+
+    for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
+        var event = this._EVENTS_ORDER[i];
+        var views = viewEvents[event];
+        for (var k = views.length - 1; k >= 0; k--) {
+            views[k].trigger(event, params);
+        }
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

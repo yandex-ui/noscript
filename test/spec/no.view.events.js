@@ -17,6 +17,21 @@ describe('no.View.events', function() {
         }
     }
 
+    function genOrderTests(defs) {
+        for (var i = 0, j = defs.length - 1; i < j; i++) {
+            var def = defs[i];
+            var defNext = defs[i + 1];
+            (function(view, event, nextView, nextEvent) {
+                it('should trigger "'+event+'" for "'+view+'" before "'+nextEvent+'" for "'+nextView+'" ', function() {
+                    var spyName = view + '-' + event + '-spy';
+                    var nextSpyName = nextView + '-' + nextEvent + '-spy';
+                    expect(this.events[spyName].calledBefore(this.events[nextSpyName])).to.be.ok();
+                });
+            })(def[0], def[1], defNext[0], defNext[1]);
+
+        }
+    }
+
     beforeEach(function() {
         no.layout.define('app', {
             'app': {
@@ -135,6 +150,41 @@ describe('no.View.events', function() {
                 ['content2', 'repaint', 'calledOnce', false]
             ]);
         });
+
+        describe('hide', function() {
+            genTests([
+                ['app', 'hide', 'calledOnce', false],
+                ['head', 'hide', 'calledOnce', false],
+                ['content1', 'hide', 'calledOnce', false],
+                ['content2', 'hide', 'calledOnce', false]
+            ]);
+        });
+
+        describe('htmldestroy', function() {
+            genTests([
+                ['app', 'htmldestroy', 'calledOnce', false],
+                ['head', 'htmldestroy', 'calledOnce', false],
+                ['content1', 'htmldestroy', 'calledOnce', false],
+                ['content2', 'htmldestroy', 'calledOnce', false]
+            ]);
+        });
+
+        describe('order', function() {
+            genOrderTests([
+                ['content1', 'htmlinit'],
+                ['head', 'htmlinit'],
+                ['app', 'htmlinit'],
+
+                ['content1', 'show'],
+                ['head', 'show'],
+                ['app', 'show'],
+
+                ['content1', 'repaint'],
+                ['head', 'repaint'],
+                ['app', 'repaint']
+            ]);
+        });
+
     });
 
     describe('change view in box', function() {
@@ -158,9 +208,38 @@ describe('no.View.events', function() {
 
             ['app', 'repaint', 'calledTwice'],
             ['head', 'repaint', 'calledTwice'],
-            ['content1', 'repaint', 'calledOnce']
+            ['content1', 'repaint', 'calledOnce'],
+            ['content2', 'repaint', 'calledOnce']
         ]);
+
+        describe('order', function() {
+            genOrderTests([
+                ['content1', 'htmlinit'],
+                ['head', 'htmlinit'],
+                ['app', 'htmlinit'],
+
+                ['content1', 'show'],
+                ['head', 'show'],
+                ['app', 'show'],
+
+                ['content1', 'repaint'],
+                ['head', 'repaint'],
+                ['app', 'repaint'],
+
+                ['content1', 'hide'],
+
+                ['content2', 'htmlinit'],
+                ['content2', 'show'],
+
+                ['content2', 'repaint'],
+                ['head', 'repaint'],
+                ['app', 'repaint']
+            ]);
+        });
     });
 
     //TODO: порядок вызова событий
+    //TODO: вызывается для всех дочерних блоков
+    //TODO: view update test
+    //TODO: async-view test
 });

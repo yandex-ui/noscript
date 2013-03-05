@@ -326,33 +326,31 @@ no.View.prototype._addView = function(id, params, type) {
 };
 
 no.View.prototype._hide = function() {
-    if ( this.isLoading() ) {
-        return;
-    }
-
-    if (this._visible === true) {
+    if (!this.isLoading() && this._visible === true) {
         this._unbindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
         this._visible = false;
-        this.trigger('hide');
+        return true;
     }
+
+    return false;
 };
 
 /**
  * Показывает View
  * @private
+ * @return {Boolean}
  */
 no.View.prototype._show = function() {
-    if ( this.isLoading() ) {
-        return;
-    }
     // При создании блока у него this._visible === undefined.
-    if (this._visible !== true) {
+    if (!this.isLoading() && this._visible !== true) {
         this._bindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
         this._visible = true;
-        this.trigger('show');
+        return true;
     }
+
+    return false;
 };
 
 /**
@@ -709,7 +707,7 @@ no.View.prototype._setNode = function(node) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем (если нужно) ноду блока.
-no.View.prototype._updateHTML = function(node, layout, params, options) {
+no.View.prototype._updateHTML = function(node, layout, params, options, events) {
     var toplevel = options.toplevel;
     var async = options.async;
 
@@ -725,14 +723,12 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
             if (toplevel) {
-                if (!wasLoading) {
-                    this._unbindEvents('init');
-                    this.trigger('htmldestroy');
-                }
-
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 if (this.node) {
+                    // вызываем htmldestory только если нода была заменена
+                    this._unbindEvents('init');
+                    events['htmldestroy'].push(this);
                     no.replaceNode(this.node, viewNode);
                 }
                 //  Все подблоки уже не toplevel.
@@ -743,7 +739,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
 
             if ( this.isOk() ) {
                 this._bindEvents('init');
-                this.trigger('htmlinit');
+                events['htmlinit'].push(this);
             }
 
             this.timestamp = +new Date();
@@ -753,14 +749,17 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
     }
 
     if ( this.isOk() ) {
-        this._show();
+        // если view был открыт
+        if (this._show()) {
+            events['show'].push(this);
+        }
     }
 
     //  В асинхронном запросе вызываем onrepaint для блоков, которые были заглушкой.
     //  В синхронном запросе вызывает onrepaint для всех блоков.
     //  Кроме того, не вызываем onrepaint для все еще заглушек.
     if ( this.isOk() && ( (async && wasLoading) || !async) ) {
-        this.trigger('repaint', params);
+        events['repaint'].push(this);
     }
 
     //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть
@@ -772,7 +771,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options) {
         view._updateHTML(viewNode, layout[id].views, params, {
             toplevel: toplevel,
             async: async
-        });
+        }, events);
     });
 };
 

@@ -94,7 +94,7 @@ no.Box.prototype._getViewTree = function(layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем бокс.
-no.Box.prototype._updateHTML = function(node, layout, params, options) {
+no.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     if (!this.node) {
         //  Ищем новую ноду бокса.
         this.node = no.byClass('ns-view-' + this.id, node)[0];
@@ -118,7 +118,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         var view = views[key];
 
         //  Обновляем его.
-        view._updateHTML(node, layout[id].views, params, options);
+        view._updateHTML(node, layout[id].views, params, options, events);
 
         if ( view.isOk() ) {
             //  Выстраиваем новые активные блоки в нужном порядке.
@@ -150,7 +150,10 @@ no.Box.prototype._updateHTML = function(node, layout, params, options) {
         if (newActive[id] !== key) {
             var subviews = views[key]._getDescendants( [] );
             for (var i = 0, l = subviews.length; i < l; i++) {
-                subviews[i]._hide();
+                // если view был скрыт
+                if (subviews[i]._hide()) {
+                    events['hide'].push(subviews[i]);
+                }
             }
         }
     }

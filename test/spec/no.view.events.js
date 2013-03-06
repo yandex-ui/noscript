@@ -67,13 +67,16 @@ describe('no.View.events', function() {
             }
         }, 'app');
 
-        var views = ['app', 'head', 'content1', 'content1-inner', 'content2', 'content2-inner'];
-        var events = ['init', 'htmlinit', 'show', 'repaint', 'hide', 'htmldestroy'];
+        var views = ['app', 'head', 'content1', 'content1-async@content1-async-model', 'content1-inner', 'content2', 'content2-inner'];
+        var events = ['async', 'init', 'htmlinit', 'show', 'repaint', 'hide', 'htmldestroy'];
 
         this.events = {};
 
         for (var i = 0, j = views.length; i < j; i++) {
-            var view = views[i];
+            var viewDecl = views[i].split('@');
+            var view = viewDecl[0];
+            var model = viewDecl[1];
+
             var eventsDecl = {};
             for (var k = 0, l = events.length; k < l; k++) {
                 var event = events[k];
@@ -84,7 +87,8 @@ describe('no.View.events', function() {
             }
 
             no.View.define(view, {
-                events: eventsDecl
+                events: eventsDecl,
+                models: model ? [model] : []
             });
         }
 
@@ -114,6 +118,7 @@ describe('no.View.events', function() {
     afterEach(function() {
         no.layout.undefine();
         no.View.undefine();
+        no.Model.undefine();
 
         no.tmpl = this.origNotmpl;
 
@@ -136,8 +141,8 @@ describe('no.View.events', function() {
                 ['head', 'init', 'calledOnce'],
                 ['content1', 'init', 'calledOnce'],
                 ['content1-inner', 'init', 'calledOnce'],
-                ['content2', 'init', 'calledOnce', false],
-                ['content2-inner', 'init', 'calledOnce', false]
+                ['content2', 'init', 'called', false],
+                ['content2-inner', 'init', 'called', false]
             ]);
         });
 
@@ -147,8 +152,8 @@ describe('no.View.events', function() {
                 ['head', 'htmlinit', 'calledOnce'],
                 ['content1', 'htmlinit', 'calledOnce'],
                 ['content1-inner', 'htmlinit', 'calledOnce'],
-                ['content2', 'htmlinit', 'calledOnce', false],
-                ['content2-inner', 'htmlinit', 'calledOnce', false]
+                ['content2', 'htmlinit', 'called', false],
+                ['content2-inner', 'htmlinit', 'called', false]
             ]);
         });
 
@@ -158,8 +163,8 @@ describe('no.View.events', function() {
                 ['head', 'show', 'calledOnce'],
                 ['content1', 'show', 'calledOnce'],
                 ['content1-inner', 'show', 'calledOnce'],
-                ['content2', 'show', 'calledOnce', false],
-                ['content2-inner', 'show', 'calledOnce', false]
+                ['content2', 'show', 'called', false],
+                ['content2-inner', 'show', 'called', false]
             ]);
         });
 
@@ -169,30 +174,30 @@ describe('no.View.events', function() {
                 ['head', 'repaint', 'calledOnce'],
                 ['content1', 'repaint', 'calledOnce'],
                 ['content1-inner', 'repaint', 'calledOnce'],
-                ['content2', 'repaint', 'calledOnce', false],
-                ['content2-inner', 'repaint', 'calledOnce', false]
+                ['content2', 'repaint', 'called', false],
+                ['content2-inner', 'repaint', 'called', false]
             ]);
         });
 
         describe('hide', function() {
             genTests([
-                ['app', 'hide', 'calledOnce', false],
-                ['head', 'hide', 'calledOnce', false],
-                ['content1', 'hide', 'calledOnce', false],
-                ['content1-inner', 'hide', 'calledOnce', false],
-                ['content2', 'hide', 'calledOnce', false],
-                ['content2-inner', 'hide', 'calledOnce', false]
+                ['app', 'hide', 'called', false],
+                ['head', 'hide', 'called', false],
+                ['content1', 'hide', 'called', false],
+                ['content1-inner', 'hide', 'called', false],
+                ['content2', 'hide', 'called', false],
+                ['content2-inner', 'hide', 'called', false]
             ]);
         });
 
         describe('htmldestroy', function() {
             genTests([
-                ['app', 'htmldestroy', 'calledOnce', false],
-                ['head', 'htmldestroy', 'calledOnce', false],
-                ['content1', 'htmldestroy', 'calledOnce', false],
-                ['content1-inner', 'htmldestroy', 'calledOnce', false],
-                ['content2', 'htmldestroy', 'calledOnce', false],
-                ['content2-inner', 'htmldestroy', 'calledOnce', false]
+                ['app', 'htmldestroy', 'called', false],
+                ['head', 'htmldestroy', 'called', false],
+                ['content1', 'htmldestroy', 'called', false],
+                ['content1-inner', 'htmldestroy', 'called', false],
+                ['content2', 'htmldestroy', 'called', false],
+                ['content2-inner', 'htmldestroy', 'called', false]
             ]);
         });
 
@@ -355,8 +360,124 @@ describe('no.View.events', function() {
         });
     });
 
-    //TODO: порядок вызова событий
-    //TODO: вызывается для всех дочерних блоков
-    //TODO: view update test
-    //TODO: async-view test
+    describe('async', function() {
+
+        beforeEach(function() {
+            no.layout.define('content1-async', {
+                'app content@': {
+                    'content1-async&': {
+                        'content1-inner': true
+                    }
+                }
+            }, 'app');
+
+            no.Model.define('content1-async-model');
+
+            this.xhr = sinon.useFakeXMLHttpRequest();
+            var requests = this.requests = [];
+            this.xhr.onCreate = function (xhr) {
+                requests.push(xhr);
+            };
+
+            var layout = no.layout.page('content1-async', {});
+            new no.Update(this.APP, layout, {}).start();
+        });
+
+        afterEach(function() {
+            this.xhr.restore();
+            no.request.clean();
+        });
+
+        describe('first pass', function() {
+            describe('events', function() {
+                genTests([
+                    ['content1-async', 'async', 'calledOnce'],
+
+                    ['content1-async', 'htmldestroy', 'called', false],
+                    ['content1-async', 'hide', 'called', false],
+                    ['content1-async', 'htmlinit', 'called', false],
+                    ['content1-async', 'show', 'called', false],
+                    ['content1-async', 'repaint', 'called', false],
+
+                    ['content1-inner', 'htmldestroy', 'called', false],
+                    ['content1-inner', 'hide', 'called', false],
+                    ['content1-inner', 'htmlinit', 'called', false],
+                    ['content1-inner', 'show', 'called', false],
+                    ['content1-inner', 'repaint', 'called', false]
+                ])
+            });
+
+            describe('order', function() {
+                genOrderTests([
+                    ['head', 'htmlinit', 0],
+                    ['app', 'htmlinit', 0],
+
+                    ['content1-async', 'async', 0],
+
+                    ['head', 'show', 0],
+                    ['app', 'show', 0],
+
+                    ['head', 'repaint', 0],
+                    ['app', 'repaint', 0]
+                ]);
+            });
+        });
+
+        describe('second pass', function() {
+
+            beforeEach(function() {
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+            });
+
+            describe('events', function() {
+                genTests([
+                    ['content1-async', 'async', 'calledOnce'],
+
+                    ['content1-async', 'htmlinit', 'calledOnce'],
+                    ['content1-async', 'show', 'calledOnce'],
+                    ['content1-async', 'repaint', 'calledOnce'],
+
+                    ['content1-inner', 'htmlinit', 'calledOnce'],
+                    ['content1-inner', 'show', 'calledOnce'],
+                    ['content1-inner', 'repaint', 'calledOnce'],
+
+                    ['head', 'repaint', 'calledOnce'],
+                    ['app', 'repaint', 'calledOnce']
+                ])
+            });
+
+            describe('order', function() {
+                genOrderTests([
+                    ['head', 'htmlinit', 0],
+                    ['app', 'htmlinit', 0],
+
+                    ['content1-async', 'async', 0],
+
+                    ['head', 'show', 0],
+                    ['app', 'show', 0],
+
+                    ['head', 'repaint', 0],
+                    ['app', 'repaint', 0],
+
+                    ['content1-inner', 'htmlinit', 0],
+                    ['content1-async', 'htmlinit', 0],
+
+                    ['content1-inner', 'show', 0],
+                    ['content1-async', 'show', 0],
+
+                    ['content1-inner', 'repaint', 0],
+                    ['content1-async', 'repaint', 0]
+                ]);
+            })
+        });
+
+    });
 });

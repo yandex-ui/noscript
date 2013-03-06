@@ -48,11 +48,14 @@ var update_id = -1;
  * @type {Array}
  * @private
  */
-no.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'show', 'repaint'];
+no.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async', 'show', 'repaint'];
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-no.Update.prototype.start = function() {
+/**
+ * Начинает работу updater'а.
+ * @param [async=false] Флаг асинхронного updater'а.
+ * @return {no.Promise}
+ */
+no.Update.prototype.start = function(async) {
     var resultPromise = new no.Promise();
 
     var updated = this.view._getRequestViews({
@@ -69,7 +72,7 @@ no.Update.prototype.start = function() {
             if (that._expired()) {
                 resultPromise.reject();
             } else {
-                that._update();
+                that._update(async);
                 //TODO: надо как-то закидывать ссылки на промисы от асинхронных view
                 resultPromise.resolve();
             }
@@ -87,7 +90,7 @@ no.Update.prototype.start = function() {
             if (!that._expired()) {
                 var fakeLayout = {};
                 fakeLayout[that.view.id] = that.layout;
-                new no.Update(that.view, fakeLayout, that.params).start();
+                new no.Update(that.view, fakeLayout, that.params).start(true);
             }
         });
     });
@@ -95,8 +98,11 @@ no.Update.prototype.start = function() {
     return resultPromise;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Обновляет DOM и триггерит нужные события
+ * @param [async=false] Флаг асинхронного updater'а.
+ * @private
+ */
 no.Update.prototype._update = function(async) {
     //  TODO: Проверить, что не начался уже более новый апдейт.
 
@@ -118,6 +124,7 @@ no.Update.prototype._update = function(async) {
     }
 
     var viewEvents = {
+        'async': [],
         'hide': [],
         'htmldestroy': [],
         'htmlinit': [],

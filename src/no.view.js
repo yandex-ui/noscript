@@ -42,8 +42,10 @@ no.View.prototype._$window = $(window);
 no.View.prototype._init = function(id, params, async) {
     this.id = id;
     this.params = params || {};
+
     /**
-     * Флаг того, что блок асинхронный.
+     * Флаг того, что view может быть асинхронным.
+     * Факт того, что сейчас view находится в асинхронном состояии опрделяться this.status и this.asyncState
      * @type {Boolean}
      */
     this.async = async;
@@ -261,8 +263,9 @@ no.View.info = function(id) {
                 } else {
                     when = when || 'init';
 
-                    // событие тригерится при создании блока, поэтому вешать его надо сразу
-                    if (eventName == 'init') {
+                    // событие init тригерится при создании блока, поэтому вешать его надо сразу
+                    // событие async тригерится до всего, его тоже надо вешать
+                    if (eventName == 'init' || eventName == 'async') {
                         info.createEvents.push([eventName, handler]);
 
                     } else {
@@ -325,11 +328,40 @@ no.View.prototype._addView = function(id, params, type) {
     return view;
 };
 
-no.View.prototype._hide = function() {
+/**
+ * Обработчик htmldestroy
+ * @param {Array} [events] Массив событий.
+ * @private
+ */
+no.View.prototype._htmldestroy = function(events) {
+    this._unbindEvents('init');
+    events.push(this);
+};
+
+/**
+ * Обработчик htmlinit
+ * @param {Array} [events] Массив событий.
+ * @private
+ */
+no.View.prototype._htmlinit = function(events) {
+    this._bindEvents('init');
+    events.push(this);
+};
+
+/**
+ * Скрывает view
+ * @param {Array} [events] Массив событий.
+ * @return {Boolean}
+ * @private
+ */
+no.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
         this._unbindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
         this._visible = false;
+        if (events) {
+            events.push(this);
+        }
         return true;
     }
 
@@ -338,15 +370,19 @@ no.View.prototype._hide = function() {
 
 /**
  * Показывает View
+ * @param {Array} [events] Массив событий.
  * @private
  * @return {Boolean}
  */
-no.View.prototype._show = function() {
+no.View.prototype._show = function(events) {
     // При создании блока у него this._visible === undefined.
     if (!this.isLoading() && this._visible !== true) {
         this._bindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
         this._visible = true;
+        if (events) {
+            events.push(this);
+        }
         return true;
     }
 
@@ -563,6 +599,12 @@ no.View.prototype._apply = function(callback) {
  * @return {*}
  */
 no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+    /**
+     * Флаг, означающий, что view грузится асинхронно.
+     * @type {Boolean}
+     */
+    this.asyncState = false;
+
     if (this.async) {
         var hasValidModels = this.isModelsValid();
         var hasValidStatus = this.isOk();
@@ -571,6 +613,7 @@ no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
             updated.sync.push(this);
 
         } else if (!hasValidModels) {
+            this.asyncState = true;
             // если асинхронный блок имеет невалидные модели, то его не надо рисовать
             updated.async.push(this);
             // прекращаем обработку
@@ -743,7 +786,7 @@ no.View.prototype._setNode = function(node) {
     var STATUS = this.STATUS;
     if (node) {
         this.node = node;
-        this.status = ( node.getAttribute('loading') ) ? STATUS.LOADING : STATUS.OK;
+        this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
     } else {
         this.status = STATUS.NONE;
     }
@@ -753,10 +796,8 @@ no.View.prototype._setNode = function(node) {
 
 //  Обновляем (если нужно) ноду блока.
 no.View.prototype._updateHTML = function(node, layout, params, options, events) {
-    var toplevel = options.toplevel;
-    var async = options.async;
-
-    var wasLoading = this.isLoading();
+    // для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
+    var generateRepaintEvent = !options.async || !this.isValid();
 
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
@@ -767,29 +808,29 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
-            if (toplevel) {
+            if (options.toplevel) {
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 if (this.node) {
                     no.replaceNode(this.node, viewNode);
                 }
                 //  Все подблоки уже не toplevel.
-                toplevel = false;
+                options.toplevel = false;
             }
             // вызываем htmldestory только если нода была заменена
             if (this.node) {
-                this._hide();
-                this._unbindEvents('init');
-
-                events['hide'].push(this);
-                events['htmldestroy'].push(this);
+                this._hide(events['hide']);
+                this._htmldestroy(events['htmldestroy']);
             }
             //  Запоминаем новую ноду.
             this._setNode(viewNode);
 
             if ( this.isOk() ) {
-                this._bindEvents('init');
-                events['htmlinit'].push(this);
+                this._htmlinit(events['htmlinit']);
+
+            } else if (this.isLoading()) {
+                // В асинхронном запросе вызываем async для view, которые являются заглушкой.
+                events['async'].push(this);
             }
 
             this.timestamp = +new Date();
@@ -798,17 +839,10 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
         }
     }
 
-    if ( this.isOk() ) {
-        // если view был открыт
-        if (this._show()) {
-            events['show'].push(this);
-        }
-    }
-
-    //  В асинхронном запросе вызываем onrepaint для блоков, которые были заглушкой.
-    //  В синхронном запросе вызывает onrepaint для всех блоков.
-    //  Кроме того, не вызываем onrepaint для все еще заглушек.
-    if ( this.isOk() && ( (async && wasLoading) || !async) ) {
+    // Если view валидный и не в async-режиме, то вызывается show и repaint
+    if ( generateRepaintEvent && this.isOk() ) {
+        // событие show будет вызвано, если у view поменяется this._visible
+        this._show(events['show']);
         events['repaint'].push(this);
     }
 
@@ -818,10 +852,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
 
     //  Рекурсивно идем вниз по дереву.
     this._apply(function(view, id) {
-        view._updateHTML(viewNode, layout[id].views, params, {
-            toplevel: toplevel,
-            async: async
-        }, events);
+        view._updateHTML(viewNode, layout[id].views, params, options, events);
     });
 };
 

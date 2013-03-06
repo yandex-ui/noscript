@@ -144,6 +144,7 @@ no.parseQuery = function(s) {
  * @param json
  * @param v
  */
+//  FIXME @nop: Что означает третий параметр?
 no.tmpl = function(json, mode, v) {
     no.todo();
 };

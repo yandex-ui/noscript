@@ -819,7 +819,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 options.toplevel = false;
             }
             // вызываем htmldestory только если нода была заменена
-            if (this.node) {
+            if (this.node && !this.isLoading()) {
                 this._hide(events['hide']);
                 this._htmldestroy(events['htmldestroy']);
             }

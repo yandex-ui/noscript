@@ -450,7 +450,10 @@ describe('no.View.events', function() {
                     ['content1-inner', 'repaint', 'calledOnce'],
 
                     ['head', 'repaint', 'calledOnce'],
-                    ['app', 'repaint', 'calledOnce']
+                    ['app', 'repaint', 'calledOnce'],
+
+                    ['content1-async', 'htmldestroy', 'called', false],
+                    ['content1-inner', 'htmldestroy', 'called', false]
                 ])
             });
 

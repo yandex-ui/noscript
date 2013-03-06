@@ -78,7 +78,7 @@ no.Update.prototype.start = function(async) {
             }
         });
 
-    // Для каждого lazy-view запрашиваем его модели.
+    // Для каждого async-view запрашиваем его модели.
     // Когда они приходят, запускаем точно такой же update.
     updated.async.forEach(function(view) {
         var models = views2models( [ view ] );

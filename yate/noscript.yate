@@ -31,7 +31,7 @@ match .* ns-build-view {
     <div class="ns-view-{ name() }">
         @class += apply . ns-view-add-class
         if /.async {
-            apply . ns-view-lazy-content
+            apply . ns-view-async-content
         } else {
             apply . ns-view-content
         }
@@ -50,8 +50,8 @@ match .* ns-view-content {
     apply /.views.* ns-view
 }
 
-// Содержимое view при lazy-инициализации
+// Содержимое view при async-инициализации
 // @public
-match .* ns-view-lazy-content {
-    "lazy view!"
+match .* ns-view-async-content {
+    "async-view-content"
 }

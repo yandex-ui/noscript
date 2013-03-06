@@ -131,14 +131,14 @@ describe('no.layout', function() {
 
     });
 
-    describe('lazy views', function() {
+    describe('async views', function() {
 
-        it('lazy view in box', function() {
-            no.layout.define('lazy1', {
+        it('async view in box', function() {
+            no.layout.define('async1', {
                 'app left@': 'long-generated-view&'
             }, 'app');
 
-            expect( no.layout.page('lazy1') ).to.eql({
+            expect( no.layout.page('async1') ).to.eql({
                 'app': {
                     'type': no.L.VIEW,
                     'views': {
@@ -168,16 +168,16 @@ describe('no.layout', function() {
             });
         });
 
-        it('lazy view in box', function() {
-            no.layout.define('lazy2', {
+        it('async view in box', function() {
+            no.layout.define('async2', {
                 'app left@': {
                     'regular-view': {
-                        'lazy-view&': true
+                        'async-view&': true
                     }
                 }
             }, 'app');
 
-            expect( no.layout.page('lazy2') ).to.eql({
+            expect( no.layout.page('async2') ).to.eql({
                 'app': {
                     'type': no.L.VIEW,
                     'views': {
@@ -191,7 +191,7 @@ describe('no.layout', function() {
                                 'regular-view': {
                                     'type': no.L.VIEW,
                                     'views': {
-                                        'lazy-view': {
+                                        'async-view': {
                                             'type': no.L.ASYNC,
                                             'views': {}
                                         }

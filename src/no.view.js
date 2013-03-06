@@ -686,6 +686,41 @@ no.View.prototype.getModel = function(id) {
     return this.models[id].getData();
 };
 
+//  Быстро что-нибудь сгенерить из данных блока.
+//  Можно передать моду и дополнительный объект,
+//  который попадет в /.extra:
+//
+//      block.tmpl()
+//      block.tmpl('mode')
+//      block.tmpl({ ... })
+//      block.tmpl('mode', { ... })
+//
+no.View.prototype.tmpl = function(mode, extra) {
+    switch (arguments.length) {
+        case 0:
+            mode = '';
+            break;
+        case 1:
+            if (typeof mode === 'object') {
+                extra = mode;
+                mode = '';
+            }
+    }
+
+    var tree = {
+        models: this._getModelsData(),
+        page: no.page.current
+    };
+
+    if (extra) {
+        tree.extra = extra;
+    }
+
+    var html = no.tmpl(tree, mode);
+
+    return no.html2node(html);
+};
+
 /**
  * Возвращает массив всех вложенных view, включая себя
  * @param {Array} [views=[]] Начальный массив.

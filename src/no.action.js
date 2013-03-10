@@ -82,7 +82,7 @@ no.action.init = function() {
     var HREF_JS_REGEXP = /^\s*javascript:/i;
 
     $("body")
-        .on("click dblclick", "a, .no-action", function(e) {
+        .on(no.V.EVENTS.click, "a, .no-action", function(e) {
             var target = e.currentTarget;
             var $target = $(target);
             var href = target.getAttribute('href');

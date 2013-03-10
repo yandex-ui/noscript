@@ -44,39 +44,6 @@ no.V.STATUS = {
     INVALID: 4
 };
 
-/**
- * Список DOM-событий.
- * @type {Array}
- * @constant
- */
-no.V.DOM_EVENTS = [
-    'blur',
-    'change',
-    'click',
-    'dblclick',
-    'focus',
-    'focusin',
-    'focusout',
-    'keydown',
-    'keypress',
-    'keyup',
-    'mousedown',
-    'mouseenter',
-    'mouseleave',
-    'mousemove',
-    'mouseout',
-    'mouseover',
-    'mouseup',
-    'resize',
-    'scroll',
-    'submit',
-//TODO: сделать прозрачные (mousedown/touchstart/MSPointerDown) константы в зависимости от окружения
-// пример тут https://github.com/nolimits4web/Swiper/blob/master/dist/idangerous.swiper-1.7.js
-    'touchstart',
-    'touchmove',
-    'touchend'
-];
-
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**

@@ -82,6 +82,8 @@ no.action.init = function() {
     var HREF_JS_REGEXP = /^\s*javascript:/i;
 
     $("body")
+        // если вешать "click", то мобильные браузеры на pushState показывают и скрывают адресную строку, что не красиво
+        // если вешать "touchstart" или "touchend", то такого не будет
         .on(no.V.EVENTS.click, "a, .no-action", function(e) {
             var target = e.currentTarget;
             var $target = $(target);

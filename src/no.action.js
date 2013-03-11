@@ -96,17 +96,18 @@ no.action.init = function() {
      */
     var HREF_JS_REGEXP = /^\s*javascript:/i;
 
+    var reHasNsActionClass = /\bns-action\b/;
+
     $("body")
         // если вешать "click", то мобильные браузеры на pushState показывают и скрывают адресную строку, что не красиво
         // если вешать "touchstart" или "touchend", то такого не будет
         .on(no.V.EVENTS.click, "a, .ns-action", function(e) {
             var target = e.currentTarget;
-            var $target = $(target);
             var href = target.getAttribute('href');
             var action = (e.type === 'dblclick') ? target.getAttribute('data-dblclick-action') : target.getAttribute('data-click-action');
             var returnValue = true;
 
-            if (action && (action in _actions) && $target.hasClass('ns-action')) {
+            if (action && (action in _actions) && reHasNsActionClass.test(target.className)) {
                 returnValue = no.action.run(action, no.action.getParams(target), target, e);
 
             } else if (e.type === 'click') {

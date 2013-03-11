@@ -132,7 +132,7 @@ var _ctors = {};
  *   - если eventName === "scroll", то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)
  *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
  * @param {String} id Название View.
- * @param {Object} info Декларация View.
+ * @param {Object} [info={}] Декларация View.
  * @param {Function} [info.ctor] Конструтор.
  * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View. Если указан, то ctor не используется.
  * @param {Array} [info.models] Массив моделей, от которых зависит View.

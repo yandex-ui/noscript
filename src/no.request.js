@@ -423,10 +423,13 @@ function models2params(models) {
         var models = [];
         for (var i = 0, l = items.length; i < l; i++) {
             var item = items[i];
-
-            // можно не использовать if (!model.get()) { model.create() }
-            // model.create все это умеет делать
-            models.push(no.Model.create(item.id, item.params));
+            if (item.model && item.model instanceof no.Model) {
+                models.push(item.model)
+            } else {
+                // можно не использовать if (!model.get()) { model.create() }
+                // model.create все это умеет делать
+                models.push(no.Model.create(item.id, item.params));
+            }
         }
 
         return models;

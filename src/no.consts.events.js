@@ -6,7 +6,12 @@
  * Хеш событий для удобного биндинга touch/desktop
  * @type {Object}
  */
-no.V.EVENTS = {};
+no.V.EVENTS = {
+    'click': 'click',
+    'mousedown': 'mousedown',
+    'mousemove': 'mousemove',
+    'mouseup': 'mouseup'
+};
 
 /**
  * Список DOM-событий.
@@ -16,6 +21,7 @@ no.V.EVENTS = {};
 no.V.DOM_EVENTS = [
     'blur',
     'change',
+    'click',
     'dblclick',
     'focus',
     'focusin',
@@ -23,10 +29,13 @@ no.V.DOM_EVENTS = [
     'keydown',
     'keypress',
     'keyup',
+    'mousedown',
     'mouseenter',
     'mouseleave',
+    'mousemove',
     'mouseout',
     'mouseover',
+    'mouseup',
     'resize',
     'scroll',
     'submit'
@@ -45,12 +54,4 @@ if (Modernizr && Modernizr.touch) {
         'mouseup': 'touchend'
     };
 
-} else {
-    no.V.DOM_EVENTS.push('click', 'mousedown', 'mousemove', 'mouseup');
-    no.V.EVENTS = {
-        'click': 'click',
-        'mousedown': 'mousedown',
-        'mousemove': 'mousemove',
-        'mouseup': 'mouseup'
-    };
 }

@@ -110,7 +110,7 @@ no.action.init = function() {
             if (action && (action in _actions) && reHasNsActionClass.test(target.className)) {
                 returnValue = no.action.run(action, no.action.getParams(target), target, e);
 
-            } else if (e.type === 'click') {
+            } else if (e.type === no.V.EVENTS.click) {
                 if (!href) {
                     return true;
                 }

@@ -201,5 +201,16 @@ if (typeof window === 'undefined') {
     module.exports = no;
 }
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+/**
+ * Создает транзакцию (cb) и блокирует вызов no.page.go
+ * @param {Function} cb
+ */
+no.transaction = function(cb) {
+    // останавливаем no.page.go
+    no.page._stop = true;
+    cb();
 
+    // запускаем no.page.go
+    no.page._stop = false;
+    no.page.go(no.page._lastUrl);
+};

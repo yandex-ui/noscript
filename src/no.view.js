@@ -44,6 +44,8 @@ no.View.prototype._init = function(id, params, async) {
     this.id = id;
     this.params = params || {};
 
+    this._onModelChangeBinded = this._onModelChange.bind(this);
+
     /**
      * Флаг того, что view может быть асинхронным.
      * Факт того, что сейчас view находится в асинхронном состояии опрделяться this.status и this.asyncState
@@ -357,6 +359,7 @@ no.View.prototype._htmlinit = function(events) {
  */
 no.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
+        this._unbindModels();
         this._unbindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
         this._visible = false;
@@ -378,6 +381,7 @@ no.View.prototype._hide = function(events) {
 no.View.prototype._show = function(events) {
     // При создании блока у него this._visible === undefined.
     if (!this.isLoading() && this._visible !== true) {
+        this._bindModels();
         this._bindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
         this._visible = true;
@@ -388,6 +392,38 @@ no.View.prototype._show = function(events) {
     }
 
     return false;
+};
+
+/**
+ * Обработчик изменений моделей.
+ * @private
+ */
+no.View.prototype._onModelChange = function() {
+    no.page.go();
+};
+
+/**
+ * Биндится на изменение моделей.
+ * @private
+ */
+no.View.prototype._bindModels = function() {
+    for (var id in this.models) {
+        var model = this.models[id];
+        //TODO: namespace бы пригодился!
+        model.on('changed', this._onModelChangeBinded);
+    }
+};
+
+/**
+ * Анбиндится на изменение моделей.
+ * @private
+ */
+no.View.prototype._unbindModels = function() {
+    for (var id in this.models) {
+        var model = this.models[id];
+        //TODO: namespace бы пригодился!
+        model.off('changed', this._onModelChangeBinded);
+    }
 };
 
 /**

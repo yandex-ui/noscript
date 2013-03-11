@@ -10,6 +10,11 @@ no.page = {};
  * @return {no.Promise}
  */
 no.page.go = function(url) {
+    if (no.page._stop) {
+        no.page._lastUrl = url;
+
+        return new no.Promise().reject();
+    }
     //TODO: return promise
 
     var loc = window.location;

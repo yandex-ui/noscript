@@ -30,6 +30,7 @@ no.request = function(items, params, options) {
  * @return {no.Promise}
  */
 no.forcedRequest = function(items, params, options) {
+    options = options || {};
     options.forced = true;
     return no.request.models(items2models(items, params), options);
 };

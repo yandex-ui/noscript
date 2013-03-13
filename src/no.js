@@ -159,7 +159,9 @@ no.init = function() {
     no.initMainView();
 
     window.addEventListener('popstate', function(e) {
+        // прибиваем событие, чтобы не дергалась адресная строка
         e.preventDefault();
+        e.stopPropagation();
         no.page.go();
     }, false);
 };

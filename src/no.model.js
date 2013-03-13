@@ -371,14 +371,14 @@ no.Model.prototype.setData = function(data, options) {
         this.error = null;
         this.status = this.STATUS.OK;
 
+        this.touch();
+
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
         if (!options || !options.silent) {
             this.trigger('changed', this.key);
         }
-
-        this.touch();
     }
 
 };

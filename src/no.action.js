@@ -101,7 +101,10 @@ no.action.init = function() {
     var $body = $('body');
     var selector = 'a, .ns-action';
 
+    $body.on(no.V.EVENTS.click, selector, this._process);
+    /*
     if (Modernizr && Modernizr.touch) {
+        */
         /*
          @doochik: тут все странно
 
@@ -116,6 +119,7 @@ no.action.init = function() {
          Как вариант, не надо вешать события на "a", а надо только на ns-action. Тогда проблем с "click" не будет, потому что ns-action обычно не сссылки и click на них ни к чему не приведет.
          Тогда надо ловить все переходы по ссылкам в popState/hashchange, а не тут.
          */
+        /*
 
         var pointerStartPageX, pointerStartPageY;
         var pointerLastPageX, pointerLastPageY;
@@ -159,7 +163,7 @@ no.action.init = function() {
     } else {
         $body.on('click', selector, this._process);
     }
-
+    */
     //TODO: no-submit
     //TODO: no-hover
     //TODO: data-counter -> no.counter()
@@ -180,7 +184,7 @@ no.action._process = function(e) {
     if (action && (action in _actions) && reHasNsActionClass.test(target.className)) {
         returnValue = no.action.run(action, no.action.getParams(target), target, e);
 
-    } else if (e.type === 'click' || e.type === 'touchend') {
+    } else if (no.V.EVENTS.click) {
         if (!href) {
             return true;
         }

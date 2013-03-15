@@ -4,6 +4,12 @@
  */
 var no = {};
 
+/**
+ * @const
+ * @type {Boolean}
+ */
+no.IS_TOUCH = Boolean(window['Modernizr'] && Modernizr.touch && window['$'] && $.mobile);
+
 // ----------------------------------------------------------------------------------------------------------------- //
 
 no.inherits = function(ctor, base, mixin) {

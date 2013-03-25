@@ -70,6 +70,15 @@ no.request.addRequestParams = function(params) {
  */
 no.request.URL = '/models/';
 
+/**
+ * Метод для проверки ответа данных.
+ * Может использоваться, например, при проверки авторизации.
+ * @returns {boolean}
+ */
+no.request.canProcessResponse = function() {
+    return true;
+};
+
 no.request.Manager = {
 
     /**
@@ -285,9 +294,16 @@ Request.prototype.request = function(loading, requesting) {
         var that = this;
 
         httpRequest.then(function(r) {
-            //  В r должен быть массив из одного или двух элементов.
-            if (requesting.length) {
-                that.extract(requesting, r);
+            if (no.request.canProcessResponse(r) === false) {
+                //TODO: clear keys, promise.reject()
+
+            } else {
+                //  В r должен быть массив из одного или двух элементов.
+                if (requesting.length) {
+                    that.extract(requesting, r);
+                } else {
+                    //TODO: clear keys, promise.reject()
+                }
             }
         });
 

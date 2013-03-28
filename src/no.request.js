@@ -277,10 +277,12 @@ Request.prototype.request = function(loading, requesting) {
 
         all = all.concat( requesting.map(model2Promise) );
 
-    } else {
+    }/* else {
+        //TODO: надо перепроверить поведение, если нет запросов
         // создаем фейковый зарезолвленный promise
         httpRequest = new no.Promise().resolve();
     }
+    */
 
     if (loading.length) {
         //  Ждем все остальные модели, которые должны загрузиться (уже были запрошены).
@@ -293,19 +295,22 @@ Request.prototype.request = function(loading, requesting) {
     if (all.length) {
         var that = this;
 
-        httpRequest.then(function(r) {
-            if (no.request.canProcessResponse(r) === false) {
-                //TODO: clear keys, promise.reject()
-
-            } else {
-                //  В r должен быть массив из одного или двух элементов.
-                if (requesting.length) {
-                    that.extract(requesting, r);
-                } else {
+        if (httpRequest) {
+            //TODO: что будет если fail?
+            httpRequest.then(function(r) {
+                if (no.request.canProcessResponse(r) === false) {
                     //TODO: clear keys, promise.reject()
+
+                } else {
+                    //  В r должен быть массив из одного или двух элементов.
+                    if (requesting.length) {
+                        that.extract(requesting, r);
+                    } else {
+                        //TODO: clear keys, promise.reject()
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Ждем резолва всех моделей и "повторяем" запрос
         // Если какие-то ключи не пришли, они будут перезапрошены.

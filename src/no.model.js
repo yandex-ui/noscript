@@ -427,6 +427,7 @@ no.Model.prototype.getRequestParams = function() {
  * Возвращает модель из кеша.
  * @param {String} id Название модели.
  * @param {String|Object} key Ключ(string) или параметры(object) модели.
+ * @static
  * @return {no.Model}
  */
 no.Model.get = function(id, key) {

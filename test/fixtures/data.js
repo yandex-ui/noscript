@@ -3,7 +3,7 @@ no.Model.TESTDATA = {
         item: [
             {
                 id: '1',
-                value: 'foo',
+                value: 'foo'
             },
             {
                 id: '2',

@@ -127,46 +127,54 @@ no.Model.prototype._splitData = function(data) {
 
     // сохраняем новый массив моделей коллекции
     this.models = newModels;
-}
+};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Определяем новую модель.
-//
-//      //  Простая модель, без параметров.
-//      no.Model.define('profile');
-//
-//      no.Model.define('album', {
-//          params: {
-//              //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
-//              //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
-//              'author-login': null,
-//              'album-id': null,
-//
-//              //  Этим двум параметрам заданы дефолтные значения.
-//              'page': 0,
-//              'pageSize': 20
-//          }
-//      });
-//
-no.Model.define = function(id, info, ctor) {
+/**
+ * Определяет новую модель.
+ * @param {String} id Название модели.
+ * @param {Object} [info]
+ * @param {Function} [info.ctor] Конструтор.
+ * @param {Object} [info.methods] Методы прототипа.
+ * @param {Object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
+ * @param {no.Model} [base=no.Model] Базовый класс для наследования
+ * @examples
+ * //  Простая модель, без параметров.
+ * no.Model.define('profile');
+ *
+ * no.Model.define('album', {
+ *   params: {
+ *     //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
+ *     //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
+ *     'author-login': null,
+ *     'album-id': null,
+ *
+ *     //  Этим двум параметрам заданы дефолтные значения.
+ *     'page': 0,
+ *     'pageSize': 20
+ *     }
+ * });
+ */
+no.Model.define = function(id, info, base) {
     if (id in _infos) {
         throw "Model '"+ id +"' can't be redefined!";
     }
 
     info = info || {};
 
-    var noModel = no.Model;
-    if (info.uniq) {
-        noModel = no.ModelUniq;
+    if (!base) {
+        if (info.uniq) {
+            base = no.ModelUniq;
+        } else {
+            base = no.Model;
+        }
     }
 
-    if (info.methods) {
-        //  Нужно унаследоваться от no.Model и добавить в прототип info.models.
-        ctor = no.inherits(function() {}, noModel, info.methods);
-    } else {
-        ctor = ctor || noModel;
-    }
+    var ctor = info.ctor || function() {};
+    // Нужно унаследоваться от base и добавить в прототип info.methods.
+    ctor = no.inherits(ctor, base, info.methods);
+
 
     // часть дополнительной обработки производится в no.Model.info
     // т.о. получаем lazy-определение
@@ -176,6 +184,8 @@ no.Model.define = function(id, info, ctor) {
 
     //  Создаем пустой кэш для всех моделей с данным id.
     _cache[id] = {};
+
+    return ctor;
 };
 
 //  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
@@ -527,6 +537,7 @@ if(window['mocha']) {
      * @param {String} [id] ID модели.
      */
     no.Model.undefine = function(id) {
+        console.log('no.Model.undefine')
         if (id) {
             delete _cache[id];
             delete _ctors[id];
@@ -538,11 +549,13 @@ if(window['mocha']) {
         }
     };
 
-    no.Model.privats = {
-        _ctors: _ctors,
-        _infos: _infos,
-        _cache: _cache,
-        _keySuffix: _keySuffix
+    no.Model.privats = function() {
+        return {
+            _ctors: _ctors,
+            _infos: _infos,
+            _cache: _cache,
+            _keySuffix: _keySuffix
+        };
     };
 }
 
@@ -552,6 +565,8 @@ if(window['mocha']) {
  * т.е. в качестве параметра у него есть массив
  * хэлперы позволяют каждый последующий раз искать в массиве значения,
  * которые ранее не грузились (уникальные) и грузить только их
+ * @class
+ * @augments no.Model
  */
 no.ModelUniq = function(){};
 

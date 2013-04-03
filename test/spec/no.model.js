@@ -1,10 +1,52 @@
 describe('no.Model', function() {
 
+    beforeEach(function() {
+        no.Model.define('m0');
+
+        no.Model.define('m1', {
+            params: {
+                p1: null,
+                p2: 2,
+                p3: null,
+                p4: 'foo'
+            }
+        });
+
+        no.Model.define('do-m1', {
+            params: {
+                p1: null,
+                p2: null
+            }
+        });
+
+        no.Model.define('split1', {
+            params: {
+                p1: null,
+                p2: null
+            },
+            split: { // условное название
+                items: '.item', // jpath, описывающий что именно выбирать.
+                id: '.id', // jpath, описывающий как для каждого item'а вычислить его id.
+                params: { // это расширенный jpath, конструирующий новый объект.
+                    id: '.id',
+                    foo: '.value'
+                },
+                model_id: 'split1-item'
+            }
+        });
+
+        no.Model.define('split1-item', {
+            params: {
+                id: null,
+                foo: null
+            }
+        });
+
+    });
+
     afterEach(function() {
         // чистим кэш созданных моделей после каждого теста
-        for (var key in no.Model.privats._cache) {
-            no.Model.privats._cache[key] = {};
-        }
+        no.Model.undefine();
     });
 
     describe('static', function() {
@@ -21,29 +63,23 @@ describe('no.Model', function() {
             it('should fill _infos', function() {
                 no.Model.define('dm1', {foo: 'bar'});
 
-                expect(no.Model.privats._infos['dm1'])
+                expect(no.Model.privats()._infos['dm1'])
                     .to.eql({foo: 'bar'});
-            });
-
-            it('should fill _ctors with default one', function() {
-                no.Model.define('dm1');
-
-                expect(no.Model.privats._ctors['dm1'])
-                    .to.be(no.Model);
             });
 
             it('should fill _ctors with custom one', function() {
                 var ctor = function() {};
-                no.Model.define('dm1', {}, ctor);
+                no.Model.define('dm1', {
+                    ctor: ctor
+                });
 
-                expect(no.Model.privats._ctors['dm1'])
-                    .to.be(ctor);
+                expect(no.Model.privats()._ctors['dm1']).to.be(ctor);
             });
 
             it('should fill _ctors with one, contained methods', function() {
                 var bar = function() {};
                 no.Model.define('dm1', { methods: {foo: bar} });
-                var proto = no.Model.privats._ctors['dm1'].prototype;
+                var proto = no.Model.privats()._ctors['dm1'].prototype;
 
                 expect(proto)
                     .to.have.property('foo', bar);
@@ -55,14 +91,55 @@ describe('no.Model', function() {
             it('should create _cache', function() {
                 no.Model.define('dm1');
 
-                expect(no.Model.privats._cache['dm1'])
+                expect(no.Model.privats()._cache['dm1'])
                     .to.eql({});
             });
 
-            afterEach(function() {
-                no.Model.undefine('dm1');
+        });
+
+        describe('define: наследование', function() {
+
+            beforeEach(function() {
+
+                var parent = no.Model.define('parent', {
+                    methods: {
+                        superMethod: function() {}
+                    }
+                });
+
+                no.Model.define('child', {
+                    methods: {
+                        oneMore: function() {}
+                    }
+                }, parent);
+
+                this.model = no.Model.create('child', {});
             });
 
+            afterEach(function() {
+                delete this.model;
+            });
+
+            it('наследуемая model должен быть no.model', function() {
+                expect(this.model instanceof no.Model).to.be.ok();
+            });
+
+            it('методы наследуются от базовой модели', function() {
+                console.log(this.model);
+                expect(this.model.superMethod).to.be.ok();
+            });
+
+            it('методы от базового view не ушли в no.View', function() {
+                expect(no.Model.prototype.superMethod).to.not.be.ok();
+            });
+
+            it('методы no.View на месте', function() {
+                expect(this.model.isValid).to.be.ok();
+            });
+
+            it('методы из info.methods тоже не потерялись', function() {
+                expect(this.model.oneMore).to.be.ok();
+            });
         });
 
         describe('create', function() {
@@ -441,8 +518,6 @@ describe('no.Model', function() {
                 delete this.changedCb;
                 delete this.changedJpathCb;
 
-                no.Model.undefine('defined-events-1');
-                no.Model.undefine('defined-events-2');
                 delete this.model;
             });
 

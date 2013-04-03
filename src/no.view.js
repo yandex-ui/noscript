@@ -136,7 +136,7 @@ var _ctors = {};
  * @param {String} id Название View.
  * @param {Object} [info={}] Декларация View.
  * @param {Function} [info.ctor] Конструтор.
- * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View. Если указан, то ctor не используется.
+ * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
  * @param {Array} [info.models] Массив моделей, от которых зависит View.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.

@@ -101,25 +101,6 @@ ns.initMainView = function() {
     ns.MAIN_VIEW = mainView;
 };
 
-ns._ENTITIFY_REGEXP = /[<>"]/g;
-
-/**
- * Преобразует специальные символы в HTML сущности.
- * @param {String} s Строка
- * @see http://jsperf.com/entityify-test
- */
-ns.entityify = function(s) {
-    s = String(s);
-    var chars = {
-        '<' : '&lt;',
-        '>' : '&gt;',
-        '"' : '&quot;'
-    };
-    return s.replace(ns._ENTITIFY_REGEXP, function(c){
-        return chars[c];
-    });
-};
-
 /**
  * Создает транзакцию (cb) и блокирует вызов ns.page.go
  * @param {Function} cb

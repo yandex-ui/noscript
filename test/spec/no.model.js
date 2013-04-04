@@ -125,7 +125,6 @@ describe('ns.Model', function() {
             });
 
             it('методы наследуются от базовой модели', function() {
-                console.log(this.model);
                 expect(this.model.superMethod).to.be.ok();
             });
 

@@ -120,7 +120,6 @@ ns.Update.prototype._update = function(async) {
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
         var html = ns.tmpl(tree, null, '');
-        console.log(1);
         var node = ns.html2node(html);
     }
 

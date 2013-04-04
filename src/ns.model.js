@@ -537,7 +537,6 @@ if(window['mocha']) {
      * @param {String} [id] ID модели.
      */
     ns.Model.undefine = function(id) {
-        console.log('ns.Model.undefine')
         if (id) {
             delete _cache[id];
             delete _ctors[id];

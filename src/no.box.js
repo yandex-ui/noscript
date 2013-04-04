@@ -4,15 +4,15 @@
  * @param params
  * @constructor
  */
-no.Box = function(id, params) {
+ns.Box = function(id, params) {
     this.id = id;
     this.params = params;
 
     this.views = {};
 
-    //  NOTE: Нет специального метода no.Box.getKey --
-    //  все ключи вычисляются только через no.View.getKey.
-    this.key = no.View.getKey(id, params);
+    //  NOTE: Нет специального метода ns.Box.getKey --
+    //  все ключи вычисляются только через ns.View.getKey.
+    this.key = ns.View.getKey(id, params);
 
     this.node = null;
     this.active = {};
@@ -20,15 +20,15 @@ no.Box = function(id, params) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype._getView = function(id, params) {
-    var key = no.View.getKey(id, params);
+ns.Box.prototype._getView = function(id, params) {
+    var key = ns.View.getKey(id, params);
     return this.views[key];
 };
 
-no.Box.prototype._addView = function(id, params, type) {
+ns.Box.prototype._addView = function(id, params, type) {
     var view = this._getView(id, params);
     if (!view) {
-        view = no.View.create(id, params, type === no.L.ASYNC);
+        view = ns.View.create(id, params, type === ns.L.ASYNC);
         this.views[view.key] = view;
     }
     return view;
@@ -36,7 +36,7 @@ no.Box.prototype._addView = function(id, params, type) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Box.prototype._getDescendants = function(descs) {
+ns.Box.prototype._getDescendants = function(descs) {
     var views = this.views;
     var active = this.active;
 
@@ -50,7 +50,7 @@ no.Box.prototype._getDescendants = function(descs) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Ищем все новые блоки и блоки, требующие перерисовки.
-no.Box.prototype._getRequestViews = function(updated, layout, params) {
+ns.Box.prototype._getRequestViews = function(updated, layout, params) {
     for (var id in layout) {
         //  Согласно новому layout'у здесь должен быть view с id/params.
         //  Создаем его (если он уже есть, он возьмется из this.views).
@@ -63,16 +63,16 @@ no.Box.prototype._getRequestViews = function(updated, layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
-no.Box.prototype._getUpdateTree = function(tree, layout, params) {
+ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
     var views = this.views;
     for (var id in layout) {
-        var key = no.View.getKey(id, params);
+        var key = ns.View.getKey(id, params);
         views[key]._getUpdateTree(tree, layout[id].views, params);
     }
 };
 
 //  Строим дерево блоков.
-no.Box.prototype._getViewTree = function(layout, params) {
+ns.Box.prototype._getViewTree = function(layout, params) {
     //  Для бокса это всегда объект (возможно, пустой).
     var tree = {
         box: true,
@@ -84,7 +84,7 @@ no.Box.prototype._getViewTree = function(layout, params) {
 
     var views = this.views;
     for (var id in layout) {
-        var key = no.View.getKey(id, params);
+        var key = ns.View.getKey(id, params);
         tree.views[id] = views[key]._getViewTree(layout[id].views, params);
     }
 
@@ -94,10 +94,10 @@ no.Box.prototype._getViewTree = function(layout, params) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем бокс.
-no.Box.prototype._updateHTML = function(node, layout, params, options, events) {
+ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     if (!this.node) {
         //  Ищем новую ноду бокса.
-        this.node = no.byClass('ns-view-' + this.id, node)[0];
+        this.node = ns.byClass('ns-view-' + this.id, node)[0];
     }
 
     var views = this.views;
@@ -111,7 +111,7 @@ no.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
     //  (включая синхронную и все асинхронные подапдейты).
     for (var id in layout) {
-        var key = no.View.getKey(id, params);
+        var key = ns.View.getKey(id, params);
         layoutActive[id] = key;
 
         //  Достаем ранее созданный блок (в _getRequestViews).

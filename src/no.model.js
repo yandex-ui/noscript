@@ -1,21 +1,21 @@
 (function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-//  no.Model
+//  ns.Model
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
  * @class Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
- * Вся инициализация делается в _init(), который вызывает фабрикой no.Model.create().
+ * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.create().
  * @constructor
  * @namespace
  */
-no.Model = function() {};
+ns.Model = function() {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Добавляем методы из no.Events: on(), off(), trigger().
-no.extend(no.Model.prototype, no.Events);
+no.extend(ns.Model.prototype, no.Events);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -29,27 +29,27 @@ var _keySuffix = 0;
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * @see no.M.STATUS
+ * @see ns.M.STATUS
  * @enum {String}
- * @borrows no.M.STATUS as no.Model.prototype.STATUS
+ * @borrows ns.M.STATUS as ns.Model.prototype.STATUS
  */
-no.Model.prototype.STATUS = no.M.STATUS;
+ns.Model.prototype.STATUS = ns.M.STATUS;
 
-no.Model.prototype._init = function(id, params, data) {
+ns.Model.prototype._init = function(id, params, data) {
     this.id = id;
     this.params = params;
 
     this._reset();
 
-    this.info = no.Model.info(id);
-    this.key = no.Model.key(id, params, this.info);
+    this.info = ns.Model.info(id);
+    this.key = ns.Model.key(id, params, this.info);
 
     this.setData(data);
 
     this._bindEvents();
 };
 
-no.Model.prototype._reset = function(status) {
+ns.Model.prototype._reset = function(status) {
     this.data = null;
     this.error = null;
 
@@ -63,7 +63,7 @@ no.Model.prototype._reset = function(status) {
  * Регистрирует обработчики событий.
  * @private
  */
-no.Model.prototype._bindEvents = function() {
+ns.Model.prototype._bindEvents = function() {
     for (var event in this.info.events) {
         var callbacks = this.info.events[event];
         // приводим обработчики к массиву
@@ -83,7 +83,7 @@ no.Model.prototype._bindEvents = function() {
  * При установке data в составной моделе
  * инициализирует все составляющие модели
  */
-no.Model.prototype._splitData = function(data) {
+ns.Model.prototype._splitData = function(data) {
     var that = this;
     var info = this.info.split;
     var newModels = [];
@@ -116,7 +116,7 @@ no.Model.prototype._splitData = function(data) {
 
         // создаём новую модель
         // или устанавливаем новые данные для существующией
-        var model = no.Model.create(info.model_id, params, item);
+        var model = ns.Model.create(info.model_id, params, item);
 
         // при изменении вложенной модели
         // тригерим нотификацию в модель-коллекцию
@@ -138,12 +138,12 @@ no.Model.prototype._splitData = function(data) {
  * @param {Function} [info.ctor] Конструтор.
  * @param {Object} [info.methods] Методы прототипа.
  * @param {Object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
- * @param {no.Model} [base=no.Model] Базовый класс для наследования
+ * @param {ns.Model} [base=ns.Model] Базовый класс для наследования
  * @examples
  * //  Простая модель, без параметров.
- * no.Model.define('profile');
+ * ns.Model.define('profile');
  *
- * no.Model.define('album', {
+ * ns.Model.define('album', {
  *   params: {
  *     //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
  *     //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
@@ -156,7 +156,7 @@ no.Model.prototype._splitData = function(data) {
  *     }
  * });
  */
-no.Model.define = function(id, info, base) {
+ns.Model.define = function(id, info, base) {
     if (id in _infos) {
         throw "Model '"+ id +"' can't be redefined!";
     }
@@ -165,18 +165,18 @@ no.Model.define = function(id, info, base) {
 
     if (!base) {
         if (info.uniq) {
-            base = no.ModelUniq;
+            base = ns.ModelUniq;
         } else {
-            base = no.Model;
+            base = ns.Model;
         }
     }
 
     var ctor = info.ctor || function() {};
     // Нужно унаследоваться от base и добавить в прототип info.methods.
-    ctor = no.inherits(ctor, base, info.methods);
+    ctor = no.inherit(ctor, base, info.methods);
 
 
-    // часть дополнительной обработки производится в no.Model.info
+    // часть дополнительной обработки производится в ns.Model.info
     // т.о. получаем lazy-определение
 
     _infos[id] = info;
@@ -189,17 +189,17 @@ no.Model.define = function(id, info, base) {
 };
 
 //  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
-no.Model.create = function(id, params, data)  {
+ns.Model.create = function(id, params, data)  {
     params = params || {};
     // не очевидно, но тут будут созданы и key и info
-    var model = no.Model.get(id, params);
+    var model = ns.Model.get(id, params);
 
     if (!model) {
         var ctor = _ctors[id];
         model = new ctor();
         model._init(id, params, data);
 
-        no.Model.store(model);
+        ns.Model.store(model);
     } else if (data) {
         //  Модель уже существует, а мы пытаемся создать такую же, но с непустой data.
         //  FIXME: Все же непонятно, что нужно делать.
@@ -213,7 +213,7 @@ no.Model.create = function(id, params, data)  {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.info = function(id) {
+ns.Model.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pNames, то надо завершить определение Model
     if (info && !info.pNames) {
@@ -245,8 +245,8 @@ no.Model.info = function(id) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.key = function(id, params, info) {
-    info = info || no.Model.info(id);
+ns.Model.key = function(id, params, info) {
+    info = info || ns.Model.info(id);
 
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {
@@ -282,7 +282,7 @@ no.Model.key = function(id, params, info) {
  * @param {String} id ID модели.
  * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
  */
-no.Model.invalidate = function(id, filter) {
+ns.Model.invalidate = function(id, filter) {
     var models = _cache[id];
 
     for (var key in models) {
@@ -293,11 +293,11 @@ no.Model.invalidate = function(id, filter) {
     }
 };
 
-no.Model.prototype.invalidate = function() {
+ns.Model.prototype.invalidate = function() {
     this._reset(this.STATUS.INVALID);
 };
 
-no.Model.prototype.isValid = function() {
+ns.Model.prototype.isValid = function() {
     return (this.status === this.STATUS.OK);
 };
 
@@ -308,7 +308,7 @@ no.Model.prototype.isValid = function() {
 //      var foo = model.get('foo'); // model.data.foo.
 //      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
 //
-no.Model.prototype.get = function(path) {
+ns.Model.prototype.get = function(path) {
     var data = this.data;
     if (data) {
         return no.path(path, data);
@@ -322,7 +322,7 @@ no.Model.prototype.get = function(path) {
  * @param {Object} [options] Флаги.
  * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
  */
-no.Model.prototype.set = function(jpath, value, options) {
+ns.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;
     if (this.status != this.STATUS.OK || !data) {
         return;
@@ -331,7 +331,7 @@ no.Model.prototype.set = function(jpath, value, options) {
     //  Сохраняем новое значение и одновременно получаем старое значение.
     var oldValue = no.path(jpath, data, value);
 
-    if ( !( (options && options.silent) || no.object.isEqual(value, oldValue) ) ) {
+    if ( !( (options && options.silent) || ns.object.isEqual(value, oldValue) ) ) {
         //TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
         this.trigger('changed.' + jpath, {
             'new': value,
@@ -343,7 +343,7 @@ no.Model.prototype.set = function(jpath, value, options) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.prototype.getData = function() {
+ns.Model.prototype.getData = function() {
     var result = this.data;
 
     // если это составная модель —
@@ -368,7 +368,7 @@ no.Model.prototype.getData = function() {
  * @param {Object} [options] Флаги.
  * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
  */
-no.Model.prototype.setData = function(data, options) {
+ns.Model.prototype.setData = function(data, options) {
     if (data) {
         this.data = this.preprocessData(data);
 
@@ -393,17 +393,17 @@ no.Model.prototype.setData = function(data, options) {
 
 };
 
-no.Model.prototype.getError = function() {
+ns.Model.prototype.getError = function() {
     return this.error;
 };
 
-no.Model.prototype.setError = function(error) {
+ns.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
     this.status = this.STATUS.ERROR;
 };
 
-no.Model.prototype.preprocessData = function(data) {
+ns.Model.prototype.preprocessData = function(data) {
     return data;
 };
 
@@ -411,7 +411,7 @@ no.Model.prototype.preprocessData = function(data) {
 
 //  FIXME: Этот код сильно пересекается с вычислением ключа.
 //  Нельзя ли избавиться от копипаста?
-no.Model.prototype.getRequestParams = function() {
+ns.Model.prototype.getRequestParams = function() {
     var params = this.params;
 
     var defaults = this.info.params;
@@ -438,19 +438,19 @@ no.Model.prototype.getRequestParams = function() {
  * @param {String} id Название модели.
  * @param {String|Object} key Ключ(string) или параметры(object) модели.
  * @static
- * @return {no.Model}
+ * @return {ns.Model}
  */
-no.Model.get = function(id, key) {
+ns.Model.get = function(id, key) {
     if (!(id in _infos)) {
         throw 'Model "' + id + '" is not defined!';
     }
-    key = (typeof key === 'string') ? key : no.Model.key(id, key);
+    key = (typeof key === 'string') ? key : ns.Model.key(id, key);
 
     return _cache[id][key];
 };
 
 //  Сохраняем модель в кэше.
-no.Model.store = function(model) {
+ns.Model.store = function(model) {
     if ( model.isDo() ) {
         return;
     }
@@ -470,8 +470,8 @@ no.Model.store = function(model) {
 };
 
 //  Проверяем, есть ли модель в кэше и валидна ли она.
-no.Model.isValid = function(id, key) {
-    var model = no.Model.get(id, key);
+ns.Model.isValid = function(id, key) {
+    var model = ns.Model.get(id, key);
     if (!model) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
 
     return model.isValid();
@@ -480,20 +480,20 @@ no.Model.isValid = function(id, key) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
-no.Model.prototype.canRetry = function(error) {
+ns.Model.prototype.canRetry = function(error) {
     //  do-модели нельзя перезапрашивать.
     return ( !this.isDo() && this.retries < 3 );
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.prototype.extractData = function(result) {
+ns.Model.prototype.extractData = function(result) {
     if (result) {
         return result.data;
     }
 };
 
-no.Model.prototype.extractError = function(result) {
+ns.Model.prototype.extractError = function(result) {
     if (result) {
         return result.error;
     }
@@ -501,17 +501,17 @@ no.Model.prototype.extractError = function(result) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.prototype.isDo = function() {
+ns.Model.prototype.isDo = function() {
     return this.info.isDo;
 };
 
-no.Model.prototype.isCollection = function() {
+ns.Model.prototype.isCollection = function() {
     return this.info.isCollection;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.Model.prototype.touch = function() {
+ns.Model.prototype.touch = function() {
     this.timestamp = +new Date();
 };
 
@@ -520,9 +520,9 @@ no.Model.prototype.touch = function() {
 /**
  * Подготавливает модель к запросу.
  * @param {Number} requestID ID запроса.
- * @return {no.Model}
+ * @return {ns.Model}
  */
-no.Model.prototype.prepareRequest = function(requestID) {
+ns.Model.prototype.prepareRequest = function(requestID) {
     this.requestID = requestID;
     this.retries++;
     this.promise = new no.Promise();
@@ -536,8 +536,8 @@ if(window['mocha']) {
      * Используется только в юнит-тестах.
      * @param {String} [id] ID модели.
      */
-    no.Model.undefine = function(id) {
-        console.log('no.Model.undefine')
+    ns.Model.undefine = function(id) {
+        console.log('ns.Model.undefine')
         if (id) {
             delete _cache[id];
             delete _ctors[id];
@@ -549,7 +549,7 @@ if(window['mocha']) {
         }
     };
 
-    no.Model.privats = function() {
+    ns.Model.privats = function() {
         return {
             _ctors: _ctors,
             _infos: _infos,
@@ -566,17 +566,17 @@ if(window['mocha']) {
  * хэлперы позволяют каждый последующий раз искать в массиве значения,
  * которые ранее не грузились (уникальные) и грузить только их
  * @class
- * @augments no.Model
+ * @augments ns.Model
  */
-no.ModelUniq = function(){};
+ns.ModelUniq = function(){};
 
-no.inherits(no.ModelUniq, no.Model);
+no.inherit(ns.ModelUniq, ns.Model);
 
-no.ModelUniq.prototype.__superInit = no.ModelUniq.prototype._init;
+ns.ModelUniq.prototype.__superInit = ns.ModelUniq.prototype._init;
 
-no.ModelUniq.prototype._init = function(id) {
+ns.ModelUniq.prototype._init = function(id) {
     // добавляем дефолтное событие changed
-    var info = no.Model.info(id);
+    var info = ns.Model.info(id);
     info.events.changed = info.events.changed || [];
     var onchangedCallbacks = info.events.changed;
 
@@ -599,11 +599,11 @@ no.ModelUniq.prototype._init = function(id) {
     this.__superInit.apply(this, arguments);
 };
 
-no.ModelUniq.prototype._superIsValid = no.Model.prototype.isValid;
+ns.ModelUniq.prototype._superIsValid = ns.Model.prototype.isValid;
 /**
  * Исходя из ключа определяет, есть ли у нас уже запрашиваемая информация
  */
-no.ModelUniq.prototype.isValid = function() {
+ns.ModelUniq.prototype.isValid = function() {
     // если в ключе не присутсвует наш уникальный параметр
     // значит запрашивать 'ничего' не планируется,
     // а 'ничего' у нас закэшировано и так
@@ -618,7 +618,7 @@ no.ModelUniq.prototype.isValid = function() {
  * @private
  * @type String
  */
-no.ModelUniq.prototype.uniqName = '';
+ns.ModelUniq.prototype.uniqName = '';
 
 /**
  * Название массива в кэше,
@@ -626,14 +626,14 @@ no.ModelUniq.prototype.uniqName = '';
  * @private
  * @type String
  */
-no.ModelUniq.prototype.uniqPath = '';
+ns.ModelUniq.prototype.uniqPath = '';
 
 /**
  * Кэш с уже загруженными значениями
  * @private
  * @type Object
  */
-no.ModelUniq.prototype.uniqCached = null;
+ns.ModelUniq.prototype.uniqCached = null;
 
 /**
  * Хэлпер, который помогает вырезать из параметров уже загруженные значения
@@ -641,7 +641,7 @@ no.ModelUniq.prototype.uniqCached = null;
  * @param {Object} cached ссылка, на объект, в который будет сложена закэшированная часть параметров
  * @type Object
  */
-no.ModelUniq.prototype.uniq = function(params, cached) {
+ns.ModelUniq.prototype.uniq = function(params, cached) {
     var that = this;
     var name = this.uniqName;
     var copy = $.extend({}, params, true);
@@ -684,7 +684,7 @@ no.ModelUniq.prototype.uniq = function(params, cached) {
  * @param {String} key
  * @type Array
  */
-no.ModelUniq.prototype.uniqFromKey = function(key) {
+ns.ModelUniq.prototype.uniqFromKey = function(key) {
     return ((key.split(this.uniqName + '=')[1] || '').split('&')[0] || '').split(',');
 };
 
@@ -696,15 +696,15 @@ no.ModelUniq.prototype.uniqFromKey = function(key) {
  * @param {String} uniq
  * @type Node
  */
-no.ModelUniq.prototype.uniqFromJSON = function(xml, uniq) {
-    no.todo();
+ns.ModelUniq.prototype.uniqFromJSON = function(xml, uniq) {
+    ns.todo();
 };
 
 /**
  * Возвращает кэш по параметрам
  * @return {*}
  */
-no.ModelUniq.prototype.getData = function(params) {
+ns.ModelUniq.prototype.getData = function(params) {
     var that = this;
     var path = this.uniqPath;
     var uniqs = [].concat(params[this.uniqName]);

@@ -1,7 +1,7 @@
 (function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-//  no.request
+//  ns.request
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
@@ -16,33 +16,33 @@
  * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.request = function(items, params, options) {
-    return no.request.models(items2models(items, params), options);
+ns.request = function(items, params, options) {
+    return ns.request.models(items2models(items, params), options);
 };
 
 /**
  * Делает запрос моделей с сервера, не учитывая их закешированности.
- * @see no.request
+ * @see ns.request
  * @param {String|Array|Object} items Массив названий моделей.
  * @param {Object} [params] Параметры моделей.
  * @param {Object} [options] Опции запроса.
  * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.forcedRequest = function(items, params, options) {
+ns.forcedRequest = function(items, params, options) {
     options = options || {};
     options.forced = true;
-    return no.request.models(items2models(items, params), options);
+    return ns.request.models(items2models(items, params), options);
 };
 
 /**
  * Делает запрос моделей с сервера.
- * @param {no.Model[]} models Массив моделей.
+ * @param {ns.Model[]} models Массив моделей.
  * @param {Object} [options] Опции запроса.
  * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
  * @return {no.Promise}
  */
-no.request.models = function(models, options) {
+ns.request.models = function(models, options) {
     var request = new Request(models, options);
 
     return request.start();
@@ -54,32 +54,32 @@ no.request.models = function(models, options) {
  * @public
  * @type {Object}
  */
-no.request.requestParams = {};
+ns.request.requestParams = {};
 
 /**
- * Добавляет к params, параметры из no.request.requestParams.
+ * Добавляет к params, параметры из ns.request.requestParams.
  * @param {Object} params Параметры запроса.
  */
-no.request.addRequestParams = function(params) {
-    no.extend(params, no.request.requestParams);
+ns.request.addRequestParams = function(params) {
+    no.extend(params, ns.request.requestParams);
 };
 
 /**
  * Урл до сервера.
  * @type {String}
  */
-no.request.URL = '/models/';
+ns.request.URL = '/models/';
 
 /**
  * Метод для проверки ответа данных.
  * Может использоваться, например, при проверки авторизации.
  * @returns {boolean}
  */
-no.request.canProcessResponse = function() {
+ns.request.canProcessResponse = function() {
     return true;
 };
 
-no.request.Manager = {
+ns.request.Manager = {
 
     /**
      * @enum {Number}
@@ -94,10 +94,10 @@ no.request.Manager = {
 
     /**
      * Добавляет запрос модели.
-     * @param {no.Model} model Модель.
+     * @param {ns.Model} model Модель.
      * @param {Number} requestId ID запроса.
      * @param {Boolean} forced Флаг принудительного запроса.
-     * @return {Boolean|no.Model} Если true - модель надо запросить, false - ничег не надо делать, no.Model - дождаться ресолва промиса возвращенной модели.
+     * @return {Boolean|ns.Model} Если true - модель надо запросить, false - ничег не надо делать, ns.Model - дождаться ресолва промиса возвращенной модели.
      */
     add: function(model, requestId, forced) {
         var REQUEST_STATUS = this.STATUS;
@@ -160,7 +160,7 @@ no.request.Manager = {
 
     /**
      * Выставляет статус запроса модели в завимости от результата.
-     * @param {no.Model} model Модель
+     * @param {ns.Model} model Модель
      * @param {Boolean} [force=false] Принудительно выставить DONE.
      */
     done: function(model, force) {
@@ -177,8 +177,8 @@ no.request.Manager = {
     },
 
     /**
-     * Удаляет модель из запросов. Вызывается после завершения no.request.model.
-     * @param {no.Model[]} models Массив запрашиваемых моделей.
+     * Удаляет модель из запросов. Вызывается после завершения ns.request.model.
+     * @param {ns.Model[]} models Массив запрашиваемых моделей.
      */
     clean: function(models) {
         for (var i = 0, j = models.length; i < j; i++) {
@@ -188,7 +188,7 @@ no.request.Manager = {
 
     /**
      * Записывает информацию о запросе.
-     * @param {no.Model} model Запрашиваемая модель.
+     * @param {ns.Model} model Запрашиваемая модель.
      * @param {Number} requestId ID запроса.
      * @private
      */
@@ -203,8 +203,8 @@ no.request.Manager = {
 };
 
 if (window['mocha']) {
-    no.request.clean = function() {
-        no.request.Manager._keys = {};
+    ns.request.clean = function() {
+        ns.request.Manager._keys = {};
     }
 }
 
@@ -222,7 +222,7 @@ var Request = function(models, options) {
 
     /**
      * Массив запрашиваемых моделей
-     * @type {no.Model[]}
+     * @type {ns.Model[]}
      * @private
      */
     this.models = models;
@@ -247,11 +247,11 @@ Request.prototype.start = function() {
     for (var i = 0, l = models.length; i < l; i++) {
         var model = models[i];
 
-        var addRequest = no.request.Manager.add(model, this.id, this.options.forced);
+        var addRequest = ns.request.Manager.add(model, this.id, this.options.forced);
         if (addRequest === true) {
             requesting.push(model);
 
-        } else if (addRequest instanceof no.Model) {
+        } else if (addRequest instanceof ns.Model) {
             loading.push(model);
         }
     }
@@ -270,10 +270,10 @@ Request.prototype.request = function(loading, requesting) {
         //  Запрашиваем модели, которые нужно запросить.
         var params = models2params(requesting);
         var modelsNames = requesting.map(models2name);
-        no.request.addRequestParams(params);
+        ns.request.addRequestParams(params);
         // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
         // мог зарезолвится без завершения http-запроса
-        httpRequest = no.http(no.request.URL + '?_m=' + modelsNames.join(','), params, 'POST'); // FIXME: Урл к серверной ручке.
+        httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params, 'POST'); // FIXME: Урл к серверной ручке.
 
         all = all.concat( requesting.map(model2Promise) );
 
@@ -298,7 +298,7 @@ Request.prototype.request = function(loading, requesting) {
         if (httpRequest) {
             //TODO: что будет если fail?
             httpRequest.then(function(r) {
-                if (no.request.canProcessResponse(r) === false) {
+                if (ns.request.canProcessResponse(r) === false) {
                     //TODO: clear keys, promise.reject()
 
                 } else {
@@ -319,9 +319,9 @@ Request.prototype.request = function(loading, requesting) {
     } else {
         // у всех моделей есть какой-то статус (ERROR или OK)
         // вызываем чистку менеджера
-        no.request.Manager.clean(this.models);
+        ns.request.Manager.clean(this.models);
 
-        // и резолвим весь no.request
+        // и резолвим весь ns.request
         this.promise.resolve(this.models);
     }
 };
@@ -364,11 +364,11 @@ Request.prototype.extract = function(models, response) {
             model.setError(error);
         }
 
-        no.Model.store(model);
+        ns.Model.store(model);
 
         // сообщаем менеджеру о завершении запроса этой модели
-        // это не означает, что завершится весь no.request
-        no.request.Manager.done(model);
+        // это не означает, что завершится весь ns.request
+        ns.request.Manager.done(model);
 
         model.promise.resolve();
     }
@@ -398,7 +398,7 @@ function models2params(models) {
 };
 
     /**
-     * Приводит запрашиваемые модели к формату №3 из no.request.
+     * Приводит запрашиваемые модели к формату №3 из ns.request.
      * @param items Массив названией моделей.
      * @param params Параметры моделей.
      * @return {Array}
@@ -417,7 +417,7 @@ function models2params(models) {
 
     /**
      * Возвращает promise из model
-     * @param {no.Model} model Модель
+     * @param {ns.Model} model Модель
      * @return {no.Promise}
      */
     function model2Promise(model) {
@@ -425,10 +425,10 @@ function models2params(models) {
     }
 
     /**
-     * Приводит аргументы из no.request к моделям.
+     * Приводит аргументы из ns.request к моделям.
      * @param {String|Array|Object} items Массив названий моделей.
      * @param {Object} [params] Параметры моделей.
-     * @return {no.Model[]}
+     * @return {ns.Model[]}
      */
     function items2models(items, params) {
         // приводим к формату №2
@@ -445,12 +445,12 @@ function models2params(models) {
         var models = [];
         for (var i = 0, l = items.length; i < l; i++) {
             var item = items[i];
-            if (item.model && item.model instanceof no.Model) {
+            if (item.model && item.model instanceof ns.Model) {
                 models.push(item.model)
             } else {
                 // можно не использовать if (!model.get()) { model.create() }
                 // model.create все это умеет делать
-                models.push(no.Model.create(item.id, item.params));
+                models.push(ns.Model.create(item.id, item.params));
             }
         }
 

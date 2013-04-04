@@ -1,4 +1,4 @@
-no.Model.TESTDATA = {
+ns.Model.TESTDATA = {
     split1: {
         item: [
             {

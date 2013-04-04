@@ -4,7 +4,7 @@ describe('no.layout', function() {
 
         it('app', function() {
 
-            no.layout.define('app', {
+            ns.layout.define('app', {
                 'app': {
                     'header': true,
                     'left@': {},
@@ -44,7 +44,7 @@ describe('no.layout', function() {
 
         it('mailbox', function() {
 
-            no.layout.define('mailbox', {
+            ns.layout.define('mailbox', {
                 'app left@': [ 'folders', 'labels' ]
             }, 'app');
 
@@ -85,7 +85,7 @@ describe('no.layout', function() {
 
         it('messages', function() {
 
-            no.layout.define('messages', {
+            ns.layout.define('messages', {
                 'app right@': 'messages'
             }, 'mailbox');
 
@@ -134,7 +134,7 @@ describe('no.layout', function() {
     describe('async views', function() {
 
         it('async view in box', function() {
-            no.layout.define('async1', {
+            ns.layout.define('async1', {
                 'app left@': 'long-generated-view&'
             }, 'app');
 
@@ -169,7 +169,7 @@ describe('no.layout', function() {
         });
 
         it('async view in box', function() {
-            no.layout.define('async2', {
+            ns.layout.define('async2', {
                 'app left@': {
                     'regular-view': {
                         'async-view&': true
@@ -217,7 +217,7 @@ describe('no.layout', function() {
 
         it('setup', function() {
 
-            no.layout.define('setup', {
+            ns.layout.define('setup', {
                 'app left@': 'setup-menu',
                 'app right@': {
                     'setup-{ .tab }': {
@@ -281,7 +281,7 @@ describe('no.layout', function() {
 
         it('setup-filters', function() {
 
-            no.layout.define('setup-filters', {
+            ns.layout.define('setup-filters', {
                 'app right@ setup-{ .tab } content@': {
                     'setup-blocks': true
                 }
@@ -335,7 +335,7 @@ describe('no.layout', function() {
 
         it('choose box from params', function() {
 
-            no.layout.define('message', {
+            ns.layout.define('message', {
                 'app right@': function(params) {
                     return (params.ids) ? 'message' : 'messages';
                 }

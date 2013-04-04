@@ -1,4 +1,4 @@
-describe('no.View.events', function() {
+describe('ns.View.events', function() {
 
     function genTests(defs) {
         for (var i = 0, j = defs.length; i < j; i++) {
@@ -44,14 +44,14 @@ describe('no.View.events', function() {
     }
 
     beforeEach(function() {
-        no.layout.define('app', {
+        ns.layout.define('app', {
             'app': {
                 'head': true,
                 'content@': true
             }
         });
 
-        no.layout.define('content1', {
+        ns.layout.define('content1', {
             'app content@': {
                 'content1': {
                     'content1-inner': true
@@ -59,7 +59,7 @@ describe('no.View.events', function() {
             }
         }, 'app');
 
-        no.layout.define('content2', {
+        ns.layout.define('content2', {
             'app content@': {
                 'content2': {
                     'content2-inner': true
@@ -86,7 +86,7 @@ describe('no.View.events', function() {
                 this.events[view + '-' + event + '-spy'] = spy
             }
 
-            no.View.define(view, {
+            ns.View.define(view, {
                 events: eventsDecl,
                 models: model ? [model] : []
             });
@@ -94,9 +94,9 @@ describe('no.View.events', function() {
 
         /**
          *
-         * @type {no.View}
+         * @type {ns.View}
          */
-        this.APP = no.View.create('app');
+        this.APP = ns.View.create('app');
 
         function genHTML(views) {
             var html = '';
@@ -108,19 +108,19 @@ describe('no.View.events', function() {
             return html;
         }
 
-        this.origNotmpl = no.tmpl;
+        this.origNotmpl = ns.tmpl;
 
-        no.tmpl = function(json) {
+        ns.tmpl = function(json) {
             return '<div class="root">' + genHTML(json.views) + '</div>';
         };
     });
 
     afterEach(function() {
-        no.layout.undefine();
-        no.View.undefine();
-        no.Model.undefine();
+        ns.layout.undefine();
+        ns.View.undefine();
+        ns.Model.undefine();
 
-        no.tmpl = this.origNotmpl;
+        ns.tmpl = this.origNotmpl;
 
         delete this.events;
         delete this.APP;
@@ -130,8 +130,8 @@ describe('no.View.events', function() {
     describe('first rendering', function() {
 
         beforeEach(function() {
-            var layout = no.layout.page('content1', {});
-            var update = new no.Update(this.APP, layout, {});
+            var layout = ns.layout.page('content1', {});
+            var update = new ns.Update(this.APP, layout, {});
             update.start();
         });
 
@@ -225,11 +225,11 @@ describe('no.View.events', function() {
     describe('change view in box', function() {
 
         beforeEach(function() {
-            var layout = no.layout.page('content1', {});
-            new no.Update(this.APP, layout, {}).start();
+            var layout = ns.layout.page('content1', {});
+            new ns.Update(this.APP, layout, {}).start();
 
-            layout = no.layout.page('content2', {});
-            new no.Update(this.APP, layout, {}).start();
+            layout = ns.layout.page('content2', {});
+            new ns.Update(this.APP, layout, {}).start();
         });
 
         genTests([
@@ -292,17 +292,17 @@ describe('no.View.events', function() {
     describe('redraw view', function() {
 
         beforeEach(function() {
-            var layout = no.layout.page('content1', {});
-            new no.Update(this.APP, layout, {}).start();
+            var layout = ns.layout.page('content1', {});
+            new ns.Update(this.APP, layout, {}).start();
 
             /**
-             * @type {no.View}
+             * @type {ns.View}
              */
             var vContent1 = this.events['content1-init-spy'].getCall(0).thisValue;
             vContent1.invalidate();
 
-            layout = no.layout.page('content1', {});
-            new no.Update(this.APP, layout, {}).start();
+            layout = ns.layout.page('content1', {});
+            new ns.Update(this.APP, layout, {}).start();
         });
 
         describe('events', function() {
@@ -363,7 +363,7 @@ describe('no.View.events', function() {
     describe('async', function() {
 
         beforeEach(function() {
-            no.layout.define('content1-async', {
+            ns.layout.define('content1-async', {
                 'app content@': {
                     'content1-async&': {
                         'content1-inner': true
@@ -371,7 +371,7 @@ describe('no.View.events', function() {
                 }
             }, 'app');
 
-            no.Model.define('content1-async-model');
+            ns.Model.define('content1-async-model');
 
             this.xhr = sinon.useFakeXMLHttpRequest();
             var requests = this.requests = [];
@@ -379,13 +379,13 @@ describe('no.View.events', function() {
                 requests.push(xhr);
             };
 
-            var layout = no.layout.page('content1-async', {});
-            new no.Update(this.APP, layout, {}).start();
+            var layout = ns.layout.page('content1-async', {});
+            new ns.Update(this.APP, layout, {}).start();
         });
 
         afterEach(function() {
             this.xhr.restore();
-            no.request.clean();
+            ns.request.clean();
         });
 
         describe('first pass', function() {

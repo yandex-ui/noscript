@@ -1,33 +1,33 @@
-describe('no.View', function() {
+describe('ns.View', function() {
 
-    describe('no.View.define', function() {
+    describe('ns.View.define', function() {
 
         beforeEach(function() {
-            sinon.spy(no.View, 'define');
+            sinon.spy(ns.View, 'define');
 
-            this.view = no.View.define('test-view-define');
+            this.view = ns.View.define('test-view-define');
         });
 
         afterEach(function() {
-            no.View.define.restore();
-            no.View.undefine('test-view-define');
+            ns.View.define.restore();
+            ns.View.undefine('test-view-define');
         });
 
         it('should throw exception if I define View twice', function() {
             try {
-                no.View.define('test-view-define');
+                ns.View.define('test-view-define');
             } catch(e) {}
 
-            expect(no.View.define.getCall(1).threw()).to.be.ok();
+            expect(ns.View.define.getCall(1).threw()).to.be.ok();
         });
 
         it('should return new view', function() {
             expect(this.view).to.be.ok();
         });
 
-        it('instance of new view should be no.View', function() {
-            var instance = no.View.create('test-view-define', {});
-            expect(instance instanceof no.View).to.be.ok();
+        it('instance of new view should be ns.View', function() {
+            var instance = ns.View.create('test-view-define', {});
+            expect(instance instanceof ns.View).to.be.ok();
         });
     });
 
@@ -35,40 +35,40 @@ describe('no.View', function() {
 
         beforeEach(function() {
 
-            var parentMegaView = no.View.define('parentMegaView', {
+            var parentMegaView = ns.View.define('parentMegaView', {
                 methods: {
                     superMethod: function() {}
                 }
             });
 
-            no.View.define('childMegaView', {
+            ns.View.define('childMegaView', {
                 methods: {
                     oneMore: function() {}
                 }
             }, parentMegaView);
 
-            this.view = no.View.create('childMegaView', {});
+            this.view = ns.View.create('childMegaView', {});
         });
 
         afterEach(function() {
             delete this.view;
-            no.View.undefine('parentMegaView');
-            no.View.undefine('childMegaView');
+            ns.View.undefine('parentMegaView');
+            ns.View.undefine('childMegaView');
         });
 
-        it('наследуемый view должен быть no.View', function() {
-            expect(this.view instanceof no.View).to.be.ok();
+        it('наследуемый view должен быть ns.View', function() {
+            expect(this.view instanceof ns.View).to.be.ok();
         });
 
         it('методы наследуются от базового view', function() {
             expect(this.view.superMethod).to.be.ok();
         });
 
-        it('методы от базового view не ушли в no.View', function() {
-            expect(no.View.prototype.superMethod).to.not.be.ok();
+        it('методы от базового view не ушли в ns.View', function() {
+            expect(ns.View.prototype.superMethod).to.not.be.ok();
         });
 
-        it('методы no.View на месте', function() {
+        it('методы ns.View на месте', function() {
             expect(this.view.isOk).to.be.ok();
         });
 
@@ -77,9 +77,9 @@ describe('no.View', function() {
         });
     });
 
-    describe('no.View.info events parse', function() {
+    describe('ns.View.info events parse', function() {
 
-        no.View.define('test-view-info-events-parse', {
+        ns.View.define('test-view-info-events-parse', {
             events: {
                 'scroll window': no.pe,
                 'scroll document': no.pe,
@@ -115,7 +115,7 @@ describe('no.View', function() {
         });
 
         beforeEach(function() {
-            this.viewInfo = no.View.info('test-view-info-events-parse');
+            this.viewInfo = ns.View.info('test-view-info-events-parse');
         });
 
         afterEach(function() {
@@ -241,10 +241,10 @@ describe('no.View', function() {
         });
     });
 
-    describe('no.View._bindEventHandlers', function() {
+    describe('ns.View._bindEventHandlers', function() {
 
         beforeEach(function() {
-            this.view = new no.View();
+            this.view = new ns.View();
             this.view.myTestFunc = function() {return this};
 
             this.eventArr = [
@@ -286,10 +286,10 @@ describe('no.View', function() {
         });
     });
 
-    describe('no.View._getEvents', function() {
+    describe('ns.View._getEvents', function() {
 
         beforeEach(function() {
-            this.view = new no.View();
+            this.view = new ns.View();
 
             this.bindArr = [1];
             this.delegateArr = [2];

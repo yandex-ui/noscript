@@ -1,12 +1,12 @@
 /**
- * @fileOverview DOM events for no.View
+ * @fileOverview DOM events for ns.View
  */
 
 /**
  * Хеш событий для удобного биндинга touch/desktop
  * @type {Object}
  */
-no.V.EVENTS = {
+ns.V.EVENTS = {
     'click': 'click',
     'mousedown': 'mousedown',
     'mousemove': 'mousemove',
@@ -18,7 +18,7 @@ no.V.EVENTS = {
  * @type {Array}
  * @constant
  */
-no.V.DOM_EVENTS = [
+ns.V.DOM_EVENTS = [
     'blur',
     'change',
     'click',
@@ -45,9 +45,9 @@ no.V.DOM_EVENTS = [
 
 // @see http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html
 // @see http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
-if (no.IS_TOUCH) {
-    no.V.DOM_EVENTS.push('tap', 'touchstart', 'touchmove', 'touchend');
-    no.V.EVENTS = {
+if (ns.IS_TOUCH) {
+    ns.V.DOM_EVENTS.push('tap', 'touchstart', 'touchmove', 'touchend');
+    ns.V.EVENTS = {
         'click': 'tap',
         'mousedown': 'touchstart',
         'mousemove': 'touchmove',

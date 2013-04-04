@@ -1,9 +1,9 @@
-describe('no.Model', function() {
+describe('ns.Model', function() {
 
     beforeEach(function() {
-        no.Model.define('m0');
+        ns.Model.define('m0');
 
-        no.Model.define('m1', {
+        ns.Model.define('m1', {
             params: {
                 p1: null,
                 p2: 2,
@@ -12,14 +12,14 @@ describe('no.Model', function() {
             }
         });
 
-        no.Model.define('do-m1', {
+        ns.Model.define('do-m1', {
             params: {
                 p1: null,
                 p2: null
             }
         });
 
-        no.Model.define('split1', {
+        ns.Model.define('split1', {
             params: {
                 p1: null,
                 p2: null
@@ -35,7 +35,7 @@ describe('no.Model', function() {
             }
         });
 
-        no.Model.define('split1-item', {
+        ns.Model.define('split1-item', {
             params: {
                 id: null,
                 foo: null
@@ -46,7 +46,7 @@ describe('no.Model', function() {
 
     afterEach(function() {
         // чистим кэш созданных моделей после каждого теста
-        no.Model.undefine();
+        ns.Model.undefine();
     });
 
     describe('static', function() {
@@ -54,44 +54,44 @@ describe('no.Model', function() {
         describe('define', function() {
 
             it('should throw on model redefine', function() {
-                var define = function() { no.Model.define('dm1'); };
+                var define = function() { ns.Model.define('dm1'); };
                 define();
 
                 expect(define).to.throwException(/Model 'dm1' can't be redefined!/);
             });
 
             it('should fill _infos', function() {
-                no.Model.define('dm1', {foo: 'bar'});
+                ns.Model.define('dm1', {foo: 'bar'});
 
-                expect(no.Model.privats()._infos['dm1'])
+                expect(ns.Model.privats()._infos['dm1'])
                     .to.eql({foo: 'bar'});
             });
 
             it('should fill _ctors with custom one', function() {
                 var ctor = function() {};
-                no.Model.define('dm1', {
+                ns.Model.define('dm1', {
                     ctor: ctor
                 });
 
-                expect(no.Model.privats()._ctors['dm1']).to.be(ctor);
+                expect(ns.Model.privats()._ctors['dm1']).to.be(ctor);
             });
 
             it('should fill _ctors with one, contained methods', function() {
                 var bar = function() {};
-                no.Model.define('dm1', { methods: {foo: bar} });
-                var proto = no.Model.privats()._ctors['dm1'].prototype;
+                ns.Model.define('dm1', { methods: {foo: bar} });
+                var proto = ns.Model.privats()._ctors['dm1'].prototype;
 
                 expect(proto)
                     .to.have.property('foo', bar);
 
                 expect(proto.__proto__)
-                    .to.have.keys(Object.keys(no.Model.prototype));
+                    .to.have.keys(Object.keys(ns.Model.prototype));
             });
 
             it('should create _cache', function() {
-                no.Model.define('dm1');
+                ns.Model.define('dm1');
 
-                expect(no.Model.privats()._cache['dm1'])
+                expect(ns.Model.privats()._cache['dm1'])
                     .to.eql({});
             });
 
@@ -101,27 +101,27 @@ describe('no.Model', function() {
 
             beforeEach(function() {
 
-                var parent = no.Model.define('parent', {
+                var parent = ns.Model.define('parent', {
                     methods: {
                         superMethod: function() {}
                     }
                 });
 
-                no.Model.define('child', {
+                ns.Model.define('child', {
                     methods: {
                         oneMore: function() {}
                     }
                 }, parent);
 
-                this.model = no.Model.create('child', {});
+                this.model = ns.Model.create('child', {});
             });
 
             afterEach(function() {
                 delete this.model;
             });
 
-            it('наследуемая model должен быть no.model', function() {
-                expect(this.model instanceof no.Model).to.be.ok();
+            it('наследуемая model должен быть ns.Model', function() {
+                expect(this.model instanceof ns.Model).to.be.ok();
             });
 
             it('методы наследуются от базовой модели', function() {
@@ -129,11 +129,11 @@ describe('no.Model', function() {
                 expect(this.model.superMethod).to.be.ok();
             });
 
-            it('методы от базового view не ушли в no.View', function() {
-                expect(no.Model.prototype.superMethod).to.not.be.ok();
+            it('методы от базового view не ушли в ns.View', function() {
+                expect(ns.Model.prototype.superMethod).to.not.be.ok();
             });
 
-            it('методы no.View на месте', function() {
+            it('методы ns.View на месте', function() {
                 expect(this.model.isValid).to.be.ok();
             });
 
@@ -145,25 +145,25 @@ describe('no.Model', function() {
         describe('create', function() {
 
             it('should init model key', function() {
-                var model = no.Model.create('m1', {p1: 1, p3: 3});
+                var model = ns.Model.create('m1', {p1: 1, p3: 3});
 
                 expect(model.key)
                     .to.be('model=m1&p1=1&p2=2&p3=3&p4=foo');
             });
 
             it('should init model info', function() {
-                var model = no.Model.create('m1', {p1: 1, p3: 4});
+                var model = ns.Model.create('m1', {p1: 1, p3: 4});
 
                 expect(model.info)
                     .to.have.keys(['params', 'events', 'pNames', 'isDo', 'isCollection']);
             });
 
             it('should update data in existing model', function() {
-                var old = no.Model.create('m1', {p1: 1, p3: 5});
+                var old = ns.Model.create('m1', {p1: 1, p3: 5});
 
                 sinon.spy(old, 'setData');
 
-                var model = no.Model.create('m1', {p1: 1, p3: 5}, {foo: 1});
+                var model = ns.Model.create('m1', {p1: 1, p3: 5}, {foo: 1});
 
                 expect(model).to.be(old);
 
@@ -175,42 +175,42 @@ describe('no.Model', function() {
         describe('info', function() {
 
             it('should return pNames property', function() {
-                expect( no.Model.info('m1').pNames )
+                expect( ns.Model.info('m1').pNames )
                     .to.eql(['p1', 'p2', 'p3', 'p4']);
             });
 
             it('should return isDo=true in for do models', function() {
-                expect( no.Model.info('do-m1').isDo )
+                expect( ns.Model.info('do-m1').isDo )
                     .to.be(true);
             });
 
             it('should return isDo=false for non-do models', function() {
-                expect( no.Model.info('m1').isDo )
+                expect( ns.Model.info('m1').isDo )
                     .to.be(false);
             });
 
             it('should return isCollection=true for split models', function() {
-                expect( no.Model.info('split1').isCollection)
+                expect( ns.Model.info('split1').isCollection)
                     .to.be(true);
             });
 
             it('should return isCollection=false for non-split models', function() {
-                expect( no.Model.info('m1').isCollection)
+                expect( ns.Model.info('m1').isCollection)
                     .to.be(false);
             });
 
             it('should initialize \'params\' property', function() {
-                expect( no.Model.info('m0').params)
+                expect( ns.Model.info('m0').params)
                     .to.eql({});
             });
 
             it('should return \'params\' property', function() {
-                expect( no.Model.info('m1').params)
+                expect( ns.Model.info('m1').params)
                     .to.eql({p1: null, p2: 2, p3: null, p4: 'foo'});
             });
 
             it('should initialize \'events\' property', function() {
-                expect( no.Model.info('m0').events)
+                expect( ns.Model.info('m0').events)
                     .to.eql({});
             });
 
@@ -219,9 +219,9 @@ describe('no.Model', function() {
                     'changed': function() {},
                     'changed..data': function() {}
                 };
-                no.Model.define('me0', {events: decl});
+                ns.Model.define('me0', {events: decl});
 
-                expect( no.Model.info('me0').events )
+                expect( ns.Model.info('me0').events )
                     .to.eql(decl)
             });
 
@@ -230,28 +230,28 @@ describe('no.Model', function() {
         describe('key', function() {
 
             it('should return right key', function() {
-                expect( no.Model.key('m1', {p1: 'foo', p2: 'bar', p3: 'baz', p4: 'aaz'}) )
+                expect( ns.Model.key('m1', {p1: 'foo', p2: 'bar', p3: 'baz', p4: 'aaz'}) )
                     .to.be('model=m1&p1=foo&p2=bar&p3=baz&p4=aaz');
             });
 
             it('should return right key with defaults', function() {
-                expect( no.Model.key('m1', {p1: 'bar', p3: 'aaz'}) )
+                expect( ns.Model.key('m1', {p1: 'bar', p3: 'aaz'}) )
                     .to.be('model=m1&p1=bar&p2=2&p3=aaz&p4=foo');
             });
 
             it('should return right incomplete key', function() {
-                expect( no.Model.key('m1', {p2: 'bar', p4: 'aaz'}) )
+                expect( ns.Model.key('m1', {p2: 'bar', p4: 'aaz'}) )
                     .to.be('model=m1&p2=bar&p4=aaz');
             });
 
             it('should return specific key for do-model', function() {
-                expect( no.Model.key('do-m1', {p1: '1'}) )
+                expect( ns.Model.key('do-m1', {p1: '1'}) )
                     .to.match(/^do-\d+$/);
             });
 
             it('should return different keys for the same do-models on each call', function() {
-                var k1 = no.Model.key('do-m1');
-                var k2 = no.Model.key('do-m1');
+                var k1 = ns.Model.key('do-m1');
+                var k2 = ns.Model.key('do-m1');
 
                 expect(k1).not.to.be(k2);
             });
@@ -265,7 +265,7 @@ describe('no.Model', function() {
         describe('_reset', function() {
 
             beforeEach(function() {
-                this.model = no.Model.create('m1', {p1: 1, p2: 2, p3: 3, p4: 4}, {foo: 'bar'});
+                this.model = ns.Model.create('m1', {p1: 1, p2: 2, p3: 3, p4: 4}, {foo: 'bar'});
             });
 
             it('should null all properties', function() {
@@ -291,7 +291,7 @@ describe('no.Model', function() {
         describe('_init', function() {
 
             it('should initialize model with given params', function() {
-                var model = new no.Model();
+                var model = new ns.Model();
                 sinon.spy(model, '_reset');
                 sinon.spy(model, 'setData');
                 sinon.spy(model, '_bindEvents');
@@ -303,9 +303,9 @@ describe('no.Model', function() {
                 expect(model._reset.calledOnce).to.be.ok();
                 expect(model.setData.calledWith({foo: 'bar'})).to.be.ok();
 
-                expect(model.info).to.be( no.Model.info('m1') );
+                expect(model.info).to.be( ns.Model.info('m1') );
                 expect(model.key)
-                    .to.be( no.Model.key('m1', {p1: 1, p2: 2, p3: 3, p4: 4}), model.info );
+                    .to.be( ns.Model.key('m1', {p1: 1, p2: 2, p3: 3, p4: 4}), model.info );
 
                 expect(model._bindEvents.calledOnce).to.be.ok();
             });
@@ -318,8 +318,8 @@ describe('no.Model', function() {
 
             beforeEach(function() {
                 callback = sinon.spy();
-                this.data = JSON.parse(JSON.stringify(no.Model.TESTDATA.split1));
-                this.model = no.Model.create('split1', {p1: 1, p2: Math.random()});
+                this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
+                this.model = ns.Model.create('split1', {p1: 1, p2: Math.random()});
                 this.model.trigger = function() { callback(); }
 
                 this.model._splitData(this.data);
@@ -372,7 +372,7 @@ describe('no.Model', function() {
         describe('setData', function() {
 
             beforeEach(function() {
-                this.model = no.Model.create('m1', {p1: 1, p3: Math.random()});
+                this.model = ns.Model.create('m1', {p1: 1, p3: Math.random()});
                 this.data = {foo: 'bar'};
             });
 
@@ -444,16 +444,16 @@ describe('no.Model', function() {
             });
 
             it('should call _splitData for split-models', function() {
-                var model = no.Model.create('split1', {p1: 1, p2: 2});
+                var model = ns.Model.create('split1', {p1: 1, p2: 2});
 
                 sinon.spy(model, '_splitData');
 
-                model.setData(no.Model.TESTDATA.split1);
+                model.setData(ns.Model.TESTDATA.split1);
 
                 expect(model._splitData.calledOnce)
                     .to.be.ok();
 
-                expect(model._splitData.calledWith(no.Model.TESTDATA.split1))
+                expect(model._splitData.calledWith(ns.Model.TESTDATA.split1))
                     .to.be.ok();
             });
 
@@ -462,13 +462,13 @@ describe('no.Model', function() {
         describe('getData', function() {
 
             beforeEach(function() {
-                this.data = JSON.parse(JSON.stringify(no.Model.TESTDATA.split1));
-                this.model = no.Model.create('split1', {p1: 1, p2: 2}, this.data);
+                this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
+                this.model = ns.Model.create('split1', {p1: 1, p2: 2}, this.data);
             })
 
             it('should return model\'s data', function() {
                 var data = {foo: 'bar'};
-                var model = no.Model.create('m1', {p1: 1, p3: 2});
+                var model = ns.Model.create('m1', {p1: 1, p3: 2});
                 model.setData(data);
 
                 expect( model.getData() )
@@ -495,7 +495,7 @@ describe('no.Model', function() {
 
             beforeEach(function() {
 
-                no.Model.define('defined-events-1');
+                ns.Model.define('defined-events-1');
 
                 this.changedCb = sinon.spy();
                 this.changedJpathCb = sinon.spy();
@@ -505,11 +505,11 @@ describe('no.Model', function() {
                     'changed..data': this.changedJpathCb
                 };
 
-                no.Model.define('defined-events-2', {
+                ns.Model.define('defined-events-2', {
                     events: this.eventsDeclaration
                 });
 
-                this.model = no.Model.create('defined-events-2');
+                this.model = ns.Model.create('defined-events-2');
                 this.model.setData({data: 1});
             });
 

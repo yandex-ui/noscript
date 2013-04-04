@@ -1,46 +1,46 @@
 (function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-//  no.View
+//  ns.View
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * Создает View. Конструктор не используется напрямую, View создаются через no.View.create.
+ * Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.
  * @class Класс, реализующий View
  * @see http://github.com/pasaran/noscript/wiki/ns.View
  * @constructor
  * @augments no.Events
  */
-no.View = function() {};
+ns.View = function() {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.extend(no.View.prototype, no.Events);
+no.extend(ns.View.prototype, no.Events);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * @see no.V.STATUS
+ * @see ns.V.STATUS
  * @enum {Number}
- * @borrows no.V.STATUS as no.View.prototype.STATUS
+ * @borrows ns.V.STATUS as ns.View.prototype.STATUS
  */
-no.View.prototype.STATUS = no.V.STATUS;
+ns.View.prototype.STATUS = ns.V.STATUS;
 
 /**
  * Закешированный $(document)
  * @type {jQuery}
  * @private
  */
-no.View.prototype._$document = $(document);
+ns.View.prototype._$document = $(document);
 
 /**
  * Закешированный $(window)
  * @type {jQuery}
  * @private
  */
-no.View.prototype._$window = $(window);
+ns.View.prototype._$window = $(window);
 
-no.View.prototype._init = function(id, params, async) {
+ns.View.prototype._init = function(id, params, async) {
     this.id = id;
     this.params = params || {};
 
@@ -53,16 +53,16 @@ no.View.prototype._init = function(id, params, async) {
      */
     this.async = async;
 
-    this.info = no.View.info(id);
+    this.info = ns.View.info(id);
 
-    this.key = no.View.getKey(id, params, this.info);
+    this.key = ns.View.getKey(id, params, this.info);
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
     for (var i = 0, l = model_ids.length; i < l; i++) {
         var model_id = model_ids[i];
-        models[model_id] = no.Model.create(model_id, params);
+        models[model_id] = ns.Model.create(model_id, params);
     }
 
     this.views = null;
@@ -70,7 +70,7 @@ no.View.prototype._init = function(id, params, async) {
 
     /**
      * Статус View.
-     * @see no.V.STATUS
+     * @see ns.V.STATUS
      * @type {Number}
      * @private
      */
@@ -96,10 +96,10 @@ no.View.prototype._init = function(id, params, async) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.getKey = function(id, params, info) {
+ns.View.getKey = function(id, params, info) {
     //  Ключ можно вычислить даже для неопределенных view,
     //  в частности, для боксов.
-    info = info || no.View.info(id) || {};
+    info = info || ns.View.info(id) || {};
 
     var key = 'view=' + id;
 
@@ -142,10 +142,10 @@ var _ctors = {};
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
  * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
  * @param {Object} [info.noevents.show] События, на которые надо подписаться при показе DOM-элемента.
- * @param {Function} [base=no.View] Базовый View для наследования
+ * @param {Function} [base=ns.View] Базовый View для наследования
  * @return {Function} Созданный View.
  */
-no.View.define = function(id, info, base) {
+ns.View.define = function(id, info, base) {
     if (id in _infos) {
         throw "View can't be redefined!";
     }
@@ -153,14 +153,14 @@ no.View.define = function(id, info, base) {
     info = info || {};
 
     var ctor = info.ctor || function() {};
-    // Нужно унаследоваться от no.View и добавить в прототип info.methods.
-    ctor = no.inherits(ctor, base || no.View, info.methods);
+    // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
+    ctor = no.inherit(ctor, base || ns.View, info.methods);
 
     info.models = info.models || [];
     info.events = info.events || {};
     info.noevents = info.noevents || {};
 
-    // часть дополнительной обработки производится в no.View.info
+    // часть дополнительной обработки производится в ns.View.info
     // т.о. получаем lazy-определение
 
     _infos[id] = info;
@@ -169,14 +169,14 @@ no.View.define = function(id, info, base) {
     return ctor;
 };
 
-no.View.info = function(id) {
+ns.View.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pNames, то надо завершить определение View
     if (info && !info.pNames) {
         var params = {};
         var models = info.models;
         for (var i = 0, l = models.length; i < l; i++) {
-            var modelInfo = no.Model.info(models[i]);
+            var modelInfo = ns.Model.info(models[i]);
             if (!modelInfo) {
                 throw 'Model "' + models[i] + '" is not defined!';
             }
@@ -246,7 +246,7 @@ no.View.info = function(id) {
 
             if (eventName) {
                 var handler = info.events[eventDecl];
-                var nativeEvent = no.V.DOM_EVENTS.indexOf(eventName) > -1;
+                var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
 
                 if (nativeEvent) {
                     var arr = [eventName, eventSelector, info.events[eventDecl]];
@@ -292,19 +292,19 @@ no.View.info = function(id) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 /**
- * Фабрика no.View
+ * Фабрика ns.View
  * @param {String} id ID view.
  * @param {Object} [params] Параметры view.
  * @param {Boolean} [async=false] Может ли view бы асинхронным.
- * @return {no.View}
+ * @return {ns.View}
  */
-no.View.create = function(id, params, async) {
+ns.View.create = function(id, params, async) {
     var Ctor = _ctors[id];
     if (!Ctor) {
-        throw 'no.View "' + id + '" is not declared!';
+        throw 'ns.View "' + id + '" is not declared!';
     }
     /**
-     * @type {no.View}
+     * @type {ns.View}
      */
     var view = new Ctor();
     view._init(id, params, async);
@@ -314,17 +314,17 @@ no.View.create = function(id, params, async) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._getView = function(id) {
+ns.View.prototype._getView = function(id) {
     return this.views[id];
 };
 
-no.View.prototype._addView = function(id, params, type) {
+ns.View.prototype._addView = function(id, params, type) {
     var view = this._getView(id);
     if (!view) {
-        if (type === no.L.BOX) {
-            view = new no.Box(id, params);
+        if (type === ns.L.BOX) {
+            view = new ns.Box(id, params);
         } else {
-            view = no.View.create(id, params, type === no.L.ASYNC);
+            view = ns.View.create(id, params, type === ns.L.ASYNC);
         }
         this.views[view.id] = view;
     }
@@ -336,7 +336,7 @@ no.View.prototype._addView = function(id, params, type) {
  * @param {Array} [events] Массив событий.
  * @private
  */
-no.View.prototype._htmldestroy = function(events) {
+ns.View.prototype._htmldestroy = function(events) {
     this._unbindEvents('init');
     events.push(this);
 };
@@ -346,7 +346,7 @@ no.View.prototype._htmldestroy = function(events) {
  * @param {Array} [events] Массив событий.
  * @private
  */
-no.View.prototype._htmlinit = function(events) {
+ns.View.prototype._htmlinit = function(events) {
     this._bindEvents('init');
     events.push(this);
 };
@@ -357,7 +357,7 @@ no.View.prototype._htmlinit = function(events) {
  * @return {Boolean}
  * @private
  */
-no.View.prototype._hide = function(events) {
+ns.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
         this._unbindModels();
         this._unbindEvents('show');
@@ -378,7 +378,7 @@ no.View.prototype._hide = function(events) {
  * @private
  * @return {Boolean}
  */
-no.View.prototype._show = function(events) {
+ns.View.prototype._show = function(events) {
     // При создании блока у него this._visible === undefined.
     if (!this.isLoading() && this._visible !== true) {
         this._bindModels();
@@ -398,15 +398,15 @@ no.View.prototype._show = function(events) {
  * Обработчик изменений моделей.
  * @private
  */
-no.View.prototype._onModelChange = function() {
-    no.page.go();
+ns.View.prototype._onModelChange = function() {
+    ns.page.go();
 };
 
 /**
  * Биндится на изменение моделей.
  * @private
  */
-no.View.prototype._bindModels = function() {
+ns.View.prototype._bindModels = function() {
     for (var id in this.models) {
         var model = this.models[id];
         //TODO: namespace бы пригодился!
@@ -418,7 +418,7 @@ no.View.prototype._bindModels = function() {
  * Анбиндится на изменение моделей.
  * @private
  */
-no.View.prototype._unbindModels = function() {
+ns.View.prototype._unbindModels = function() {
     for (var id in this.models) {
         var model = this.models[id];
         //TODO: namespace бы пригодился!
@@ -433,7 +433,7 @@ no.View.prototype._unbindModels = function() {
  * @return {Array} Копия events c забинженными обработчиками.
  * @private
  */
-no.View.prototype._bindEventHandlers = function(events, handlerPos) {
+ns.View.prototype._bindEventHandlers = function(events, handlerPos) {
     var bindedEvents = [];
 
     for (var i = 0, j = events.length; i < j; i++) {
@@ -459,7 +459,7 @@ no.View.prototype._bindEventHandlers = function(events, handlerPos) {
  * @return {Object}
  * @private
  */
-no.View.prototype._getEvents = function(type) {
+ns.View.prototype._getEvents = function(type) {
     // this._initEvents
     var eventProp = '_' + type + 'Events';
 
@@ -483,7 +483,7 @@ no.View.prototype._getEvents = function(type) {
  * Регистрирует обработчики событий после создания ноды.
  * @private
  */
-no.View.prototype._bindEvents = function(type) {
+ns.View.prototype._bindEvents = function(type) {
     var $node = $(this.node);
     var i, j, event;
     var events = this._getEvents(type);
@@ -533,7 +533,7 @@ no.View.prototype._bindEvents = function(type) {
  * Удаляет обработчики событий перед удалением ноды.
  * @private
  */
-no.View.prototype._unbindEvents = function(type) {
+ns.View.prototype._unbindEvents = function(type) {
     var $node = $(this.node);
     var i, j, event;
 
@@ -567,7 +567,7 @@ no.View.prototype._unbindEvents = function(type) {
 /**
  * Инвалидует себя и своих потомков.
  */
-no.View.prototype.invalidate = function() {
+ns.View.prototype.invalidate = function() {
     // рекурсивно инвалидируем себя и потомков
     var views = this._getDescendants();
     for (var i = 0, j = views.length; i < j; i++) {
@@ -577,11 +577,11 @@ no.View.prototype.invalidate = function() {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype.isOk = function() {
+ns.View.prototype.isOk = function() {
     return (this.status === this.STATUS.OK);
 };
 
-no.View.prototype.isLoading = function() {
+ns.View.prototype.isLoading = function() {
     return (this.status === this.STATUS.LOADING);
 };
 
@@ -589,7 +589,7 @@ no.View.prototype.isLoading = function() {
  * Возвращает true, если блок валиден.
  * @return {Boolean}
  */
-no.View.prototype.isValid = function() {
+ns.View.prototype.isValid = function() {
     return this.isOk() && this.isModelsValid(this.timestamp);
 };
 
@@ -598,7 +598,7 @@ no.View.prototype.isValid = function() {
  * @param {Number} [timestamp] Также проверяем, что кеш модели не свежее переданного timestamp.
  * @return {Boolean}
  */
-no.View.prototype.isModelsValid = function(timestamp) {
+ns.View.prototype.isModelsValid = function(timestamp) {
     var models = this.models;
     for (var id in models) {
         var model = models[id];
@@ -618,7 +618,7 @@ no.View.prototype.isModelsValid = function(timestamp) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Вызываем callback для всех подблоков.
-no.View.prototype._apply = function(callback) {
+ns.View.prototype._apply = function(callback) {
     var views = this.views;
     for (var id in views) {
         callback(views[id], id);
@@ -635,7 +635,7 @@ no.View.prototype._apply = function(callback) {
  * @param params
  * @return {*}
  */
-no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     /**
      * Флаг, означающий, что view грузится асинхронно.
      * @type {Boolean}
@@ -689,7 +689,7 @@ no.View.prototype._getRequestViews = function(updated, pageLayout, params) {
 //
 //  В tree.models будут все модели, требуемые для этих блоков.
 //
-no.View.prototype._getUpdateTree = function(tree, layout, params) {
+ns.View.prototype._getUpdateTree = function(tree, layout, params) {
     if ( !this.isValid() ) {
         tree.views[this.id] = this._getViewTree(layout, params);
     } else {
@@ -707,7 +707,7 @@ no.View.prototype._getUpdateTree = function(tree, layout, params) {
  * @param params
  * @return {Object}
  */
-no.View.prototype._getViewTree = function(layout, params) {
+ns.View.prototype._getViewTree = function(layout, params) {
     var tree = {
         async: false,
         // фейковое дерево, чтобы удобно матчится в yate
@@ -718,7 +718,7 @@ no.View.prototype._getViewTree = function(layout, params) {
         //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,
         //  FIXME: Не должно ли оно приходить в параметрах Update'а?
-        page: no.page.current,
+        page: ns.page.current,
         views: {}
     };
 
@@ -748,7 +748,7 @@ no.View.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
-no.View.prototype._getModelsData = function() {
+ns.View.prototype._getModelsData = function() {
     var r = {};
 
     var models = this.models;
@@ -762,7 +762,7 @@ no.View.prototype._getModelsData = function() {
     return r;
 };
 
-no.View.prototype.getModel = function(id) {
+ns.View.prototype.getModel = function(id) {
     return this.models[id].getData();
 };
 
@@ -775,7 +775,7 @@ no.View.prototype.getModel = function(id) {
 //      block.tmpl({ ... })
 //      block.tmpl('mode', { ... })
 //
-no.View.prototype.tmpl = function(mode, extra) {
+ns.View.prototype.tmpl = function(mode, extra) {
     switch (arguments.length) {
         case 0:
             mode = '';
@@ -789,16 +789,16 @@ no.View.prototype.tmpl = function(mode, extra) {
 
     var tree = {
         models: this._getModelsData(),
-        page: no.page.current
+        page: ns.page.current
     };
 
     if (extra) {
         tree.extra = extra;
     }
 
-    var html = no.tmpl(tree, mode);
+    var html = ns.tmpl(tree, mode);
 
-    return no.html2node(html);
+    return ns.html2node(html);
 };
 
 /**
@@ -807,7 +807,7 @@ no.View.prototype.tmpl = function(mode, extra) {
  * @return {Array}
  * @private
  */
-no.View.prototype._getDescendants = function(views) {
+ns.View.prototype._getDescendants = function(views) {
     views = views || [];
     views.push(this);
     this._apply(function(view) {
@@ -819,7 +819,7 @@ no.View.prototype._getDescendants = function(views) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.View.prototype._setNode = function(node) {
+ns.View.prototype._setNode = function(node) {
     var STATUS = this.STATUS;
     if (node) {
         this.node = node;
@@ -832,7 +832,7 @@ no.View.prototype._setNode = function(node) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем (если нужно) ноду блока.
-no.View.prototype._updateHTML = function(node, layout, params, options, events) {
+ns.View.prototype._updateHTML = function(node, layout, params, options, events) {
     // для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
     var generateRepaintEvent = !options.async || !this.isValid();
 
@@ -840,7 +840,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
-        viewNode = no.byClass('ns-view-' + this.id, node)[0];
+        viewNode = ns.byClass('ns-view-' + this.id, node)[0];
         if (viewNode) {
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
@@ -849,7 +849,7 @@ no.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 if (this.node) {
-                    no.replaceNode(this.node, viewNode);
+                    ns.replaceNode(this.node, viewNode);
                 }
                 //  Все подблоки уже не toplevel.
                 options.toplevel = false;
@@ -900,7 +900,7 @@ if (window['mocha']) {
      * Используется только в юнит-тестах.
      * @param {String} [id] ID view.
      */
-    no.View.undefine = function(id) {
+    ns.View.undefine = function(id) {
         if (id) {
             delete _ctors[id];
             delete _infos[id];
@@ -910,7 +910,7 @@ if (window['mocha']) {
         }
     };
 
-    no.View.privats = {
+    ns.View.privats = {
         _ctors: _ctors,
         _infos: _infos
     };

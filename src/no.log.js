@@ -1,24 +1,24 @@
 /**
  * @fileOverview
  */
-(function(/**no*/no) {
+(function(/** @type ns */ns) {
 
     /**
      * Модуль логирования ошибок.
      * @namespace
      */
-    no.log = {};
+    ns.log = {};
 
-    no.log.info = function(name, data) {
-
-    };
-
-    no.log.error = function(name, data) {
+    ns.log.info = function(name, data) {
 
     };
 
-    no.log.exception = function(name, exception) {
+    ns.log.error = function(name, data) {
 
     };
 
-})(no);
+    ns.log.exception = function(name, exception) {
+
+    };
+
+})(ns);

@@ -7,7 +7,7 @@
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.layout = {};
+ns.layout = {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -18,7 +18,7 @@ var hasSpacesRE = /\s+/;
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-no.layout.define = function(id, layout, parent_id) {
+ns.layout.define = function(id, layout, parent_id) {
     if ( _pages[id] ) {
         throw Error('Cannot redefine layout of ' + id);
     }
@@ -35,7 +35,7 @@ no.layout.define = function(id, layout, parent_id) {
  * @param {Object} [params]
  * @return {Object}
  */
-no.layout.page = function(id, params) {
+ns.layout.page = function(id, params) {
     var raw = _pages[id];
     if (!raw) {
         throw 'Layout ' + id + ' is undefined';
@@ -44,7 +44,7 @@ no.layout.page = function(id, params) {
     var layout = compile(raw.layout, params);
 
     if (raw.parent_id) {
-        var parent = no.layout.page(raw.parent_id, params);
+        var parent = ns.layout.page(raw.parent_id, params);
 
         layout = inherit(layout, parent);
     }
@@ -122,7 +122,7 @@ function compile(layout, params) {
 //  Наследуем layout от parent'а.
 //
 function inherit(layout, parent) {
-    var result = no.object.clone(parent);
+    var result = ns.object.clone(parent);
 
     for (var key in layout) {
         //  В ключе должен быть "путь" вида 'app left@ message content@'.
@@ -133,7 +133,7 @@ function inherit(layout, parent) {
         //  Т.е. на строку вида 'foo@'.
         //  Потому что можно переопределять только содержимое боксов.
         //  Изменять лэйаут блоков нельзя.
-        if ( getViewType( parts[l - 1] ) !== no.L.BOX ) {
+        if ( getViewType( parts[l - 1] ) !== ns.L.BOX ) {
             throw Error('Cannot overwrite view layout "' + parts[l - 1] + '"');
         }
 
@@ -153,12 +153,12 @@ function inherit(layout, parent) {
 function getViewType(s) {
     var lastChar = s.substr(-1);
     if (lastChar === '@') {
-        return no.L.BOX;
+        return ns.L.BOX;
     } else if (lastChar === '&') {
-        return no.L.ASYNC;
+        return ns.L.ASYNC;
     }
 
-    return no.L.VIEW;
+    return ns.L.VIEW;
 }
 
 function cleanKey(key) {
@@ -180,7 +180,7 @@ if (window['mocha']) {
      * Используется только в юнит-тестах.
      * @param {String} [id] Layout ID.
      */
-    no.layout.undefine = function(id) {
+    ns.layout.undefine = function(id) {
         if (id) {
             delete _pages[id];
         } else {

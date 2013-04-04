@@ -1,18 +1,18 @@
-no.object = {};
+ns.object = {};
 
-no.object.clone = function(obj) {
+ns.object.clone = function(obj) {
     if (obj && typeof obj === 'object') {
         var r;
 
         if ( Array.isArray(obj) ) {
             r = [];
             for (var i = 0; i < obj.length; i++) {
-                r.push( no.object.clone( obj[i] ) );
+                r.push( ns.object.clone( obj[i] ) );
             }
         } else {
             r = {};
             for (var key in obj) {
-                r[key] = no.object.clone( obj[key] );
+                r[key] = ns.object.clone( obj[key] );
             }
         }
 
@@ -26,7 +26,7 @@ no.object.clone = function(obj) {
     @param {!Object} obj
     @return {boolean} Определяет, пустой ли объект или нет.
 */
-no.object.isEmpty = function(obj) {
+ns.object.isEmpty = function(obj) {
     for (var key in obj) {
         return false;
     }
@@ -36,7 +36,7 @@ no.object.isEmpty = function(obj) {
 
 //  FIXME: Как-то это все коряво. Нужно переписать и прооптимизировать.
 //NOTE: doochik@: в expect.js есть отличный сравнятор, можно взять оттуда
-no.object.isEqual = function(a, b) {
+ns.object.isEqual = function(a, b) {
     if (a === b) { return true; }
     if (a == null || b == null) { return false; }
 
@@ -61,7 +61,7 @@ no.object.isEqual = function(a, b) {
         }
 
         for (var key in a) {
-            if ( !no.object.isEqual( a[key], b[key] ) ) { return false; }
+            if ( !ns.object.isEqual( a[key], b[key] ) ) { return false; }
         }
     } else {
         //  Это два скаляра (string, boolean, number) и они точно не равны,

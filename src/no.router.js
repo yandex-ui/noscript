@@ -3,12 +3,12 @@
  * @param {string} url
  * @return {{ page: string, params: Object }|Boolean}
 */
-no.router = function(url) {
+ns.router = function(url) {
 
-    var routesDef = no.router._routes;
+    var routesDef = ns.router._routes;
 
     if (url in routesDef.redirect) {
-        no.page.redirect(routesDef.redirect[url]);
+        ns.page.redirect(routesDef.redirect[url]);
         return false;
     }
 
@@ -34,7 +34,7 @@ no.router = function(url) {
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
             var query = r[l + 1];
             if (query) {
-                no.extend( params, no.parseQuery(query) );
+                no.extend( params, ns.parseQuery(query) );
             }
 
             // реврайты параметров для этой страницы
@@ -58,10 +58,10 @@ no.router = function(url) {
 };
 
 /**
- * Inititialize no.router, compiles defined routes.
+ * Inititialize ns.router, compiles defined routes.
  */
-no.router.init = function() {
-    var routes = no.router.routes;
+ns.router.init = function() {
+    var routes = ns.router.routes;
 
     var _routes = {};
     _routes.redirect = routes.redirect || {};
@@ -72,13 +72,13 @@ no.router.init = function() {
 
     var compiledRoutes = [];
     for (var route in rawRoutes) {
-        var compiled = no.router.compile(route);
+        var compiled = ns.router.compile(route);
         compiled.page = rawRoutes[route];
         compiledRoutes.push(compiled);
     }
     _routes.route = compiledRoutes;
 
-    no.router._routes = _routes;
+    ns.router._routes = _routes;
 };
 
 /**
@@ -86,7 +86,7 @@ no.router.init = function() {
  * @param {String} route
  * @return {{ regexp: RegExp, tokens: Array.<string> }}
 */
-no.router.compile = function(route) {
+ns.router.compile = function(route) {
     var regexp = route.replace(/\/$/, ''); // Отрезаем последний слэш, он ниже добавится как необязательный.
 
     var tokens = [];
@@ -94,7 +94,7 @@ no.router.compile = function(route) {
         var tokenParts = token.split(':');
 
         var type = tokenParts[1] || 'id';
-        var rx_part = no.router.regexps[type];
+        var rx_part = ns.router.regexps[type];
         if (!rx_part) {
             throw "Can't find regexp for '" + type +"'!";
         }
@@ -116,20 +116,20 @@ no.router.compile = function(route) {
  * @type {Object}
  * @private
  */
-no.router._routes = null;
+ns.router._routes = null;
 
 /**
  * Маршруты.
  * Этот массив должен быть объявлен в проекте.
  * @type {Object}
  */
-no.router.routes = {};
+ns.router.routes = {};
 
 /**
  * Регулярные выражения для проверки типов параметров.
  * @type {Object}
  */
-no.router.regexps = {
+ns.router.regexps = {
     'id': '[A-Za-z_][A-Za-z0-9_-]*',
     'int': '[0-9]+'
 };

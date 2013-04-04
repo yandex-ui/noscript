@@ -6,9 +6,9 @@ describe('no.request.js', function() {
             this._requestModels = no.request.models;
             no.request.models = sinon.spy();
 
-            no.Model.define('test-model');
-            no.Model.define('test-model2');
-            no.Model.define('test-model-with-params', {
+            ns.Model.define('test-model');
+            ns.Model.define('test-model2');
+            ns.Model.define('test-model-with-params', {
                 params: {
                     id: false
                 }
@@ -30,7 +30,7 @@ describe('no.request.js', function() {
             it('should call no.request.models with requested model', function() {
                 no.request('test-model');
 
-                var model = no.Model.get('test-model');
+                var model = ns.Model.get('test-model');
                 expect(no.request.models.calledWithExactly([model])).to.be.ok();
             });
         });
@@ -46,7 +46,7 @@ describe('no.request.js', function() {
             });
 
             it('should call no.request.models with requested model', function() {
-                var model = no.Model.get('test-model-with-params', {id: 1});
+                var model = ns.Model.get('test-model-with-params', {id: 1});
                 expect(no.request.models.calledWithExactly([model])).to.be.ok();
             });
         });
@@ -62,8 +62,8 @@ describe('no.request.js', function() {
             });
 
             it('should call no.request.models with requested models', function() {
-                var model1 = no.Model.get('test-model');
-                var model2 = no.Model.get('test-model-with-params', {});
+                var model1 = ns.Model.get('test-model');
+                var model2 = ns.Model.get('test-model-with-params', {});
 
                 expect(no.request.models.calledWithExactly([model1, model2])).to.be.ok();
             });
@@ -80,8 +80,8 @@ describe('no.request.js', function() {
             });
 
             it('should call no.request.models with requested models', function() {
-                var model1 = no.Model.get('test-model');
-                var model2 = no.Model.get('test-model-with-params', {id: 1});
+                var model1 = ns.Model.get('test-model');
+                var model2 = ns.Model.get('test-model-with-params', {id: 1});
 
                 expect(no.request.models.calledWithExactly([model1, model2])).to.be.ok();
             });
@@ -108,8 +108,8 @@ describe('no.request.js', function() {
             });
 
             it('should call no.request.models with requested models', function() {
-                var model1 = no.Model.get('test-model');
-                var model2 = no.Model.get('test-model-with-params', {id: 2});
+                var model1 = ns.Model.get('test-model');
+                var model2 = ns.Model.get('test-model-with-params', {id: 2});
 
                 expect(no.request.models.calledWithExactly([model1, model2])).to.be.ok();
             });
@@ -120,7 +120,7 @@ describe('no.request.js', function() {
     describe('no.forcedRequest', function() {
 
         beforeEach(function() {
-            no.Model.define('test-forcedRequest');
+            ns.Model.define('test-forcedRequest');
             sinon.stub(no.request, 'models');
         });
 
@@ -140,7 +140,7 @@ describe('no.request.js', function() {
         mocha.setup({ignoreLeaks: true});
 
         beforeEach(function() {
-            no.Model.define('test-model');
+            ns.Model.define('test-model');
 
             this.xhr = sinon.useFakeXMLHttpRequest();
             var requests = this.requests = [];
@@ -157,9 +157,9 @@ describe('no.request.js', function() {
         describe('STATUS.NONE', function() {
 
             beforeEach(function() {
-                no.Model.define('test-model-none');
+                ns.Model.define('test-model-none');
 
-                this.model = no.Model.create('test-model-none');
+                this.model = ns.Model.create('test-model-none');
                 this.promise = no.request('test-model-none');
             });
 
@@ -213,7 +213,7 @@ describe('no.request.js', function() {
         describe('STATUS.OK', function() {
 
             beforeEach(function() {
-                var model = no.Model.create('test-model');
+                var model = ns.Model.create('test-model');
                 model.setData(true);
             });
 
@@ -278,7 +278,7 @@ describe('no.request.js', function() {
         describe('STATUS.ERROR', function() {
 
             beforeEach(function() {
-                var model = no.Model.create('test-model');
+                var model = ns.Model.create('test-model');
                 model.status = model.STATUS.ERROR;
             });
 
@@ -300,7 +300,7 @@ describe('no.request.js', function() {
         describe('STATUS_LOADING', function() {
 
             beforeEach(function() {
-                var model = no.Model.create('test-model');
+                var model = ns.Model.create('test-model');
                 model.status = model.STATUS_LOADING;
                 model.promise = new no.Promise();
             });
@@ -349,9 +349,9 @@ describe('no.request.js', function() {
         describe('STATUS_FAILED', function() {
 
             beforeEach(function() {
-                no.Model.define('test-model-failed');
+                ns.Model.define('test-model-failed');
 
-                this.model = no.Model.create('test-model-failed');
+                this.model = ns.Model.create('test-model-failed');
                 this.model.status = this.model.STATUS_FAILED;
             });
 
@@ -444,7 +444,7 @@ describe('no.request.js', function() {
                 return new no.Promise();
             });
 
-            no.Model.define('test-model-addRequestParams');
+            ns.Model.define('test-model-addRequestParams');
 
             this.originalParams = {
                 a: 1,
@@ -484,7 +484,7 @@ describe('no.request.js', function() {
         describe('two equal requests', function() {
 
             beforeEach(function() {
-                no.Model.define('test-model-two-equal-requests');
+                ns.Model.define('test-model-two-equal-requests');
 
                 var promises = this.promises = [];
 
@@ -526,7 +526,7 @@ describe('no.request.js', function() {
 
         describe('regular + force requests', function() {
             beforeEach(function() {
-                no.Model.define('test-model-two-equal-requests');
+                ns.Model.define('test-model-two-equal-requests');
 
                 var promises = this.promises = [];
 

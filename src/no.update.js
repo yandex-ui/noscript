@@ -1,23 +1,23 @@
 (function() {
 
 /**
- * Создает no.Update
- * @class no.Update
- * @param {no.View} view Корневой view.
- * @param {Object} layout Layout для этого view, результат от no.layout.page()
- * @param {Object} params Параметры, результат от no.router()
+ * Создает ns.Update
+ * @class ns.Update
+ * @param {ns.View} view Корневой view.
+ * @param {Object} layout Layout для этого view, результат от ns.layout.page()
+ * @param {Object} params Параметры, результат от ns.router()
  * @constructor
  * @example
- * var route = no.router('/folder/123/message/456');
- * var layout = no.layout.page(route.page, route.params);
- * var update = new no.Update(AppBlock, layout, route.params);
+ * var route = ns.router('/folder/123/message/456');
+ * var layout = ns.layout.page(route.page, route.params);
+ * var update = new ns.Update(AppBlock, layout, route.params);
  * update.start();
  */
-no.Update = function(view, layout, params) {
+ns.Update = function(view, layout, params) {
     /**
      * Корневой view.
      * @private
-     * @type {no.View}
+     * @type {ns.View}
      */
     this.view = view;
 
@@ -27,7 +27,7 @@ no.Update = function(view, layout, params) {
 
     } else {
         // если его нет - ругаемся
-        throw "no.Update: can't find view layout";
+        throw "ns.Update: can't find view layout";
     }
 
     this.params = params;
@@ -48,14 +48,14 @@ var update_id = -1;
  * @type {Array}
  * @private
  */
-no.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async', 'show', 'repaint'];
+ns.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async', 'show', 'repaint'];
 
 /**
  * Начинает работу updater'а.
  * @param [async=false] Флаг асинхронного updater'а.
  * @return {no.Promise}
  */
-no.Update.prototype.start = function(async) {
+ns.Update.prototype.start = function(async) {
     var resultPromise = new no.Promise();
 
     var updated = this.view._getRequestViews({
@@ -66,7 +66,7 @@ no.Update.prototype.start = function(async) {
     var that = this;
 
     var models = views2models(updated.sync);
-    var promise = no.request.models(models)
+    var promise = ns.request.models(models)
         .then(function(r) {
             //TODO: check errors
             if (that._expired()) {
@@ -84,13 +84,13 @@ no.Update.prototype.start = function(async) {
         var models = views2models( [ view ] );
         no.Promise.wait([
             promise,
-            no.request.models(models)
+            ns.request.models(models)
         ]).then(function(r) {
             //TODO: смотреть, что не запустился другой update
             if (!that._expired()) {
                 var fakeLayout = {};
                 fakeLayout[that.view.id] = that.layout;
-                new no.Update(that.view, fakeLayout, that.params).start(true);
+                new ns.Update(that.view, fakeLayout, that.params).start(true);
             }
         });
     });
@@ -103,7 +103,7 @@ no.Update.prototype.start = function(async) {
  * @param [async=false] Флаг асинхронного updater'а.
  * @private
  */
-no.Update.prototype._update = function(async) {
+ns.Update.prototype._update = function(async) {
     //  TODO: Проверить, что не начался уже более новый апдейт.
 
     var params = this.params;
@@ -118,9 +118,10 @@ no.Update.prototype._update = function(async) {
 
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
-    if (!no.object.isEmpty(tree.views)) {
-        var html = no.tmpl(tree, null, '');
-        var node = no.html2node(html);
+    if (!ns.object.isEmpty(tree.views)) {
+        var html = ns.tmpl(tree, null, '');
+        console.log(1);
+        var node = ns.html2node(html);
     }
 
     var viewEvents = {
@@ -152,7 +153,7 @@ no.Update.prototype._update = function(async) {
  * @return {Boolean} true in case another update was created after current update.
  * @private
  */
-no.Update.prototype._expired = function() {
+ns.Update.prototype._expired = function() {
     var expired = this.id < update_id;
     return expired;
 };

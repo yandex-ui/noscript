@@ -2,16 +2,16 @@
  * Модуль управления "страницей" и переходами между ними.
  * @namespace
  */
-no.page = {};
+ns.page = {};
 
 /**
  * Осуществляем переход по ссылке.
  * @param {String} [url=location.pathname + location.search]
  * @return {no.Promise}
  */
-no.page.go = function(url) {
-    if (no.page._stop) {
-        no.page._lastUrl = url;
+ns.page.go = function(url) {
+    if (ns.page._stop) {
+        ns.page._lastUrl = url;
 
         return new no.Promise().reject();
     }
@@ -22,39 +22,39 @@ no.page.go = function(url) {
     url = url || (loc.pathname + loc.search);
 
     // подготавливаем
-    url = no.page.urlPrepare(url);
+    url = ns.page.urlPrepare(url);
 
     // возможность заблокировать переход
     if (url === false) {
         return new no.Promise().reject();
     }
 
-    var route = no.router(url);
+    var route = ns.router(url);
     if (route === false) {
         return new no.Promise().reject();
     }
-    var layout = no.layout.page(route.page, route.params);
+    var layout = ns.layout.page(route.page, route.params);
 
-    no.events.trigger('no:page-before-load', [no.page.current, route]);
+    no.events.trigger('no:page-before-load', [ns.page.current, route]);
     /**
      * Текущие параметры страницы.
      * @type {{page: string, params: Object}}
      */
-    no.page.current = route;
+    ns.page.current = route;
 
-    var update = new no.Update(no.MAIN_VIEW, layout, route.params);
+    var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
     return update.start();
 };
 
-no.page.redirect = function(url) {
+ns.page.redirect = function(url) {
     window.history.replaceState(null, 'mail', url);
-    no.page.go(url);
+    ns.page.go(url);
 };
 
 /**
  * Подготавливает url.
  * @return {String}
  */
-no.page.urlPrepare = function(url) {
+ns.page.urlPrepare = function(url) {
     return url;
 };

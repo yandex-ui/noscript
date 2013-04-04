@@ -1,6 +1,6 @@
-no.debug = {};
+ns.debug = {};
 
-no.debug.log = function(s) {
+ns.debug.log = function(s) {
     return function() {
         var args = [].slice.call(arguments);
         if (s) {

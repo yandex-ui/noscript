@@ -1,10 +1,10 @@
-(function(/** @type no */no, undefined) {
+(function(/** @type ns */ns, undefined) {
 
 /**
  * Объект, реализующий экшены.
  * @namespace
  */
-no.action = {};
+ns.action = {};
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -33,9 +33,9 @@ var reHasNsActionClass = /\bns-action\b/;
  * @param {string} id Action id.
  * @param {function} action Action to be performed.
  */
-no.action.define = function(id, action) {
+ns.action.define = function(id, action) {
     if (id in _actions) {
-        throw "No.action '" + id + "' can't be redefined!";
+        throw "ns.action '" + id + "' can't be redefined!";
     }
     _actions[id] = action;
 };
@@ -45,12 +45,12 @@ no.action.define = function(id, action) {
  * @param {String} existentAction Action id.
  * @param {String} newAction Action id.
  */
-no.action.copy = function(existentAction, newAction) {
+ns.action.copy = function(existentAction, newAction) {
     if (newAction in _actions) {
-        throw "No.action '" + newAction + "' can't be redefined!";
+        throw "ns.action '" + newAction + "' can't be redefined!";
     }
     if (!(existentAction in _actions)) {
-        throw "No.action '" + existentAction + "' doesn't exist!";
+        throw "ns.action '" + existentAction + "' doesn't exist!";
     }
     _actions[newAction] = _actions[existentAction];
 };
@@ -65,18 +65,18 @@ no.action.copy = function(existentAction, newAction) {
  * @param {Event} event
  * @return {*}
  */
-no.action.run = function(id, params, node, event) {
+ns.action.run = function(id, params, node, event) {
     var action = _actions[id];
     if (action) {
         try {
             return action(id, params, node, event);
         } catch(e) {
-            no.log.exception('action', e);
+            ns.log.exception('action', e);
         }
     }
 };
 
-no.action.getParams = function(node) {
+ns.action.getParams = function(node) {
     var paramString = node.getAttribute('data-params');
     if (paramString && paramString.charAt(0) === '{') {
         try {
@@ -91,7 +91,7 @@ no.action.getParams = function(node) {
 /**
  * Инициализует механизм экшенов (навешивает обработчики событий).
  */
-no.action.init = function() {
+ns.action.init = function() {
     if (_inited) {
         return;
     }
@@ -101,7 +101,7 @@ no.action.init = function() {
     var $body = $('body');
     var selector = 'a, .ns-action';
 
-    $body.on(no.V.EVENTS.click, selector, this._process);
+    $body.on(ns.V.EVENTS.click, selector, this._process);
     /*
     if (Modernizr && Modernizr.touch) {
         */
@@ -129,17 +129,17 @@ no.action.init = function() {
         var pointerOffsetLimit = 5;
 
         $body
-            .on(no.V.EVENTS.mousedown, selector, function(e) {
+            .on(ns.V.EVENTS.mousedown, selector, function(e) {
                 e = e.originalEvent;
                 pointerLastPageX =  pointerStartPageX = e.pageX;
                 pointerLastPageY = pointerStartPageY = e.pageY;
             })
-            .on(no.V.EVENTS.mousemove, selector, function(e) {
+            .on(ns.V.EVENTS.mousemove, selector, function(e) {
                 e = e.originalEvent;
                 pointerLastPageX = e.pageX;
                 pointerLastPageY = e.pageY;
             })
-            .on(no.V.EVENTS.mouseup, selector, function(e) {
+            .on(ns.V.EVENTS.mouseup, selector, function(e) {
                 // если вешать "click", то мобильные браузеры на pushState показывают и скрывают адресную строку, что не красиво
                 // если вешать "touchstart" или "touchend", то такого не будет
 
@@ -166,7 +166,7 @@ no.action.init = function() {
     */
     //TODO: no-submit
     //TODO: no-hover
-    //TODO: data-counter -> no.counter()
+    //TODO: data-counter -> ns.counter()
 };
 
 /**
@@ -175,16 +175,16 @@ no.action.init = function() {
  * @returns {boolean}
  * @private
  */
-no.action._process = function(e) {
+ns.action._process = function(e) {
     var target = e.currentTarget;
     var href = target.getAttribute('href');
     var action = (e.type === 'dblclick') ? target.getAttribute('data-dblclick-action') : target.getAttribute('data-click-action');
     var returnValue = true;
 
     if (action && (action in _actions) && reHasNsActionClass.test(target.className)) {
-        returnValue = no.action.run(action, no.action.getParams(target), target, e);
+        returnValue = ns.action.run(action, ns.action.getParams(target), target, e);
 
-    } else if (no.V.EVENTS.click) {
+    } else if (ns.V.EVENTS.click) {
         if (!href) {
             return true;
         }
@@ -204,7 +204,7 @@ no.action._process = function(e) {
         //могут быть ссылки <a href="#hash" target="_blank"/>
         if (target.getAttribute('target') != '_blank') {
             window.history.pushState(null, 'mail', href);
-            returnValue = no.page.go(href);
+            returnValue = ns.page.go(href);
             if (returnValue instanceof no.Promise) {
                 return false;
             }
@@ -216,5 +216,5 @@ no.action._process = function(e) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-})(no);
+})(ns);
 

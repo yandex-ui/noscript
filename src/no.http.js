@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------------------------------------- //
-// no.http
+// ns.http
 // ------------------------------------------------------------------------------------------------------------- //
 
 /**
@@ -9,7 +9,7 @@
     @param {object=} options Standart jQuery.ajax settings object.
     @return {no.Promise}
 */
-no.http = function(url, params, options) {
+ns.http = function(url, params, options) {
     options = no.extend({ type: 'POST', dataType: 'json' }, options || {});
     options.url = url;
     options.data = params;

@@ -9,7 +9,7 @@
  * @class Класс, реализующий View
  * @see http://github.com/pasaran/noscript/wiki/ns.View
  * @constructor
- * @augments no.Events
+ * @mixes no.Events
  */
 ns.View = function() {};
 

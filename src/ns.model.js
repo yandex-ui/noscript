@@ -9,6 +9,7 @@
  * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.create().
  * @constructor
  * @namespace
+ * @mixes no.Events
  */
 ns.Model = function() {};
 

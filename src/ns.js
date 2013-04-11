@@ -64,7 +64,7 @@ ns.parseQuery = function(s) {
  * Performs json templating.
  * @param {*} json
  * @param {String} mode
- * @param {String} module
+ * @param {String} [module='main']
  * @returns {Element}
  */
 ns.tmpl = function(json, mode, module) {

@@ -119,8 +119,7 @@ ns.Update.prototype._update = function(async) {
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
-        var html = ns.tmpl(tree, null, '');
-        var node = ns.html2node(html);
+        var node = ns.tmpl(tree, null, '');
     }
 
     var viewEvents = {

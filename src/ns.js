@@ -65,9 +65,11 @@ ns.parseQuery = function(s) {
  * @param {*} json
  * @param {String} mode
  * @param {String} module
+ * @returns {Element}
  */
 ns.tmpl = function(json, mode, module) {
-    ns.todo();
+    var result = yr.run(module || 'main', json, mode);
+    return ns.html2node(result);
 };
 
 /**

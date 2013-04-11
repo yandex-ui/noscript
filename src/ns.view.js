@@ -796,9 +796,7 @@ ns.View.prototype.tmpl = function(mode, extra) {
         tree.extra = extra;
     }
 
-    var html = ns.tmpl(tree, mode);
-
-    return ns.html2node(html);
+    return ns.tmpl(tree, mode);
 };
 
 /**

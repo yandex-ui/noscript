@@ -1,4 +1,4 @@
-describe('no.layout', function() {
+describe('ns.layout', function() {
 
     describe('simple layouts', function() {
 
@@ -13,24 +13,24 @@ describe('no.layout', function() {
                 }
             });
 
-            expect( no.layout.page('app') ).to.eql({
+            expect( ns.layout.page('app') ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {}
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {}
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -48,33 +48,33 @@ describe('no.layout', function() {
                 'app left@': [ 'folders', 'labels' ]
             }, 'app');
 
-            expect( no.layout.page('mailbox' ) ).to.eql({
+            expect( ns.layout.page('mailbox' ) ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'folders': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 },
                                 'labels': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {}
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -89,38 +89,38 @@ describe('no.layout', function() {
                 'app right@': 'messages'
             }, 'mailbox');
 
-            expect( no.layout.page('messages' ) ).to.eql({
+            expect( ns.layout.page('messages' ) ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'folders': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 },
                                 'labels': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'messages': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -138,29 +138,29 @@ describe('no.layout', function() {
                 'app left@': 'long-generated-view&'
             }, 'app');
 
-            expect( no.layout.page('async1') ).to.eql({
+            expect( ns.layout.page('async1') ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'long-generated-view': {
-                                    'type': no.L.ASYNC,
+                                    'type': ns.L.ASYNC,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {}
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -177,22 +177,22 @@ describe('no.layout', function() {
                 }
             }, 'app');
 
-            expect( no.layout.page('async2') ).to.eql({
+            expect( ns.layout.page('async2') ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'regular-view': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {
                                         'async-view': {
-                                            'type': no.L.ASYNC,
+                                            'type': ns.L.ASYNC,
                                             'views': {}
                                         }
                                     }
@@ -200,11 +200,11 @@ describe('no.layout', function() {
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {}
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -230,38 +230,38 @@ describe('no.layout', function() {
             }, 'app');
 
 
-            expect( no.layout.page('setup', { tab: 'interface' }) ).to.eql({
+            expect( ns.layout.page('setup', { tab: 'interface' }) ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'setup-menu': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'setup-interface': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {
                                         'content': {
-                                            'type': no.L.BOX,
+                                            'type': ns.L.BOX,
                                             'views': {
                                                 'setup-submenu': {
-                                                    'type': no.L.VIEW,
+                                                    'type': ns.L.VIEW,
                                                     'views': {}
                                                 },
                                                 'setup-blocks': {
-                                                    'type': no.L.VIEW,
+                                                    'type': ns.L.VIEW,
                                                     'views': {}
                                                 }
                                             }
@@ -271,7 +271,7 @@ describe('no.layout', function() {
                             }
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -287,34 +287,34 @@ describe('no.layout', function() {
                 }
             }, 'setup');
 
-            expect( no.layout.page('setup-filters', { tab: 'filters' }) ).to.eql({
+            expect( ns.layout.page('setup-filters', { tab: 'filters' }) ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'setup-menu': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'setup-filters': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {
                                         'content': {
-                                            'type': no.L.BOX,
+                                            'type': ns.L.BOX,
                                             'views': {
                                                 'setup-blocks': {
-                                                    'type': no.L.VIEW,
+                                                    'type': ns.L.VIEW,
                                                     'views': {}
                                                 }
                                             }
@@ -324,7 +324,7 @@ describe('no.layout', function() {
                             }
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
@@ -341,76 +341,76 @@ describe('no.layout', function() {
                 }
             }, 'mailbox');
 
-            expect( no.layout.page('message', { ids: "1234567890" }) ).to.eql({
+            expect( ns.layout.page('message', { ids: "1234567890" }) ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'folders': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 },
                                 'labels': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'message': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }
                 }
             });
 
-            expect( no.layout.page('message', { current_folder: "9876543210" }) ).to.eql({
+            expect( ns.layout.page('message', { current_folder: "9876543210" }) ).to.eql({
                 'app': {
-                    'type': no.L.VIEW,
+                    'type': ns.L.VIEW,
                     'views': {
                         'header': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         },
                         'left': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'folders': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 },
                                 'labels': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'right': {
-                            'type': no.L.BOX,
+                            'type': ns.L.BOX,
                             'views': {
                                 'messages': {
-                                    'type': no.L.VIEW,
+                                    'type': ns.L.VIEW,
                                     'views': {}
                                 }
                             }
                         },
                         'footer': {
-                            'type': no.L.VIEW,
+                            'type': ns.L.VIEW,
                             'views': {}
                         }
                     }

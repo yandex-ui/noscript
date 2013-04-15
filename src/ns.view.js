@@ -870,7 +870,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
 
             this.timestamp = +new Date();
         } else {
-            //  FIXME: А что делать, если новой ноды не обнаружено?
+            throw "Can't find node for ns.View '" + this.id + "'";
         }
     }
 

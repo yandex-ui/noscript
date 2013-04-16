@@ -22,12 +22,11 @@ describe('ns.router', function() {
     describe('init+compile', function() {
 
         beforeEach(function() {
-            ns.router.routes = [
+            ns.router.routes = {
                 '/', '-> /inbox',
                 '/inbox', 'messages',
                 '/message/{mid:int}', 'message'
-            ];
-
+            };
             ns.router.init();
         });
 

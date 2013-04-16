@@ -111,7 +111,7 @@ describe('ns.View.events', function() {
         this.origNotmpl = ns.tmpl;
 
         ns.tmpl = function(json) {
-            return '<div class="root">' + genHTML(json.views) + '</div>';
+            return ns.html2node('<div class="root">' + genHTML(json.views) + '</div>');
         };
     });
 

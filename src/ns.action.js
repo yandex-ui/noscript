@@ -100,8 +100,12 @@ ns.action.init = function() {
 
     var $body = $('body');
     var selector = 'a, .ns-action';
+    var events = [
+        ns.V.EVENTS.click,
+        ns.V.EVENTS.dblclick
+    ].join(' ');
 
-    $body.on(ns.V.EVENTS.click, selector, this._process);
+    $body.on(events, selector, this._process);
     /*
     if (Modernizr && Modernizr.touch) {
         */

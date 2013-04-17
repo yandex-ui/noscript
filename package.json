@@ -13,7 +13,7 @@
         "url": "git://github.com/pasaran/noscript.git"
     },
     "dependencies": {
-        "nommon": "*"
+        "nommon": "0.0.17"
     },
     "devDependencies": {
         "expect.js": "*",

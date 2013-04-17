@@ -8,6 +8,7 @@
  */
 ns.V.EVENTS = {
     'click': 'click',
+    'dblclick': 'dblclick',
     'mousedown': 'mousedown',
     'mousemove': 'mousemove',
     'mouseup': 'mouseup'
@@ -49,6 +50,7 @@ if (ns.IS_TOUCH) {
     ns.V.DOM_EVENTS.push('tap', 'touchstart', 'touchmove', 'touchend');
     ns.V.EVENTS = {
         'click': 'tap',
+        'dblclick': 'doubletap',
         'mousedown': 'touchstart',
         'mousemove': 'touchmove',
         'mouseup': 'touchend'

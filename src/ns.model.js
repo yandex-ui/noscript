@@ -99,7 +99,7 @@ ns.Model.prototype._splitData = function(data) {
     }
     var callback = this._splitData.callback;
 
-    var items = no.path(info.items, data);
+    var items = no.jpath(info.items, data);
 
     // анбиндим все старые модели
     // если они останутся в коллекции
@@ -112,7 +112,7 @@ ns.Model.prototype._splitData = function(data) {
         // собираем параметры для новой модели
         var params = {};
         for (var key in info.params) {
-            params[key] = no.path(info.params[key], item);
+            params[key] = no.jpath(info.params[key], item);
         }
 
         // создаём новую модель
@@ -312,7 +312,7 @@ ns.Model.prototype.isValid = function() {
 ns.Model.prototype.get = function(path) {
     var data = this.data;
     if (data) {
-        return no.path(path, data);
+        return no.jpath(path, data);
     }
 };
 
@@ -321,14 +321,33 @@ ns.Model.prototype.get = function(path) {
  * @param {String} jpath jpath до значения.
  * @param {*} value Новое значение.
  * @param {Object} [options] Флаги.
- * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
  */
 ns.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;
+    //  FIXME: Нет ли метода соответствующего? this.isValid()?
     if (this.status != this.STATUS.OK || !data) {
         return;
     }
 
+    no.jpath.set(jpath, data, value);
+
+    //  FIXME: Непонятно, нужно ли сравнивать старое и новое значение.
+    //  Как бы нужно, но это довольно дорого и сложно.
+    //  Пока что будет версия без сравнения.
+
+    if ( !(options && options.silent) ) {
+        //  Кидаем сообщения о том, что модель (или ее часть) изменилась.
+        //  Например, если jpath был '.foo.bar', то кидаем два сообщения 'change'.
+        //  Одно с параметром '.foo.bar', второе с '.foo'.
+        var parts = jpath.split('.');
+        var l = parts.length;
+        while (l > 1) {
+            var _jpath = parts.slice(0, l).join('.');
+            this.trigger('changed', _jpath);
+            l--;
+        }
+    }
+    /*
     //  Сохраняем новое значение и одновременно получаем старое значение.
     var oldValue = no.path(jpath, data, value);
 
@@ -340,6 +359,7 @@ ns.Model.prototype.set = function(jpath, value, options) {
             'jpath': jpath
         });
     }
+    */
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -388,7 +408,7 @@ ns.Model.prototype.setData = function(data, options) {
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
         if (!options || !options.silent) {
-            this.trigger('changed', this.key);
+            this.trigger('changed', '.');
         }
     }
 

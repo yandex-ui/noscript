@@ -313,13 +313,15 @@ ns.View.create = function(id, params, async) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 ns.View._prepareModels = function(models) {
-    if (!Array.isArray(models)) {
-        return models;
-    }
-
     var _models = {};
-    for (var i = 0; i < models.length; i++) {
-        _models[ models[i] ] = true;
+
+    if ( Array.isArray(models) ) {
+        //  Если указан массив -- все модели обязательны.
+        for (var i = 0; i < models.length; i++) {
+            _models[ models[i] ] = true;
+        }
+    } else {
+        _models = models;
     }
 
     return _models;
@@ -614,10 +616,15 @@ ns.View.prototype.isModelsValid = function(timestamp) {
     for (var id in models) {
         var model = models[id];
         if (
-            // модель не валидна
-            !model.isValid() ||
-            // или ее кеш более свежий
-            (timestamp && model.timestamp > timestamp)
+            // Модель является обязательной
+            this.info.models[id]
+            &&
+            (
+                // модель не валидна
+                !model.isValid() ||
+                // или ее кеш более свежий
+                (timestamp && model.timestamp > timestamp)
+            )
         ) {
             return false;
         }

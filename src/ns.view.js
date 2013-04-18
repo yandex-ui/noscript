@@ -487,7 +487,7 @@ ns.View.prototype._getEvents = function(type) {
 
             'no-global': this._bindEventHandlers(noeventsInfo['global'], 1),
             'no-local': this._bindEventHandlers(noeventsInfo['local'], 1)
-        }
+        };
     }
     return this[eventProp];
 };
@@ -772,8 +772,16 @@ ns.View.prototype._getModelsData = function() {
     var models = this.models;
     for (var id in models) {
         var data = models[id].getData();
-        if (data) {
-            r[id] = data;
+        if ( !this.info.models[id] ) {
+            if (data) {
+                r[id] = data;
+            }
+        } else {
+            //  Для необязательной модели подойдёт и ошибка.
+            data = data || models[id].getError();
+            if (data) {
+                r[id] = data;
+            }
         }
     }
 

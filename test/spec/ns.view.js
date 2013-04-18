@@ -241,6 +241,36 @@ describe('ns.View', function() {
         });
     });
 
+    describe('ns.View.info models parse', function() {
+
+        describe('no models specified', function() {
+
+            ns.Model.define('a');
+            ns.Model.define('b');
+            ns.Model.define('c');
+
+            ns.View.define('test-view-info-models-parse_no-models', {});
+            ns.View.define('test-view-info-models-parse_empty-array', { models: [] });
+            ns.View.define('test-view-info-models-parse_array', { models: [ 'a', 'b' ] });
+            ns.View.define('test-view-info-models-parse_object', { models: { a: true, b: false, c: null } });
+
+            it('no models at all', function() {
+                var info = ns.View.info('test-view-info-models-parse_no-models');
+                expect(info.models).to.be.eql({});
+            });
+
+            it('models specified as empty array', function() {
+                var info = ns.View.info('test-view-info-models-parse_empty-array');
+                expect(info.models).to.be.eql({});
+            });
+
+            it('models array is converted to object', function() {
+                var info = ns.View.info('test-view-info-models-parse_array');
+                expect(info.models).to.be.eql({ a: true, b: true });
+            });
+        });
+    });
+
     describe('ns.View._bindEventHandlers', function() {
 
         beforeEach(function() {

@@ -788,10 +788,6 @@ ns.View.prototype._getModelsData = function() {
     return r;
 };
 
-ns.View.prototype.getModel = function(id) {
-    return this.models[id].getData();
-};
-
 //  Быстро что-нибудь сгенерить из данных блока.
 //  Можно передать моду и дополнительный объект,
 //  который попадет в /.extra:

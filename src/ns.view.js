@@ -286,7 +286,38 @@ ns.View.info = function(id) {
 
         // больше не нужны
         delete info.events;
+
+        //  Парсим информацию про subview.
+        //
+        //  В info.subviews может находиться структура такого вида:
+        //
+        //      {
+        //          'labels': [
+        //              'message .labels',
+        //              'labels'
+        //          ],
+        //          ...
+        //      }
+        //
+        var _subviews = {};
+        for (var subview in info.subviews) {
+            var deps = info.subviews[subview];
+            if (typeof deps === 'string') {
+                deps = [ deps ];
+            }
+
+            for (var i = 0; i < deps.length; i++) {
+                var r = deps[i].split(' ');
+                var model_id = r[0];
+                var jpath = r[1] || '';
+
+                var x = _subviews[model_id] || (( _subviews[model_id] = {} ));
+                var y = x[jpath] || (( x[jpath] = {} ));
+                y[subview] = true;
+            }
+        }
     }
+
     return info;
 };
 

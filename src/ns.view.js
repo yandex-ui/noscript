@@ -772,7 +772,7 @@ ns.View.prototype._getModelsData = function() {
     var models = this.models;
     for (var id in models) {
         var data = models[id].getData();
-        if ( !this.info.models[id] ) {
+        if ( this.info.models[id] ) {
             if (data) {
                 r[id] = data;
             }

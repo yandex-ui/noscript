@@ -245,30 +245,96 @@ describe('ns.View', function() {
 
         describe('no models specified', function() {
 
-            ns.Model.define('a');
-            ns.Model.define('b');
-            ns.Model.define('c');
+            beforeEach(function() {
+                ns.Model.define('a');
+                ns.Model.define('b');
+                ns.Model.define('c');
+            });
 
-            ns.View.define('test-view-info-models-parse_no-models', {});
-            ns.View.define('test-view-info-models-parse_empty-array', { models: [] });
-            ns.View.define('test-view-info-models-parse_array', { models: [ 'a', 'b' ] });
-            ns.View.define('test-view-info-models-parse_object', { models: { a: true, b: false, c: null } });
+            afterEach(function() {
+                ns.Model.undefine();
+            });
 
             it('no models at all', function() {
+                ns.View.define('test-view-info-models-parse_no-models', {});
+
                 var info = ns.View.info('test-view-info-models-parse_no-models');
                 expect(info.models).to.be.eql({});
+
+                ns.View.undefine('test-view-info-models-parse_no-models');
             });
 
             it('models specified as empty array', function() {
+                ns.View.define('test-view-info-models-parse_empty-array', { models: [] });
+
                 var info = ns.View.info('test-view-info-models-parse_empty-array');
                 expect(info.models).to.be.eql({});
+
+                ns.View.undefine('test-view-info-models-parse_empty-array');
             });
 
             it('models array is converted to object', function() {
+                ns.View.define('test-view-info-models-parse_array', { models: [ 'a', 'b' ] });
+
                 var info = ns.View.info('test-view-info-models-parse_array');
                 expect(info.models).to.be.eql({ a: true, b: true });
+
+                ns.View.undefine('test-view-info-models-parse_array');
             });
         });
+    });
+
+    describe('ns.View render', function() {
+
+        describe('ns.View render with some invalid models', function() {
+
+            beforeEach(function() {
+                ns.Model.define('a');
+                ns.Model.define('b');
+                ns.Model.define('c');
+
+                var models = {
+                    a: ns.Model.create('a', { id: 1 }),
+                    b: ns.Model.create('b', { id: 2 }),
+                    c: ns.Model.create('c', { id: 3 })
+                };
+
+                models.a.setData({ data: 'a' });
+                models.b.setError({ error: 'b invalid' });
+                models.c.setError({ error: 'c invalid' });
+
+                ns.View.define('test-view-render_complex', {
+                    models: {
+                        a: true,
+                        b: false,
+                        c: null
+                    }
+                });
+
+                this.view = ns.View.create('test-view-render_complex', {}, false);
+            });
+
+            afterEach(function() {
+                ns.Model.undefine();
+                ns.View.undefine();
+                delete this.view;
+            });
+
+            it('models are valid for view', function() {
+                expect( this.view.isModelsValid() ).to.be.ok();
+            });
+
+            it('errors are also rendered', function() {
+                expect( this.view._getModelsData() ).to.be.eql({
+                    a: { data: 'a' },
+                    b: { error: 'b invalid' },
+                    c: { error: 'c invalid' }
+                });
+            });
+
+        });
+
+
     });
 
     describe('ns.View._bindEventHandlers', function() {

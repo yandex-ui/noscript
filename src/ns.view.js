@@ -58,10 +58,8 @@ ns.View.prototype._init = function(id, params, async) {
     this.key = ns.View.getKey(id, params, this.info);
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
-    var model_ids = this.info.models;
     var models = this.models = {};
-    for (var i = 0, l = model_ids.length; i < l; i++) {
-        var model_id = model_ids[i];
+    for (var model_id in this.info.models) {
         models[model_id] = ns.Model.create(model_id, params);
     }
 
@@ -137,7 +135,7 @@ var _ctors = {};
  * @param {Object} [info={}] Декларация View.
  * @param {Function} [info.ctor] Конструтор.
  * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
- * @param {Array} [info.models] Массив моделей, от которых зависит View.
+ * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
  * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
@@ -156,7 +154,7 @@ ns.View.define = function(id, info, base) {
     // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
     ctor = no.inherit(ctor, base || ns.View, info.methods);
 
-    info.models = info.models || [];
+    info.models = ns.View._prepareModels( info.models || {} );
     info.events = info.events || {};
     info.noevents = info.noevents || {};
 
@@ -174,14 +172,14 @@ ns.View.info = function(id) {
     // если есть декларация, но еще нет pNames, то надо завершить определение View
     if (info && !info.pNames) {
         var params = {};
-        var models = info.models;
-        for (var i = 0, l = models.length; i < l; i++) {
-            var modelInfo = ns.Model.info(models[i]);
+        for (var model_id in info.models) {
+            var modelInfo = ns.Model.info(model_id);
             if (!modelInfo) {
-                throw 'Model "' + models[i] + '" is not defined!';
+                throw 'Model "' + model_id + '" is not defined!';
             }
             no.extend( params, modelInfo.params );
         }
+
         if (info.params) {
             no.extend(params, info.params);
         }
@@ -313,6 +311,19 @@ ns.View.create = function(id, params, async) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+ns.View._prepareModels = function(models) {
+    if (!Array.isArray(models)) {
+        return models;
+    }
+
+    var _models = {};
+    for (var i = 0; i < models.length; i++) {
+        _models[ models[i] ] = true;
+    }
+
+    return _models;
+};
 
 ns.View.prototype._getView = function(id) {
     return this.views[id];

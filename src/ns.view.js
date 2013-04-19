@@ -66,6 +66,7 @@ ns.View.prototype._init = function(id, params, async) {
     }
 
     this.views = null;
+    this.subviews = null;
     this.node = null;
 
     /**
@@ -289,7 +290,7 @@ ns.View.info = function(id) {
 
         //  Парсим информацию про subview.
         //
-        //  В info.subviews может находиться структура такого вида:
+        //  В info.subviews приходит структура такого вида:
         //
         //      {
         //          'labels': [
@@ -311,11 +312,33 @@ ns.View.info = function(id) {
                 var model_id = r[0];
                 var jpath = r[1] || '';
 
+                //  FIXME: Придумать названия переменным!
                 var x = _subviews[model_id] || (( _subviews[model_id] = {} ));
                 var y = x[jpath] || (( x[jpath] = {} ));
                 y[subview] = true;
             }
         }
+        info.subviews = _subviews;
+        //  На выходе в info.subviews такая структура:
+        //
+        //      {
+        //          //  Название модели.
+        //          'message': {
+        //              //  jpath.
+        //              '.labels': {
+        //                  //  Список subview, которые зависят от этого jpath в данной модели.
+        //                  'labels': true
+        //              }
+        //          },
+        //          'labels': {
+        //              //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
+        //              '': {
+        //                  'labels': true
+        //              }
+        //          },
+        //          ...
+        //      }
+        //
     }
 
     return info;
@@ -390,6 +413,7 @@ ns.View.prototype._htmlinit = function(events) {
  */
 ns.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
+        //  FIXME: Почему это делается на hide?
         this._unbindModels();
         this._unbindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
@@ -412,6 +436,7 @@ ns.View.prototype._hide = function(events) {
 ns.View.prototype._show = function(events) {
     // При создании блока у него this._visible === undefined.
     if (!this.isLoading() && this._visible !== true) {
+        //  FIXME: Почему это делается на show?
         this._bindModels();
         this._bindEvents('show');
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
@@ -433,15 +458,33 @@ ns.View.prototype._onModelChange = function() {
     ns.page.go();
 };
 
+ns.View.prototype.invalidateSubview = function(subview) {
+    //  FIXME: ns.SV.STATUS.INVALID?
+    this._subviews[subview] = ns.V.STATUS.INVALID;
+};
+
 /**
  * Биндится на изменение моделей.
  * @private
  */
 ns.View.prototype._bindModels = function() {
+    var that = this;
+
     for (var id in this.models) {
-        var model = this.models[id];
-        //TODO: namespace бы пригодился!
-        model.on('changed', this._onModelChangeBinded);
+        (function(id, model) {
+            model.on('change', function(e, jpath) {
+                var jpaths = that.info.subviews[id];
+                var deps = jpaths && jpaths[jpath];
+                if (!deps) {
+                    that.invalidate();
+                } else {
+                    for (var subview in deps) {
+                        that.invalidateSubview(subview);
+                    }
+                }
+
+            });
+        })( id, this.models[id] );
     }
 };
 
@@ -450,11 +493,14 @@ ns.View.prototype._bindModels = function() {
  * @private
  */
 ns.View.prototype._unbindModels = function() {
+    //  FIXME: Переписать все соответственно _bindModels.
+    /*
     for (var id in this.models) {
         var model = this.models[id];
         //TODO: namespace бы пригодился!
         model.off('changed', this._onModelChangeBinded);
     }
+    */
 };
 
 /**
@@ -694,7 +740,9 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
 
     // Если views еще не определены (первая отрисовка)
     if (!this.views) {
+        //  FIXME: Почему бы это в конструкторе не делать?
         this.views = {};
+        this.subviews = {};
         // Создаем подблоки
         for (var view_id in pageLayout) {
             this._addView(view_id, params, pageLayout[view_id].type);

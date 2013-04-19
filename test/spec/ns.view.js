@@ -307,7 +307,7 @@ describe('ns.View', function() {
                 ns.View.undefine();
             });
 
-            it('models are valid for view', function() {
+            it('required models are valid, optional ones — invalid', function() {
                 var a = ns.Model.create('a', { id: 1 });
                 var b = ns.Model.create('b', { id: 2 });
                 var c = ns.Model.create('c', { id: 3 });
@@ -321,7 +321,20 @@ describe('ns.View', function() {
                 expect( view.isModelsValid() ).to.be.ok();
             });
 
-            it('errors are also rendered', function() {
+            it('required model is invalid, the rest is valid', function() {
+                var a = ns.Model.create('a', { id: 1 });
+                var b = ns.Model.create('b', { id: 2 });
+                var c = ns.Model.create('c', { id: 3 });
+
+                a.setError({ error: 'a invalid' });
+                b.setData({ data: 'b' });
+                c.setData({ data: 'c' });
+
+                var view = ns.View.create('test-view-render_complex', {}, false);
+                expect( view.isModelsValid() ).not.to.be.ok();
+            });
+
+            it('render errors also', function() {
                 var a = ns.Model.create('a', { id: 1 });
                 var b = ns.Model.create('b', { id: 2 });
                 var c = ns.Model.create('c', { id: 3 });
@@ -338,6 +351,7 @@ describe('ns.View', function() {
                     c: { error: 'c invalid' }
                 });
             });
+
         });
     });
 

@@ -293,16 +293,6 @@ describe('ns.View', function() {
                 ns.Model.define('b');
                 ns.Model.define('c');
 
-                var models = {
-                    a: ns.Model.create('a', { id: 1 }),
-                    b: ns.Model.create('b', { id: 2 }),
-                    c: ns.Model.create('c', { id: 3 })
-                };
-
-                models.a.setData({ data: 'a' });
-                models.b.setError({ error: 'b invalid' });
-                models.c.setError({ error: 'c invalid' });
-
                 ns.View.define('test-view-render_complex', {
                     models: {
                         a: true,
@@ -310,31 +300,45 @@ describe('ns.View', function() {
                         c: null
                     }
                 });
-
-                this.view = ns.View.create('test-view-render_complex', {}, false);
             });
 
             afterEach(function() {
                 ns.Model.undefine();
                 ns.View.undefine();
-                delete this.view;
             });
 
             it('models are valid for view', function() {
-                expect( this.view.isModelsValid() ).to.be.ok();
+                var a = ns.Model.create('a', { id: 1 });
+                var b = ns.Model.create('b', { id: 2 });
+                var c = ns.Model.create('c', { id: 3 });
+
+                a.setData({ data: 'a' });
+                b.setError({ error: 'b invalid' });
+                c.setError({ error: 'c invalid' });
+
+                var view = ns.View.create('test-view-render_complex', {}, false);
+
+                expect( view.isModelsValid() ).to.be.ok();
             });
 
             it('errors are also rendered', function() {
-                expect( this.view._getModelsData() ).to.be.eql({
+                var a = ns.Model.create('a', { id: 1 });
+                var b = ns.Model.create('b', { id: 2 });
+                var c = ns.Model.create('c', { id: 3 });
+
+                a.setData({ data: 'a' });
+                b.setError({ error: 'b invalid' });
+                c.setError({ error: 'c invalid' });
+
+                var view = ns.View.create('test-view-render_complex', {}, false);
+
+                expect( view._getModelsData() ).to.be.eql({
                     a: { data: 'a' },
                     b: { error: 'b invalid' },
                     c: { error: 'c invalid' }
                 });
             });
-
         });
-
-
     });
 
     describe('ns.View._bindEventHandlers', function() {

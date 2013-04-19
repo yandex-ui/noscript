@@ -35,8 +35,7 @@ match .* ns-build-view {
         } else {
             if /.is_models_valid {
                 apply . ns-view-content
-            }
-            else {
+            } else {
                 apply . ns-view-error-content
             }
         }

@@ -48,7 +48,8 @@ ns.View.prototype._init = function(id, params, async) {
 
     /**
      * Флаг того, что view может быть асинхронным.
-     * Факт того, что сейчас view находится в асинхронном состояии опрделяться this.status и this.asyncState
+     * Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState
+
      * @type {Boolean}
      */
     this.async = async;
@@ -171,121 +172,125 @@ ns.View.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pNames, то надо завершить определение View
     if (info && !info.pNames) {
-        var params = {};
-        for (var model_id in info.models) {
-            var modelInfo = ns.Model.info(model_id);
-            if (!modelInfo) {
-                throw 'Model "' + model_id + '" is not defined!';
-            }
-            no.extend( params, modelInfo.params );
+        ns.View._initInfo(info);
+    }
+    return info;
+};
+
+ns.View._initInfo = function(info) {
+    var params = {};
+    for (var model_id in info.models) {
+        var modelInfo = ns.Model.info(model_id);
+        if (!modelInfo) {
+            throw 'Model "' + model_id + '" is not defined!';
         }
+        no.extend( params, modelInfo.params );
+    }
 
-        if (info.params) {
-            no.extend(params, info.params);
-        }
-        info.pNames = Object.keys(params);
+    if (info.params) {
+        no.extend(params, info.params);
+    }
+    info.pNames = Object.keys(params);
 
-        /**
-         * События, которые надо повесить сразу при создании view
-         * @type {Array}
-         */
-        info.createEvents = [];
+    /**
+     * События, которые надо повесить сразу при создании view
+     * @type {Array}
+     */
+    info.createEvents = [];
 
-        /**
-         * События, которые вешаются на htmlinit, снимаются на htmldestroy
-         * @type {Object}
-         */
-        info.initEvents = {
-            'bind': [],
-            'delegate': []
-        };
+    /**
+     * События, которые вешаются на htmlinit, снимаются на htmldestroy
+     * @type {Object}
+     */
+    info.initEvents = {
+        'bind': [],
+        'delegate': []
+    };
 
-        /**
-         * События, которые вешаются на show, снимаются на hide
-         * @type {Object}
-         */
-        info.showEvents = {
-            'bind': [],
-            'delegate': []
-        };
+    /**
+     * События, которые вешаются на show, снимаются на hide
+     * @type {Object}
+     */
+    info.showEvents = {
+        'bind': [],
+        'delegate': []
+    };
 
-        /**
-         * Декларации подписок на кастомные события при создании View.
-         * @type {Object}
-         */
-        info.initNoevents = {
-            'global': [],
-            'local': []
-        };
+    /**
+     * Декларации подписок на кастомные события при создании View.
+     * @type {Object}
+     */
+    info.initNoevents = {
+        'global': [],
+        'local': []
+    };
 
-        /**
-         * Декларации подписок на кастомные события при показе View.
-         * @type {Object}
-         */
-        info.showNoevents = {
-            'global': [],
-            'local': []
-        };
+    /**
+     * Декларации подписок на кастомные события при показе View.
+     * @type {Object}
+     */
+    info.showNoevents = {
+        'global': [],
+        'local': []
+    };
 
-        // парсим события View
-        for (var eventDecl in info.events) {
-            var declParts = eventDecl.split(' ');
+    // парсим события View
+    for (var eventDecl in info.events) {
+        var declParts = eventDecl.split(' ');
 
-            // первый элемент - событие
-            var eventParts = declParts.shift().split('@');
-            var when = eventParts.length > 1 ? eventParts.pop() : '';
-            // нормализуем when
-            when = when && (when === 'init' || when === 'show') ? when : '';
+        // первый элемент - событие
+        var eventParts = declParts.shift().split('@');
+        var when = eventParts.length > 1 ? eventParts.pop() : '';
+        // нормализуем when
+        when = when && (when === 'init' || when === 'show') ? when : '';
 
-            var eventName = eventParts.join('@');
+        var eventName = eventParts.join('@');
 
-            // осталоное - селектор
-            var eventSelector = declParts.join(' ');
+        // осталоное - селектор
+        var eventSelector = declParts.join(' ');
 
-            if (eventName) {
-                var handler = info.events[eventDecl];
-                var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
+        if (eventName) {
+            var handler = info.events[eventDecl];
+            var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
 
-                if (nativeEvent) {
-                    var arr = [eventName, eventSelector, info.events[eventDecl]];
+            if (nativeEvent) {
+                var arr = [eventName, eventSelector, info.events[eventDecl]];
 
-                    // глобальные селекторы всегда delegate
-                    var globalSelector = eventSelector === 'window' || eventSelector === 'document';
-                    // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
-                    var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
+                // глобальные селекторы всегда delegate
+                var globalSelector = eventSelector === 'window' || eventSelector === 'document';
+                // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
+                var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
 
-                    if (!when) {
-                        when = globalSelector ? 'show' : 'init';
-                    }
+                if (!when) {
+                    when = globalSelector ? 'show' : 'init';
+                }
 
-                    // info.initEvents.delegate.push(arr)
-                    info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
+                // info.initEvents.delegate.push(arr)
+                info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
+
+            } else {
+                when = when || 'init';
+
+                // событие init тригерится при создании блока, поэтому вешать его надо сразу
+                // событие async тригерится до всего, его тоже надо вешать
+                if (eventName == 'init' || eventName == 'async') {
+                    info.createEvents.push([eventName, handler]);
 
                 } else {
-                    when = when || 'init';
-
-                    // событие init тригерится при создании блока, поэтому вешать его надо сразу
-                    // событие async тригерится до всего, его тоже надо вешать
-                    if (eventName == 'init' || eventName == 'async') {
-                        info.createEvents.push([eventName, handler]);
+                    // если есть селектор, то это локальное событие
+                    if (eventSelector) {
+                        info[when + 'Noevents'].local.push([eventName, handler]);
 
                     } else {
-                        // если есть селектор, то это локальное событие
-                        if (eventSelector) {
-                            info[when + 'Noevents'].local.push([eventName, handler]);
-
-                        } else {
-                            info[when + 'Noevents'].global.push([eventName, handler]);
-                        }
+                        info[when + 'Noevents'].global.push([eventName, handler]);
                     }
                 }
             }
         }
-
-        // больше не нужны
-        delete info.events;
     }
-    return info;
+
+    // больше не нужны
+    delete info.events;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

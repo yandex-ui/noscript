@@ -48,7 +48,8 @@ ns.View.prototype._init = function(id, params, async) {
 
     /**
      * Флаг того, что view может быть асинхронным.
-     * Факт того, что сейчас view находится в асинхронном состояии опрделяться this.status и this.asyncState
+     * Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState
+
      * @type {Boolean}
      */
     this.async = async;
@@ -58,10 +59,8 @@ ns.View.prototype._init = function(id, params, async) {
     this.key = ns.View.getKey(id, params, this.info);
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
-    var model_ids = this.info.models;
     var models = this.models = {};
-    for (var i = 0, l = model_ids.length; i < l; i++) {
-        var model_id = model_ids[i];
+    for (var model_id in this.info.models) {
         models[model_id] = ns.Model.create(model_id, params);
     }
 
@@ -137,7 +136,7 @@ var _ctors = {};
  * @param {Object} [info={}] Декларация View.
  * @param {Function} [info.ctor] Конструтор.
  * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
- * @param {Array} [info.models] Массив моделей, от которых зависит View.
+ * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
  * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
@@ -156,7 +155,7 @@ ns.View.define = function(id, info, base) {
     // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
     ctor = no.inherit(ctor, base || ns.View, info.methods);
 
-    info.models = info.models || [];
+    info.models = ns.View._prepareModels( info.models || {} );
     info.events = info.events || {};
     info.noevents = info.noevents || {};
 
@@ -173,121 +172,125 @@ ns.View.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pNames, то надо завершить определение View
     if (info && !info.pNames) {
-        var params = {};
-        var models = info.models;
-        for (var i = 0, l = models.length; i < l; i++) {
-            var modelInfo = ns.Model.info(models[i]);
-            if (!modelInfo) {
-                throw 'Model "' + models[i] + '" is not defined!';
-            }
-            no.extend( params, modelInfo.params );
+        ns.View._initInfo(info);
+    }
+    return info;
+};
+
+ns.View._initInfo = function(info) {
+    var params = {};
+    for (var model_id in info.models) {
+        var modelInfo = ns.Model.info(model_id);
+        if (!modelInfo) {
+            throw 'Model "' + model_id + '" is not defined!';
         }
-        if (info.params) {
-            no.extend(params, info.params);
-        }
-        info.pNames = Object.keys(params);
+        no.extend( params, modelInfo.params );
+    }
 
-        /**
-         * События, которые надо повесить сразу при создании view
-         * @type {Array}
-         */
-        info.createEvents = [];
+    if (info.params) {
+        no.extend(params, info.params);
+    }
+    info.pNames = Object.keys(params);
 
-        /**
-         * События, которые вешаются на htmlinit, снимаются на htmldestroy
-         * @type {Object}
-         */
-        info.initEvents = {
-            'bind': [],
-            'delegate': []
-        };
+    /**
+     * События, которые надо повесить сразу при создании view
+     * @type {Array}
+     */
+    info.createEvents = [];
 
-        /**
-         * События, которые вешаются на show, снимаются на hide
-         * @type {Object}
-         */
-        info.showEvents = {
-            'bind': [],
-            'delegate': []
-        };
+    /**
+     * События, которые вешаются на htmlinit, снимаются на htmldestroy
+     * @type {Object}
+     */
+    info.initEvents = {
+        'bind': [],
+        'delegate': []
+    };
 
-        /**
-         * Декларации подписок на кастомные события при создании View.
-         * @type {Object}
-         */
-        info.initNoevents = {
-            'global': [],
-            'local': []
-        };
+    /**
+     * События, которые вешаются на show, снимаются на hide
+     * @type {Object}
+     */
+    info.showEvents = {
+        'bind': [],
+        'delegate': []
+    };
 
-        /**
-         * Декларации подписок на кастомные события при показе View.
-         * @type {Object}
-         */
-        info.showNoevents = {
-            'global': [],
-            'local': []
-        };
+    /**
+     * Декларации подписок на кастомные события при создании View.
+     * @type {Object}
+     */
+    info.initNoevents = {
+        'global': [],
+        'local': []
+    };
 
-        // парсим события View
-        for (var eventDecl in info.events) {
-            var declParts = eventDecl.split(' ');
+    /**
+     * Декларации подписок на кастомные события при показе View.
+     * @type {Object}
+     */
+    info.showNoevents = {
+        'global': [],
+        'local': []
+    };
 
-            // первый элемент - событие
-            var eventParts = declParts.shift().split('@');
-            var when = eventParts.length > 1 ? eventParts.pop() : '';
-            // нормализуем when
-            when = when && (when === 'init' || when === 'show') ? when : '';
+    // парсим события View
+    for (var eventDecl in info.events) {
+        var declParts = eventDecl.split(' ');
 
-            var eventName = eventParts.join('@');
+        // первый элемент - событие
+        var eventParts = declParts.shift().split('@');
+        var when = eventParts.length > 1 ? eventParts.pop() : '';
+        // нормализуем when
+        when = when && (when === 'init' || when === 'show') ? when : '';
 
-            // осталоное - селектор
-            var eventSelector = declParts.join(' ');
+        var eventName = eventParts.join('@');
 
-            if (eventName) {
-                var handler = info.events[eventDecl];
-                var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
+        // осталоное - селектор
+        var eventSelector = declParts.join(' ');
 
-                if (nativeEvent) {
-                    var arr = [eventName, eventSelector, info.events[eventDecl]];
+        if (eventName) {
+            var handler = info.events[eventDecl];
+            var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
 
-                    // глобальные селекторы всегда delegate
-                    var globalSelector = eventSelector === 'window' || eventSelector === 'document';
-                    // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
-                    var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
+            if (nativeEvent) {
+                var arr = [eventName, eventSelector, info.events[eventDecl]];
 
-                    if (!when) {
-                        when = globalSelector ? 'show' : 'init';
-                    }
+                // глобальные селекторы всегда delegate
+                var globalSelector = eventSelector === 'window' || eventSelector === 'document';
+                // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
+                var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
 
-                    // info.initEvents.delegate.push(arr)
-                    info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
+                if (!when) {
+                    when = globalSelector ? 'show' : 'init';
+                }
+
+                // info.initEvents.delegate.push(arr)
+                info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
+
+            } else {
+                when = when || 'init';
+
+                // событие init тригерится при создании блока, поэтому вешать его надо сразу
+                // событие async тригерится до всего, его тоже надо вешать
+                if (eventName == 'init' || eventName == 'async') {
+                    info.createEvents.push([eventName, handler]);
 
                 } else {
-                    when = when || 'init';
-
-                    // событие init тригерится при создании блока, поэтому вешать его надо сразу
-                    // событие async тригерится до всего, его тоже надо вешать
-                    if (eventName == 'init' || eventName == 'async') {
-                        info.createEvents.push([eventName, handler]);
+                    // если есть селектор, то это локальное событие
+                    if (eventSelector) {
+                        info[when + 'Noevents'].local.push([eventName, handler]);
 
                     } else {
-                        // если есть селектор, то это локальное событие
-                        if (eventSelector) {
-                            info[when + 'Noevents'].local.push([eventName, handler]);
-
-                        } else {
-                            info[when + 'Noevents'].global.push([eventName, handler]);
-                        }
+                        info[when + 'Noevents'].global.push([eventName, handler]);
                     }
                 }
             }
         }
-
-        // больше не нужны
-        delete info.events;
     }
-    return info;
+
+    // больше не нужны
+    delete info.events;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -313,6 +316,21 @@ ns.View.create = function(id, params, async) {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+ns.View._prepareModels = function(models) {
+    var _models = {};
+
+    if ( Array.isArray(models) ) {
+        //  Если указан массив -- все модели обязательны.
+        for (var i = 0; i < models.length; i++) {
+            _models[ models[i] ] = true;
+        }
+    } else {
+        _models = models;
+    }
+
+    return _models;
+};
 
 ns.View.prototype._getView = function(id) {
     return this.views[id];
@@ -474,7 +492,7 @@ ns.View.prototype._getEvents = function(type) {
 
             'no-global': this._bindEventHandlers(noeventsInfo['global'], 1),
             'no-local': this._bindEventHandlers(noeventsInfo['local'], 1)
-        }
+        };
     }
     return this[eventProp];
 };
@@ -603,10 +621,15 @@ ns.View.prototype.isModelsValid = function(timestamp) {
     for (var id in models) {
         var model = models[id];
         if (
-            // модель не валидна
-            !model.isValid() ||
-            // или ее кеш более свежий
-            (timestamp && model.timestamp > timestamp)
+            // Модель является обязательной
+            this.info.models[id] === true
+            &&
+            (
+                // модель не валидна
+                !model.isValid() ||
+                // или ее кеш более свежий
+                (timestamp && model.timestamp > timestamp)
+            )
         ) {
             return false;
         }
@@ -714,6 +737,7 @@ ns.View.prototype._getViewTree = function(layout, params) {
         tree: {},
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
+        is_models_valid: this.isModelsValid(),
         //  добавляем собственные параметры блока
         //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,
@@ -754,16 +778,20 @@ ns.View.prototype._getModelsData = function() {
     var models = this.models;
     for (var id in models) {
         var data = models[id].getData();
-        if (data) {
-            r[id] = data;
+        if ( this.info.models[id] ) {
+            if (data) {
+                r[id] = data;
+            }
+        } else {
+            //  Для необязательной модели подойдёт и ошибка.
+            data = data || models[id].getError();
+            if (data) {
+                r[id] = data;
+            }
         }
     }
 
     return r;
-};
-
-ns.View.prototype.getModel = function(id) {
-    return this.models[id].getData();
 };
 
 //  Быстро что-нибудь сгенерить из данных блока.

@@ -3,12 +3,12 @@
     "devel": true,
     "jquery": true,
     "globals": {
-        "no": false
+        "no": false,
+        "ns": true
     },
 
     "bitwise": true,
     "curly": true,
-    "indent": 4,
     "latedef": true,
     "sub": true,
     "newcap": true,

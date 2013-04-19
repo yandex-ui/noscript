@@ -33,7 +33,12 @@ match .* ns-build-view {
         if /.async {
             apply . ns-view-async-content
         } else {
-            apply . ns-view-content
+            if /.is_models_valid {
+                apply . ns-view-content
+            }
+            else {
+                apply . ns-view-error-content
+            }
         }
     </div>
 }
@@ -54,4 +59,10 @@ match .* ns-view-content {
 // @public
 match .* ns-view-async-content {
     "async-view-content"
+}
+
+// Часть обязательных моделей не удалось получить или для них вернулась ошибка
+// @public
+match .* ns-view-error-content {
+    "view-error-content"
 }

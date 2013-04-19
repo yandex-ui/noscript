@@ -622,7 +622,7 @@ ns.View.prototype.isModelsValid = function(timestamp) {
         var model = models[id];
         if (
             // Модель является обязательной
-            this.info.models[id]
+            this.info.models[id] === true
             &&
             (
                 // модель не валидна
@@ -737,6 +737,7 @@ ns.View.prototype._getViewTree = function(layout, params) {
         tree: {},
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
+        is_models_valid: this.isModelsValid(),
         //  добавляем собственные параметры блока
         //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,

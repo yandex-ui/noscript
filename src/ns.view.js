@@ -66,7 +66,7 @@ ns.View.prototype._init = function(id, params, async) {
     }
 
     this.views = null;
-    this.subviews = null;
+    this._subviews = null;
     this.node = null;
 
     /**
@@ -472,7 +472,7 @@ ns.View.prototype._bindModels = function() {
 
     for (var id in this.models) {
         (function(id, model) {
-            model.on('change', function(e, jpath) {
+            model.on('changed', function(e, jpath) {
                 var jpaths = that.info.subviews[id];
                 var deps = jpaths && jpaths[jpath];
                 if (!deps) {
@@ -667,6 +667,9 @@ ns.View.prototype.isLoading = function() {
  * @return {Boolean}
  */
 ns.View.prototype.isValid = function() {
+    for (var subview in this._subviews) {
+        return false;
+    }
     return this.isOk() && this.isModelsValid(this.timestamp);
 };
 
@@ -742,7 +745,6 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     if (!this.views) {
         //  FIXME: Почему бы это в конструкторе не делать?
         this.views = {};
-        this.subviews = {};
         // Создаем подблоки
         for (var view_id in pageLayout) {
             this._addView(view_id, params, pageLayout[view_id].type);
@@ -904,6 +906,9 @@ ns.View.prototype._setNode = function(node) {
     } else {
         this.status = STATUS.NONE;
     }
+
+    //  Тут лежит список инвалидированных subview.
+    this._subviews = {};
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

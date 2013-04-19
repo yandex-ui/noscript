@@ -408,7 +408,7 @@ ns.Model.prototype.setData = function(data, options) {
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
         if (!options || !options.silent) {
-            this.trigger('changed', '.');
+            this.trigger('changed', '');
         }
     }
 

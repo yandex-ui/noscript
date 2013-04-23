@@ -662,15 +662,18 @@ ns.View.prototype.isLoading = function() {
     return (this.status === this.STATUS.LOADING);
 };
 
+//  FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
+ns.View.prototype.isSubviewsOk = function() {
+    //  Возвращаем, есть ли хоть один невалидный subview.
+    return ns.object.isEmpty(this._subviews);
+};
+
 /**
  * Возвращает true, если блок валиден.
  * @return {Boolean}
  */
 ns.View.prototype.isValid = function() {
-    for (var subview in this._subviews) {
-        return false;
-    }
-    return this.isOk() && this.isModelsValid(this.timestamp);
+    return this.isOk() && this.isSubviewsOk() && this.isModelsValid(this.timestamp);
 };
 
 /**
@@ -688,6 +691,8 @@ ns.View.prototype.isModelsValid = function(timestamp) {
             // или ее кеш более свежий
             (timestamp && model.timestamp > timestamp)
         ) {
+            //  FIXME: А не нужно ли тут поменять статус блока?
+            //  Раз уж мы заметили, что он невалидный.
             return false;
         }
     }
@@ -915,7 +920,7 @@ ns.View.prototype._setNode = function(node) {
 
 //  Обновляем (если нужно) ноду блока.
 ns.View.prototype._updateHTML = function(node, layout, params, options, events) {
-    // для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
+    // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
     var generateRepaintEvent = !options.async || !this.isValid();
 
     var viewNode;
@@ -923,13 +928,38 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
         viewNode = ns.byClass('ns-view-' + this.id, node)[0];
-        if (viewNode) {
+        if (!viewNode) {
+            throw "Can't find node for ns.View '" + this.id + "'";
+        }
+
+        //  Тут у нас может быть несколько вариантов, почему блок нужно как-то обновлять:
+        //
+        //    * Вообще весь блок невалидный ( предположительно !this.isOk() ).
+        //
+        //    * Невалидны некоторые subview (все остальные варианты).
+        //
+
+        if ( this.isOk() ) {
+            //  Обновляем только subview.
+            for (var subview_id in this._subviews) {
+                var new_subview_node = ns.byClass('ns-subview-' + subview_id, viewNode)[0];
+                var old_subview_node = ns.byClass('ns-subview-' + subview_id, this.node)[0];
+                if ( !(new_subview_node && old_subview_node) ) {
+                    throw "Can't find subview node " + subview + " for ns.View '" + this.id + "'";
+                }
+
+                ns.replaceNode(old_subview_node, new_subview_node);
+            }
+        } else {
+            //  Обновляем весь блок.
+
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
             if (options.toplevel) {
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
+                //  FIXME: Вот тут нужны два варианта: вся нода невалидна или же невалидные некоторое subview.
                 if (this.node) {
                     ns.replaceNode(this.node, viewNode);
                 }
@@ -951,11 +981,9 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 // В асинхронном запросе вызываем async для view, которые являются заглушкой.
                 events['async'].push(this);
             }
-
-            this.timestamp = +new Date();
-        } else {
-            throw "Can't find node for ns.View '" + this.id + "'";
         }
+
+        this.timestamp = +new Date();
     }
 
     // Если view валидный и не в async-режиме, то вызывается show и repaint

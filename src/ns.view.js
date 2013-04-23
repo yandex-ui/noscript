@@ -476,7 +476,11 @@ ns.View.prototype._bindModels = function() {
                 var jpaths = that.info.subviews[id];
                 var deps = jpaths && jpaths[jpath];
                 if (!deps) {
-                    that.invalidate();
+                    //  FIXME: Если раскомментить, то вылезают проблемы:
+                    //  https://github.com/pasaran/noscript/issues/74#issuecomment-16851486
+                    //  Надо подумать.
+
+                    //  that.invalidate();
                 } else {
                     for (var subview in deps) {
                         that.invalidateSubview(subview);
@@ -911,9 +915,6 @@ ns.View.prototype._setNode = function(node) {
     } else {
         this.status = STATUS.NONE;
     }
-
-    //  Тут лежит список инвалидированных subview.
-    this._subviews = {};
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -929,7 +930,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
         //  Ищем новую ноду блока.
         viewNode = ns.byClass('ns-view-' + this.id, node)[0];
         if (!viewNode) {
-            throw "Can't find node for ns.View '" + this.id + "'";
+            throw "Can't find node for view '" + this.id + "'";
         }
 
         //  Тут у нас может быть несколько вариантов, почему блок нужно как-то обновлять:
@@ -942,10 +943,13 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
         if ( this.isOk() ) {
             //  Обновляем только subview.
             for (var subview_id in this._subviews) {
-                var new_subview_node = ns.byClass('ns-subview-' + subview_id, viewNode)[0];
-                var old_subview_node = ns.byClass('ns-subview-' + subview_id, this.node)[0];
+                var className = 'ns-subview-' + subview_id;
+
+                var new_subview_node = ns.byClass(className, viewNode)[0];
+                var old_subview_node = ns.byClass(className, this.node)[0];
+
                 if ( !(new_subview_node && old_subview_node) ) {
-                    throw "Can't find subview node " + subview + " for ns.View '" + this.id + "'";
+                    throw "Can't find node for subview '" + subview_id + "' in view '" + this.id + "'";
                 }
 
                 ns.replaceNode(old_subview_node, new_subview_node);
@@ -982,6 +986,9 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 events['async'].push(this);
             }
         }
+
+        //  Все subview теперь валидны.
+        this._subviews = {};
 
         this.timestamp = +new Date();
     }

@@ -293,14 +293,20 @@ ns.View.info = function(id) {
         //  В info.subviews приходит структура такого вида:
         //
         //      {
+        //          //  Определяем subview 'labels':
         //          'labels': [
+        //              //  зависящее от поля '.labels' модели 'message',
         //              'message .labels',
+        //              //  и от модели 'labels' целиком.
         //              'labels'
         //          ],
+        //          //  Пустая строка в качестве имени subview означает все view целиком.
+        //          //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
+        //          '': 'folders'
         //          ...
         //      }
         //
-        var _subviews = {};
+        var _subviews = (typeof info.subviews === 'object') ? {} : info.subviews;
         for (var subview in info.subviews) {
             var deps = info.subviews[subview];
             if (typeof deps === 'string') {
@@ -319,6 +325,7 @@ ns.View.info = function(id) {
             }
         }
         info.subviews = _subviews;
+        //
         //  На выходе в info.subviews такая структура:
         //
         //      {
@@ -334,6 +341,12 @@ ns.View.info = function(id) {
         //              //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
         //              '': {
         //                  'labels': true
+        //              }
+        //          },
+        //          'folders': {
+        //              '': {
+        //                  //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
+        //                  '': true
         //              }
         //          },
         //          ...
@@ -468,27 +481,50 @@ ns.View.prototype.invalidateSubview = function(subview) {
  * @private
  */
 ns.View.prototype._bindModels = function() {
+    //  console.log('bindModels', this.id);
     var that = this;
 
-    for (var id in this.models) {
-        (function(id, model) {
-            model.on('changed', function(e, jpath) {
-                var jpaths = that.info.subviews[id];
-                var deps = jpaths && jpaths[jpath];
-                if (!deps) {
-                    //  FIXME: Если раскомментить, то вылезают проблемы:
-                    //  https://github.com/pasaran/noscript/issues/74#issuecomment-16851486
-                    //  Надо подумать.
+    var subviews = this.info.subviews;
+    var has_subviews = (subviews === true) || !ns.object.isEmpty(subviews);
+    console.log(this.id, subviews);
 
-                    //  that.invalidate();
+    for (var id in this.models) {
+        (function(model) {
+            model.on('changed', function(e, jpath) {
+                console.log('model', model.id, 'view', that.id, 'jpath', jpath);
+
+                //  Варианты, когда нужно перерисовать весь блок целиком:
+                //
+                //    * Для view вообще не определено никаких subview и jpath равен ''.
+                //    * Или же в зависимостях явно указано, что нужно перерисовать блок целиком.
+                //
+
+                if (!has_subviews) {
+                    if (jpath === '') {
+                        console.log('invalidate all #1', that.id);
+
+                        that.invalidate();
+                    }
+                    return;
+                }
+
+                var jpaths = subviews[id];
+                var deps = jpaths && jpaths[jpath];
+
+                if ( !deps || ( '' in deps ) ) {
+                    console.log( 'invalidate all #2', that.id, !deps );
+
+                    that.invalidate();
                 } else {
+                    console.log('invalidate subviews only', that.id);
+
                     for (var subview in deps) {
                         that.invalidateSubview(subview);
                     }
                 }
 
             });
-        })( id, this.models[id] );
+        })( this.models[id] );
     }
 };
 
@@ -927,6 +963,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
+        console.log('updateHTML', this.id);
         //  Ищем новую ноду блока.
         viewNode = ns.byClass('ns-view-' + this.id, node)[0];
         if (!viewNode) {

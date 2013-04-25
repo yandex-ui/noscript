@@ -481,17 +481,15 @@ ns.View.prototype.invalidateSubview = function(subview) {
  * @private
  */
 ns.View.prototype._bindModels = function() {
-    //  console.log('bindModels', this.id);
     var that = this;
 
     var subviews = this.info.subviews;
     var has_subviews = (subviews === true) || !ns.object.isEmpty(subviews);
-    console.log(this.id, subviews);
 
     for (var id in this.models) {
         (function(model) {
             model.on('changed', function(e, jpath) {
-                console.log('model', model.id, 'view', that.id, 'jpath', jpath);
+                //  console.log('model', model.id, 'view', that.id, 'jpath', jpath);
 
                 //  Варианты, когда нужно перерисовать весь блок целиком:
                 //
@@ -499,30 +497,23 @@ ns.View.prototype._bindModels = function() {
                 //    * Или же в зависимостях явно указано, что нужно перерисовать блок целиком.
                 //
 
-                if (!has_subviews) {
-                    if (jpath === '') {
-                        console.log('invalidate all #1', that.id);
+                var jpaths = subviews && subviews[model.id];
+                var deps = jpaths && jpaths[jpath];
 
+                if (jpath === '') {
+                    if (!has_subviews || ( deps && ('' in deps) ) ) {
+                        console.log('invalidate all view', that.id);
                         that.invalidate();
                     }
                     return;
                 }
 
-                var jpaths = subviews[id];
-                var deps = jpaths && jpaths[jpath];
+                if (!deps) { return; }
 
-                if ( !deps || ( '' in deps ) ) {
-                    console.log( 'invalidate all #2', that.id, !deps );
-
-                    that.invalidate();
-                } else {
-                    console.log('invalidate subviews only', that.id);
-
-                    for (var subview in deps) {
-                        that.invalidateSubview(subview);
-                    }
+                console.log('invalidate subviews only in', that.id);
+                for (var subview in deps) {
+                    that.invalidateSubview(subview);
                 }
-
             });
         })( this.models[id] );
     }

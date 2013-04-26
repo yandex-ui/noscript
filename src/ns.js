@@ -80,13 +80,6 @@ ns.init = function() {
     ns.router.init();
 
     ns.initMainView();
-
-    window.addEventListener('popstate', function(e) {
-        // прибиваем событие, чтобы не дергалась адресная строка
-        e.preventDefault();
-        e.stopPropagation();
-        ns.page.go();
-    }, false);
 };
 
 /**

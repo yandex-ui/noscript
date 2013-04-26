@@ -23,12 +23,13 @@ ns.router = function(url) {
         var r = route.regexp.exec(url);
         if (r) {
             var tokens = route.tokens;
+            var defaults = route.defaults;
             var params = {};
 
             // Вытаскиваем параметры из основной части урла. Имена параметров берем из массива tokens.
             var l = tokens.length;
             for (var k = 0; k < l; k++) {
-                params[ tokens[k] ] = r[ k + 1 ];
+                params[ tokens[k] ] = r[ k + 1 ] || defaults[ tokens[k] ];
             }
 
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
@@ -90,6 +91,8 @@ ns.router.compile = function(route) {
     var regexp = route.replace(/\/$/, ''); // Отрезаем последний слэш, он ниже добавится как необязательный.
 
     var tokens = [];
+    var defaults = {};
+
     regexp = regexp.replace(/{(.*?)}/g, function(_, token) { // Заменяем {name} на кусок регэкспа соответствующего типу токена name.
         var tokenParts = token.split(':');
 
@@ -98,16 +101,29 @@ ns.router.compile = function(route) {
         if (!rx_part) {
             throw "Can't find regexp for '" + type +"'!";
         }
-        tokens.push(tokenParts[0]); // Запоминаем имя токена, оно нужно при парсинге урлов.
 
-        return '(' + rx_part + ')';
+        var token_name = tokenParts[0];
+
+        if (token_name.indexOf('=') > 0) {
+            var _index = token_name.indexOf('=');
+            var token_default = token_name.substring(_index + 1);
+            token_name = token_name.substring(0, _index);
+
+            tokens.push(token_name);
+            defaults[token_name] = token_default;
+            return '(' + rx_part + ')?';
+        } else {
+            tokens.push(tokenParts[0]); // Запоминаем имя токена, оно нужно при парсинге урлов.
+            return '(' + rx_part + ')';
+        }
     });
     regexp = '^' + regexp + '\/?(?:\\?(.*))?$'; // Добавляем "якоря" ^ и $;
                                                 // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
 
     return {
         regexp: new RegExp(regexp),
-        tokens: tokens
+        tokens: tokens,
+        defaults: defaults
     };
 };
 

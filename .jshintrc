@@ -3,6 +3,7 @@
     "devel": true,
     "jquery": true,
     "globals": {
+        "ns": true,
         "no": false
     },
 

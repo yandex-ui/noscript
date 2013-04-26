@@ -1,0 +1,7 @@
+include "../../yate/noscript.yate"
+
+/// Index view
+
+match .index ns-view-content {
+    "Hi, I am index view"
+}

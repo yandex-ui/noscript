@@ -19,7 +19,8 @@
         "expect.js": "*",
         "jshint": "*",
         "mocha": "*",
-        "sinon": "*"
+        "sinon": "*",
+        "yate": "*"
     },
     "optionalDependencies": {},
     "engines": {

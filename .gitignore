@@ -1,2 +1,7 @@
 .idea
 node_modules
+
+.live*
+stub-project/*.jade
+stub-project/*.styl
+stub-project/yate/*.js

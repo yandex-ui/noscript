@@ -23,39 +23,39 @@ describe('ns.router', function() {
 
         beforeEach(function() {
             ns.router.routes = {
-                '/', '-> /inbox',
-                '/inbox', 'messages',
-                '/message/{mid:int}', 'message'
+                redirect: {
+                    '/': '/inbox'
+                },
+                route: {
+                    '/inbox': 'messages',
+                    '/message/{mid:int}': 'message'
+                }
             };
             ns.router.init();
         });
 
         afterEach(function() {
-            ns.router.routes = [];
+            delete ns.router.routes;
         });
 
-        it('/ regexp check', function(){
-            expect(ns.router.routes[0].regexp.toString()).to.be('/^\/?(?:\\?(.*))?$/')
+        it('/ redirect check', function() {
+            expect(ns.router._routes.redirect['/']).to.be.eql('/inbox')
         });
 
-        it('/ redirect check', function(){
-            expect(ns.router.routes[0].redirect).to.be.eql('/inbox')
+        it('/inbox regexp check', function() {
+            expect(ns.router._routes.route[0].regexp.toString()).to.be('/^\/inbox\/?(?:\\?(.*))?$/')
         });
 
-        it('/inbox regexp check', function(){
-            expect(ns.router.routes[1].regexp.toString()).to.be('/^\/inbox\/?(?:\\?(.*))?$/')
+        it('/inbox tokens check', function() {
+            expect(ns.router._routes.route[0].tokens).to.be.eql([])
         });
 
-        it('/inbox tokens check', function(){
-            expect(ns.router.routes[1].tokens).to.be.eql([])
+        it('/message/{mid:int} regexp check', function() {
+            expect(ns.router._routes.route[1].regexp.toString()).to.be('/^/message/([0-9]+)/?(?:\\?(.*))?$/')
         });
 
-        it('/message/{mid:int} regexp check', function(){
-            expect(ns.router.routes[2].regexp.toString()).to.be('/^/message/([0-9]+)/?(?:\\?(.*))?$/')
-        });
-
-        it('/message/{mid:int} tokens check', function(){
-            expect(ns.router.routes[2].tokens).to.be.eql(['mid'])
+        it('/message/{mid:int} tokens check', function() {
+            expect(ns.router._routes.route[1].tokens).to.be.eql(['mid'])
         });
 
     });

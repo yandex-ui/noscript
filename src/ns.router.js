@@ -102,18 +102,18 @@ ns.router.compile = function(route) {
             throw "Can't find regexp for '" + type +"'!";
         }
 
-        var token_name = tokenParts[0];
+        var tokenName = tokenParts[0];
+        var equalSignIndex = tokenName.indexOf('=');
 
-        if (token_name.indexOf('=') > 0) {
-            var _index = token_name.indexOf('=');
-            var token_default = token_name.substring(_index + 1);
-            token_name = token_name.substring(0, _index);
+        if (equalSignIndex > 0) {
+            var tokenDefault = tokenName.substring(equalSignIndex + 1);
+            tokenName = tokenName.substring(0, equalSignIndex);
 
-            tokens.push(token_name);
-            defaults[token_name] = token_default;
+            tokens.push(tokenName);
+            defaults[tokenName] = tokenDefault;
             return '(' + rx_part + ')?';
         } else {
-            tokens.push(tokenParts[0]); // Запоминаем имя токена, оно нужно при парсинге урлов.
+            tokens.push(tokenName); // Запоминаем имя токена, оно нужно при парсинге урлов.
             return '(' + rx_part + ')';
         }
     });

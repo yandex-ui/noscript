@@ -3,7 +3,11 @@
     "devel": true,
     "jquery": true,
     "globals": {
-        "no": false
+        "Modernizr": false,
+        "module": false,
+        "no": false,
+        "ns": false,
+        "yr": false
     },
 
     "bitwise": true,

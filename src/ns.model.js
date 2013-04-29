@@ -73,9 +73,8 @@ ns.Model.prototype._bindEvents = function() {
         }
 
         for (var i = 0, j = callbacks.length; i < j; i++) {
-            // сразу биндим обработчики в this
-            this.on(event, callbacks[i].bind(this));
             //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
+            this.on(event, callbacks[i]);
         }
     }
 };

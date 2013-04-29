@@ -7,6 +7,9 @@
  *   Меняет URL в адресной строке, запоминая его в истории браузера.
  * `ns.history.replaceState(url)`
  *   Меняет URL в адресной строке, заменяя текущую запись в истории браузера.
+ * `ns.history.adapt()`
+ *   Адаптирует хешовые URL для браузеров, поддерживающих HTML5 History API,
+ *   выполняя трансформации типа `/#/message/123/` в `/message/123/`.
  * `ns.history.legacy`
  *   {Boolean}
  *   Флаг использования HTML5 History API или отката на `hashchange`.
@@ -27,7 +30,6 @@ ns.history = (function(window, ns) {
 
             ns.page.go();
         }, false);
-
 
         return {
             pushState: history.pushState.bind(history, null, 'mail'),

@@ -1,5 +1,9 @@
 describe('ns.router', function() {
 
+    afterEach(function() {
+        delete ns.router.routes;
+    });
+
     describe('API', function() {
 
         it('should be defined', function() {
@@ -32,10 +36,6 @@ describe('ns.router', function() {
                 }
             };
             ns.router.init();
-        });
-
-        afterEach(function() {
-            delete ns.router.routes;
         });
 
         it('/ redirect check', function() {
@@ -71,10 +71,6 @@ describe('ns.router', function() {
                 }
             };
             ns.router.init();
-        });
-
-        afterEach(function() {
-            delete ns.router.routes;
         });
 
         it('/messages : does not match because of the last slash', function() {

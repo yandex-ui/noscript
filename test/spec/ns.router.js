@@ -14,10 +14,6 @@ describe('ns.router', function() {
             expect(ns.router.init).to.be.a('function');
         });
 
-        it('ns.router.routes should be defined', function() {
-            expect(ns.router.routes).to.be.an('object');
-        });
-
         it('ns.router.regexps should be defined', function() {
             expect(ns.router.regexps).to.be.an('object');
         });

@@ -124,7 +124,7 @@ var _ctors = {};
  * Определяет новый View.
  * @description
  * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
- * "eventDecl" записывается в виде "eventName[ selector]".
+ * "eventDecl" записывается в виде "eventName [ selector ]".
  * "selector" опционален, если его нет, то события регистрируется на ноду View.
  * "handler" может быть строка (тогда она заменится на метод прототипа) или функция.
  * Все хендлеры биндятся на экземпляр View.
@@ -241,7 +241,7 @@ ns.View.info = function(id) {
 
             var eventName = eventParts.join('@');
 
-            // осталоное - селектор
+            // остальное - селектор
             var eventSelector = declParts.join(' ');
 
             if (eventName) {
@@ -427,7 +427,7 @@ ns.View.prototype._unbindModels = function() {
 };
 
 /**
- * Копирует массив деклараций событий и возвращает такой же массив, но забинженными на этот инстанс обработчиками.
+ * Копирует массив деклараций событий и возвращает такой же массив, но с забинженными на этот инстанс обработчиками.
  * @param {Array} events
  * @param {Number} handlerPos Позиция хендлера в массиве.
  * @return {Array} Копия events c забинженными обработчиками.
@@ -498,10 +498,10 @@ ns.View.prototype._bindEvents = function(type) {
         // если надо переопределяем $target на глобальные объекты
         var $target = $node;
         if (event[0] === 'window') {
-            $target = this._$document;
+            $target = this._$window;
 
         } else if (event[0] === 'document') {
-            $target = this._$window;
+            $target = this._$document;
         }
         if (event[1]) { //selector
             $target.on(event[0] + eventNS, event[1], event[2]);
@@ -622,6 +622,7 @@ ns.View.prototype._apply = function(callback) {
     var views = this.views;
     for (var id in views) {
         callback(views[id], id);
+        // @chestozo: а не надо тут вызвать: views[id]._apply(callback) ?
     }
 };
 
@@ -646,7 +647,7 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
         var hasValidModels = this.isModelsValid();
         var hasValidStatus = this.isOk();
         if (hasValidModels && !hasValidStatus) {
-            // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его
+            // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его синхронно
             updated.sync.push(this);
 
         } else if (!hasValidModels) {

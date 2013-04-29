@@ -19,6 +19,7 @@ ns.page.go = function(url) {
 
     var loc = window.location;
 
+    // @chestozo: а какже hash?
     url = url || (loc.pathname + loc.search);
 
     // подготавливаем
@@ -47,6 +48,7 @@ ns.page.go = function(url) {
 };
 
 ns.page.redirect = function(url) {
+    // @chestozo: упс
     window.history.replaceState(null, 'mail', url);
     ns.page.go(url);
 };

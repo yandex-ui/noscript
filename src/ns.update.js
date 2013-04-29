@@ -80,6 +80,7 @@ ns.Update.prototype.start = function(async) {
 
     // Для каждого async-view запрашиваем его модели.
     // Когда они приходят, запускаем точно такой же update.
+    // Причем ждем отрисовку sync-view, чтобы точно запуститься после него.
     updated.async.forEach(function(view) {
         var models = views2models( [ view ] );
         no.Promise.wait([

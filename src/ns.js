@@ -1,5 +1,5 @@
 /**
- * noscrpt
+ * noscript MVC framework
  * @namespace
  */
 var ns = {};

@@ -79,14 +79,8 @@ ns.init = function() {
     ns.action.init();
     ns.router.init();
 
+    ns.history.adapt();
     ns.initMainView();
-
-    window.addEventListener('popstate', function(e) {
-        // прибиваем событие, чтобы не дергалась адресная строка
-        e.preventDefault();
-        e.stopPropagation();
-        ns.page.go();
-    }, false);
 };
 
 /**

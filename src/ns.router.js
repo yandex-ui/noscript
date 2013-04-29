@@ -51,7 +51,7 @@ ns.router = function(url) {
 
     // Ничего подходящего не нашли.
     return {
-        page: 'not-found',
+        page: ns.L.NOT_FOUND,
         params: {}
     };
 

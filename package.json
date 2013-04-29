@@ -13,11 +13,15 @@
         "url": "git://github.com/pasaran/noscript.git"
     },
     "dependencies": {
-        "nommon": "*"
+        "nommon": "*",
+        "es5-shim": "*"
     },
     "devDependencies": {
         "expect.js": "*",
-        "jshint": "*",
+        "grunt": "*",
+        "grunt-cli": "*",
+        "grunt-contrib-jshint": "*",
+        "grunt-mocha": "*",
         "mocha": "*",
         "sinon": "*"
     },

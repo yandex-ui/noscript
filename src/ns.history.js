@@ -28,24 +28,40 @@ ns.history = (function(window, ns) {
             ns.page.go();
         }, false);
 
-        // Редирект с хешового урла на его полноценный аналог.
-        if ((location.pathname + location.search).length === 1 && location.hash.length !== 0) {
-            history.replaceState(null, 'mail', location.hash.substr(1));
-
-            // Здесь `ns.page.go` можно не вызывать, потому что после `ns.init`
-            // `ns.page.go` все равно вызывается.
-        }
 
         return {
             pushState: history.pushState.bind(history, null, 'mail'),
             replaceState: history.replaceState.bind(history, null, 'mail'),
+
+            // Редирект с хешового урла на его полноценный аналог.
+            adapt: function() {
+                var hash = location.hash.substr(1);
+
+                var hashRoute = ns.router(hash);
+                var pathRoute = ns.router(location.pathname);
+
+                if (hash.length &&
+                    hashRoute && hashRoute.page !== ns.L.NOT_FOUND &&
+
+                    // TODO: При добавлении способа задания корневого урла заменить
+                    // слеш на нужное свойство/метод.
+                    (location.pathname === '/' || pathRoute.page === ns.L.NOT_FOUND)) {
+                    this.replaceState(hash + location.search);
+                }
+
+                // Здесь `ns.page.go` можно не вызывать, потому что после `ns.init`
+                // `ns.page.go` все равно вызывается.
+            },
             legacy: false
         };
 
     // Откат на `hashchange`.
     } else {
         // Редирект с текущего полноценного урла на его хешовый аналог.
-        if ((location.pathname + location.search).length > 1) {
+        //
+        // TODO: При добавлении способа задания корневого урла заменить
+        // слеш на нужное свойство/метод.
+        if ((location.pathname + location.search) !== '/') {
             return location.replace('/#' + location.pathname + location.search);
         }
 
@@ -70,6 +86,7 @@ ns.history = (function(window, ns) {
                 ignore = true;
                 location.replace(location.pathname + location.search + '#' + url);
             },
+            adapt: function() {},
             legacy: true
         };
     }

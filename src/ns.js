@@ -79,6 +79,7 @@ ns.init = function() {
     ns.action.init();
     ns.router.init();
 
+    ns.history.adapt();
     ns.initMainView();
 };
 

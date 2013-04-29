@@ -309,7 +309,7 @@ ns.Model.prototype.isValid = function() {
 //      var foo = model.get('foo'); // model.data.foo.
 //      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
 //
-no.Model.prototype.get = function(jpath) {
+ns.Model.prototype.get = function(jpath) {
     var data = this.data;
     if (data) {
         return no.path(jpath, data);
@@ -332,7 +332,7 @@ ns.Model.prototype.set = function(jpath, value, options) {
     //  Сохраняем новое значение и одновременно получаем старое значение.
     var oldValue = no.path(jpath, data, value);
 
-    if ( !( (options && options.silent) || no.object.isEqual(value, oldValue) ) ) {
+    if ( !( (options && options.silent) || ns.object.isEqual(value, oldValue) ) ) {
         // TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
         // @chestozo: может `:` ?
         this.trigger('changed.' + jpath, {

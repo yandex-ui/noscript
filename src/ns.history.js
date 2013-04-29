@@ -17,7 +17,7 @@
 ns.history = (function(window, ns) {
 
     var history = window.history;
-    var location = window.location;
+    var loc = window.location;
 
     var legacy = !(history.pushState && history.replaceState);
 
@@ -37,18 +37,22 @@ ns.history = (function(window, ns) {
 
             // Редирект с хешового урла на его полноценный аналог.
             adapt: function() {
-                var hash = location.hash.substr(1);
+                var hash = loc.hash.substr(1);
+
+                // Если в хеше уже есть какие-то query параметры,
+                // текущие надо к ним прибавить.
+                var search = hash.indexOf('?') !== -1 ? loc.search.replace(/^\?/, '&') : loc.search;
 
                 var hashRoute = ns.router(hash);
-                var pathRoute = ns.router(location.pathname);
+                var pathRoute = ns.router(loc.pathname);
 
                 if (hash.length &&
                     hashRoute && hashRoute.page !== ns.L.NOT_FOUND &&
 
                     // TODO: При добавлении способа задания корневого урла заменить
                     // слеш на нужное свойство/метод.
-                    (location.pathname === '/' || pathRoute.page === ns.L.NOT_FOUND)) {
-                    this.replaceState(hash + location.search);
+                    (loc.pathname === '/' || pathRoute.page === ns.L.NOT_FOUND)) {
+                    this.replaceState(hash + search);
                 }
 
                 // Здесь `ns.page.go` можно не вызывать, потому что после `ns.init`
@@ -63,8 +67,8 @@ ns.history = (function(window, ns) {
         //
         // TODO: При добавлении способа задания корневого урла заменить
         // слеш на нужное свойство/метод.
-        if ((location.pathname + location.search) !== '/') {
-            return location.replace('/#' + location.pathname + location.search);
+        if ((loc.pathname + loc.search) !== '/') {
+            return loc.replace('/#' + loc.pathname + loc.search);
         }
 
         // Заставляет `hashchange` игнорировать смену URL через вызов legacy
@@ -82,11 +86,11 @@ ns.history = (function(window, ns) {
         return {
             pushState: function(url) {
                 ignore = true;
-                location.hash = url;
+                loc.hash = url;
             },
             replaceState: function(url) {
                 ignore = true;
-                location.replace(location.pathname + location.search + '#' + url);
+                loc.replace(loc.pathname + loc.search + '#' + url);
             },
             adapt: function() {},
             legacy: true

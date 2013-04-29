@@ -94,12 +94,12 @@ describe('ns.history', function() {
 
         it('should keep the query params', function(done) {
 
-            window.history.pushState(null, 'test', '/?debug=true#/message/123/');
+            window.history.pushState(null, 'test', '/?debug=true&append=%25a%25#/message/123/?param=1');
 
             ns.history.adapt();
 
             setTimeout(function() {
-                expect(window.location.pathname + window.location.search).to.be('/message/123/?debug=true');
+                expect(window.location.pathname + window.location.search).to.be('/message/123/?param=1&debug=true&append=%25a%25');
                 done();
             }, 0);
 

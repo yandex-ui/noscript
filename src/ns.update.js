@@ -67,7 +67,7 @@ ns.Update.prototype.start = function(async) {
 
     var models = views2models(updated.sync);
     var promise = ns.request.models(models)
-        .then(function(r) {
+        .then(function() {
             //TODO: check errors
             if (that._expired()) {
                 resultPromise.reject();
@@ -86,7 +86,7 @@ ns.Update.prototype.start = function(async) {
         no.Promise.wait([
             promise,
             ns.request.models(models)
-        ]).then(function(r) {
+        ]).then(function() {
             //TODO: смотреть, что не запустился другой update
             if (!that._expired()) {
                 var fakeLayout = {};
@@ -117,10 +117,11 @@ ns.Update.prototype._update = function(async) {
     };
     this.view._getUpdateTree(tree, layout.views, params);
 
+    var node;
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
-        var node = ns.tmpl(tree, null, '');
+        node = ns.tmpl(tree, null, '');
     }
 
     var viewEvents = {

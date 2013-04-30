@@ -205,7 +205,7 @@ ns.request.Manager = {
 if (window['mocha']) {
     ns.request.clean = function() {
         ns.request.Manager._keys = {};
-    }
+    };
 }
 
 var REQUEST_ID = 0;
@@ -298,16 +298,20 @@ Request.prototype.request = function(loading, requesting) {
         if (httpRequest) {
             //TODO: что будет если fail?
             httpRequest.then(function(r) {
+                /*
                 if (ns.request.canProcessResponse(r) === false) {
                     //TODO: clear keys, promise.reject()
 
                 } else {
+                */
+                if (ns.request.canProcessResponse(r) !== false) {
                     //  В r должен быть массив из одного или двух элементов.
                     if (requesting.length) {
                         that.extract(requesting, r);
-                    } else {
+                    }/* else {
                         //TODO: clear keys, promise.reject()
                     }
+                    */
                 }
             });
         }
@@ -395,7 +399,7 @@ function models2params(models) {
     }
 
     return params;
-};
+}
 
     /**
      * Приводит запрашиваемые модели к формату №3 из ns.request.
@@ -446,7 +450,7 @@ function models2params(models) {
         for (var i = 0, l = items.length; i < l; i++) {
             var item = items[i];
             if (item.model && item.model instanceof ns.Model) {
-                models.push(item.model)
+                models.push(item.model);
             } else {
                 // можно не использовать if (!model.get()) { model.create() }
                 // model.create все это умеет делать

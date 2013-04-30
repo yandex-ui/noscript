@@ -60,8 +60,8 @@ ns.View.prototype._init = function(id, params, async) {
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
-    for (var i = 0, l = model_ids.length; i < l; i++) {
-        var model_id = model_ids[i];
+    for (var modelI = 0, l = model_ids.length; modelI < l; modelI++) {
+        var model_id = model_ids[modelI];
         models[model_id] = ns.Model.create(model_id, params);
     }
 
@@ -474,7 +474,7 @@ ns.View.prototype._getEvents = function(type) {
 
             'no-global': this._bindEventHandlers(noeventsInfo['global'], 1),
             'no-local': this._bindEventHandlers(noeventsInfo['local'], 1)
-        }
+        };
     }
     return this[eventProp];
 };

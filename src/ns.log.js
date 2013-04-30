@@ -1,5 +1,7 @@
 (function(/** @type ns */ns) {
 
+    /* jshint unused: false */
+
     /**
      * Модуль логирования ошибок.
      * @namespace

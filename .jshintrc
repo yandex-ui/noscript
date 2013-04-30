@@ -12,6 +12,7 @@
 
     "bitwise": true,
     "curly": true,
+    "eqnull": true,
     "latedef": true,
     "newcap": true,
     "noarg": true,

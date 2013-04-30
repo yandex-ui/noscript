@@ -195,7 +195,7 @@ ns.action._process = function(e) {
         if (HREF_JS_REGEXP.test(href)) {
             return false;
         }
-        if (href.indexOf('conf:sip:') == 0 || href.indexOf('meet:sip:') == 0) {
+        if (href.indexOf('conf:sip:') === 0 || href.indexOf('meet:sip:') === 0) {
             return true;
         }
 

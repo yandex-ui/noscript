@@ -131,24 +131,24 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     //  а по актуальным блокам. В частности, заглушки в новый active не попадают.
     //  Вместо них берем старые блоки, если они были.
     var newActive = {};
-    for (var id in layoutActive) {
-        var key = layoutActive[id];
+    for (var activeId in layoutActive) {
+        var activeKey = layoutActive[activeId];
 
-        if ( views[key].isLoading() ) {
-            key = oldActive[id];
-            if (key) {
-                newActive[id] = key;
+        if ( views[activeKey].isLoading() ) {
+            activeKey = oldActive[activeId];
+            if (activeKey) {
+                newActive[activeId] = activeKey;
             }
         } else {
-            newActive[id] = key;
+            newActive[activeId] = activeKey;
         }
     }
 
     //  Прячем все блоки, которые были в старом active, но не попали в новый.
-    for (var id in oldActive) {
-        var key = oldActive[id];
-        if (newActive[id] !== key) {
-            var subviews = views[key]._getDescendants( [] );
+    for (var oldActiveId in oldActive) {
+        var oldActiveKey = oldActive[oldActiveId];
+        if (newActive[oldActiveId] !== oldActiveKey) {
+            var subviews = views[oldActiveKey]._getDescendants( [] );
             for (var i = 0, l = subviews.length; i < l; i++) {
                 // если view был скрыт
                 if (subviews[i]._hide()) {

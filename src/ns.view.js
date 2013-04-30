@@ -832,6 +832,8 @@ ns.View.prototype._setNode = function(node) {
 
 //  Обновляем (если нужно) ноду блока.
 ns.View.prototype._updateHTML = function(node, layout, params, options, events) {
+    var options_next = no.extend({}, options);
+
     // для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
     var generateRepaintEvent = !options.async || !this.isValid();
 
@@ -849,15 +851,22 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 if (this.node) {
                     ns.replaceNode(this.node, viewNode);
+                    options_next.parent_added = true;
                 }
-                //  Все подблоки уже не toplevel.
-                options.toplevel = false;
+                //  Все подблоки ниже уже не toplevel.
+                options_next.toplevel = false;
             }
-            // вызываем htmldestory только если нода была заменена
+            //  вызываем htmldestory только если нода была заменена
             if (this.node && !this.isLoading()) {
                 this._hide(events['hide']);
                 this._htmldestroy(events['htmldestroy']);
             }
+
+            //  новая нода должна в любом случае попасть в DOM
+            if (this.node && !options.parent_added && !options_next.parent_added) {
+                ns.replaceNode(this.node, viewNode);
+            }
+
             //  Запоминаем новую ноду.
             this._setNode(viewNode);
 
@@ -888,7 +897,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
 
     //  Рекурсивно идем вниз по дереву.
     this._apply(function(view, id) {
-        view._updateHTML(viewNode, layout[id].views, params, options, events);
+        view._updateHTML(viewNode, layout[id].views, params, options_next, events);
     });
 };
 

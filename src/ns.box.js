@@ -28,7 +28,11 @@ ns.Box.prototype._getView = function(id, params) {
 ns.Box.prototype._addView = function(id, params, type) {
     var view = this._getView(id, params);
     if (!view) {
-        view = ns.View.create(id, params, type === ns.L.ASYNC);
+        if (type === ns.L.BOX) {
+            view = new ns.Box(id, params);
+        } else {
+            view = ns.View.create(id, params, type === ns.L.ASYNC);
+        }
         this.views[view.key] = view;
     }
     return view;
@@ -170,3 +174,5 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     this.active = newActive;
 };
 
+ns.Box.prototype.isOk = no.true;
+ns.Box.prototype.isLoading = no.false;

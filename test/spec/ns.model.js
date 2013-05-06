@@ -463,7 +463,7 @@ describe('ns.Model', function() {
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
                 this.model = ns.Model.create('split1', {p1: 1, p2: 2}, this.data);
-            })
+            });
 
             it('should return model\'s data', function() {
                 var data = {foo: 'bar'};
@@ -472,6 +472,13 @@ describe('ns.Model', function() {
 
                 expect( model.getData() )
                     .to.be(data);
+            });
+
+            it('should return no data of model is invalid', function() {
+                var model = ns.Model.create('m1', {p1: 1, p3: 2});
+
+                expect( model.getData() )
+                    .to.be(null);
             });
 
             it('should return data of splitted model', function() {

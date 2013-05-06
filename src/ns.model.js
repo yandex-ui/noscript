@@ -350,7 +350,7 @@ ns.Model.prototype.getData = function() {
     // если это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
-    if ( this.isCollection() ) {
+    if ( this.isCollection() && this.isValid() ) {
         // массив с хранилищем данных моделей
         var items = no.path(this.info.split.items, this.data);
         // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку

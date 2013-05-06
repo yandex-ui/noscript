@@ -97,22 +97,6 @@ describe('ns.View.events', function() {
          * @type {ns.View}
          */
         this.APP = ns.View.create('app');
-
-        function genHTML(views) {
-            var html = '';
-            for (var id in views) {
-                html += '<div class="ns-view-' + id + '">';
-                html += genHTML(views[id].views);
-                html += '</div>';
-            }
-            return html;
-        }
-
-        this.origNotmpl = ns.tmpl;
-
-        ns.tmpl = function(json) {
-            return ns.html2node('<div class="root">' + genHTML(json.views) + '</div>');
-        };
     });
 
     afterEach(function() {
@@ -120,11 +104,8 @@ describe('ns.View.events', function() {
         ns.View.undefine();
         ns.Model.undefine();
 
-        ns.tmpl = this.origNotmpl;
-
         delete this.events;
         delete this.APP;
-        delete this.origNotmpl
     });
 
     describe('first rendering', function() {

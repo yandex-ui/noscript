@@ -48,7 +48,7 @@ var update_id = -1;
  * @type {Array}
  * @private
  */
-ns.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async', 'show', 'repaint'];
+ns.Update.prototype._EVENTS_ORDER = ['ns-hide', 'ns-htmldestroy', 'ns-htmlinit', 'ns-async', 'ns-show', 'ns-repaint'];
 
 /**
  * Начинает работу updater'а.
@@ -67,7 +67,7 @@ ns.Update.prototype.start = function(async) {
 
     var models = views2models(updated.sync);
     var promise = ns.request.models(models)
-        .then(function(r) {
+        .then(function() {
             //TODO: check errors
             if (that._expired()) {
                 resultPromise.reject();
@@ -86,7 +86,7 @@ ns.Update.prototype.start = function(async) {
         no.Promise.wait([
             promise,
             ns.request.models(models)
-        ]).then(function(r) {
+        ]).then(function() {
             //TODO: смотреть, что не запустился другой update
             if (!that._expired()) {
                 var fakeLayout = {};
@@ -117,19 +117,20 @@ ns.Update.prototype._update = function(async) {
     };
     this.view._getUpdateTree(tree, layout.views, params);
 
+    var node;
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
-        var node = ns.tmpl(tree, null, '');
+        node = ns.tmpl(tree, null, '');
     }
 
     var viewEvents = {
-        'async': [],
-        'hide': [],
-        'htmldestroy': [],
-        'htmlinit': [],
-        'show': [],
-        'repaint': []
+        'ns-async': [],
+        'ns-hide': [],
+        'ns-htmldestroy': [],
+        'ns-htmlinit': [],
+        'ns-show': [],
+        'ns-repaint': []
     };
 
     this.view._updateHTML(node, layout.views, params, {

@@ -20,13 +20,13 @@ var hasSpacesRE = /\s+/;
 
 ns.layout.define = function(id, layout, parent_id) {
     if ( _pages[id] ) {
-        throw Error('Cannot redefine layout of ' + id);
+        throw new Error('Cannot redefine layout of ' + id);
     }
 
     _pages[id] = {
         layout: layout,
         parent_id: parent_id
-    }
+    };
 };
 
 /**
@@ -134,14 +134,14 @@ function inherit(layout, parent) {
         //  Потому что можно переопределять только содержимое боксов.
         //  Изменять лэйаут блоков нельзя.
         if ( getViewType( parts[l - 1] ) !== ns.L.BOX ) {
-            throw Error('Cannot overwrite view layout "' + parts[l - 1] + '"');
+            throw new Error('Cannot overwrite view layout "' + parts[l - 1] + '"');
         }
 
         var lvalue = result;
         for (var i = 0; i < l - 1; i++) {
             lvalue = lvalue[ cleanKey(parts[i]) ].views;
             if (!lvalue) {
-                throw Error( 'Path "' + parts.slice(0, i).join(' ') + '" is undefined in this layout and cannot be extended' );
+                throw new Error( 'Path "' + parts.slice(0, i).join(' ') + '" is undefined in this layout and cannot be extended' );
             }
         }
         lvalue[ cleanKey(parts[l - 1]) ] = layout[key];

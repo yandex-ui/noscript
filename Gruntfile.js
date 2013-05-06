@@ -21,5 +21,5 @@ module.exports = function (grunt) {
 
     grunt.initConfig(gruntConfig);
 
-    grunt.registerTask('default', ['mocha']);
+    grunt.registerTask('default', ['jshint', 'mocha']);
 };

@@ -94,7 +94,7 @@ ns.Model.prototype._splitData = function(data) {
     if (!this._splitData.callback) {
         this._splitData.callback = function(evt, data) {
             return that.trigger(evt, data);
-        }
+        };
     }
     var callback = this._splitData.callback;
 
@@ -195,8 +195,8 @@ ns.Model.create = function(id, params, data)  {
     var model = ns.Model.get(id, params);
 
     if (!model) {
-        var ctor = _ctors[id];
-        model = new ctor();
+        var Ctor = _ctors[id];
+        model = new Ctor();
         model._init(id, params, data);
 
         ns.Model.store(model);
@@ -481,8 +481,11 @@ ns.Model.isValid = function(id, key) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
-ns.Model.prototype.canRetry = function(error) {
+/**
+ * Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
+ * @returns {boolean}
+ */
+ns.Model.prototype.canRetry = function() {
     //  do-модели нельзя перезапрашивать.
     return ( !this.isDo() && this.retries < 3 );
 };
@@ -698,9 +701,7 @@ ns.ModelUniq.prototype.uniqFromKey = function(key) {
  * @param {String} uniq
  * @type Node
  */
-ns.ModelUniq.prototype.uniqFromJSON = function(xml, uniq) {
-    ns.todo();
-};
+ns.ModelUniq.prototype.uniqFromJSON = ns.todo;
 
 /**
  * Возвращает кэш по параметрам

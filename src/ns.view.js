@@ -91,7 +91,7 @@ ns.View.prototype._init = function(id, params, async) {
         this.on(event[0], event[1]);
     }
 
-    this.trigger('init');
+    this.trigger('ns-init');
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -268,14 +268,13 @@ ns.View.info = function(id) {
 
                     // событие init тригерится при создании блока, поэтому вешать его надо сразу
                     // событие async тригерится до всего, его тоже надо вешать
-                    if (eventName == 'init' || eventName == 'async') {
+                    if (eventName == 'ns-init' || eventName == 'ns-async') {
                         info.createEvents.push([eventName, handler]);
 
                     } else {
-                        // если есть селектор, то это локальное событие
-                        if (eventSelector) {
+                        // к View нельзя получить доступ, поэтому локальными могут быть только встроенные ns-* события
+                        if (ns.V.NS_EVENTS.indexOf(eventName) > -1) {
                             info[when + 'Noevents'].local.push([eventName, handler]);
-
                         } else {
                             info[when + 'Noevents'].global.push([eventName, handler]);
                         }
@@ -472,8 +471,8 @@ ns.View.prototype._getEvents = function(type) {
             'bind': this._bindEventHandlers(eventsInfo['bind'], 2),
             'delegate': this._bindEventHandlers(eventsInfo['delegate'], 2),
 
-            'no-global': this._bindEventHandlers(noeventsInfo['global'], 1),
-            'no-local': this._bindEventHandlers(noeventsInfo['local'], 1)
+            'ns-global': this._bindEventHandlers(noeventsInfo['global'], 1),
+            'ns-local': this._bindEventHandlers(noeventsInfo['local'], 1)
         };
     }
     return this[eventProp];
@@ -516,13 +515,13 @@ ns.View.prototype._bindEvents = function(type) {
         $node.find(event[1]).on(event[0] + eventNS, event[2]);
     }
 
-    var localNoevents = events['no-local'];
+    var localNoevents = events['ns-local'];
     for (i = 0, j = localNoevents.length; i < j; i++) {
         event = localNoevents[i];
         this.on(event[0], event[1]);
     }
 
-    var globalNoevents = events['no-global'];
+    var globalNoevents = events['ns-global'];
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
         no.events.on(event[0], event[1]);
@@ -551,13 +550,13 @@ ns.View.prototype._unbindEvents = function(type) {
         $node.find(event[1]).off(eventNS);
     }
 
-    var localNoevents = events['no-local'];
+    var localNoevents = events['ns-local'];
     for (i = 0, j = localNoevents.length; i < j; i++) {
         event = localNoevents[i];
         this.off(event[0], event[1]);
     }
 
-    var globalNoevents = events['no-global'];
+    var globalNoevents = events['ns-global'];
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
         no.events.off(event[0], event[1]);
@@ -855,18 +854,18 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
             }
             // вызываем htmldestory только если нода была заменена
             if (this.node && !this.isLoading()) {
-                this._hide(events['hide']);
-                this._htmldestroy(events['htmldestroy']);
+                this._hide(events['ns-hide']);
+                this._htmldestroy(events['ns-htmldestroy']);
             }
             //  Запоминаем новую ноду.
             this._setNode(viewNode);
 
             if ( this.isOk() ) {
-                this._htmlinit(events['htmlinit']);
+                this._htmlinit(events['ns-htmlinit']);
 
             } else if (this.isLoading()) {
                 // В асинхронном запросе вызываем async для view, которые являются заглушкой.
-                events['async'].push(this);
+                events['ns-async'].push(this);
             }
 
             this.timestamp = +new Date();
@@ -878,8 +877,8 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     // Если view валидный и не в async-режиме, то вызывается show и repaint
     if ( generateRepaintEvent && this.isOk() ) {
         // событие show будет вызвано, если у view поменяется this._visible
-        this._show(events['show']);
-        events['repaint'].push(this);
+        this._show(events['ns-show']);
+        events['ns-repaint'].push(this);
     }
 
     //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть

@@ -42,6 +42,21 @@ ns.V.DOM_EVENTS = [
     'submit'
 ];
 
+/**
+ * Список внутренних Noscript-событий.
+ * @type {Array}
+ * @constant
+ */
+ns.V.NS_EVENTS = [
+    'ns-async',
+    'ns-init',
+    'ns-htmlinit',
+    'ns-show',
+    'ns-repaint',
+    'ns-hide',
+    'ns-htmldestroy'
+];
+
 //TODO: Pointer events support (MSIE 10)
 
 // @see http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html

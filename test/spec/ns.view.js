@@ -104,13 +104,10 @@ describe('ns.View', function() {
                 'click@show .bar-show': no.nop,
 
                 'my-global-init-event-short': no.nop,
-                'my-local-init-event-short .': no.nop,
 
                 'my-global-init-event@init': no.nop,
-                'my-local-init-event@init .': no.nop,
 
-                'my-global-show-event@show': no.nop,
-                'my-local-show-event@show .': no.nop
+                'my-global-show-event@show': no.nop
             }
         });
 
@@ -221,10 +218,7 @@ describe('ns.View', function() {
             });
 
             it('should parse local init noevents properly', function() {
-                expect(this.viewInfo.initNoevents['local']).to.be.eql([
-                    ['my-local-init-event-short', no.nop],
-                    ['my-local-init-event', no.nop]
-                ]);
+                expect(this.viewInfo.initNoevents['local']).to.be.eql([]);
             });
 
             it('should parse global show noevents properly', function() {
@@ -234,9 +228,7 @@ describe('ns.View', function() {
             });
 
             it('should parse local show noevents properly', function() {
-                expect(this.viewInfo.showNoevents['local']).to.be.eql([
-                    ['my-local-show-event', no.nop]
-                ]);
+                expect(this.viewInfo.showNoevents['local']).to.be.eql([]);
             });
         });
     });
@@ -329,8 +321,8 @@ describe('ns.View', function() {
             expect(this.result).to.be.eql({
                 'bind': [],
                 'delegate': [],
-                'no-local': [],
-                'no-global': []
+                'ns-local': [],
+                'ns-global': []
             });
         });
 

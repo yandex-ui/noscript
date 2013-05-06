@@ -48,7 +48,7 @@ var update_id = -1;
  * @type {Array}
  * @private
  */
-ns.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async', 'show', 'repaint'];
+ns.Update.prototype._EVENTS_ORDER = ['ns-hide', 'ns-htmldestroy', 'ns-htmlinit', 'ns-async', 'ns-show', 'ns-repaint'];
 
 /**
  * Начинает работу updater'а.
@@ -125,12 +125,12 @@ ns.Update.prototype._update = function(async) {
     }
 
     var viewEvents = {
-        'async': [],
-        'hide': [],
-        'htmldestroy': [],
-        'htmlinit': [],
-        'show': [],
-        'repaint': []
+        'ns-async': [],
+        'ns-hide': [],
+        'ns-htmldestroy': [],
+        'ns-htmlinit': [],
+        'ns-show': [],
+        'ns-repaint': []
     };
 
     this.view._updateHTML(node, layout.views, params, {

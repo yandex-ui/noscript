@@ -68,7 +68,7 @@ describe('ns.View.events', function() {
         }, 'app');
 
         var views = ['app', 'head', 'content1', 'content1-async@content1-async-model', 'content1-inner', 'content2', 'content2-inner'];
-        var events = ['async', 'init', 'htmlinit', 'show', 'repaint', 'hide', 'htmldestroy'];
+        var events = ['ns-async', 'ns-init', 'ns-htmlinit', 'ns-show', 'ns-repaint', 'ns-hide', 'ns-htmldestroy'];
 
         this.events = {};
 
@@ -116,88 +116,88 @@ describe('ns.View.events', function() {
             update.start();
         });
 
-        describe('init', function() {
+        describe('ns-init', function() {
             genTests([
-                ['app', 'init', 'calledOnce'],
-                ['head', 'init', 'calledOnce'],
-                ['content1', 'init', 'calledOnce'],
-                ['content1-inner', 'init', 'calledOnce'],
-                ['content2', 'init', 'called', false],
-                ['content2-inner', 'init', 'called', false]
+                ['app', 'ns-init', 'calledOnce'],
+                ['head', 'ns-init', 'calledOnce'],
+                ['content1', 'ns-init', 'calledOnce'],
+                ['content1-inner', 'ns-init', 'calledOnce'],
+                ['content2', 'ns-init', 'called', false],
+                ['content2-inner', 'ns-init', 'called', false]
             ]);
         });
 
-        describe('htmlinit', function() {
+        describe('ns-htmlinit', function() {
             genTests([
-                ['app', 'htmlinit', 'calledOnce'],
-                ['head', 'htmlinit', 'calledOnce'],
-                ['content1', 'htmlinit', 'calledOnce'],
-                ['content1-inner', 'htmlinit', 'calledOnce'],
-                ['content2', 'htmlinit', 'called', false],
-                ['content2-inner', 'htmlinit', 'called', false]
+                ['app', 'ns-htmlinit', 'calledOnce'],
+                ['head', 'ns-htmlinit', 'calledOnce'],
+                ['content1', 'ns-htmlinit', 'calledOnce'],
+                ['content1-inner', 'ns-htmlinit', 'calledOnce'],
+                ['content2', 'ns-htmlinit', 'called', false],
+                ['content2-inner', 'ns-htmlinit', 'called', false]
             ]);
         });
 
-        describe('show', function() {
+        describe('ns-show', function() {
             genTests([
-                ['app', 'show', 'calledOnce'],
-                ['head', 'show', 'calledOnce'],
-                ['content1', 'show', 'calledOnce'],
-                ['content1-inner', 'show', 'calledOnce'],
-                ['content2', 'show', 'called', false],
-                ['content2-inner', 'show', 'called', false]
+                ['app', 'ns-show', 'calledOnce'],
+                ['head', 'ns-show', 'calledOnce'],
+                ['content1', 'ns-show', 'calledOnce'],
+                ['content1-inner', 'ns-show', 'calledOnce'],
+                ['content2', 'ns-show', 'called', false],
+                ['content2-inner', 'ns-show', 'called', false]
             ]);
         });
 
-        describe('repaint', function() {
+        describe('ns-repaint', function() {
             genTests([
-                ['app', 'repaint', 'calledOnce'],
-                ['head', 'repaint', 'calledOnce'],
-                ['content1', 'repaint', 'calledOnce'],
-                ['content1-inner', 'repaint', 'calledOnce'],
-                ['content2', 'repaint', 'called', false],
-                ['content2-inner', 'repaint', 'called', false]
+                ['app', 'ns-repaint', 'calledOnce'],
+                ['head', 'ns-repaint', 'calledOnce'],
+                ['content1', 'ns-repaint', 'calledOnce'],
+                ['content1-inner', 'ns-repaint', 'calledOnce'],
+                ['content2', 'ns-repaint', 'called', false],
+                ['content2-inner', 'ns-repaint', 'called', false]
             ]);
         });
 
-        describe('hide', function() {
+        describe('ns-hide', function() {
             genTests([
-                ['app', 'hide', 'called', false],
-                ['head', 'hide', 'called', false],
-                ['content1', 'hide', 'called', false],
-                ['content1-inner', 'hide', 'called', false],
-                ['content2', 'hide', 'called', false],
-                ['content2-inner', 'hide', 'called', false]
+                ['app', 'ns-hide', 'called', false],
+                ['head', 'ns-hide', 'called', false],
+                ['content1', 'ns-hide', 'called', false],
+                ['content1-inner', 'ns-hide', 'called', false],
+                ['content2', 'ns-hide', 'called', false],
+                ['content2-inner', 'ns-hide', 'called', false]
             ]);
         });
 
-        describe('htmldestroy', function() {
+        describe('ns-htmldestroy', function() {
             genTests([
-                ['app', 'htmldestroy', 'called', false],
-                ['head', 'htmldestroy', 'called', false],
-                ['content1', 'htmldestroy', 'called', false],
-                ['content1-inner', 'htmldestroy', 'called', false],
-                ['content2', 'htmldestroy', 'called', false],
-                ['content2-inner', 'htmldestroy', 'called', false]
+                ['app', 'ns-htmldestroy', 'called', false],
+                ['head', 'ns-htmldestroy', 'called', false],
+                ['content1', 'ns-htmldestroy', 'called', false],
+                ['content1-inner', 'ns-htmldestroy', 'called', false],
+                ['content2', 'ns-htmldestroy', 'called', false],
+                ['content2-inner', 'ns-htmldestroy', 'called', false]
             ]);
         });
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'htmlinit'],
-                ['content1', 'htmlinit'],
-                ['head', 'htmlinit'],
-                ['app', 'htmlinit'],
+                ['content1-inner', 'ns-htmlinit'],
+                ['content1', 'ns-htmlinit'],
+                ['head', 'ns-htmlinit'],
+                ['app', 'ns-htmlinit'],
 
-                ['content1-inner', 'show'],
-                ['content1', 'show'],
-                ['head', 'show'],
-                ['app', 'show'],
+                ['content1-inner', 'ns-show'],
+                ['content1', 'ns-show'],
+                ['head', 'ns-show'],
+                ['app', 'ns-show'],
 
-                ['content1-inner', 'repaint'],
-                ['content1', 'repaint'],
-                ['head', 'repaint'],
-                ['app', 'repaint']
+                ['content1-inner', 'ns-repaint'],
+                ['content1', 'ns-repaint'],
+                ['head', 'ns-repaint'],
+                ['app', 'ns-repaint']
             ]);
         });
 
@@ -215,57 +215,57 @@ describe('ns.View.events', function() {
 
         genTests([
 
-            ['content2-inner', 'init', 'calledOnce'],
-            ['content2-inner', 'htmlinit', 'calledOnce'],
-            ['content2-inner', 'show', 'calledOnce'],
-            ['content2-inner', 'repaint', 'calledOnce'],
+            ['content2-inner', 'ns-init', 'calledOnce'],
+            ['content2-inner', 'ns-htmlinit', 'calledOnce'],
+            ['content2-inner', 'ns-show', 'calledOnce'],
+            ['content2-inner', 'ns-repaint', 'calledOnce'],
 
-            ['content2', 'init', 'calledOnce'],
-            ['content2', 'htmlinit', 'calledOnce'],
-            ['content2', 'show', 'calledOnce'],
-            ['content2', 'repaint', 'calledOnce'],
+            ['content2', 'ns-init', 'calledOnce'],
+            ['content2', 'ns-htmlinit', 'calledOnce'],
+            ['content2', 'ns-show', 'calledOnce'],
+            ['content2', 'ns-repaint', 'calledOnce'],
 
-            ['app', 'show', 'calledOnce'],
-            ['content1-inner', 'hide', 'calledOnce'],
-            ['content1', 'hide', 'calledOnce'],
+            ['app', 'ns-show', 'calledOnce'],
+            ['content1-inner', 'ns-hide', 'calledOnce'],
+            ['content1', 'ns-hide', 'calledOnce'],
 
-            ['app', 'repaint', 'calledTwice'],
-            ['head', 'repaint', 'calledTwice'],
-            ['content1', 'repaint', 'calledOnce'],
-            ['content1-inner', 'repaint', 'calledOnce'],
-            ['content2', 'repaint', 'calledOnce'],
-            ['content2-inner', 'repaint', 'calledOnce']
+            ['app', 'ns-repaint', 'calledTwice'],
+            ['head', 'ns-repaint', 'calledTwice'],
+            ['content1', 'ns-repaint', 'calledOnce'],
+            ['content1-inner', 'ns-repaint', 'calledOnce'],
+            ['content2', 'ns-repaint', 'calledOnce'],
+            ['content2-inner', 'ns-repaint', 'calledOnce']
         ]);
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'htmlinit', 0],
-                ['content1', 'htmlinit', 0],
-                ['head', 'htmlinit', 0],
-                ['app', 'htmlinit', 0],
+                ['content1-inner', 'ns-htmlinit', 0],
+                ['content1', 'ns-htmlinit', 0],
+                ['head', 'ns-htmlinit', 0],
+                ['app', 'ns-htmlinit', 0],
 
-                ['content1-inner', 'show', 0],
-                ['content1', 'show', 0],
-                ['head', 'show', 0],
-                ['app', 'show', 0],
+                ['content1-inner', 'ns-show', 0],
+                ['content1', 'ns-show', 0],
+                ['head', 'ns-show', 0],
+                ['app', 'ns-show', 0],
 
-                ['content1-inner', 'repaint', 0],
-                ['content1', 'repaint', 0],
-                ['head', 'repaint', 0],
-                ['app', 'repaint', 0],
+                ['content1-inner', 'ns-repaint', 0],
+                ['content1', 'ns-repaint', 0],
+                ['head', 'ns-repaint', 0],
+                ['app', 'ns-repaint', 0],
 
-                ['content1-inner', 'hide', 0],
-                ['content1', 'hide', 0],
+                ['content1-inner', 'ns-hide', 0],
+                ['content1', 'ns-hide', 0],
 
-                ['content2-inner', 'htmlinit', 0],
-                ['content2', 'htmlinit', 0],
-                ['content2-inner', 'show', 0],
-                ['content2', 'show', 0],
+                ['content2-inner', 'ns-htmlinit', 0],
+                ['content2', 'ns-htmlinit', 0],
+                ['content2-inner', 'ns-show', 0],
+                ['content2', 'ns-show', 0],
 
-                ['content2-inner', 'repaint', 0],
-                ['content2', 'repaint', 0],
-                ['head', 'repaint', 1],
-                ['app', 'repaint', 1]
+                ['content2-inner', 'ns-repaint', 0],
+                ['content2', 'ns-repaint', 0],
+                ['head', 'ns-repaint', 1],
+                ['app', 'ns-repaint', 1]
             ]);
         });
     });
@@ -279,7 +279,7 @@ describe('ns.View.events', function() {
             /**
              * @type {ns.View}
              */
-            var vContent1 = this.events['content1-init-spy'].getCall(0).thisValue;
+            var vContent1 = this.events['content1-ns-init-spy'].getCall(0).thisValue;
             vContent1.invalidate();
 
             layout = ns.layout.page('content1', {});
@@ -288,60 +288,60 @@ describe('ns.View.events', function() {
 
         describe('events', function() {
             genTests([
-                ['content1-inner', 'hide', 'calledOnce'],
-                ['content1', 'hide', 'calledOnce'],
+                ['content1-inner', 'ns-hide', 'calledOnce'],
+                ['content1', 'ns-hide', 'calledOnce'],
 
-                ['content1-inner', 'htmldestroy', 'calledOnce'],
-                ['content1', 'htmldestroy', 'calledOnce'],
+                ['content1-inner', 'ns-htmldestroy', 'calledOnce'],
+                ['content1', 'ns-htmldestroy', 'calledOnce'],
 
-                ['content1-inner', 'htmlinit', 'calledTwice'],
-                ['content1', 'htmlinit', 'calledTwice'],
+                ['content1-inner', 'ns-htmlinit', 'calledTwice'],
+                ['content1', 'ns-htmlinit', 'calledTwice'],
 
-                ['content1-inner', 'show', 'calledTwice'],
-                ['content1', 'show', 'calledTwice'],
+                ['content1-inner', 'ns-show', 'calledTwice'],
+                ['content1', 'ns-show', 'calledTwice'],
 
-                ['content1-inner', 'repaint', 'calledTwice'],
-                ['content1', 'repaint', 'calledTwice']
+                ['content1-inner', 'ns-repaint', 'calledTwice'],
+                ['content1', 'ns-repaint', 'calledTwice']
             ]);
         });
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'htmlinit', 0],
-                ['content1', 'htmlinit', 0],
-                ['head', 'htmlinit', 0],
-                ['app', 'htmlinit', 0],
+                ['content1-inner', 'ns-htmlinit', 0],
+                ['content1', 'ns-htmlinit', 0],
+                ['head', 'ns-htmlinit', 0],
+                ['app', 'ns-htmlinit', 0],
 
-                ['content1-inner', 'show', 0],
-                ['content1', 'show', 0],
-                ['head', 'show', 0],
-                ['app', 'show', 0],
+                ['content1-inner', 'ns-show', 0],
+                ['content1', 'ns-show', 0],
+                ['head', 'ns-show', 0],
+                ['app', 'ns-show', 0],
 
-                ['content1-inner', 'repaint', 0],
-                ['content1', 'repaint', 0],
-                ['head', 'repaint', 0],
-                ['app', 'repaint', 0],
+                ['content1-inner', 'ns-repaint', 0],
+                ['content1', 'ns-repaint', 0],
+                ['head', 'ns-repaint', 0],
+                ['app', 'ns-repaint', 0],
 
-                ['content1-inner', 'hide', 0],
-                ['content1', 'hide', 0],
+                ['content1-inner', 'ns-hide', 0],
+                ['content1', 'ns-hide', 0],
 
-                ['content1-inner', 'htmldestroy', 0],
-                ['content1', 'htmldestroy', 0],
+                ['content1-inner', 'ns-htmldestroy', 0],
+                ['content1', 'ns-htmldestroy', 0],
 
-                ['content1-inner', 'htmlinit', 1],
-                ['content1', 'htmlinit', 1],
-                ['content1-inner', 'show', 1],
-                ['content1', 'show', 1],
+                ['content1-inner', 'ns-htmlinit', 1],
+                ['content1', 'ns-htmlinit', 1],
+                ['content1-inner', 'ns-show', 1],
+                ['content1', 'ns-show', 1],
 
-                ['content1-inner', 'repaint', 1],
-                ['content1', 'repaint', 1],
-                ['head', 'repaint', 1],
-                ['app', 'repaint', 1]
+                ['content1-inner', 'ns-repaint', 1],
+                ['content1', 'ns-repaint', 1],
+                ['head', 'ns-repaint', 1],
+                ['app', 'ns-repaint', 1]
             ]);
         });
     });
 
-    describe('async', function() {
+    describe('ns-async', function() {
 
         beforeEach(function() {
             ns.layout.define('content1-async', {
@@ -372,34 +372,34 @@ describe('ns.View.events', function() {
         describe('first pass', function() {
             describe('events', function() {
                 genTests([
-                    ['content1-async', 'async', 'calledOnce'],
+                    ['content1-async', 'ns-async', 'calledOnce'],
 
-                    ['content1-async', 'htmldestroy', 'called', false],
-                    ['content1-async', 'hide', 'called', false],
-                    ['content1-async', 'htmlinit', 'called', false],
-                    ['content1-async', 'show', 'called', false],
-                    ['content1-async', 'repaint', 'called', false],
+                    ['content1-async', 'ns-htmldestroy', 'called', false],
+                    ['content1-async', 'ns-hide', 'called', false],
+                    ['content1-async', 'ns-htmlinit', 'called', false],
+                    ['content1-async', 'ns-show', 'called', false],
+                    ['content1-async', 'ns-repaint', 'called', false],
 
-                    ['content1-inner', 'htmldestroy', 'called', false],
-                    ['content1-inner', 'hide', 'called', false],
-                    ['content1-inner', 'htmlinit', 'called', false],
-                    ['content1-inner', 'show', 'called', false],
-                    ['content1-inner', 'repaint', 'called', false]
+                    ['content1-inner', 'ns-htmldestroy', 'called', false],
+                    ['content1-inner', 'ns-hide', 'called', false],
+                    ['content1-inner', 'ns-htmlinit', 'called', false],
+                    ['content1-inner', 'ns-show', 'called', false],
+                    ['content1-inner', 'ns-repaint', 'called', false]
                 ])
             });
 
             describe('order', function() {
                 genOrderTests([
-                    ['head', 'htmlinit', 0],
-                    ['app', 'htmlinit', 0],
+                    ['head', 'ns-htmlinit', 0],
+                    ['app', 'ns-htmlinit', 0],
 
-                    ['content1-async', 'async', 0],
+                    ['content1-async', 'ns-async', 0],
 
-                    ['head', 'show', 0],
-                    ['app', 'show', 0],
+                    ['head', 'ns-show', 0],
+                    ['app', 'ns-show', 0],
 
-                    ['head', 'repaint', 0],
-                    ['app', 'repaint', 0]
+                    ['head', 'ns-repaint', 0],
+                    ['app', 'ns-repaint', 0]
                 ]);
             });
         });
@@ -420,45 +420,45 @@ describe('ns.View.events', function() {
 
             describe('events', function() {
                 genTests([
-                    ['content1-async', 'async', 'calledOnce'],
+                    ['content1-async', 'ns-async', 'calledOnce'],
 
-                    ['content1-async', 'htmlinit', 'calledOnce'],
-                    ['content1-async', 'show', 'calledOnce'],
-                    ['content1-async', 'repaint', 'calledOnce'],
+                    ['content1-async', 'ns-htmlinit', 'calledOnce'],
+                    ['content1-async', 'ns-show', 'calledOnce'],
+                    ['content1-async', 'ns-repaint', 'calledOnce'],
 
-                    ['content1-inner', 'htmlinit', 'calledOnce'],
-                    ['content1-inner', 'show', 'calledOnce'],
-                    ['content1-inner', 'repaint', 'calledOnce'],
+                    ['content1-inner', 'ns-htmlinit', 'calledOnce'],
+                    ['content1-inner', 'ns-show', 'calledOnce'],
+                    ['content1-inner', 'ns-repaint', 'calledOnce'],
 
-                    ['head', 'repaint', 'calledOnce'],
-                    ['app', 'repaint', 'calledOnce'],
+                    ['head', 'ns-repaint', 'calledOnce'],
+                    ['app', 'ns-repaint', 'calledOnce'],
 
-                    ['content1-async', 'htmldestroy', 'called', false],
-                    ['content1-inner', 'htmldestroy', 'called', false]
+                    ['content1-async', 'ns-htmldestroy', 'called', false],
+                    ['content1-inner', 'ns-htmldestroy', 'called', false]
                 ])
             });
 
             describe('order', function() {
                 genOrderTests([
-                    ['head', 'htmlinit', 0],
-                    ['app', 'htmlinit', 0],
+                    ['head', 'ns-htmlinit', 0],
+                    ['app', 'ns-htmlinit', 0],
 
-                    ['content1-async', 'async', 0],
+                    ['content1-async', 'ns-async', 0],
 
-                    ['head', 'show', 0],
-                    ['app', 'show', 0],
+                    ['head', 'ns-show', 0],
+                    ['app', 'ns-show', 0],
 
-                    ['head', 'repaint', 0],
-                    ['app', 'repaint', 0],
+                    ['head', 'ns-repaint', 0],
+                    ['app', 'ns-repaint', 0],
 
-                    ['content1-inner', 'htmlinit', 0],
-                    ['content1-async', 'htmlinit', 0],
+                    ['content1-inner', 'ns-htmlinit', 0],
+                    ['content1-async', 'ns-htmlinit', 0],
 
-                    ['content1-inner', 'show', 0],
-                    ['content1-async', 'show', 0],
+                    ['content1-inner', 'ns-show', 0],
+                    ['content1-async', 'ns-show', 0],
 
-                    ['content1-inner', 'repaint', 0],
-                    ['content1-async', 'repaint', 0]
+                    ['content1-inner', 'ns-repaint', 0],
+                    ['content1-async', 'ns-repaint', 0]
                 ]);
             })
         });

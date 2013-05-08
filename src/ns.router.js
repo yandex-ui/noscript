@@ -88,12 +88,14 @@ ns.router.init = function() {
  * @return {{ regexp: RegExp, tokens: Array.<string> }}
 */
 ns.router.compile = function(route) {
-    var regexp = route.replace(/\/$/, ''); // Отрезаем последний слэш, он ниже добавится как необязательный.
+    //  Отрезаем последний слэш, он ниже добавится как необязательный.
+    var regexp = route.replace(/\/$/, '');
 
     var tokens = [];
     var defaults = {};
 
-    regexp = regexp.replace(/{(.*?)}/g, function(_, token) { // Заменяем {name} на кусок регэкспа соответствующего типу токена name.
+    // Заменяем {name} на кусок регэкспа соответствующего типу токена name.
+    regexp = regexp.replace(/{(.*?)}/g, function(_, token) {
         var tokenParts = token.split(':');
 
         var type = tokenParts[1] || 'id';
@@ -113,12 +115,14 @@ ns.router.compile = function(route) {
             defaults[tokenName] = tokenDefault;
             return '(' + rx_part + ')?';
         } else {
-            tokens.push(tokenName); // Запоминаем имя токена, оно нужно при парсинге урлов.
+            // Запоминаем имя токена, оно нужно при парсинге урлов.
+            tokens.push(tokenName);
             return '(' + rx_part + ')';
         }
     });
-    regexp = '^' + regexp + '\/?(?:\\?(.*))?$'; // Добавляем "якоря" ^ и $;
-                                                // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+    // Добавляем "якоря" ^ и $;
+    // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+    regexp = '^' + regexp + '\/?(?:\\?(.*))?$';
 
     return {
         regexp: new RegExp(regexp),

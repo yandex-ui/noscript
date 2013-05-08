@@ -70,7 +70,7 @@ describe('ns.router', function() {
         });
 
         it('/messages : does not match because of the last slash', function() {
-            expect(ns.router('/messages')).to.be.eql({ page: 'not-found', params: {} });
+            expect(ns.router('/messages')).to.be.eql({ page: 'folder', params: { folder: 'inbox' } });
         });
 
         it('/messages/', function() {

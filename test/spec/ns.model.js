@@ -57,7 +57,7 @@ describe('ns.Model', function() {
                 var define = function() { ns.Model.define('dm1'); };
                 define();
 
-                expect(define).to.throwException(/Model 'dm1' can't be redefined!/);
+                expect(define).to.throwException();
             });
 
             it('should fill _infos', function() {

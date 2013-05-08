@@ -147,7 +147,7 @@ var _ctors = {};
  */
 ns.View.define = function(id, info, base) {
     if (id in _infos) {
-        throw new Error("ns.View can't be redefined!");
+        throw new Error("[ns.View] Can't redefine '" + id + "'");
     }
 
     info = info || {};
@@ -177,9 +177,6 @@ ns.View.info = function(id) {
         var models = info.models;
         for (var i = 0, l = models.length; i < l; i++) {
             var modelInfo = ns.Model.info(models[i]);
-            if (!modelInfo) {
-                throw new Error('ns.Model "' + models[i] + '" is not defined!');
-            }
             no.extend( params, modelInfo.params );
         }
         if (info.params) {
@@ -300,7 +297,7 @@ ns.View.info = function(id) {
 ns.View.create = function(id, params, async) {
     var Ctor = _ctors[id];
     if (!Ctor) {
-        throw new Error('ns.View "' + id + '" is not defined!');
+        throw new Error('[ns.View] "' + id + '" is not defined');
     }
     /**
      * @type {ns.View}
@@ -870,7 +867,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
 
             this.timestamp = +new Date();
         } else {
-            throw new Error("Can't find node for ns.View '" + this.id + "'");
+            throw new Error("[ns.View] Can't find node for '" + this.id + "'");
         }
     }
 

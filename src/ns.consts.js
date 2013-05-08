@@ -96,10 +96,21 @@ ns.U.STATUS = {
     /**
      * Updater failed because of models request
      */
-    'MODELS': 0,
+    'MODELS': 'models',
 
     /**
      * Updater failed because it expired (new Updater is running)
      */
-    'EXPIRED': 1
+    'EXPIRED': 'expired'
+};
+
+/**
+ * Execution statuses of ns.Updater.
+ * @enum {Number}
+ * @constant
+ */
+ns.U.EXEC = {
+    'GLOBAL': 'global',
+    'ASYNC': 'async',
+    'PARALLEL': 'parallel'
 };

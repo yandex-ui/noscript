@@ -158,7 +158,7 @@ ns.Model.prototype._splitData = function(data) {
  */
 ns.Model.define = function(id, info, base) {
     if (id in _infos) {
-        throw "Model '"+ id +"' can't be redefined!";
+        throw new Error("[ns.Model] Can't redefine '" + id + "'");
     }
 
     info = info || {};
@@ -212,9 +212,16 @@ ns.Model.create = function(id, params, data)  {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Returns model's info
+ * @param {String} id Model ID.
+ * @returns {Object}
+ */
 ns.Model.info = function(id) {
     var info = _infos[id];
+    if (!info) {
+        throw new Error('[ns.Model] "' + id + '" is not defined');
+    }
     // если есть декларация, но еще нет pNames, то надо завершить определение Model
     if (info && !info.pNames) {
         /**
@@ -350,7 +357,7 @@ ns.Model.prototype.getData = function() {
     // если это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
-    if ( this.isCollection() ) {
+    if ( this.isCollection() && this.isValid() ) {
         // массив с хранилищем данных моделей
         var items = no.path(this.info.split.items, this.data);
         // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
@@ -444,7 +451,7 @@ ns.Model.prototype.getRequestParams = function() {
  */
 ns.Model.get = function(id, key) {
     if (!(id in _infos)) {
-        throw 'Model "' + id + '" is not defined!';
+        throw new Error('[ns.Model] "' + id + '" is not defined');
     }
     key = (typeof key === 'string') ? key : ns.Model.key(id, key);
 

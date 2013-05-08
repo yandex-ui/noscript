@@ -62,8 +62,8 @@ describe('ns.router', function() {
             ns.router.regexps[ 'page' ] = 'folder|home';
             ns.router.routes = {
                 route: {
-                    // '/messages/{folder=inbox:id}/{message_id:id}': 'message',
-                    '/messages/{folder=inbox:id}': 'folder',
+                    '/messages/{folder=inbox:id}/{message_id:id}': 'message',
+                    '/folder/{folder=inbox:id}': 'folder',
                     '/{page=home:page}': 'page'
                 }
             };
@@ -82,9 +82,6 @@ describe('ns.router', function() {
         // /messages/45?
         // /messages/45
 
-
-        //  ?  /messages/(inbox(?:/)?id
-
         // fail
         // /messages//45?var1=val1&var2=val2
         // /messages//45?var1=val1
@@ -92,25 +89,16 @@ describe('ns.router', function() {
         // /messages//45?
         // /messages//45
 
-        it('/messages : does not match because of the last slash', function() {
-            expect(ns.router('/messages')).to.be.eql({ page: 'folder', params: { folder: 'inbox' } });
-        });
+        var test_route = function(url, page, params, test_name) {
+            it(test_name || url, function() {
+                expect(ns.router(url)).to.be.eql({ page: page, params: params });
+            });
+        };
 
-        it('/messages/', function() {
-            expect(ns.router('/messages/')).to.be.eql({ page: 'folder', params: { folder: 'inbox' } });
-        });
-
-        it('/messages/inbox', function() {
-            expect(ns.router('/messages/inbox')).to.be.eql({ page: 'folder', params: { folder: 'inbox' } });
-        });
-
-        it('/messages/starred', function() {
-            expect(ns.router('/messages/starred')).to.be.eql({ page: 'folder', params: { folder: 'starred' } });
-        });
-
-        it('/ resolved to default value of a custom type', function() {
-            expect(ns.router('/')).to.be.eql({ page: 'page', params: { page: 'home' } });
-        });
-
+        test_route('/folder/',        'folder', { folder: 'inbox' });
+        test_route('/folder/inbox',   'folder', { folder: 'inbox' });
+        test_route('/folder/starred', 'folder', { folder: 'starred' });
+        test_route('/folder',         'folder', { folder: 'inbox' }, '/folder : slash near param with default value can collapse');
+        test_route('/', 'page', { page: 'home' }, '/ resolved to default value of a custom type');
     });
 });

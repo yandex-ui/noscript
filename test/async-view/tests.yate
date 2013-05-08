@@ -1,6 +1,0 @@
-module "main"
-include "../../yate/noscript.yate"
-
-match .* ns-view-async-content {
-    <div class="will-be-replaced">async-view-content</div>
-}

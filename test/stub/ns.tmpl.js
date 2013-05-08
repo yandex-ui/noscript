@@ -3,7 +3,7 @@ beforeEach(function() {
     function genHTML(views) {
         var html = '';
         for (var id in views) {
-            html += '<div class="ns-view-' + id + '">';
+            html += '<div class="ns-view-' + id + (views[id].async ? ' ns-async' : '') + '">';
             html += genHTML(views[id].views);
             html += '</div>';
         }

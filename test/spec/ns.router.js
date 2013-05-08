@@ -62,12 +62,35 @@ describe('ns.router', function() {
             ns.router.regexps[ 'page' ] = 'folder|home';
             ns.router.routes = {
                 route: {
+                    // '/messages/{folder=inbox:id}/{message_id:id}': 'message',
                     '/messages/{folder=inbox:id}': 'folder',
                     '/{page=home:page}': 'page'
                 }
             };
             ns.router.init();
         });
+
+        // ok
+        // /messages/inbox/45?var1=val1&var2=val2
+        // /messages/inbox/45?var1=val1
+        // /messages/inbox/45?val1
+        // /messages/inbox/45?
+        // /messages/inbox/45
+        // /messages/45?var1=val1&var2=val2
+        // /messages/45?var1=val1
+        // /messages/45?val1
+        // /messages/45?
+        // /messages/45
+
+
+        //  ?  /messages/(inbox(?:/)?id
+
+        // fail
+        // /messages//45?var1=val1&var2=val2
+        // /messages//45?var1=val1
+        // /messages//45?val1
+        // /messages//45?
+        // /messages//45
 
         it('/messages : does not match because of the last slash', function() {
             expect(ns.router('/messages')).to.be.eql({ page: 'folder', params: { folder: 'inbox' } });

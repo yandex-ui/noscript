@@ -94,9 +94,11 @@ ns.router.compile = function(route) {
     var tokens = [];
     var defaults = {};
 
-    // Заменяем {name} на кусок регэкспа соответствующего типу токена name.
-    regexp = regexp.replace(/{(.*?)}/g, function(_, token) {
+    //  Заменяем {name} на кусок регэкспа соответствующего типу токена name.
+    //  Матч на слеш нужен, чтобы сделать слеш опциональным.
+    regexp = regexp.replace(/(\/?){(.*?)}/g, function(_, slash, token) {
         var tokenParts = token.split(':');
+        slash = slash || '';
 
         var type = tokenParts[1] || 'id';
         var rx_part = ns.router.regexps[type];
@@ -113,15 +115,21 @@ ns.router.compile = function(route) {
 
             tokens.push(tokenName);
             defaults[tokenName] = tokenDefault;
-            return '(' + rx_part + ')?';
+            if (slash) {
+                return slash + '?(' + rx_part + ')?';
+            }
+            else {
+                return '(' + rx_part + ')?';
+            }
+
         } else {
-            // Запоминаем имя токена, оно нужно при парсинге урлов.
+            //  Запоминаем имя токена, оно нужно при парсинге урлов.
             tokens.push(tokenName);
-            return '(' + rx_part + ')';
+            return slash + '(' + rx_part + ')';
         }
     });
-    // Добавляем "якоря" ^ и $;
-    // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+    //  Добавляем "якоря" ^ и $;
+    //  Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
     regexp = '^' + regexp + '\/?(?:\\?(.*))?$';
 
     return {

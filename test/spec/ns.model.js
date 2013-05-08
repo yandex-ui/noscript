@@ -474,7 +474,7 @@ describe('ns.Model', function() {
                     .to.be(data);
             });
 
-            it('should return no data of model is invalid', function() {
+            it('should return no data if model is invalid', function() {
                 var model = ns.Model.create('m1', {p1: 1, p3: 2});
 
                 expect( model.getData() )

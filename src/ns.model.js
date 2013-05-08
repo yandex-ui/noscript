@@ -220,7 +220,7 @@ ns.Model.create = function(id, params, data)  {
 ns.Model.info = function(id) {
     var info = _infos[id];
     if (!info) {
-        throw new Error('[ns.Model] "' + models[i] + '" is not defined');
+        throw new Error('[ns.Model] "' + id + '" is not defined');
     }
     // если есть декларация, но еще нет pNames, то надо завершить определение Model
     if (info && !info.pNames) {

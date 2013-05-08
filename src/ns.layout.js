@@ -38,7 +38,7 @@ ns.layout.define = function(id, layout, parent_id) {
 ns.layout.page = function(id, params) {
     var raw = _pages[id];
     if (!raw) {
-        throw 'Layout ' + id + ' is undefined';
+        throw new Error('Layout ' + id + ' is undefined');
     }
 
     var layout = compile(raw.layout, params);

@@ -35,7 +35,7 @@ var reHasNsActionClass = /\bns-action\b/;
  */
 ns.action.define = function(id, action) {
     if (id in _actions) {
-        throw "ns.action '" + id + "' can't be redefined!";
+        throw new Error("ns.action '" + id + "' can't be redefined!");
     }
     _actions[id] = action;
 };
@@ -47,10 +47,10 @@ ns.action.define = function(id, action) {
  */
 ns.action.copy = function(existentAction, newAction) {
     if (newAction in _actions) {
-        throw "ns.action '" + newAction + "' can't be redefined!";
+        throw new Error("ns.action '" + newAction + "' can't be redefined!");
     }
     if (!(existentAction in _actions)) {
-        throw "ns.action '" + existentAction + "' doesn't exist!";
+        throw new Error("ns.action '" + existentAction + "' doesn't exist!");
     }
     _actions[newAction] = _actions[existentAction];
 };

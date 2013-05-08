@@ -73,14 +73,19 @@ ns.Update.prototype.start = function(async) {
     var that = this;
 
     var models = views2models(updated.sync);
-    var promise = ns.request.models(models)
+
+    // create promise for each async view
+    var asyncUpdaterPromises = updated.async.map(function() {
+        return new no.Promise();
+    });
+
+    var syncModelsPromise = ns.request.models(models)
         .done(function(models) {
-            //TODO: check errors
             if (that._expired()) {
                 resultPromise.reject({
-                    error: that.STATUS.EXPIRED,
-                    instance: that
+                    error: that.STATUS.EXPIRED
                 });
+
             } else {
                 //FIXME: we should delete this loop when ns.request will can reject promise
                 // check that all models is valid
@@ -88,7 +93,6 @@ ns.Update.prototype.start = function(async) {
                     if (!models[i].isValid()) {
                         resultPromise.reject({
                             error: that.STATUS.MODELS,
-                            instance: that,
                             models: models
                         });
                         return;
@@ -96,9 +100,9 @@ ns.Update.prototype.start = function(async) {
                 }
 
                 that._update(async);
-                //TODO: надо как-то закидывать ссылки на промисы от асинхронных view
+                // resolve main promise and return promises for async views
                 resultPromise.resolve({
-                    instance: that
+                    async: asyncUpdaterPromises
                 });
             }
         })
@@ -106,7 +110,6 @@ ns.Update.prototype.start = function(async) {
             //FIXME: ns.request.models can't reject promise this time, we should fix it
             resultPromise.reject({
                 error: that.STATUS.MODELS,
-                instance: that,
                 models: models
             });
         });
@@ -114,18 +117,47 @@ ns.Update.prototype.start = function(async) {
     // Для каждого async-view запрашиваем его модели.
     // Когда они приходят, запускаем точно такой же update.
     // Причем ждем отрисовку sync-view, чтобы точно запуститься после него.
-    updated.async.forEach(function(view) {
+    updated.async.forEach(function(view, asyncViewId) {
         var models = views2models( [ view ] );
         no.Promise.wait([
-            promise,
+            syncModelsPromise,
             ns.request.models(models)
-        ]).then(function() {
-            //TODO: смотреть, что не запустился другой update
+        ]).done(function(result) {
+            var models = result[1];
+            //FIXME: we should delete this loop when ns.request will can reject promise
+            // check that all models is valid
+            for (var i = 0, j = models.length; i < j; i++) {
+                if (!models[i].isValid()) {
+                    asyncUpdaterPromises[asyncViewId].reject({
+                        error: that.STATUS.MODELS,
+                        async_view: view,
+                        models: models
+                    });
+                    return;
+                }
+            }
+
             if (!that._expired()) {
                 var fakeLayout = {};
                 fakeLayout[that.view.id] = that.layout;
-                new ns.Update(that.view, fakeLayout, that.params).start(true);
+                new ns.Update(that.view, fakeLayout, that.params)
+                    .start(true)
+                    // pipes ns.Update promise to asyncPromise
+                    .pipe(asyncUpdaterPromises[asyncViewId]);
+
+            } else {
+                asyncUpdaterPromises[asyncViewId].reject({
+                    error: that.STATUS.EXPIRED,
+                    async_view: view
+                });
             }
+        }).fail(function(result) {
+            //FIXME: ns.request.models can't reject promise this time, we should fix it
+            asyncUpdaterPromises[asyncViewId].reject({
+                error: that.STATUS.MODELS,
+                async_view: view,
+                models: result[1]
+            });
         });
     });
 

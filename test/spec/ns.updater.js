@@ -1,10 +1,8 @@
 describe('no.Updater', function() {
 
     describe('.start()', function() {
+
         beforeEach(function() {
-            ns.layout.define('simple', {
-                'main': true
-            });
 
             ns.Model.define('model', {
                 methods: {
@@ -15,15 +13,12 @@ describe('no.Updater', function() {
             ns.View.define('main', {
                 models: ['model']
             });
-            var view = ns.View.create('main');
 
-            var layout = ns.layout.page('simple', {});
-            this.updater = new ns.Update(view, layout, {});
+            this.view = ns.View.create('main');
 
             this.xhr = sinon.useFakeXMLHttpRequest();
             var requests = this.requests = [];
             this.xhr.onCreate = function (xhr) {
-                console.log('add request', xhr);
                 requests.push(xhr);
             };
         });
@@ -33,93 +28,211 @@ describe('no.Updater', function() {
 
             this.xhr.restore();
             delete this.updater;
+            delete this.view;
         });
 
-        it('should return no.Promise', function() {
-            var returnValue = this.updater.start();
-            expect(returnValue).to.be.a(no.Promise);
-        });
+        describe('interface', function() {
 
-        it('should resolve promise with ns.Updater instance', function(finish) {
-            var returnValue = this.updater.start();
-            var that = this;
-            returnValue.done(function(data) {
-                try {
-                    expect(data).to.be.eql({
-                        instance: that.updater
-                    });
-                    finish();
-                } catch(e) {
-                    finish(e);
-                }
+            beforeEach(function() {
+                ns.layout.define('simple', {
+                    'main': true
+                });
 
+                var layout = ns.layout.page('simple', {});
+                this.updater = new ns.Update(this.view, layout, {});
             });
 
-            this.requests[0].respond(
-                200,
-                {"Content-Type": "application/json"},
-                JSON.stringify({
-                    models: [
-                        {data: true}
-                    ]
-                })
-            );
+            it('should return no.Promise', function() {
+                var returnValue = this.updater.start();
+                expect(returnValue).to.be.a(no.Promise);
+            });
         });
 
-        it('should reject promise with ns.Updater instance and status expired', function(finish) {
-            this.updater.id = Number.NEGATIVE_INFINITY;
-            var returnValue = this.updater.start();
-            var that = this;
-            returnValue.fail(function(data) {
-                try {
-                    expect(data).to.be.eql({
-                        instance: that.updater,
-                        error: ns.U.STATUS.EXPIRED
-                    });
-                    finish();
-                } catch(e) {
-                    finish(e);
-                }
+        describe('sync views: return values from promise', function() {
 
+            beforeEach(function() {
+                ns.layout.define('simple', {
+                    'main': true
+                });
+
+                var layout = ns.layout.page('simple', {});
+                this.updater = new ns.Update(this.view, layout, {});
             });
 
-            this.requests[0].respond(
-                200,
-                {"Content-Type": "application/json"},
-                JSON.stringify({
-                    models: [
-                        {data: true}
-                    ]
-                })
-            );
+            it('should resolve promise', function(finish) {
+                var returnValue = this.updater.start();
+                returnValue.done(function() {
+                    finish();
+                });
+
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+            });
+
+            it('should reject promise with status EXPIRED when new ns.Update is running', function(finish) {
+                this.updater.id = Number.NEGATIVE_INFINITY;
+                var returnValue = this.updater.start();
+                returnValue.fail(function(data) {
+                    try {
+                        expect(data).to.be.eql({
+                            error: ns.U.STATUS.EXPIRED
+                        });
+                        finish();
+                    } catch(e) {
+                        finish(e);
+                    }
+
+                });
+
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+            });
+
+            it('should reject promise with status MODELS when ns.request is failed', function(finish) {
+                var returnValue = this.updater.start();
+                returnValue.fail(function(data) {
+                    try {
+                        expect(data).to.be.eql({
+                            error: ns.U.STATUS.MODELS,
+                            models: [ns.Model.get('model')]
+                        });
+                        finish();
+                    } catch(e) {
+                        finish(e);
+                    }
+
+                });
+
+                this.requests[0].respond(
+                    500,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+            });
         });
 
-        it('should reject promise with ns.Updater instance and status models', function(finish) {
-            var returnValue = this.updater.start();
-            var that = this;
-            returnValue.fail(function(data) {
-                try {
-                    expect(data).to.be.eql({
-                        instance: that.updater,
-                        error: ns.U.STATUS.MODELS,
-                        models: [ns.Model.get('model')]
-                    });
-                    finish();
-                } catch(e) {
-                    finish(e);
-                }
+        describe('async views: return values from promise', function() {
 
+            beforeEach(function() {
+                ns.layout.define('simple-async', {
+                    'app': {
+                        'main&': true
+                    }
+                });
+
+                ns.View.define('app');
+                var view = ns.View.create('app');
+
+                var layout = ns.layout.page('simple-async', {});
+                this.updater = new ns.Update(view, layout, {});
             });
 
-            this.requests[0].respond(
-                500,
-                {"Content-Type": "application/json"},
-                JSON.stringify({
-                    models: [
-                        {data: true}
-                    ]
-                })
-            );
+            it('should return promises for async ns.Update', function(finish) {
+                var returnValue = this.updater.start();
+                returnValue.done(function(data) {
+                    try {
+                        expect(data.async).to.be.a(Array);
+                        finish();
+                    } catch(e) {
+                        finish(e);
+                    }
+
+                });
+            });
+
+            it('should resolve promise with new ns.Update instance when async view is finished', function(finish) {
+                var returnValue = this.updater.start();
+                returnValue.done(function(data) {
+                    data.async[0].done(function(result) {
+                        try {
+                            expect(result.async).to.have.length(0);
+                            finish();
+                        } catch(e) {
+                            finish(e);
+                        }
+                    });
+                });
+
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+            });
+
+            it('should reject promise with status MODELS when ns.request is failed', function(finish) {
+                var returnValue = this.updater.start();
+                returnValue.done(function(data) {
+                    data.async[0].fail(function(result) {
+                        try {
+                            expect(result).to.have.property('error', ns.U.STATUS.MODELS);
+                            expect(result.models).to.be.eql([ns.Model.get('model')]);
+                            finish();
+                        } catch(e) {
+                            finish(e);
+                        }
+                    });
+                });
+
+                this.requests[0].respond(
+                    500,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+            });
+
+            it('should reject promise with status EXPIRED when new ns.Update is running', function(finish) {
+                var returnValue = this.updater.start();
+                var that = this;
+                returnValue.done(function(data) {
+                    that.updater.id = Number.NEGATIVE_INFINITY;
+                    that.requests[0].respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {data: true}
+                            ]
+                        })
+                    );
+
+                    data.async[0].fail(function(result) {
+                        try {
+                            expect(result).to.have.property('error', ns.U.STATUS.EXPIRED);
+                            finish();
+                        } catch(e) {
+                            finish(e);
+                        }
+                    });
+                });
+            })
+
         });
     });
 
@@ -182,15 +295,6 @@ describe('no.Updater', function() {
             };
             expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.ok();
         });
-    });
-
-    describe('_getRequestViews', function() {
-        //sync, async, models
-    });
-
-    describe('_getUpdateTree', function() {
-        //sync, async, tree structure, add models to structure
-        //empty tree
     });
 
 });

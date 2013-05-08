@@ -79,3 +79,27 @@ ns.M.STATUS = {
      */
     INVALID: 'invalid'
 };
+
+/**
+ * Constants for ns.Updater.
+ * @type {Object}
+ * @constant
+ */
+ns.U = {};
+
+/**
+ * Statuses of ns.Updater.
+ * @enum {Number}
+ * @constant
+ */
+ns.U.STATUS = {
+    /**
+     * Updater failed because of models request
+     */
+    'MODELS': 0,
+
+    /**
+     * Updater failed because it expired (new Updater is running)
+     */
+    'EXPIRED': 1
+};

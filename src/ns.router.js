@@ -116,7 +116,7 @@ ns.router.compile = function(route) {
             tokens.push(tokenName);
             defaults[tokenName] = tokenDefault;
             if (slash) {
-                return slash + '?(' + rx_part + ')?';
+                return '(?:' + slash + '(' + rx_part + '))?';
             }
             else {
                 return '(' + rx_part + ')?';

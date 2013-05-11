@@ -828,7 +828,21 @@ ns.View.prototype._setNode = function(node) {
 
 //  Обновляем (если нужно) ноду блока.
 ns.View.prototype._updateHTML = function(node, layout, params, options, events) {
-    var options_next = no.extend({}, options);
+
+    // при обработке toplevel-view надо скопировать первоначальные options
+    // инчае, при обновлении параллельных веток дерева, toplevel оказажется только первая
+    // и, соответственно, DOM-надо обновиться только у нее
+    // {
+    //   "my-root-view1": {/* tree 1 */},
+    //   "my-root-view2": {/* tree 2 */}
+    // }
+    var options_next;
+    if (false && options.toplevel) {
+        options_next = no.extend({}, options);
+
+    } else {
+        options_next = options;
+    }
 
     // для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
     var generateRepaintEvent = !options.async || !this.isValid();

@@ -1,9 +1,5 @@
 describe('ns.layout', function() {
 
-    afterEach(function() {
-        ns.clean();
-    });
-
     beforeEach(function() {
         ns.layout.define('app', {
             'app': {

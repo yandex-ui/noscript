@@ -44,11 +44,6 @@ describe('ns.Model', function() {
 
     });
 
-    afterEach(function() {
-        // чистим кэш созданных моделей после каждого теста
-        ns.Model.undefine();
-    });
-
     describe('static', function() {
 
         describe('define', function() {

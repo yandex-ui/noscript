@@ -10,7 +10,6 @@ describe('ns.View', function() {
 
         afterEach(function() {
             ns.View.define.restore();
-            ns.View.undefine('test-view-define');
         });
 
         it('should throw exception if I define View twice', function() {
@@ -52,8 +51,6 @@ describe('ns.View', function() {
 
         afterEach(function() {
             delete this.view;
-            ns.View.undefine('parentMegaView');
-            ns.View.undefine('childMegaView');
         });
 
         it('наследуемый view должен быть ns.View', function() {
@@ -79,39 +76,39 @@ describe('ns.View', function() {
 
     describe('ns.View.info events parse', function() {
 
-        ns.View.define('test-view-info-events-parse', {
-            events: {
-                'scroll window': no.nop,
-                'scroll document': no.nop,
-
-                'scroll@init window': no.nop,
-                'scroll@init document': no.nop,
-
-                'resize window': no.nop,
-                'resize document': no.nop,
-
-                'resize@init window': no.nop,
-                'resize@init document': no.nop,
-
-                'scroll .foo-init': no.nop,
-                'scroll': no.nop,
-                'click': no.nop,
-                'click .bar-init': no.nop,
-
-                'scroll@show .foo-show': no.nop,
-                'scroll@show': no.nop,
-                'click@show': no.nop,
-                'click@show .bar-show': no.nop,
-
-                'my-global-init-event-short': no.nop,
-
-                'my-global-init-event@init': no.nop,
-
-                'my-global-show-event@show': no.nop
-            }
-        });
-
         beforeEach(function() {
+            ns.View.define('test-view-info-events-parse', {
+                events: {
+                    'scroll window': no.nop,
+                    'scroll document': no.nop,
+
+                    'scroll@init window': no.nop,
+                    'scroll@init document': no.nop,
+
+                    'resize window': no.nop,
+                    'resize document': no.nop,
+
+                    'resize@init window': no.nop,
+                    'resize@init document': no.nop,
+
+                    'scroll .foo-init': no.nop,
+                    'scroll': no.nop,
+                    'click': no.nop,
+                    'click .bar-init': no.nop,
+
+                    'scroll@show .foo-show': no.nop,
+                    'scroll@show': no.nop,
+                    'click@show': no.nop,
+                    'click@show .bar-show': no.nop,
+
+                    'my-global-init-event-short': no.nop,
+
+                    'my-global-init-event@init': no.nop,
+
+                    'my-global-show-event@show': no.nop
+                }
+            });
+
             this.viewInfo = ns.View.info('test-view-info-events-parse');
         });
 

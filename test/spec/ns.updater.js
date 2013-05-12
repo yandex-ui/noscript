@@ -1,9 +1,5 @@
 describe('no.Updater', function() {
 
-    afterEach(function() {
-        ns.clean();
-    });
-
     describe('concurent ns.Update instances', function() {
 
         beforeEach(function() {
@@ -397,11 +393,6 @@ describe('no.Updater', function() {
             var layout = ns.layout.page('box-inside-box', {});
             var updater = new ns.Update(view, layout, {});
             updater.start();
-        });
-
-        afterEach(function() {
-            ns.layout.undefine();
-            ns.View.undefine();
         });
 
         it('check arg to ns.tmpl', function() {

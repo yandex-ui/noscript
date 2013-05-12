@@ -100,10 +100,6 @@ describe('ns.View.events', function() {
     });
 
     afterEach(function() {
-        ns.layout.undefine();
-        ns.View.undefine();
-        ns.Model.undefine();
-
         delete this.events;
         delete this.APP;
     });

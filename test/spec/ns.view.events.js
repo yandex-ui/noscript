@@ -348,7 +348,11 @@ describe('ns.View.events', function() {
                 }
             }, 'app');
 
-            ns.Model.define('content1-async-model');
+            ns.Model.define('content1-async-model', {
+                params: {
+                    p: null
+                }
+            });
 
             this.xhr = sinon.useFakeXMLHttpRequest();
             var requests = this.requests = [];
@@ -356,13 +360,13 @@ describe('ns.View.events', function() {
                 requests.push(xhr);
             };
 
-            var layout = ns.layout.page('content1-async', {});
-            new ns.Update(this.APP, layout, {}).start();
+            var params = {p: 1};
+            var layout = ns.layout.page('content1-async', params);
+            new ns.Update(this.APP, layout, params).start();
         });
 
         afterEach(function() {
             this.xhr.restore();
-            ns.request.clean();
         });
 
         describe('first pass', function() {
@@ -457,6 +461,43 @@ describe('ns.View.events', function() {
                     ['content1-async', 'ns-repaint', 0]
                 ]);
             })
+        });
+
+        describe('change params and redraw async-view', function() {
+
+            beforeEach(function(finish) {
+                // finish first draw
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+
+                var that = this;
+
+                window.setTimeout(function() {
+                    // emulates go from /page?p=1 -> /page?p=2
+                    var params = {p: 2};
+                    var layout = ns.layout.page('content1-async', params);
+                    new ns.Update(that.APP, layout, params).start();
+
+                    finish();
+                }, 50);
+            });
+
+            describe('first pass', function() {
+
+                it('should create second "content1-async" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content1-sync')
+                    ).to.have.length(2)
+                });
+            });
         });
 
     });

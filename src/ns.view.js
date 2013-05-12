@@ -837,7 +837,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     //   "my-root-view2": {/* tree 2 */}
     // }
     var options_next;
-    if (false && options.toplevel) {
+    if (options.toplevel) {
         options_next = no.extend({}, options);
 
     } else {

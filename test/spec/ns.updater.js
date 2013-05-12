@@ -4,7 +4,7 @@ describe('no.Updater', function() {
         ns.clean();
     });
 
-    xdescribe('concurent ns.Update instances', function() {
+    describe('concurent ns.Update instances', function() {
 
         beforeEach(function() {
             this.xhr = sinon.useFakeXMLHttpRequest();
@@ -196,7 +196,7 @@ describe('no.Updater', function() {
 
     });
 
-    xdescribe('.start()', function() {
+    describe('.start()', function() {
 
         beforeEach(function() {
 
@@ -380,7 +380,7 @@ describe('no.Updater', function() {
         });
     });
 
-    xdescribe('box inside box', function() {
+    describe('box inside box', function() {
 
         beforeEach(function() {
             ns.layout.define('box-inside-box', {

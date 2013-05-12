@@ -23,7 +23,8 @@
         "grunt-contrib-jshint": "*",
         "grunt-mocha": "*",
         "mocha": "*",
-        "sinon": "*"
+        "sinon": "*",
+        "yate": "*"
     },
     "optionalDependencies": {},
     "engines": {

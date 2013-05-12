@@ -36,7 +36,11 @@ describe('ns.Box', function() {
             models: ['model3']
         });
 
-        ns.Model.define('model3');
+        ns.Model.define('model3', {
+            params: {
+                p: null
+            }
+        });
 
         this.xhr = sinon.useFakeXMLHttpRequest();
         var requests = this.requests = [];
@@ -161,6 +165,53 @@ describe('ns.Box', function() {
 
             it('should have second visible node for "content1" ', function() {
                 expect($(this.APP.node).find('.ns-view-content1:eq(1)').hasClass('ns-view-visible')).to.be.ok();
+            });
+
+        });
+
+        describe('"async-view"(p=1) -> "async-view"(p=2)', function() {
+
+            beforeEach(function(finish) {
+                var page1Params = {p: 1};
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('content3', page1Params),
+                    page1Params
+                ).start();
+
+                // finish first draw
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+
+                var that = this;
+
+                window.setTimeout(function() {
+                    var page2Params = {p: 2};
+                    new ns.Update(
+                        that.APP,
+                        ns.layout.page('content3', page2Params),
+                        page2Params
+                    ).start();
+
+                    finish();
+                }, 50);
+            });
+
+            describe('first pass', function() {
+
+                it('should create second "content1-async" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content3')
+                    ).to.have.length(2)
+                });
             });
 
         });

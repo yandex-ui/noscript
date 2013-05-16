@@ -42,7 +42,6 @@ ns.View.prototype._$window = $(window);
 
 ns.View.prototype._init = function(id, params, async) {
     this.id = id;
-    this.params = params || {};
 
     this._onModelChangeBinded = this._onModelChange.bind(this);
 
@@ -55,14 +54,23 @@ ns.View.prototype._init = function(id, params, async) {
 
     this.info = ns.View.info(id);
 
-    this.key = ns.View.getKey(id, params, this.info);
+    this.params = params || {};
+
+    // сгенерируем ключ по исходным параметрам, т.к. метод getKey тоже делает rewrite
+    this.key = ns.View.getKey(id, this.params, this.info);
+
+    if ('function' === typeof this.info.rewriteParams) {
+        // если для view определен метод rewriteParams и он вернул объект
+        // то перепишем параметры
+        this.params = this.info.rewriteParams(no.extend({}, this.params)) || this.params;
+    }
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
     for (var modelI = 0, l = model_ids.length; modelI < l; modelI++) {
         var model_id = model_ids[modelI];
-        models[model_id] = ns.Model.create(model_id, params);
+        models[model_id] = ns.Model.create(model_id, this.params);
     }
 
     this.views = null;
@@ -100,6 +108,12 @@ ns.View.getKey = function(id, params, info) {
     //  Ключ можно вычислить даже для неопределенных view,
     //  в частности, для боксов.
     info = info || ns.View.info(id) || {};
+
+    if ('function' === typeof info.rewriteParams) {
+        // если для view определен метод rewriteParams и он вернул объект,
+        // то перепишем параметры
+        params = info.rewriteParams(no.extend({}, params)) || params;
+    }
 
     var key = 'view=' + id;
 

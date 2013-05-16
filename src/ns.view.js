@@ -266,7 +266,7 @@ ns.View.info = function(id) {
                     // событие init тригерится при создании блока, поэтому вешать его надо сразу
                     // событие async тригерится до всего, его тоже надо вешать
                     if (eventName == 'ns-init' || eventName == 'ns-async') {
-                        info.createEvents.push([eventName, info.methods[handler]]);
+                        info.createEvents.push([eventName, handler]);
 
                     } else {
                         // к View нельзя получить доступ, поэтому локальными могут быть только встроенные ns-* события

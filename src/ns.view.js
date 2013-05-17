@@ -54,16 +54,7 @@ ns.View.prototype._init = function(id, params, async) {
 
     this.info = ns.View.info(id);
 
-    this.params = params || {};
-
-    // сгенерируем ключ по исходным параметрам, т.к. метод getKey тоже делает rewrite
-    this.key = ns.View.getKey(id, this.params, this.info);
-
-    if ('function' === typeof this.info.rewriteParams) {
-        // если для view определен метод rewriteParams и он вернул объект
-        // то перепишем параметры
-        this.params = this.info.rewriteParams(no.extend({}, this.params)) || this.params;
-    }
+    no.extend(this, ns.View.getKeyAndParams(this.id, params || {}, this.info));
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
@@ -105,14 +96,23 @@ ns.View.prototype._init = function(id, params, async) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 ns.View.getKey = function(id, params, info) {
+    return this.getKeyAndParams(id, params, info).key;
+};
+
+/**
+ * Возвращает в объекта ключ и параметры с учётом rewriteParamsOnInit
+ * В этом методе собрана вся логика рерайтов параметров при создании view
+ * @return Object
+ */
+ns.View.getKeyAndParams = function(id, params, info) {
     //  Ключ можно вычислить даже для неопределенных view,
     //  в частности, для боксов.
     info = info || ns.View.info(id) || {};
 
-    if ('function' === typeof info.rewriteParams) {
-        // если для view определен метод rewriteParams и он вернул объект,
+    if ('function' === typeof info.rewriteParamsOnInit) {
+        // если для view определен метод rewriteParamsOnInit и он вернул объект,
         // то перепишем параметры
-        params = info.rewriteParams(no.extend({}, params)) || params;
+        params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
     }
 
     var key = 'view=' + id;
@@ -126,7 +126,10 @@ ns.View.getKey = function(id, params, info) {
         }
     }
 
-    return key;
+    return {
+        params: params, // параметры с учётом rewrite
+        key: key        // ключ с учётом правильных параметров
+    };
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

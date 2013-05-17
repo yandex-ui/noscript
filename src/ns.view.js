@@ -42,7 +42,6 @@ ns.View.prototype._$window = $(window);
 
 ns.View.prototype._init = function(id, params, async) {
     this.id = id;
-    this.params = params || {};
 
     this._onModelChangeBinded = this._onModelChange.bind(this);
 
@@ -55,14 +54,14 @@ ns.View.prototype._init = function(id, params, async) {
 
     this.info = ns.View.info(id);
 
-    this.key = ns.View.getKey(id, params, this.info);
+    no.extend(this, ns.View.getKeyAndParams(this.id, params || {}, this.info));
 
     //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
     var model_ids = this.info.models;
     var models = this.models = {};
     for (var modelI = 0, l = model_ids.length; modelI < l; modelI++) {
         var model_id = model_ids[modelI];
-        models[model_id] = ns.Model.create(model_id, params);
+        models[model_id] = ns.Model.create(model_id, this.params);
     }
 
     this.views = null;
@@ -97,9 +96,24 @@ ns.View.prototype._init = function(id, params, async) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 ns.View.getKey = function(id, params, info) {
+    return this.getKeyAndParams(id, params, info).key;
+};
+
+/**
+ * Возвращает в объекта ключ и параметры с учётом rewriteParamsOnInit
+ * В этом методе собрана вся логика рерайтов параметров при создании view
+ * @return Object
+ */
+ns.View.getKeyAndParams = function(id, params, info) {
     //  Ключ можно вычислить даже для неопределенных view,
     //  в частности, для боксов.
     info = info || ns.View.info(id) || {};
+
+    if ('function' === typeof info.rewriteParamsOnInit) {
+        // если для view определен метод rewriteParamsOnInit и он вернул объект,
+        // то перепишем параметры
+        params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
+    }
 
     var key = 'view=' + id;
 
@@ -112,7 +126,10 @@ ns.View.getKey = function(id, params, info) {
         }
     }
 
-    return key;
+    return {
+        params: params, // параметры с учётом rewrite
+        key: key        // ключ с учётом правильных параметров
+    };
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

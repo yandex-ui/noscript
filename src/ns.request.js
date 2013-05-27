@@ -43,6 +43,12 @@ ns.forcedRequest = function(items, params, options) {
  * @return {no.Promise}
  */
 ns.request.models = function(models, options) {
+
+    // Загрузка порционных данных. В этом случае грузим не саму модель, а порцию данных.
+    models = $.map(models, function(model){
+        return model.getRequest ? model.getRequest() : model;
+    });
+
     var request = new Request(models, options);
 
     return request.start();

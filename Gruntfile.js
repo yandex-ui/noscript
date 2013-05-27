@@ -16,6 +16,9 @@ module.exports = function (grunt) {
     };
 
     gruntConfig.mocha = {
+        options: {
+            bail: true
+        },
         index: ['test/index.html']
     };
 

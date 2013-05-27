@@ -206,12 +206,64 @@ describe('ns.Box', function() {
 
             describe('first pass', function() {
 
-                it('should create second "content1-async" node', function() {
+                it('should create second "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
                     ).to.have.length(2)
                 });
+
+                it('should hide first "content3" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
+                    ).to.have.length(1)
+                });
+
+                it('should show second "content3" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content3.ns-async')
+                    ).to.have.length(1)
+                });
+
+            });
+
+            describe('second pass', function() {
+
+                beforeEach(function() {
+                    this.requests[1].respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {data: true}
+                            ]
+                        })
+                    );
+                });
+
+                it('should create second "content3" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content3')
+                    ).to.have.length(2)
+                });
+
+                it('should hide first "content3" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
+                    ).to.have.length(1)
+                });
+
+                it('should show second "content3" node', function() {
+                    var that = this;
+                    expect(
+                        $(that.APP.node).find('.ns-view-content3.ns-view-visible')
+                    ).to.have.length(1)
+                });
+
             });
 
         });

@@ -124,7 +124,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         //  Обновляем его.
         view._updateHTML(node, layout[id].views, params, options, events);
 
-        if ( view.isOk() ) {
+        if ( view.isOk() || view.isLoading() ) {
             //  Выстраиваем новые активные блоки в нужном порядке.
             //  Плюс, если это новый блок, подклеиваем его к боксу.
             this.node.appendChild(view.node);
@@ -138,14 +138,18 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     for (var activeId in layoutActive) {
         var activeKey = layoutActive[activeId];
 
+        /*
         if ( views[activeKey].isLoading() ) {
             activeKey = oldActive[activeId];
             if (activeKey) {
                 newActive[activeId] = activeKey;
             }
         } else {
+        */
             newActive[activeId] = activeKey;
+        /*
         }
+        */
     }
 
     //  Прячем все блоки, которые были в старом active, но не попали в новый.

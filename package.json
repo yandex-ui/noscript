@@ -34,6 +34,9 @@
     "files": [
         "lib",
         "noscript.js"
-    ]
+    ],
+    "scripts": {
+        "test": "grunt"
+    }
 }
 

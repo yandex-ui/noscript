@@ -343,4 +343,62 @@ describe('ns.View', function() {
             expect(this.view._bindEventHandlers.calledWithExactly(this.globalArr, 1)).to.be.ok()
         });
     });
+
+    describe('ns-init event', function() {
+
+        it('should call event handler defined as string', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': 'initCallback'
+                },
+                methods: {
+                    initCallback: spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.calledOnce).to.be.ok();
+        });
+
+        it('should call event handler defined as string with ns.View instance', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': 'initCallback'
+                },
+                methods: {
+                    initCallback: spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.ok();
+        });
+
+        it('should bind event defined as function', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.calledOnce).to.be.ok();
+        });
+
+        it('should bind event defined as function with ns.View instance', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.ok();
+        });
+
+    });
 });

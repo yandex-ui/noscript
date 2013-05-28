@@ -87,7 +87,7 @@ ns.View.prototype._init = function(id, params, async) {
     // события, которые надо забиндить сразу при создании блока
     for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
         var event = this.info.createEvents[i];
-        this.on(event[0], event[1]);
+        this.on(event[0], this._prepareCallback(event[1]));
     }
 
     this.trigger('ns-init');
@@ -440,6 +440,23 @@ ns.View.prototype._unbindModels = function() {
 };
 
 /**
+ * Returns function or method from prototype.
+ * @param {String|Function} fn Function or method name from prototype.
+ * @returns {Function}
+ * @private
+ */
+ns.View.prototype._prepareCallback = function(fn) {
+    if (typeof fn === 'string') {
+        var method = this[fn];
+        if (!method) {
+            throw new Error("[ns.View] Can't find method '" + fn + "' in '" + this.id + "'");
+        }
+    }
+
+    return method || fn;
+};
+
+/**
  * Копирует массив деклараций событий и возвращает такой же массив, но с забинженными на этот инстанс обработчиками.
  * @param {Array} events
  * @param {Number} handlerPos Позиция хендлера в массиве.
@@ -451,14 +468,10 @@ ns.View.prototype._bindEventHandlers = function(events, handlerPos) {
 
     for (var i = 0, j = events.length; i < j; i++) {
         var event = events[i];
-        var method = event[handlerPos];
-        if (typeof method === 'string') {
-            method = this[method];
-        }
 
         // копируем события из info, чтобы не испортить оригинальные данные
         var eventCopy = [].concat(event);
-        eventCopy[handlerPos] = method.bind(this);
+        eventCopy[handlerPos] = this._prepareCallback(event[handlerPos]).bind(this);
 
         bindedEvents.push(eventCopy);
     }

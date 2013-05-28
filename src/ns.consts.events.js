@@ -69,7 +69,15 @@ ns.V.NS_EVENTS = [
 // @see http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html
 // @see http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
 if (ns.IS_TOUCH) {
-    ns.V.DOM_EVENTS.push('tap', 'touchstart', 'touchmove', 'touchend');
+    ns.V.DOM_EVENTS.push(
+        'swipe',
+        'swipeleft',
+        'swiperight',
+        'tap',
+        'touchstart',
+        'touchmove',
+        'touchend'
+    );
     ns.V.EVENTS = {
         'click': 'tap',
         'dblclick': 'doubletap',

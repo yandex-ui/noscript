@@ -451,9 +451,10 @@ ns.View.prototype._prepareCallback = function(fn) {
         if (!method) {
             throw new Error("[ns.View] Can't find method '" + fn + "' in '" + this.id + "'");
         }
+        return method;
     }
 
-    return method || fn;
+    return fn;
 };
 
 /**
@@ -965,4 +966,3 @@ if (window['mocha']) {
 }
 
 })();
-

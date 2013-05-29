@@ -341,39 +341,25 @@ ns.Model.prototype.set = function(jpath, value, options) {
     //  Пока что будет версия без сравнения.
 
     if ( !(options && options.silent) ) {
-        //  FIXME: Непонятно, хорошая ли это идея, кидать сообщение об изменении
-        //  .foo, если изменилось .foo.bar.
-        //  И нужно ли кидать сообщение об изменении всей модели?
-        //  В общем так вроде должно быть, но тогда любое внутреннее изменение модели приводит к тому,
-        //  что вся модель считается изменившейся и блок инвалидируется целиком.
-
         //  Кидаем сообщения о том, что модель (или ее часть) изменилась.
-        //  Например, если jpath был '.foo.bar', то кидаем два сообщения 'change'.
-        //  Одно с параметром '.foo.bar', второе с '.foo'.
+        //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'changed.foo.bar' и 'changed.foo'.
+        //  В качестве параметра (пока что) этот же самый jpath.
+        //
         var parts = jpath.split('.');
         var l = parts.length;
         while (l > 1) {
             var _jpath = parts.slice(0, l).join('.');
-            this.trigger('changed', _jpath);
+
+            //  TODO @nop: Видимо, нужно в параметр передавать больше информации, например:
+            //  если изначально jpath был `.foo.bar`, то для события `changed.foo` передавать
+            //  старое значение и новое, полный jpath `.foo.bar`, текущий jpath `.foo`.
+            //
+            this.trigger('changed' + _jpath, _jpath);
             l--;
         }
         //  Сообщение о том, что вообще вся модель изменилась.
-        this.trigger('changed', '');
+        this.trigger('changed', jpath);
     }
-    /*
-    //  Сохраняем новое значение и одновременно получаем старое значение.
-    var oldValue = no.path(jpath, data, value);
-
-    if ( !( (options && options.silent) || ns.object.isEqual(value, oldValue) ) ) {
-        // TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
-        // @chestozo: может `:` ?
-        this.trigger('changed.' + jpath, {
-            'new': value,
-            'old': oldValue,
-            'jpath': jpath
-        });
-    }
-    */
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

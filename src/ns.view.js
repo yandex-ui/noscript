@@ -319,7 +319,7 @@ ns.View.info = function(id) {
         //          ...
         //      }
         //
-        var _subviews = (typeof info.subviews === 'object') ? {} : info.subviews;
+        var _subviews = {};
         for (var subview in info.subviews) {
             var deps = info.subviews[subview];
             if (typeof deps === 'string') {
@@ -496,39 +496,50 @@ ns.View.prototype.invalidateSubview = function(subview) {
 ns.View.prototype._bindModels = function() {
     var that = this;
 
+    var models = this.models;
     var subviews = this.info.subviews;
-    var has_subviews = (subviews === true) || !ns.object.isEmpty(subviews);
 
-    for (var id in this.models) {
-        (function(model) {
-            model.on('changed', function(e, jpath) {
-                //  console.log('model', model.id, 'view', that.id, 'jpath', jpath);
+    for (var model_id in models) {
+        var model = models[model_id];
+        var jpaths = subviews[model_id];
 
-                //  Варианты, когда нужно перерисовать весь блок целиком:
+        if (jpaths) {
+            for (var jpath in jpaths) {
+                //  В deps объект вида:
                 //
-                //    * Для view вообще не определено никаких subview и jpath равен ''.
-                //    * Или же в зависимостях явно указано, что нужно перерисовать блок целиком.
+                //      {
+                //          //  Нужно инвалидировать subview 'foo'.
+                //          'foo': true,
+                //          //  Нужно инвалидировать весь view целиком.
+                //          '': true
+                //      }
                 //
+                var deps = jpaths[jpath];
 
-                var jpaths = subviews && subviews[model.id];
-                var deps = jpaths && jpaths[jpath];
-
-                if (jpath === '') {
-                    if (!has_subviews || ( deps && ('' in deps) ) ) {
-                        console.log('invalidate all view', that.id);
+                if ('' in deps) {
+                    //  При любом изменении модели нужно инвалидировать
+                    //  весь view целиком.
+                    model.on('changed' + jpath, function() {
                         that.invalidate();
-                    }
-                    return;
+                    });
+                } else {
+                    //  Инвалидируем только соответствующие subview:
+                    (function(deps) {
+                        model.on('changed' + jpath, function() {
+                            for (var subview_id in deps) {
+                                that.invalidateSubview(subview_id);
+                            }
+                        });
+                    })(deps);
                 }
-
-                if (!deps) { return; }
-
-                console.log('invalidate subviews only in', that.id);
-                for (var subview in deps) {
-                    that.invalidateSubview(subview);
-                }
+            }
+        } else {
+            //  Для этой модели нет данных о том, какие subview она инвалидирует.
+            //  Значит при изменении этой модели инвалидируем весь view целиком.
+            model.on('changed', function() {
+                that.invalidate();
             });
-        })( this.models[id] );
+        }
     }
 };
 

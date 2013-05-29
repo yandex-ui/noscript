@@ -21,7 +21,10 @@ ns.http = function(url, params, options) {
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             var error = errorThrown || textStatus || 'unknown error';
-            promise.resolve({ error: error });
+            promise.resolve({
+                error: error,
+                xhr: jqXHR
+            });
         });
 
     return promise;

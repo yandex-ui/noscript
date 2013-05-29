@@ -27,6 +27,7 @@ ns.object.clone = function(obj) {
     @return {boolean} Определяет, пустой ли объект или нет.
 */
 ns.object.isEmpty = function(obj) {
+    /* jshint unused: false */
     for (var key in obj) {
         return false;
     }
@@ -56,12 +57,12 @@ ns.object.isEqual = function(a, b) {
     //  сравнить все значения.
     //
     if (typeof a === 'object') {
-        for (var key in b) {
-            if ( !(key in a) ) { return false; }
+        for (var keyB in b) {
+            if ( !(keyB in a) ) { return false; }
         }
 
-        for (var key in a) {
-            if ( !ns.object.isEqual( a[key], b[key] ) ) { return false; }
+        for (var keyA in a) {
+            if ( !ns.object.isEqual( a[keyA], b[keyA] ) ) { return false; }
         }
     } else {
         //  Это два скаляра (string, boolean, number) и они точно не равны,

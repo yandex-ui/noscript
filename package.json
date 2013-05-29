@@ -13,13 +13,18 @@
         "url": "git://github.com/pasaran/noscript.git"
     },
     "dependencies": {
-        "nommon": "0.0.17"
+        "nommon": "0.0.17",
+        "es5-shim": "*"
     },
     "devDependencies": {
         "expect.js": "*",
-        "jshint": "*",
+        "grunt": "*",
+        "grunt-cli": "*",
+        "grunt-contrib-jshint": "*",
+        "grunt-mocha": "*",
         "mocha": "*",
-        "sinon": "*"
+        "sinon": "*",
+        "yate": "*"
     },
     "optionalDependencies": {},
     "engines": {
@@ -29,6 +34,9 @@
     "files": [
         "lib",
         "noscript.js"
-    ]
+    ],
+    "scripts": {
+        "test": "grunt"
+    }
 }
 

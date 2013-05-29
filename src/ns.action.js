@@ -35,7 +35,7 @@ var reHasNsActionClass = /\bns-action\b/;
  */
 ns.action.define = function(id, action) {
     if (id in _actions) {
-        throw "ns.action '" + id + "' can't be redefined!";
+        throw new Error("[ns.action] Can't redefine '" + id + "'");
     }
     _actions[id] = action;
 };
@@ -47,10 +47,10 @@ ns.action.define = function(id, action) {
  */
 ns.action.copy = function(existentAction, newAction) {
     if (newAction in _actions) {
-        throw "ns.action '" + newAction + "' can't be redefined!";
+        throw new Error("[ns.action] Can't redefine '" + newAction + "'");
     }
     if (!(existentAction in _actions)) {
-        throw "ns.action '" + existentAction + "' doesn't exist!";
+        throw new Error("[ns.action] '" + existentAction + "' is not defined");
     }
     _actions[newAction] = _actions[existentAction];
 };
@@ -100,8 +100,12 @@ ns.action.init = function() {
 
     var $body = $('body');
     var selector = 'a, .ns-action';
+    var events = [
+        ns.V.EVENTS.click,
+        ns.V.EVENTS.dblclick
+    ].join(' ');
 
-    $body.on(ns.V.EVENTS.click, selector, this._process);
+    $body.on(events, selector, this._process);
     /*
     if (Modernizr && Modernizr.touch) {
         */
@@ -191,7 +195,7 @@ ns.action._process = function(e) {
         if (HREF_JS_REGEXP.test(href)) {
             return false;
         }
-        if (href.indexOf('conf:sip:') == 0 || href.indexOf('meet:sip:') == 0) {
+        if (href.indexOf('conf:sip:') === 0 || href.indexOf('meet:sip:') === 0) {
             return true;
         }
 

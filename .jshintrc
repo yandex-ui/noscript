@@ -2,20 +2,25 @@
     "browser": true,
     "devel": true,
     "jquery": true,
+    "node": true,
     "globals": {
-        "no": false
+        "Modernizr": false,
+        "no": false,
+        "ns": true,
+        "yr": false
     },
 
     "bitwise": true,
     "curly": true,
-    "indent": 4,
+    "eqnull": true,
     "latedef": true,
-    "sub": true,
     "newcap": true,
     "noarg": true,
     "noempty": true,
     "nonew": true,
     "onevar": false,
+    "sub": true,
+    "trailing": true,
     "undef": true,
     "unused": true
 }

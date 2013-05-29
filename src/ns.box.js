@@ -28,7 +28,11 @@ ns.Box.prototype._getView = function(id, params) {
 ns.Box.prototype._addView = function(id, params, type) {
     var view = this._getView(id, params);
     if (!view) {
-        view = ns.View.create(id, params, type === ns.L.ASYNC);
+        if (type === ns.L.BOX) {
+            view = new ns.Box(id, params);
+        } else {
+            view = ns.View.create(id, params, type === ns.L.ASYNC);
+        }
         this.views[view.key] = view;
     }
     return view;
@@ -120,7 +124,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         //  Обновляем его.
         view._updateHTML(node, layout[id].views, params, options, events);
 
-        if ( view.isOk() ) {
+        if ( view.isOk() || view.isLoading() ) {
             //  Выстраиваем новые активные блоки в нужном порядке.
             //  Плюс, если это новый блок, подклеиваем его к боксу.
             this.node.appendChild(view.node);
@@ -131,28 +135,32 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     //  а по актуальным блокам. В частности, заглушки в новый active не попадают.
     //  Вместо них берем старые блоки, если они были.
     var newActive = {};
-    for (var id in layoutActive) {
-        var key = layoutActive[id];
+    for (var activeId in layoutActive) {
+        var activeKey = layoutActive[activeId];
 
-        if ( views[key].isLoading() ) {
-            key = oldActive[id];
-            if (key) {
-                newActive[id] = key;
+        /*
+        if ( views[activeKey].isLoading() ) {
+            activeKey = oldActive[activeId];
+            if (activeKey) {
+                newActive[activeId] = activeKey;
             }
         } else {
-            newActive[id] = key;
+        */
+            newActive[activeId] = activeKey;
+        /*
         }
+        */
     }
 
     //  Прячем все блоки, которые были в старом active, но не попали в новый.
-    for (var id in oldActive) {
-        var key = oldActive[id];
-        if (newActive[id] !== key) {
-            var subviews = views[key]._getDescendants( [] );
+    for (var oldActiveId in oldActive) {
+        var oldActiveKey = oldActive[oldActiveId];
+        if (newActive[oldActiveId] !== oldActiveKey) {
+            var subviews = views[oldActiveKey]._getDescendants( [] );
             for (var i = 0, l = subviews.length; i < l; i++) {
                 // если view был скрыт
                 if (subviews[i]._hide()) {
-                    events['hide'].push(subviews[i]);
+                    events['ns-hide'].push(subviews[i]);
                 }
             }
         }
@@ -170,3 +178,5 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     this.active = newActive;
 };
 
+ns.Box.prototype.isOk = no.true;
+ns.Box.prototype.isLoading = no.false;

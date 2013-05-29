@@ -73,15 +73,14 @@ ns.Model.prototype._bindEvents = function() {
         }
 
         for (var i = 0, j = callbacks.length; i < j; i++) {
-            // сразу биндим обработчики в this
-            this.on(event, callbacks[i].bind(this));
             //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
+            this.on(event, callbacks[i]);
         }
     }
 };
 
 /**
- * При установке data в составной моделе
+ * При установке data в составной модели
  * инициализирует все составляющие модели
  */
 ns.Model.prototype._splitData = function(data) {
@@ -95,7 +94,7 @@ ns.Model.prototype._splitData = function(data) {
     if (!this._splitData.callback) {
         this._splitData.callback = function(evt, data) {
             return that.trigger(evt, data);
-        }
+        };
     }
     var callback = this._splitData.callback;
 
@@ -159,7 +158,7 @@ ns.Model.prototype._splitData = function(data) {
  */
 ns.Model.define = function(id, info, base) {
     if (id in _infos) {
-        throw "Model '"+ id +"' can't be redefined!";
+        throw new Error("[ns.Model] Can't redefine '" + id + "'");
     }
 
     info = info || {};
@@ -196,8 +195,8 @@ ns.Model.create = function(id, params, data)  {
     var model = ns.Model.get(id, params);
 
     if (!model) {
-        var ctor = _ctors[id];
-        model = new ctor();
+        var Ctor = _ctors[id];
+        model = new Ctor();
         model._init(id, params, data);
 
         ns.Model.store(model);
@@ -213,9 +212,16 @@ ns.Model.create = function(id, params, data)  {
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Returns model's info
+ * @param {String} id Model ID.
+ * @returns {Object}
+ */
 ns.Model.info = function(id) {
     var info = _infos[id];
+    if (!info) {
+        throw new Error('[ns.Model] "' + id + '" is not defined');
+    }
     // если есть декларация, но еще нет pNames, то надо завершить определение Model
     if (info && !info.pNames) {
         /**
@@ -251,7 +257,7 @@ ns.Model.key = function(id, params, info) {
 
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {
-        return 'do-' + _keySuffix++;
+        return 'do-' + id + '-' + _keySuffix++;
     }
 
     var defaults = info.params;
@@ -309,10 +315,10 @@ ns.Model.prototype.isValid = function() {
 //      var foo = model.get('foo'); // model.data.foo.
 //      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
 //
-ns.Model.prototype.get = function(path) {
+ns.Model.prototype.get = function(jpath) {
     var data = this.data;
     if (data) {
-        return no.jpath(path, data);
+        return no.jpath(jpath, data);
     }
 };
 
@@ -324,8 +330,7 @@ ns.Model.prototype.get = function(path) {
  */
 ns.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;
-    //  FIXME: Нет ли метода соответствующего? this.isValid()?
-    if (this.status != this.STATUS.OK || !data) {
+    if ( !this.isValid() || !data ) {
         return;
     }
 
@@ -360,7 +365,8 @@ ns.Model.prototype.set = function(jpath, value, options) {
     var oldValue = no.path(jpath, data, value);
 
     if ( !( (options && options.silent) || ns.object.isEqual(value, oldValue) ) ) {
-        //TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
+        // TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
+        // @chestozo: может `:` ?
         this.trigger('changed.' + jpath, {
             'new': value,
             'old': oldValue,
@@ -378,10 +384,10 @@ ns.Model.prototype.getData = function() {
     // если это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
-    if ( this.isCollection() ) {
+    if ( this.isCollection() && this.isValid() ) {
         // массив с хранилищем данных моделей
         var items = no.path(this.info.split.items, this.data);
-        // удаляем все старые данные
+        // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
         items.splice(0, items.length);
         // пишем новые
         this.models.forEach(function(model) {
@@ -415,6 +421,7 @@ ns.Model.prototype.setData = function(data, options) {
         //  Не проверяем здесь, действительно ли data отличается от oldData --
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
+        //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
         if (!options || !options.silent) {
             this.trigger('changed', '');
         }
@@ -471,7 +478,7 @@ ns.Model.prototype.getRequestParams = function() {
  */
 ns.Model.get = function(id, key) {
     if (!(id in _infos)) {
-        throw 'Model "' + id + '" is not defined!';
+        throw new Error('[ns.Model] "' + id + '" is not defined');
     }
     key = (typeof key === 'string') ? key : ns.Model.key(id, key);
 
@@ -508,8 +515,11 @@ ns.Model.isValid = function(id, key) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-//  Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
-ns.Model.prototype.canRetry = function(error) {
+/**
+ * Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
+ * @returns {boolean}
+ */
+ns.Model.prototype.canRetry = function() {
     //  do-модели нельзя перезапрашивать.
     return ( !this.isDo() && this.retries < 3 );
 };
@@ -559,6 +569,7 @@ ns.Model.prototype.prepareRequest = function(requestID) {
     return this;
 };
 
+// @chestozo: куда-то хочется вынести это...
 if(window['mocha']) {
     /**
      * Удаляет определение модели.
@@ -650,7 +661,7 @@ ns.ModelUniq.prototype.uniqName = '';
 
 /**
  * Название массива в кэше,
- * в котором дожны храниться уникальные значения
+ * в котором должны храниться уникальные значения
  * @private
  * @type String
  */
@@ -724,9 +735,7 @@ ns.ModelUniq.prototype.uniqFromKey = function(key) {
  * @param {String} uniq
  * @type Node
  */
-ns.ModelUniq.prototype.uniqFromJSON = function(xml, uniq) {
-    ns.todo();
-};
+ns.ModelUniq.prototype.uniqFromJSON = ns.todo;
 
 /**
  * Возвращает кэш по параметрам

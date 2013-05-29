@@ -1,17 +1,19 @@
 describe('ns.layout', function() {
 
+    beforeEach(function() {
+        ns.layout.define('app', {
+            'app': {
+                'header': true,
+                'left@': {},
+                'right@': {},
+                'footer': true
+            }
+        });
+    });
+
     describe('simple layouts', function() {
 
         it('app', function() {
-
-            ns.layout.define('app', {
-                'app': {
-                    'header': true,
-                    'left@': {},
-                    'right@': {},
-                    'footer': true
-                }
-            });
 
             expect( ns.layout.page('app') ).to.eql({
                 'app': {
@@ -42,11 +44,17 @@ describe('ns.layout', function() {
 
     describe('extented layouts', function() {
 
-        it('mailbox', function() {
-
+        beforeEach(function() {
             ns.layout.define('mailbox', {
                 'app left@': [ 'folders', 'labels' ]
             }, 'app');
+
+            ns.layout.define('messages', {
+                'app right@': 'messages'
+            }, 'mailbox');
+        });
+
+        it('mailbox', function() {
 
             expect( ns.layout.page('mailbox' ) ).to.eql({
                 'app': {
@@ -84,10 +92,6 @@ describe('ns.layout', function() {
         });
 
         it('messages', function() {
-
-            ns.layout.define('messages', {
-                'app right@': 'messages'
-            }, 'mailbox');
 
             expect( ns.layout.page('messages' ) ).to.eql({
                 'app': {
@@ -133,10 +137,21 @@ describe('ns.layout', function() {
 
     describe('async views', function() {
 
-        it('async view in box', function() {
+        beforeEach(function() {
             ns.layout.define('async1', {
                 'app left@': 'long-generated-view&'
             }, 'app');
+
+            ns.layout.define('async2', {
+                'app left@': {
+                    'regular-view': {
+                        'async-view&': true
+                    }
+                }
+            }, 'app');
+        });
+
+        it('async view in box', function() {
 
             expect( ns.layout.page('async1') ).to.eql({
                 'app': {
@@ -169,13 +184,6 @@ describe('ns.layout', function() {
         });
 
         it('async view in box', function() {
-            ns.layout.define('async2', {
-                'app left@': {
-                    'regular-view': {
-                        'async-view&': true
-                    }
-                }
-            }, 'app');
 
             expect( ns.layout.page('async2') ).to.eql({
                 'app': {
@@ -215,8 +223,7 @@ describe('ns.layout', function() {
 
     describe('dynamic layouts', function() {
 
-        it('setup', function() {
-
+        beforeEach(function() {
             ns.layout.define('setup', {
                 'app left@': 'setup-menu',
                 'app right@': {
@@ -229,6 +236,24 @@ describe('ns.layout', function() {
                 }
             }, 'app');
 
+            ns.layout.define('setup-filters', {
+                'app right@ setup-{ .tab } content@': {
+                    'setup-blocks': true
+                }
+            }, 'setup');
+
+            ns.layout.define('mailbox', {
+                'app left@': [ 'folders', 'labels' ]
+            }, 'app');
+
+            ns.layout.define('message', {
+                'app right@': function(params) {
+                    return (params.ids) ? 'message' : 'messages';
+                }
+            }, 'mailbox');
+        });
+
+        it('setup', function() {
 
             expect( ns.layout.page('setup', { tab: 'interface' }) ).to.eql({
                 'app': {
@@ -281,12 +306,6 @@ describe('ns.layout', function() {
 
         it('setup-filters', function() {
 
-            ns.layout.define('setup-filters', {
-                'app right@ setup-{ .tab } content@': {
-                    'setup-blocks': true
-                }
-            }, 'setup');
-
             expect( ns.layout.page('setup-filters', { tab: 'filters' }) ).to.eql({
                 'app': {
                     'type': ns.L.VIEW,
@@ -334,12 +353,6 @@ describe('ns.layout', function() {
 
 
         it('choose box from params', function() {
-
-            ns.layout.define('message', {
-                'app right@': function(params) {
-                    return (params.ids) ? 'message' : 'messages';
-                }
-            }, 'mailbox');
 
             expect( ns.layout.page('message', { ids: "1234567890" }) ).to.eql({
                 'app': {

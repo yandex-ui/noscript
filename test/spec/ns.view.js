@@ -10,7 +10,6 @@ describe('ns.View', function() {
 
         afterEach(function() {
             ns.View.define.restore();
-            ns.View.undefine('test-view-define');
         });
 
         it('should throw exception if I define View twice', function() {
@@ -52,8 +51,6 @@ describe('ns.View', function() {
 
         afterEach(function() {
             delete this.view;
-            ns.View.undefine('parentMegaView');
-            ns.View.undefine('childMegaView');
         });
 
         it('наследуемый view должен быть ns.View', function() {
@@ -79,42 +76,39 @@ describe('ns.View', function() {
 
     describe('ns.View.info events parse', function() {
 
-        ns.View.define('test-view-info-events-parse', {
-            events: {
-                'scroll window': no.pe,
-                'scroll document': no.pe,
-
-                'scroll@init window': no.pe,
-                'scroll@init document': no.pe,
-
-                'resize window': no.pe,
-                'resize document': no.pe,
-
-                'resize@init window': no.pe,
-                'resize@init document': no.pe,
-
-                'scroll .foo-init': no.pe,
-                'scroll': no.pe,
-                'click': no.pe,
-                'click .bar-init': no.pe,
-
-                'scroll@show .foo-show': no.pe,
-                'scroll@show': no.pe,
-                'click@show': no.pe,
-                'click@show .bar-show': no.pe,
-
-                'my-global-init-event-short': no.pe,
-                'my-local-init-event-short .': no.pe,
-
-                'my-global-init-event@init': no.pe,
-                'my-local-init-event@init .': no.pe,
-
-                'my-global-show-event@show': no.pe,
-                'my-local-show-event@show .': no.pe
-            }
-        });
-
         beforeEach(function() {
+            ns.View.define('test-view-info-events-parse', {
+                events: {
+                    'scroll window': no.nop,
+                    'scroll document': no.nop,
+
+                    'scroll@init window': no.nop,
+                    'scroll@init document': no.nop,
+
+                    'resize window': no.nop,
+                    'resize document': no.nop,
+
+                    'resize@init window': no.nop,
+                    'resize@init document': no.nop,
+
+                    'scroll .foo-init': no.nop,
+                    'scroll': no.nop,
+                    'click': no.nop,
+                    'click .bar-init': no.nop,
+
+                    'scroll@show .foo-show': no.nop,
+                    'scroll@show': no.nop,
+                    'click@show': no.nop,
+                    'click@show .bar-show': no.nop,
+
+                    'my-global-init-event-short': no.nop,
+
+                    'my-global-init-event@init': no.nop,
+
+                    'my-global-show-event@show': no.nop
+                }
+            });
+
             this.viewInfo = ns.View.info('test-view-info-events-parse');
         });
 
@@ -150,40 +144,40 @@ describe('ns.View', function() {
 
             it('should parse delegated init events properly', function() {
                 expect(this.viewInfo.initEvents['delegate']).to.be.eql([
-                    ['scroll', 'window', no.pe],
-                    ['scroll', 'document', no.pe],
+                    ['scroll', 'window', no.nop],
+                    ['scroll', 'document', no.nop],
 
-                    ['resize', 'window', no.pe],
-                    ['resize', 'document', no.pe],
+                    ['resize', 'window', no.nop],
+                    ['resize', 'document', no.nop],
 
-                    ['scroll', '', no.pe],
-                    ['click', '', no.pe],
-                    ['click', '.bar-init', no.pe]
+                    ['scroll', '', no.nop],
+                    ['click', '', no.nop],
+                    ['click', '.bar-init', no.nop]
                 ]);
             });
 
             it('should parse bind init events properly', function() {
                 expect(this.viewInfo.initEvents['bind']).to.be.eql([
-                    ['scroll', '.foo-init', no.pe]
+                    ['scroll', '.foo-init', no.nop]
                 ]);
             });
 
             it('should parse show events properly', function() {
                 expect(this.viewInfo.showEvents['delegate']).to.be.eql([
-                    ['scroll', 'window', no.pe],
-                    ['scroll', 'document', no.pe],
-                    ['resize', 'window', no.pe],
-                    ['resize', 'document', no.pe],
+                    ['scroll', 'window', no.nop],
+                    ['scroll', 'document', no.nop],
+                    ['resize', 'window', no.nop],
+                    ['resize', 'document', no.nop],
 
-                    ['scroll', '', no.pe],
-                    ['click', '', no.pe],
-                    ['click', '.bar-show', no.pe]
+                    ['scroll', '', no.nop],
+                    ['click', '', no.nop],
+                    ['click', '.bar-show', no.nop]
                 ]);
             });
 
             it('should parse show events properly', function() {
                 expect(this.viewInfo.showEvents['bind']).to.be.eql([
-                    ['scroll', '.foo-show', no.pe]
+                    ['scroll', '.foo-show', no.nop]
                 ]);
             });
         });
@@ -215,28 +209,23 @@ describe('ns.View', function() {
 
             it('should parse global init noevents properly', function() {
                 expect(this.viewInfo.initNoevents['global']).to.be.eql([
-                    ['my-global-init-event-short', no.pe],
-                    ['my-global-init-event', no.pe]
+                    ['my-global-init-event-short', no.nop],
+                    ['my-global-init-event', no.nop]
                 ]);
             });
 
             it('should parse local init noevents properly', function() {
-                expect(this.viewInfo.initNoevents['local']).to.be.eql([
-                    ['my-local-init-event-short', no.pe],
-                    ['my-local-init-event', no.pe]
-                ]);
+                expect(this.viewInfo.initNoevents['local']).to.be.eql([]);
             });
 
             it('should parse global show noevents properly', function() {
                 expect(this.viewInfo.showNoevents['global']).to.be.eql([
-                    ['my-global-show-event', no.pe]
+                    ['my-global-show-event', no.nop]
                 ]);
             });
 
             it('should parse local show noevents properly', function() {
-                expect(this.viewInfo.showNoevents['local']).to.be.eql([
-                    ['my-local-show-event', no.pe]
-                ]);
+                expect(this.viewInfo.showNoevents['local']).to.be.eql([]);
             });
         });
     });
@@ -329,8 +318,8 @@ describe('ns.View', function() {
             expect(this.result).to.be.eql({
                 'bind': [],
                 'delegate': [],
-                'no-local': [],
-                'no-global': []
+                'ns-local': [],
+                'ns-global': []
             });
         });
 
@@ -353,5 +342,63 @@ describe('ns.View', function() {
         it('should call _bindEventHandlers for global no.events', function() {
             expect(this.view._bindEventHandlers.calledWithExactly(this.globalArr, 1)).to.be.ok()
         });
+    });
+
+    describe('ns-init event', function() {
+
+        it('should call event handler defined as string', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': 'initCallback'
+                },
+                methods: {
+                    initCallback: spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.calledOnce).to.be.ok();
+        });
+
+        it('should call event handler defined as string with ns.View instance', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': 'initCallback'
+                },
+                methods: {
+                    initCallback: spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.ok();
+        });
+
+        it('should bind event defined as function', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.calledOnce).to.be.ok();
+        });
+
+        it('should bind event defined as function with ns.View instance', function() {
+            var spy = sinon.spy();
+            ns.View.define('myblock', {
+                events: {
+                    'ns-init': spy
+                }
+            });
+            ns.View.create('myblock');
+
+            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.ok();
+        });
+
     });
 });

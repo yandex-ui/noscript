@@ -1,5 +1,5 @@
 /**
- * noscrpt
+ * noscript MVC framework
  * @namespace
  */
 var ns = {};
@@ -116,3 +116,16 @@ ns.transaction = function(cb) {
     ns.page._stop = false;
     ns.page.go(ns.page._lastUrl);
 };
+
+if (window['mocha']) {
+
+    /**
+     * Clean internal data after tests
+     */
+    ns.clean = function() {
+        ns.layout.undefine();
+        ns.View.undefine();
+        ns.Model.undefine();
+        ns.request.clean();
+    };
+}

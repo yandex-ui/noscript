@@ -44,11 +44,6 @@ describe('ns.Model', function() {
 
     });
 
-    afterEach(function() {
-        // чистим кэш созданных моделей после каждого теста
-        ns.Model.undefine();
-    });
-
     describe('static', function() {
 
         describe('define', function() {
@@ -57,7 +52,7 @@ describe('ns.Model', function() {
                 var define = function() { ns.Model.define('dm1'); };
                 define();
 
-                expect(define).to.throwException(/Model 'dm1' can't be redefined!/);
+                expect(define).to.throwException();
             });
 
             it('should fill _infos', function() {
@@ -245,7 +240,7 @@ describe('ns.Model', function() {
 
             it('should return specific key for do-model', function() {
                 expect( ns.Model.key('do-m1', {p1: '1'}) )
-                    .to.match(/^do-\d+$/);
+                    .to.match(/^do-do-m1-\d+$/);
             });
 
             it('should return different keys for the same do-models on each call', function() {
@@ -463,7 +458,7 @@ describe('ns.Model', function() {
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
                 this.model = ns.Model.create('split1', {p1: 1, p2: 2}, this.data);
-            })
+            });
 
             it('should return model\'s data', function() {
                 var data = {foo: 'bar'};
@@ -472,6 +467,13 @@ describe('ns.Model', function() {
 
                 expect( model.getData() )
                     .to.be(data);
+            });
+
+            it('should return no data if model is invalid', function() {
+                var model = ns.Model.create('m1', {p1: 1, p3: 2});
+
+                expect( model.getData() )
+                    .to.be(null);
             });
 
             it('should return data of splitted model', function() {

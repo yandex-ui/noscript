@@ -6,6 +6,8 @@
  * @param {ns.View} view Корневой view.
  * @param {Object} layout Layout для этого view, результат от ns.layout.page()
  * @param {Object} params Параметры, результат от ns.router()
+ * @param {Object} [options] Options for ns.Update
+ * @param {ns.U.EXEC} [options.execFlag=ns.U.EXEC.GLOBAL] Options for ns.Update
  * @constructor
  * @example
  * var route = ns.router('/folder/123/message/456');
@@ -13,7 +15,7 @@
  * var update = new ns.Update(AppBlock, layout, route.params);
  * update.start();
  */
-ns.Update = function(view, layout, params) {
+ns.Update = function(view, layout, params, options) {
     /**
      * Корневой view.
      * @private
@@ -27,15 +29,28 @@ ns.Update = function(view, layout, params) {
 
     } else {
         // если его нет - ругаемся
-        throw "ns.Update: can't find view layout";
+        throw new Error("[ns.Update] Can't find view layout");
     }
 
     this.params = params;
 
     this.id = ++update_id;
+
+    options = options || {};
+
+    /**
+     * Execution flag
+     * @type {ns.U.EXEC}
+     */
+    this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+/**
+ * Current ns.Updates.
+ * @type ns.Update[]
+ * @private
+ */
+var currentUpdates = [];
 
 /**
  * Id последнего созданного update-а.
@@ -44,11 +59,18 @@ ns.Update = function(view, layout, params) {
 var update_id = -1;
 
 /**
+ * @see ns.U.STATUS
+ * @enum {Number}
+ * @borrows ns.U.STATUS as ns.Update.prototype.STATUS
+ */
+ns.Update.prototype.STATUS = ns.U.STATUS;
+
+/**
  * Порядок событий для View.
  * @type {Array}
  * @private
  */
-ns.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async', 'show', 'repaint'];
+ns.Update.prototype._EVENTS_ORDER = ['ns-hide', 'ns-htmldestroy', 'ns-htmlinit', 'ns-async', 'ns-show', 'ns-repaint'];
 
 /**
  * Начинает работу updater'а.
@@ -57,6 +79,12 @@ ns.Update.prototype._EVENTS_ORDER = ['hide', 'htmldestroy', 'htmlinit', 'async',
  */
 ns.Update.prototype.start = function(async) {
     var resultPromise = new no.Promise();
+    this.promise = resultPromise;
+
+    if (!this.addToQueue(this)) {
+        this.abort();
+        return this.promise;
+    }
 
     var updated = this.view._getRequestViews({
         sync: [],
@@ -66,32 +94,84 @@ ns.Update.prototype.start = function(async) {
     var that = this;
 
     var models = views2models(updated.sync);
-    var promise = ns.request.models(models)
-        .then(function(r) {
-            //TODO: check errors
+
+    // create promise for each async view
+    var asyncUpdaterPromises = updated.async.map(function() {
+        return new no.Promise();
+    });
+
+    var syncModelsPromise = ns.request.models(models)
+        .done(function(models) {
             if (that._expired()) {
-                resultPromise.reject();
+                that.error({
+                    error: that.STATUS.EXPIRED
+                });
+
             } else {
+                //FIXME: we should delete this loop when ns.request will can reject promise
+                // check that all models is valid
+                for (var i = 0, j = models.length; i < j; i++) {
+                    if (!models[i].isValid()) {
+                        that.error({
+                            error: that.STATUS.MODELS,
+                            models: models
+                        });
+                        return;
+                    }
+                }
+
                 that._update(async);
-                //TODO: надо как-то закидывать ссылки на промисы от асинхронных view
-                resultPromise.resolve();
+                // resolve main promise and return promises for async views
+                that.done({
+                    async: asyncUpdaterPromises
+                });
             }
+        })
+        .fail(function(models) {
+            //FIXME: ns.request.models can't reject promise this time, we should fix it
+            that.error({
+                error: that.STATUS.MODELS,
+                models: models
+            });
         });
 
     // Для каждого async-view запрашиваем его модели.
     // Когда они приходят, запускаем точно такой же update.
-    updated.async.forEach(function(view) {
+    // Причем ждем отрисовку sync-view, чтобы точно запуститься после него.
+    updated.async.forEach(function(view, asyncViewId) {
         var models = views2models( [ view ] );
         no.Promise.wait([
-            promise,
+            syncModelsPromise,
             ns.request.models(models)
-        ]).then(function(r) {
-            //TODO: смотреть, что не запустился другой update
-            if (!that._expired()) {
-                var fakeLayout = {};
-                fakeLayout[that.view.id] = that.layout;
-                new ns.Update(that.view, fakeLayout, that.params).start(true);
+        ]).done(function(result) {
+            var models = result[1];
+            //FIXME: we should delete this loop when ns.request will can reject promise
+            // check that all models is valid
+            for (var i = 0, j = models.length; i < j; i++) {
+                if (!models[i].isValid()) {
+                    asyncUpdaterPromises[asyncViewId].reject({
+                        error: that.STATUS.MODELS,
+                        async_view: view,
+                        models: models
+                    });
+                    return;
+                }
             }
+
+            var fakeLayout = {};
+            fakeLayout[that.view.id] = that.layout;
+            new ns.Update(that.view, fakeLayout, that.params, {execFlag: ns.U.EXEC.ASYNC})
+                .start(true)
+                // pipes ns.Update promise to asyncPromise
+                .pipe(asyncUpdaterPromises[asyncViewId]);
+
+        }).fail(function(result) {
+            //FIXME: ns.request.models can't reject promise this time, we should fix it
+            asyncUpdaterPromises[asyncViewId].reject({
+                error: that.STATUS.MODELS,
+                async_view: view,
+                models: result[1]
+            });
         });
     });
 
@@ -116,19 +196,20 @@ ns.Update.prototype._update = function(async) {
     };
     this.view._getUpdateTree(tree, layout.views, params);
 
+    var node;
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
-        var node = ns.tmpl(tree, null, '');
+        node = ns.tmpl(tree, null, '');
     }
 
     var viewEvents = {
-        'async': [],
-        'hide': [],
-        'htmldestroy': [],
-        'htmlinit': [],
-        'show': [],
-        'repaint': []
+        'ns-async': [],
+        'ns-hide': [],
+        'ns-htmldestroy': [],
+        'ns-htmlinit': [],
+        'ns-show': [],
+        'ns-repaint': []
     };
 
     this.view._updateHTML(node, layout.views, params, {
@@ -152,8 +233,111 @@ ns.Update.prototype._update = function(async) {
  * @private
  */
 ns.Update.prototype._expired = function() {
-    var expired = this.id < update_id;
-    return expired;
+    return this.stopped || currentUpdates.indexOf(this) === -1;
+};
+
+ns.Update.prototype.abort = function() {
+    //TODO: Should we abort ns.request?
+
+    /**
+     * Flag that update was stopped.
+     * @type {boolean}
+     */
+    this.stopped = true;
+
+    // reject promise
+    this.error({
+        error: ns.U.STATUS.EXPIRED
+    });
+};
+
+/**
+ * @private
+ * @param result
+ */
+ns.Update.prototype.done = function(result) {
+    this.removeFromQueue();
+    this.promise.resolve(result);
+};
+
+/**
+ * @private
+ * @param result
+ */
+ns.Update.prototype.error = function(result) {
+    this.removeFromQueue();
+    this.promise.reject(result);
+};
+
+/**
+ * @private
+ */
+ns.Update.prototype.removeFromQueue = function() {
+    var index = currentUpdates.indexOf(this);
+    if (index > -1) {
+        currentUpdates.splice(index, 1);
+    }
+};
+
+/**
+ * Check whether it is possible to execute given ns.Update
+ * @description
+ * ns.Update can be global, async or parallel.
+ * Cases:
+ *   - Global update can be terminated by another global Update only.
+ *   - Global Update terminated all Updates except parallel.
+ *   - Async updates execute simultaneously.
+ *   - Parallel update can't be terminated.
+ * @static
+ * @private
+ * @param {ns.Update} newUpdate New instance of ns.Update.
+ * @returns Boolean
+ */
+ns.Update.prototype.addToQueue = function(newUpdate) {
+    var currentRuns = currentUpdates;
+    var FLAGS = ns.U.EXEC;
+    var FLAG_GLOBAL = FLAGS.GLOBAL;
+    var FLAG_PARALLEL = FLAGS.PARALLEL;
+    var FLAG_ASYNC = FLAGS.ASYNC;
+
+    var newRunExecutionFlag = newUpdate.EXEC_FLAG;
+    var i,j;
+
+    // if newUpdate is global we should terminate all non-parallel updates
+    if (newRunExecutionFlag === FLAG_GLOBAL) {
+        var survivedRuns = [];
+        //прекращаем текущие runs
+        for (i = 0, j = currentRuns.length; i < j; i++) {
+            /**
+             * @type {ns.Update}
+             */
+            var run = currentRuns[i];
+
+            // don't terminated paraller updates
+            if (run.EXEC_FLAG === FLAG_PARALLEL) {
+                survivedRuns.push(run);
+
+            } else {
+                run.abort();
+            }
+        }
+        // save survived updates
+        currentUpdates = survivedRuns;
+
+    } else if (newRunExecutionFlag === FLAG_ASYNC) { // async update
+
+        // check whether we have one global update
+        for (i = 0, j = currentRuns.length; i < j; i++) {
+            if (currentRuns[i].EXEC_FLAG === FLAG_GLOBAL) {
+                return false;
+            }
+        }
+
+    }
+
+    currentUpdates.push(newUpdate);
+
+    return true;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

@@ -11,7 +11,7 @@
         };
         return function(c) {
             return chars[c];
-        }
+        };
     })();
 
     /**
@@ -38,7 +38,7 @@
         };
         return function(a, b) {
             return chars[b] || a;
-        }
+        };
     })();
 
     /**

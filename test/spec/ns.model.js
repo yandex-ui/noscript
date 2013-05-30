@@ -503,7 +503,7 @@ describe('ns.Model', function() {
 
                 this.eventsDeclaration = {
                     'changed': this.changedCb,
-                    'changed..data': this.changedJpathCb
+                    'changed.data': this.changedJpathCb
                 };
 
                 ns.Model.define('defined-events-2', {
@@ -542,11 +542,7 @@ describe('ns.Model', function() {
 
             it('should call callback on .set() with params', function() {
                 this.model.set('.data', 2);
-                expect(this.changedJpathCb.calledWith('changed..data', {
-                    'old': 1,
-                    'new': 2,
-                    'jpath': '.data'
-                })).to.be.ok();
+                expect(this.changedJpathCb.calledWith('changed.data', '.data')).to.be.ok();
             });
 
         });

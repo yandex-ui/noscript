@@ -1012,11 +1012,17 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
-        console.log('updateHTML', this.id);
+        //  console.log('updateHTML', this.id);
+
         //  Ищем новую ноду блока.
         viewNode = ns.byClass('ns-view-' + this.id, node)[0];
+
         if (!viewNode) {
-            throw "Can't find node for view '" + this.id + "'";
+            //  TODO @nop: Может сделать метод типа:
+            //
+            //      this.error("Can't find node for %id");
+            //
+            throw new Error("[ns.View] Can't find node for '" + this.id + "'");
         }
 
         //  Тут у нас может быть несколько вариантов, почему блок нужно как-то обновлять:
@@ -1078,12 +1084,6 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
                 // В асинхронном запросе вызываем async для view, которые являются заглушкой.
                 events['ns-async'].push(this);
             }
-
-            //  TODO nop@: Может сделать метод типа:
-            //
-            //      this.error("Can't find node for %id");
-            //
-            throw new Error("[ns.View] Can't find node for '" + this.id + "'");
         }
 
         //  Все subview теперь валидны.

@@ -327,6 +327,7 @@ ns.Model.prototype.get = function(jpath) {
  * @param {String} jpath jpath до значения.
  * @param {*} value Новое значение.
  * @param {Object} [options] Флаги.
+ * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
  */
 ns.Model.prototype.set = function(jpath, value, options) {
     var data = this.data;

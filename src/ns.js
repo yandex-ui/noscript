@@ -48,13 +48,38 @@ ns.todo = function() {
     throw new Error('Unimplemented');
 };
 
+/**
+ * Parse query string to object.
+ * @param {String} s Query string
+ * @returns {Object}
+ */
 ns.parseQuery = function(s) {
     var o = {};
 
-    s.split('&').forEach(function(s) {
-        var p = s.split('=');
-        //  FIXME: decode-бла-бла.
-        o[ p[0] ] = p[1];
+    s.split('&').forEach(function(chunk) {
+        var p = chunk.split('=');
+        var name = p[0];
+        if (name) {
+            var value = p[1];
+
+            // &c=
+            if (typeof value === 'undefined') {
+                value = '';
+
+            } else {
+                try {
+                    value = decodeURIComponent(value);
+                } catch (e) {
+                    value = '';
+                    ns.log.info('ns.parseQuery.invalid-param', {
+                        query: s,
+                        chunk: chunk
+                    });
+                }
+            }
+
+            o[name] = value;
+        }
     });
 
     return o;

@@ -84,19 +84,16 @@ ns.Model.prototype._bindEvents = function() {
  * инициализирует все составляющие модели
  */
 ns.Model.prototype._splitData = function(data) {
-    var that = this;
     var info = this.info.split;
     var newModels = [];
     var oldModels = this.models || [];
 
     // нужно сохранить ссылку на callback,
     // чтобы можно было его анбиндить
-    if (!this._splitData.callback) {
-        this._splitData.callback = function(evt, data) {
-            return that.trigger(evt, data);
-        };
+    if (!this._splitDataCallback) {
+        this._splitDataCallback = this.trigger.bind(this);
     }
-    var callback = this._splitData.callback;
+    var callback = this._splitDataCallback;
 
     var items = no.path(info.items, data);
 

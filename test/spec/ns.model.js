@@ -307,17 +307,19 @@ describe('ns.Model', function() {
         });
 
         describe('_splitData', function() {
-            // пришлось поизвращаться, чтобы sinon заработал
-            var callback;
 
             beforeEach(function() {
-                callback = sinon.spy();
+                this.callback = sinon.spy();
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
                 this.model = ns.Model.create('split1', {p1: 1, p2: Math.random()});
-                this.model.trigger = function() { callback(); }
+                this.model.trigger = this.callback;
 
                 this.model._splitData(this.data);
                 this.models = this.model.models;
+            });
+
+            afterEach(function() {
+                delete this.callback;
             });
 
             it('should create nested models', function() {
@@ -339,14 +341,14 @@ describe('ns.Model', function() {
 
             it('should trigger collections \'changed\' on submodel\'s \'changed\'', function() {
                 this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
-                expect(callback.callCount).to.be(1);
+                expect(this.callback.callCount).to.be(1);
             });
 
             it('should not duplicate \'changed\' bindings', function() {
                 this.model._splitData(this.data);
                 this.model._splitData(this.data);
                 this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
-                expect(callback.callCount).to.be(1);
+                expect(this.callback.callCount).to.be(1);
             });
 
             it('should not trigger if submodel not in collection now', function() {
@@ -358,7 +360,7 @@ describe('ns.Model', function() {
 
                 model.setData({id: 1, foo: 'foo', bar: 'bar'});
 
-                expect(callback.called).not.to.be.ok();
+                expect(this.callback.called).not.to.be.ok();
             });
 
         });

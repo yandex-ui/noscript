@@ -52,7 +52,7 @@ ns.router = function(url) {
 
     // Ничего подходящего не нашли.
     return {
-        page: 'not-found',
+        page: ns.R.NOT_FOUND,
         params: {}
     };
 

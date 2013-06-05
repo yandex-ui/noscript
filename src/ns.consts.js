@@ -81,6 +81,18 @@ ns.M.STATUS = {
 };
 
 /**
+ * Константы для ns.router.
+ * @type {Object}
+ * @constant
+ */
+ns.R = {
+    /**
+     * ID необъявленной/ненайденной страницы
+     */
+    NOT_FOUND: 'not-found'
+};
+
+/**
  * Constants for ns.Updater.
  * @type {Object}
  * @constant

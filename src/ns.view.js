@@ -160,6 +160,7 @@ var _ctors = {};
  * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
  * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
  * @param {Object} [info.noevents.show] События, на которые надо подписаться при показе DOM-элемента.
+ * @param {Object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
  * @param {Function} [base=ns.View] Базовый View для наследования
  * @return {Function} Созданный View.
  */

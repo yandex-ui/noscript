@@ -7,7 +7,7 @@
 /**
  * Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.
  * @class Класс, реализующий View
- * @see http://github.com/pasaran/noscript/wiki/ns.View
+ * @see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md
  * @constructor
  * @mixes no.Events
  */

@@ -987,12 +987,12 @@ ns.View.prototype._setNode = function(node) {
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем (если нужно) ноду блока.
-ns.View.prototype._updateHTML = function(node, layout, params, options, events) {
+ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
 
     //  FIXME nop@: Велик могучим русский языка!
     //  Падежи не сходятся вообще :(
     //
-    // при обработке toplevel-view надо скопировать первоначальные options
+    // при обработке toplevel-view надо скопировать первоначальные updateOptions
     // инчае, при обновлении параллельных веток дерева, toplevel оказажется только первая
     // и, соответственно, DOM-надо обновиться только у нее
     // {
@@ -1000,14 +1000,14 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     //   "my-root-view2": {/* tree 2 */}
     // }
     var options_next;
-    if (options.toplevel) {
-        options_next = no.extend({}, options);
+    if (updateOptions.toplevel) {
+        options_next = no.extend({}, updateOptions);
 
     } else {
-        options_next = options;
+        options_next = updateOptions;
     }
 
-    var syncUpdate = !options.async;
+    var syncUpdate = !updateOptions.async;
     var viewWasInvalid = !this.isValid();
 
     var viewNode;
@@ -1053,7 +1053,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
-            if (options.toplevel) {
+            if (updateOptions.toplevel) {
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 //  FIXME: Вот тут нужны два варианта: вся нода невалидна или же невалидные некоторое subview.
@@ -1071,7 +1071,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
             }
 
             //  новая нода должна в любом случае попасть в DOM
-            if (this.node && !options.parent_added && !options_next.parent_added) {
+            if (this.node && !updateOptions.parent_added && !options_next.parent_added) {
                 ns.replaceNode(this.node, viewNode);
             }
 

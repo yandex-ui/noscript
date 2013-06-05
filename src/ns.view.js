@@ -875,8 +875,8 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
         options_next = options;
     }
 
-    // для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
-    var generateRepaintEvent = !options.async || !this.isValid();
+    var syncUpdate = !options.async;
+    var viewWasInvalid = !this.isValid();
 
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
@@ -926,7 +926,11 @@ ns.View.prototype._updateHTML = function(node, layout, params, options, events) 
     }
 
     // Если view валидный и не в async-режиме, то вызывается show и repaint
-    if ( generateRepaintEvent && this.isOk() ) {
+    // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать repaint
+
+    // Условие звучит так "(Если мы в синхнронном ns.Update и view стал валиден) или (view был не валиден и стал валиден)"
+    // Второе условие относится как к перерисованным view, так и к async-view, которые полностью отрисовались
+    if ( (syncUpdate || viewWasInvalid) && this.isOk() ) {
         // событие show будет вызвано, если у view поменяется this._visible
         this._show(events['ns-show']);
         events['ns-repaint'].push(this);

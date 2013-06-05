@@ -230,6 +230,120 @@ describe('ns.View', function() {
         });
     });
 
+    describe('ns.View.info models parse', function() {
+
+        describe('no models specified', function() {
+
+            beforeEach(function() {
+                ns.Model.define('a');
+                ns.Model.define('b');
+                ns.Model.define('c');
+            });
+
+            afterEach(function() {
+                ns.Model.undefine();
+            });
+
+            it('no models at all', function() {
+                ns.View.define('test-view-info-models-parse_no-models', {});
+
+                var info = ns.View.info('test-view-info-models-parse_no-models');
+                expect(info.models).to.be.eql({});
+
+                ns.View.undefine('test-view-info-models-parse_no-models');
+            });
+
+            it('models specified as empty array', function() {
+                ns.View.define('test-view-info-models-parse_empty-array', { models: [] });
+
+                var info = ns.View.info('test-view-info-models-parse_empty-array');
+                expect(info.models).to.be.eql({});
+
+                ns.View.undefine('test-view-info-models-parse_empty-array');
+            });
+
+            it('models array is converted to object', function() {
+                ns.View.define('test-view-info-models-parse_array', { models: [ 'a', 'b' ] });
+
+                var info = ns.View.info('test-view-info-models-parse_array');
+                expect(info.models).to.be.eql({ a: true, b: true });
+
+                ns.View.undefine('test-view-info-models-parse_array');
+            });
+        });
+    });
+
+    describe('ns.View render', function() {
+
+        describe('ns.View render with some invalid models', function() {
+
+            beforeEach(function() {
+                ns.Model.define('a');
+                ns.Model.define('b');
+                ns.Model.define('c');
+
+                ns.View.define('test-view-render_complex', {
+                    models: {
+                        a: true,
+                        b: false,
+                        c: null
+                    }
+                });
+            });
+
+            afterEach(function() {
+                ns.Model.undefine();
+                ns.View.undefine();
+            });
+
+            it('required models are valid, optional ones — invalid', function() {
+                var a = ns.Model.create('a', { id: 1 });
+                var b = ns.Model.create('b', { id: 2 });
+                var c = ns.Model.create('c', { id: 3 });
+
+                a.setData({ data: 'a' });
+                b.setError({ error: 'b invalid' });
+                c.setError({ error: 'c invalid' });
+
+                var view = ns.View.create('test-view-render_complex', {}, false);
+
+                expect( view.isModelsValid() ).to.be.ok();
+            });
+
+            it('required model is invalid, the rest is valid', function() {
+                var a = ns.Model.create('a', { id: 1 });
+                var b = ns.Model.create('b', { id: 2 });
+                var c = ns.Model.create('c', { id: 3 });
+
+                a.setError({ error: 'a invalid' });
+                b.setData({ data: 'b' });
+                c.setData({ data: 'c' });
+
+                var view = ns.View.create('test-view-render_complex', {}, false);
+                expect( view.isModelsValid() ).not.to.be.ok();
+            });
+
+            it('render errors also', function() {
+                var a = ns.Model.create('a', { id: 1 });
+                var b = ns.Model.create('b', { id: 2 });
+                var c = ns.Model.create('c', { id: 3 });
+
+                a.setData({ data: 'a' });
+                b.setError({ error: 'b invalid' });
+                c.setError({ error: 'c invalid' });
+
+                var view = ns.View.create('test-view-render_complex', {}, false);
+
+                expect( view._getModelsData() ).to.be.eql({
+                    a: { data: 'a' },
+                    b: { error: 'b invalid' },
+                    c: { error: 'c invalid' }
+                });
+            });
+
+        });
+    });
+
     describe('ns.View._bindEventHandlers', function() {
 
         beforeEach(function() {

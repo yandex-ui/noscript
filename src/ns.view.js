@@ -778,8 +778,7 @@ ns.View.prototype.isModelsValid = function(timestamp) {
         var model = models[id];
         if (
             // Модель является обязательной
-            this.info.models[id] === true
-            &&
+            this.info.models[id] === true &&
             (
                 // модель не валидна
                 !model.isValid() ||

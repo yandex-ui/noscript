@@ -86,39 +86,8 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, par
 };
 
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
-    // Сделаем декларацию для этого ViewCollection
-    var currentTree = this._getViewTree(layout, params);
-
-    // Какие элементы коллекции обновлять, мы можем понять только по модели
-    // Поэтому, полезем внутрь, только если есть все данные
-    if (this.isModelsValid()) {
-        // ModelCollection
-        var MC = this.models[this.info.modelCollectionId];
-        var itemsToRender = [];
-
-        // Проходом по элементам MC определим,
-        //  - какие виды нужно добавить
-        //  - какие виды нужно обновить
-        for (var i = 0, view, p; i < MC.models.length; i++) {
-            p    = no.extend({}, params, MC.models[i].params);
-            view = this._getView(this.info.split.view_id, p);
-
-            if (!view) {
-                view = this._addView(this.info.split.view_id, p);
-            }
-
-            if (!view.isValid()) {
-                itemsToRender.push(
-                    view._getViewTree(layout, params)
-                );
-            }
-        }
-
-        currentTree.views[this.info.split.view_id] = itemsToRender;
-    }
-
     // Добавим декларацию этого ViewCollection в общее дерево
-    tree.views[this.id] = currentTree;
+    tree.views[this.id] = this._getViewTree(layout, params);
 
     return tree;
 };
@@ -149,6 +118,32 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
     if ( this.async && !this.isModelsValid() ) {
         tree.async = true;
+    }
+
+    // Какие элементы коллекции рендерить, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если есть все данные
+    if (this.isModelsValid()) {
+        // ModelCollection
+        var MC = this.models[this.info.modelCollectionId];
+        var itemsToRender = [];
+
+        // Проходом по элементам MC определим, какие виды нужно срендерить
+        for (var i = 0, view, p; i < MC.models.length; i++) {
+            p    = no.extend({}, params, MC.models[i].params);
+            view = this._getView(this.info.split.view_id, p);
+
+            if (!view) {
+                view = this._addView(this.info.split.view_id, p);
+            }
+
+            if (!view.isValid()) {
+                itemsToRender.push(
+                    view._getViewTree(layout, params)
+                );
+            }
+        }
+
+        tree.views[this.info.split.view_id] = itemsToRender;
     }
 
     return tree;

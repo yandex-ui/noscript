@@ -48,7 +48,6 @@ ns.View.prototype._init = function(id, params, async) {
     /**
      * Флаг того, что view может быть асинхронным.
      * Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState
-
      * @type {Boolean}
      */
     this.async = async;
@@ -253,7 +252,6 @@ ns.View._initInfo = function(info) {
         'local': []
     };
 
-
     // парсим события View
     for (var eventDecl in info.events) {
         var declParts = eventDecl.split(' ');
@@ -266,7 +264,7 @@ ns.View._initInfo = function(info) {
 
         var eventName = eventParts.join('@');
 
-        // осталоное - селектор
+        // остальное - селектор
         var eventSelector = declParts.join(' ');
 
         if (eventName) {

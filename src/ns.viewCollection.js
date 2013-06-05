@@ -86,37 +86,39 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, par
 };
 
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
-    // Добавим декларацию этого VC в дерево
-    tree.views[this.id] = this._getViewTree(layout, params);
+    // Сделаем декларацию для этого ViewCollection
+    var currentTree = this._getViewTree(layout, params);
 
-    // Полезем внутрь только если невалиден и пришли данные
-    if ( !this.isValid() && this.isModelsValid() ) {
+    // Какие элементы коллекции обновлять, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если есть все данные
+    if (this.isModelsValid()) {
+        // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
         var itemsToRender = [];
 
-        // Проходом по элементам MC определим, какие виды нужно добавить
+        // Проходом по элементам MC определим,
+        //  - какие виды нужно добавить
+        //  - какие виды нужно обновить
         for (var i = 0, view, p; i < MC.models.length; i++) {
             p    = no.extend({}, params, MC.models[i].params);
             view = this._getView(this.info.split.view_id, p);
 
             if (!view) {
                 view = this._addView(this.info.split.view_id, p);
+            }
+
+            if (!view.isValid()) {
                 itemsToRender.push(
                     view._getViewTree(layout, params)
                 );
             }
         }
 
-        // Проходом по элементам VC определим, какие виды нужно обновить
-        this._apply(function(view) {
-            // Если вид
-            if (!view.isValid()) {
-                itemsToRender.push(view);
-            }
-        });
-
-        tree.views[this.id].views[this.info.split.view_id] = itemsToRender;
+        currentTree.views[this.info.split.view_id] = itemsToRender;
     }
+
+    // Добавим декларацию этого ViewCollection в общее дерево
+    tree.views[this.id] = currentTree;
 
     return tree;
 };
@@ -189,7 +191,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
 
     // Будем обновлять вложенные виды
     // только если этот блок был не валиден и это не первая отрисовка async-view
-    if (viewWasInvalid && !this.isLoading()) {
+    if (!this.isLoading()) {
         // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
         var itemsExist = {};

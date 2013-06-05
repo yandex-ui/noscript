@@ -95,7 +95,7 @@ ns.Model.prototype._splitData = function(data) {
     }
     var callback = this._splitDataCallback;
 
-    var items = no.path(info.items, data);
+    var items = no.jpath(info.items, data);
 
     // анбиндим все старые модели
     // если они останутся в коллекции
@@ -108,7 +108,7 @@ ns.Model.prototype._splitData = function(data) {
         // собираем параметры для новой модели
         var params = {};
         for (var key in info.params) {
-            params[key] = no.path(info.params[key], item);
+            params[key] = no.jpath(info.params[key], item);
         }
 
         // создаём новую модель
@@ -315,7 +315,7 @@ ns.Model.prototype.isValid = function() {
 ns.Model.prototype.get = function(jpath) {
     var data = this.data;
     if (data) {
-        return no.path(jpath, data);
+        return no.jpath(jpath, data);
     }
 };
 
@@ -332,17 +332,31 @@ ns.Model.prototype.set = function(jpath, value, options) {
         return;
     }
 
-    //  Сохраняем новое значение и одновременно получаем старое значение.
-    var oldValue = no.path(jpath, data, value);
+    no.jpath.set(jpath, data, value);
 
-    if ( !( (options && options.silent) || ns.object.isEqual(value, oldValue) ) ) {
-        // TODO: надо придумать какой-то другой разделитель, а то получается changed..jpath
-        // @chestozo: может `:` ?
-        this.trigger('changed.' + jpath, {
-            'new': value,
-            'old': oldValue,
-            'jpath': jpath
-        });
+    //  FIXME: Непонятно, нужно ли сравнивать старое и новое значение.
+    //  Как бы нужно, но это довольно дорого и сложно.
+    //  Пока что будет версия без сравнения.
+
+    if ( !(options && options.silent) ) {
+        //  Кидаем сообщения о том, что модель (или ее часть) изменилась.
+        //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'changed.foo.bar' и 'changed.foo'.
+        //  В качестве параметра (пока что) этот же самый jpath.
+        //
+        var parts = jpath.split('.');
+        var l = parts.length;
+        while (l > 1) {
+            var _jpath = parts.slice(0, l).join('.');
+
+            //  TODO @nop: Видимо, нужно в параметр передавать больше информации, например:
+            //  если изначально jpath был `.foo.bar`, то для события `changed.foo` передавать
+            //  старое значение и новое, полный jpath `.foo.bar`, текущий jpath `.foo`.
+            //
+            this.trigger('changed' + _jpath, _jpath);
+            l--;
+        }
+        //  Сообщение о том, что вообще вся модель изменилась.
+        this.trigger('changed', jpath);
     }
 };
 
@@ -393,7 +407,7 @@ ns.Model.prototype.setData = function(data, options) {
         //  Можно считать, что она в этом случае всегда меняется.
         //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
         if (!options || !options.silent) {
-            this.trigger('changed', this.key);
+            this.trigger('changed', '');
         }
     }
 

@@ -88,13 +88,17 @@ ns.router.init = function() {
  * @return {{ regexp: RegExp, tokens: Array.<string> }}
 */
 ns.router.compile = function(route) {
-    var regexp = route.replace(/\/$/, ''); // Отрезаем последний слэш, он ниже добавится как необязательный.
+    //  Отрезаем последний слэш, он ниже добавится как необязательный.
+    var regexp = route.replace(/\/$/, '');
 
     var tokens = [];
     var defaults = {};
 
-    regexp = regexp.replace(/{(.*?)}/g, function(_, token) { // Заменяем {name} на кусок регэкспа соответствующего типу токена name.
+    //  Заменяем {name} на кусок регэкспа соответствующего типу токена name.
+    //  Матч на слеш нужен, чтобы сделать слеш опциональным.
+    regexp = regexp.replace(/(\/?){(.*?)}/g, function(_, slash, token) {
         var tokenParts = token.split(':');
+        slash = slash || '';
 
         var type = tokenParts[1] || 'id';
         var rx_part = ns.router.regexps[type];
@@ -111,14 +115,22 @@ ns.router.compile = function(route) {
 
             tokens.push(tokenName);
             defaults[tokenName] = tokenDefault;
-            return '(' + rx_part + ')?';
+            if (slash) {
+                return '(?:' + slash + '(' + rx_part + '))?';
+            }
+            else {
+                return '(' + rx_part + ')?';
+            }
+
         } else {
-            tokens.push(tokenName); // Запоминаем имя токена, оно нужно при парсинге урлов.
-            return '(' + rx_part + ')';
+            //  Запоминаем имя токена, оно нужно при парсинге урлов.
+            tokens.push(tokenName);
+            return slash + '(' + rx_part + ')';
         }
     });
-    regexp = '^' + regexp + '\/?(?:\\?(.*))?$'; // Добавляем "якоря" ^ и $;
-                                                // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+    //  Добавляем "якоря" ^ и $;
+    //  Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+    regexp = '^' + regexp + '\/?(?:\\?(.*))?$';
 
     return {
         regexp: new RegExp(regexp),

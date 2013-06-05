@@ -88,13 +88,13 @@ describe('ns.router', function() {
         //test_route('/messages/inbox/45?var1=val1&',           'message', { folder: 'inbox', message_id: '45', var1: 'val1' });
         test_route('/messages/inbox/45?var1=val1',           'message', { folder: 'inbox', message_id: '45', var1: 'val1' });
         //  NOTE может надо какое-то другое значение для val1 ?
-        test_route('/messages/inbox/45?val1',                'message', { folder: 'inbox', message_id: '45', val1: undefined });
+        test_route('/messages/inbox/45?val1',                'message', { folder: 'inbox', message_id: '45', val1: '' });
         test_route('/messages/inbox/45?',                    'message', { folder: 'inbox', message_id: '45' });
         test_route('/messages/inbox/45',                     'message', { folder: 'inbox', message_id: '45' });
 
         test_route('/messages/45?var1=val1&var2=val2', 'message', { folder: 'inbox', message_id: '45', var1: 'val1', var2: 'val2' });
         test_route('/messages/45?var1=val1',           'message', { folder: 'inbox', message_id: '45', var1: 'val1' });
-        test_route('/messages/45?val1',                'message', { folder: 'inbox', message_id: '45', val1: undefined });
+        test_route('/messages/45?val1',                'message', { folder: 'inbox', message_id: '45', val1: '' });
         test_route('/messages/45?',                    'message', { folder: 'inbox', message_id: '45' });
         test_route('/messages/45',                     'message', { folder: 'inbox', message_id: '45' });
 

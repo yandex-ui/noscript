@@ -56,11 +56,7 @@ ns.View.prototype._init = function(id, params, async) {
 
     no.extend(this, ns.View.getKeyAndParams(this.id, params || {}, this.info));
 
-    //  Создаем нужные модели (или берем их из кэша, если они уже существуют).
-    var models = this.models = {};
-    for (var model_id in this.info.models) {
-        models[model_id] = ns.Model.create(model_id, params);
-    }
+    this._initModels();
 
     this.views = null;
     this._subviews = null;
@@ -90,6 +86,17 @@ ns.View.prototype._init = function(id, params, async) {
     }
 
     this.trigger('ns-init');
+};
+
+/**
+ * Инициализирует модели
+ */
+ns.View.prototype._initModels = function() {
+    // Создаёи модели или берем их из кэша, если они уже есть
+    var models = this.models = {};
+    for (var model_id in this.info.models) {
+        models[model_id] = ns.Model.create(model_id, params);
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -912,7 +919,8 @@ ns.View.prototype._getViewTree = function(layout, params) {
         params: this.params,
         //  FIXME: Не должно ли оно приходить в параметрах Update'а?
         page: ns.page.current,
-        views: {}
+        views: {},
+        key: this.key
     };
 
     // добавляем название view, чтобы можно было писать
@@ -1016,6 +1024,7 @@ ns.View.prototype.tmpl = function(mode, extra) {
 
 /**
  * Возвращает массив всех вложенных view, включая себя
+ * FIXME: это же _getDescendantsOrSelf
  * @param {Array} [views=[]] Начальный массив.
  * @return {Array}
  * @private
@@ -1058,6 +1067,26 @@ ns.View.prototype._setNode = function(node) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
+ns.View.prototype.extractNode = function(node) {
+    var viewNode;
+    // Найдём ноду по классу
+    var viewNodes = ns.byClass('ns-view-' + this.id, node);
+
+    // Если такая одна, то это то, что нам нужно
+    if (1 === viewNodes.length) {
+        viewNode = viewNodes[0];
+    } else {
+        // Если этих нод много, придётся заjQuerить
+        for (var i = 0; i < viewNodes.length; i++) {
+            if (viewNodes[i].getAttribute('data-key') === this.key) {
+                viewNode = viewNodes[i];
+            }
+        }
+    }
+
+    return viewNode;
+};
+
 //  Обновляем (если нужно) ноду блока.
 ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
 
@@ -1088,7 +1117,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
         //  console.log('updateHTML', this.id);
 
         //  Ищем новую ноду блока.
-        viewNode = ns.byClass('ns-view-' + this.id, node)[0];
+        viewNode = this.extractNode(node);
 
         if (!viewNode) {
             //  TODO @nop: Может сделать метод типа:
@@ -1121,7 +1150,6 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
             }
         } else {
             //  Обновляем весь блок.
-
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.

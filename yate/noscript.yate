@@ -28,8 +28,9 @@ match .* ns-view {
 // Содержимое view определяется модой ns-view-content
 // @private
 match .* ns-build-view {
-    <div class="ns-view-{ name() }">
+    <div class="ns-view-{ name() }" data-key="{ /.key }">
         @class += apply . ns-view-add-class
+        apply . ns-view-add-attrs
         if /.async {
             apply . ns-view-async-content
         } else {
@@ -49,6 +50,10 @@ match .* ns-build-view {
 // @public
 match .* ns-view-add-class {
     // по умолчанию ничего к классу не добавляем
+}
+
+match .* ns-view-add-attrs {
+    // по умолчанию ничего в атрибуты не добавляем
 }
 
 // Содержимое view

@@ -663,18 +663,18 @@ ns.View.prototype._bindEvents = function(type) {
     for (i = 0, j = delegateEvents.length; i < j; i++) {
         event = delegateEvents[i];
 
-        // если надо переопределяем $target на глобальные объекты
-        var $target = $node;
-        if (event[0] === 'window') {
-            $target = this._$window;
+        if (event[1] === 'window' || event[1] === 'document') {
+            // this._$window
+            // this._$document
+            this['_$' + event[1]].on(event[0] + eventNS, event[2]);
 
-        } else if (event[0] === 'document') {
-            $target = this._$document;
-        }
-        if (event[1]) { //selector
-            $target.on(event[0] + eventNS, event[1], event[2]);
         } else {
-            $target.on(event[0] + eventNS, event[2]);
+
+            if (event[1]) { //selector
+                $node.on(event[0] + eventNS, event[1], event[2]);
+            } else {
+                $node.on(event[0] + eventNS, event[2]);
+            }
         }
     }
 

@@ -103,9 +103,9 @@ ns.tmpl = function(json, mode, module) {
 ns.init = function() {
     ns.action.init();
     ns.router.init();
+    ns.initMainView();
 
     ns.history.adapt();
-    ns.initMainView();
 };
 
 /**

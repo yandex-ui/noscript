@@ -33,10 +33,13 @@ match .* ns-build-view {
         if /.async {
             apply . ns-view-async-content
         } else {
-            if /.is_models_valid {
-                apply . ns-view-content
-            } else {
+
+            // у ns.Box и ns.ViewCollection не бывает is_models_valid
+            if ( /.is_models_valid == false() ) {
                 apply . ns-view-error-content
+
+            } else {
+                apply . ns-view-content
             }
         }
     </div>

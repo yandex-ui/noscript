@@ -203,12 +203,11 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
             // Получим view для этой модели
             view = this._getView(this.info.split.view_id, p);
 
-            // Если view валиден, ничего не делаем
+            // Если у него была старая нода, она заменится сама в _updateHTML
+            view._updateHTML(newNode, null, params, updaterOptions, events);
+
             // Если невалиден
             if (!view.isValid()) {
-                // Если у него была старая нода, она заменится сама в _updateHTML
-                view._updateHTML(newNode, null, params, updaterOptions, events);
-
                 // поставим ноду в правильное место
                 if (prev) {
                     // Либо после предыдущего вида

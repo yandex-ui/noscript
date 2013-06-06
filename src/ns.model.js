@@ -370,7 +370,7 @@ ns.Model.prototype.getData = function() {
     // из моделей её состовляющих
     if ( this.isCollection() && this.isValid() ) {
         // массив с хранилищем данных моделей
-        var items = no.path(this.info.split.items, this.data);
+        var items = no.jpath(this.info.split.items, this.data);
         // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
         items.splice(0, items.length);
         // пишем новые

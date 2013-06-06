@@ -13,9 +13,8 @@ ns.page.go = function(url) {
     if (ns.page._stop) {
         ns.page._lastUrl = url;
 
-        return new no.Promise().reject();
+        return no.Promise.rejected();
     }
-    //TODO: return promise
 
     var loc = window.location;
 
@@ -26,12 +25,12 @@ ns.page.go = function(url) {
 
     // возможность заблокировать переход
     if (url === false) {
-        return new no.Promise().reject();
+        return no.Promise.rejected();
     }
 
     var route = ns.router(url);
     if (route === false) {
-        return new no.Promise().reject();
+        return no.Promise.rejected();
     }
     var layout = ns.layout.page(route.page, route.params);
 

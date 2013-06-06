@@ -80,6 +80,7 @@ ns.Box.prototype._getViewTree = function(layout, params) {
     //  Для бокса это всегда объект (возможно, пустой).
     var tree = {
         box: true,
+        is_models_valid: true,
         tree: {},
         views: {}
     };

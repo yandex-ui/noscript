@@ -896,7 +896,8 @@ ns.View.prototype._getViewTree = function(layout, params) {
         tree: {},
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
-        is_models_valid: this.isModelsValid(),
+        // есть view находится в режиме async, то модели проверять не надо
+        is_models_valid: this.asyncState || this.isModelsValid(),
         //  добавляем собственные параметры блока
         //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,

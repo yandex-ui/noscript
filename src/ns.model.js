@@ -74,9 +74,28 @@ ns.Model.prototype._bindEvents = function() {
 
         for (var i = 0, j = callbacks.length; i < j; i++) {
             //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
-            this.on(event, callbacks[i]);
+            this.on(event, this._prepareCallback(callbacks[i]));
         }
     }
+};
+
+/**
+ * Ищет метод в объекте по имени или возвращает переданную функцию
+ * Нужен для навешивания коллбеков
+ *
+ * @param {String | Function} method
+ * @return {Function}
+ */
+ns.Model.prototype._prepareCallback = function(method) {
+    if (typeof method === 'string') {
+        method = this[method];
+    }
+
+    if (typeof method !== 'function') {
+        throw new Error("[ns.View] Can't find method '" + method + "' in '" + this.id + "'");
+    }
+
+    return method;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

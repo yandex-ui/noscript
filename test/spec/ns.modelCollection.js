@@ -3,6 +3,7 @@ describe('ns.ModelCollection', function() {
     beforeEach(function() {
         var methodCallback = this.methodCallback = sinon.spy();
         var methodNameCallback = this.methodNameCallback = sinon.spy();
+        var changedCallback = this.changedCallback = sinon.spy();
 
         ns.Model.define('mc0', {
             params: {
@@ -15,12 +16,19 @@ describe('ns.ModelCollection', function() {
                     id: '.id',
                     foo: '.value'
                 },
-                model_id: 'split1-item',
-                events: {
-                    'event1': 'onEvent1',
-                    'event2': function ev2() {
-                        methodCallback();
-                    }
+                model_id: 'split1-item'
+            },
+
+            events: {
+                'event1': 'onEvent1',
+                // 'event1': function() {
+                //     methodNameCallback();
+                // },
+                'event2': function() {
+                    methodCallback();
+                },
+                'changed': function() {
+                    changedCallback();
                 }
             },
 
@@ -41,6 +49,7 @@ describe('ns.ModelCollection', function() {
     afterEach(function() {
         delete this.methodCallback;
         delete this.methodNameCallback;
+        delete this.changedCallback;
         ns.Model.undefine();
     });
 
@@ -53,7 +62,6 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.create('mc0', { id: Math.random() });
 
-                this.model.trigger = sinon.spy();
                 this.model._splitData(this.data);
 
                 this.models = this.model.models;
@@ -81,41 +89,55 @@ describe('ns.ModelCollection', function() {
                 expect(this.models[2].params).to.eql({id: 3, foo: 'baz'});
             });
 
-            it('should binding `changed` event', function() {
+            it('should trigger `changed` event', function() {
                 // this.models[0].setData({ id: 1, foo: 'barrr' });
                 this.models[0].setData({ id: 3, foo: 'barrr' });
-                expect(this.model.trigger.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be(1);
             });
 
-            it('should not duplicate binding `changed` event', function() {
+            it('should not duplicate trigger `changed` event', function() {
+                this.model._splitData(this.data);
                 this.model._splitData(this.data);
                 this.models[0].setData({ id: 1, foo: 'barrr' });
-                expect(this.model.trigger.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be(1);
             });
 
-            it('should binding events by methodName', function() {
+            it('should trigger events by methodName', function() {
                 this.models[0].trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
 
-            it('should binding events by func', function() {
+            it('should trigger events by func', function() {
                 this.models[0].trigger('event2');
                 expect(this.methodCallback.callCount).to.be(1);
             });
 
-            it('should not duplicate binding events by methodName', function() {
+            it('should not duplicate trigger events by methodName', function() {
                 this.model._splitData(this.data);
                 this.model._splitData(this.data);
                 this.models[0].trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
 
-            it('should not duplicate binding events by func', function() {
+            it('should not duplicate trigger events by func', function() {
                 this.model._splitData(this.data);
                 this.model._splitData(this.data);
                 this.models[0].trigger('event2');
                 expect(this.methodCallback.callCount).to.be(1);
             });
+
+            it('should not trigger if submodel not in collection now', function() {
+                var data = this.data;
+                data.item = data.item.slice(1, 3);
+                var model = this.models[0];
+
+                this.model._splitData(data);
+
+                model.setData({id: 1, foo: 'foo', bar: 'bar'});
+
+                expect(this.changedCallback.called).not.to.be.ok();
+            });
+
         });
 
         describe('insert', function() {
@@ -125,9 +147,6 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.create('mc0', { id: Math.random() });
                 this.modelEmpty = ns.Model.create('mc0', { id: Math.random() });
-
-                this.model.trigger = sinon.spy();
-                this.modelEmpty.trigger = sinon.spy();
 
                 this.model._splitData(this.data);
                 this.models = this.model.models;
@@ -193,14 +212,14 @@ describe('ns.ModelCollection', function() {
             it('should binding `changed` event', function() {
                 this.model.insert(this.item1, 2);
                 this.models[2].setData({id: 100, value: 'ololo'});
-                expect(this.model.trigger.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be(1);
             });
 
             it('should binding `changed` event for few models', function() {
                 this.model.insert(this.packItems);
                 this.models[0].setData({ id: 1, value: 'foo' });
                 this.models[3].setData({ id: 100, value: 'foo' });
-                expect(this.model.trigger.callCount).to.be(2);
+                expect(this.changedCallback.callCount).to.be(2);
             });
 
             it('should binding custom events for few models', function() {
@@ -226,7 +245,6 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.create('mc0', { id: Math.random() });
 
-                this.model.trigger = sinon.spy();
                 this.model._splitData(this.data);
 
                 this.models = this.model.models;
@@ -246,10 +264,10 @@ describe('ns.ModelCollection', function() {
                 expect(this.models.length).to.be(2);
             });
 
-            it('should not trigger `change` event', function() {
+            it('should not trigger `changed` event', function() {
                 this.model.remove(this.item1);
                 this.item1.setData({ id: 1, foo: 'bar' });
-                expect(this.model.trigger.callCount).to.be(0);
+                expect(this.changedCallback.callCount).to.be(0);
             });
 
             it('should not trigger custom event', function() {
@@ -294,7 +312,7 @@ describe('ns.ModelCollection', function() {
             it('should not trigger `change` event', function() {
                 this.model.clear();
                 this.item1.setData({ id: 1, foo: 'bar' });
-                expect(this.model.trigger.callCount).to.be(0);
+                expect(this.changedCallback.callCount).to.be(0);
             });
 
             it('should not trigger custom event', function() {
@@ -304,7 +322,6 @@ describe('ns.ModelCollection', function() {
             });
 
         });
-
     });
 
 });

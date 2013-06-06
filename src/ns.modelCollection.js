@@ -108,45 +108,29 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
 
-    // отдельно созраняем коллбек на событие `changed`
-    // здесь надо подумать над событиями `changed.something`
-    if (!this._callbackChange) {
-        this._callbackChange = this.trigger.bind(this);
-    }
-
-    var callbackChange = this._callbackChange;
-
-    model.on('changed', callbackChange);
-
     var info = this.info.split;
 
-    // пока придется брать события из this.info.split.events
-    // если брать события из this.info.events, придется
-    // подписывать подмодель на те события, которые в ней никогда
-    // не стригерятся
-    // надо переделать
-    if (info.events) {
-        for (var eventName in info.events) {
-            (function() {
+    // добавим нашу коллекцию с список слушающих коллекций для подмодели
+    model.eventListeners = model.eventListeners || {};
+    model.eventListeners[this.key] = this;
 
-                // получим нужный коллбек из объекта коллекции
-                var method = this._prepareCallback(info.events[eventName]);
+    // если ранее мы не переопределяли прототипный тригер
+    // то переопеделим его
+    if (ns.Model.prototype.trigger === model.trigger) {
+        model.trigger = function(evt, data) {
+            ns.Model.prototype.trigger.call(this, evt, data);
 
-                // будем запоминать все навешанные коллбеки, для анбиндига
-                this._callbacksEvents = this._callbacksEvents || {};
+            var collData = {
+                data: data,
+                model: this
+            };
 
-                var callback = this._callbacksEvents[eventName];
-
-                if (!callback) {
-                    // если нет нужного коллбека опишем его таким образом:
-                    callback = this._callbacksEvents[eventName] = function(data) {
-                        // необходимо пробросить подмодель, на котором произошло событие
-                        method.call(this, model, data);
-                    }.bind(this);
+            for (var key in this.eventListeners) {
+                var collection = this.eventListeners[key];
+                if (collection) {
+                    collection.trigger(evt, collData);
                 }
-                model.on(eventName, callback);
-
-            }.bind(this))();
+            }
         }
     }
 };
@@ -158,21 +142,8 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
-    var callbackChange = this._callbackChange;
-
-    if (callbackChange) {
-        model.off('changed', callbackChange);
-    }
-
-    var info = this.info.split;
-
-    if (info.events) {
-        for (var eventName in info.events) {
-            var callback = this._callbacksEvents[eventName];
-            if (callback) {
-                model.off(eventName, callback);
-            }
-        }
+    if (model.eventListeners) {
+        delete model.eventListeners[this.key];
     }
 };
 
@@ -194,88 +165,86 @@ ns.ModelCollection.prototype.clear = function() {
  *
  * @param {Array <ns.Model> | ns.Model} models – одна или несколько подмоделей
  *                                                 для вставки
- * @param [{Number}] index – индекс позиции, куда надо вставить подмодели
+ * @param [{Number}] index – индекс позиции на которое вставить подмодели
+ * @return {Boolean} – признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
 
-    index = !isNaN(index) ? index : this.models.length;
-    var info = this.info.split;
+    index = isNaN(index) ? this.models.length : index;
 
+    // если переданная модель не массив
     if (!(models instanceof Array)) {
+        // обернем ее в массив
         models = [models];
     }
 
-    models.forEach(function(model) {
-        // если переданная модель является моделью и принадлежит коллекции
-        // то можно смело ее вставлять
-        if (this.isMyModel(model)) {
-            this.models.splice(index, 0, model);
-            index++;
+    var info = this.info.split;
 
-            // не забудем подписаться на события
-            this._subscribeSplit(model);
-        }
+    models.forEach(function(model) {
+
+        this.models.splice(index, 0, model);
+        index++;
+
+        // не забудем подписаться на события
+        this._subscribeSplit(model);
+
     }.bind(this));
+
+    // оповестим всех, что вставили модель
+    // причем тригерить будем на каждой модельке
+    // по-отдельности
+    models.forEach(function(model) {
+        this.trigger('insert', model);
+    }.bind(this));
+
+    return true;
 };
 
 /**
- * Находит и удаляет подмодель из коллекции
- * Может в будущем разнести на два метода indexOf(model) и remove(index)?
+ * Удаляет подмодель из коллекции
  *
- * @param {ns.Model} needle – модель, которую надо удалить
+ * @param {ns.Model | Number} needle – подмодель или индекс подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления
  */
-ns.ModelCollection.prototype.remove = function(needle) {
-    // ищем только интересные для нас модели
-    if (!this.isMyModel(needle)) {
-        // возвращаем признак того, что модель удалить не получилось
-        return false;
+ns.ModelCollection.prototype.remove = function(index) {
+
+    if (isNaN(index)) {
+        index = this.indexOf(index);
     }
 
-    var models = this.models;
-
-    for (var index = 0, length = models.length; index < length; index++) {
+    if (index >= 0) {
+        var models = this.models;
         var model = this.models[index];
-        if (model === needle) {
 
-            // не забудем отписаться от событий подмодели
-            this._unsubscribeSplit(model);
-            this.models.splice(index, 1);
+        // не забудем отписаться от событий подмодели
+        this._unsubscribeSplit(model);
+        this.models.splice(index, 1);
 
-            return true;
-        }
+        this.trigger('remove', model);
+
+        return true;
     }
 
     return false;
 };
 
-/**
- * Ищет метод в объекте по имени или возвращает переданную функцию
- * Нужен для навешивания коллбеков
- *
- * @param {String | Function} method
- * @return {Function}
- */
-ns.ModelCollection.prototype._prepareCallback = function(method) {
-    if (typeof method === 'string') {
-        method = this[method];
-    }
-
-    if (typeof method !== 'function') {
-        throw new Error("[ns.View] Can't find method '" + method + "' in '" + this.id + "'");
-    }
-
-    return method;
-};
 
 /**
- * Возвращает признак того, что подмодель принадлежит коллекции
+ * Возвращает индекс подмодели из this.models
  *
- * @param {ns.Model} model
- * @return {Boolean}
+ * @param {ns.Model} needle – подмодель
  */
-ns.ModelCollection.prototype.isMyModel = function(model) {
-    return model instanceof ns.Model && this.info.split.model_id === model.id
+ns.ModelCollection.prototype.indexOf = function(needle) {
+    var models = this.models;
+
+    for (var index = 0, length = models.length; index < length; index++) {
+        var model = this.models[index];
+        if (model === needle) {
+            return index;
+        }
+    }
+
+    return -1;
 };
 
 })();

@@ -113,7 +113,8 @@ ns.init = function() {
  */
 ns.initMainView = function() {
     var mainView = ns.View.create('app');
-    mainView.node = document.getElementById('app');
+    mainView._setNode(document.getElementById('app'));
+    mainView.invalidate();
 
     /**
      * Корневой View.

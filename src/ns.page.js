@@ -19,7 +19,7 @@ ns.page.go = function(url) {
 
     var loc = window.location;
 
-    url = url || ns.history.legacy ? loc.hash.substr(1) : (loc.pathname + loc.search);
+    url = url || (ns.history.legacy ? loc.hash.substr(1) : (loc.pathname + loc.search));
 
     // подготавливаем
     url = ns.page.urlPrepare(url);

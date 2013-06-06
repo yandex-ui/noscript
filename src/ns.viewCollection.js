@@ -9,8 +9,7 @@ ns.ViewCollection.define = function(id, info) {
 ns.ViewCollection.prototype._initModels = function() {
     var models = this.models = {};
 
-    for (var modelI = 0, l = this.info.models.length; modelI < l; modelI++) {
-        var model_id = this.info.models[modelI];
+    for (var model_id in this.info.models) {
 
         if (ns.Model.info(model_id).isCollection) {
             // Пока можно подписывать viewCollection только на одну modelCollection

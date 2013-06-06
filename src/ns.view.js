@@ -95,7 +95,7 @@ ns.View.prototype._initModels = function() {
     // Создаёи модели или берем их из кэша, если они уже есть
     var models = this.models = {};
     for (var model_id in this.info.models) {
-        models[model_id] = ns.Model.create(model_id, params);
+        models[model_id] = ns.Model.create(model_id, this.params);
     }
 };
 

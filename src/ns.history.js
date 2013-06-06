@@ -23,14 +23,6 @@ ns.history = (function(window, ns) {
 
     // API для браузеров с поддержкой HTML5 History API.
     if (!legacy) {
-        window.addEventListener('popstate', function(e) {
-            // прибиваем событие, чтобы не дергалась адресная строка
-            e.preventDefault();
-            e.stopPropagation();
-
-            ns.page.go();
-        }, false);
-
         return {
             pushState: history.pushState.bind(history, null, 'mail'),
             replaceState: history.replaceState.bind(history, null, 'mail'),
@@ -54,6 +46,14 @@ ns.history = (function(window, ns) {
                     (loc.pathname === '/' || pathRoute.page === ns.L.NOT_FOUND)) {
                     this.replaceState(hash + search);
                 }
+
+                window.addEventListener('popstate', function(e) {
+                    // прибиваем событие, чтобы не дергалась адресная строка
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    ns.page.go();
+                }, false);
 
                 // Здесь `ns.page.go` можно не вызывать, потому что после `ns.init`
                 // `ns.page.go` все равно вызывается.

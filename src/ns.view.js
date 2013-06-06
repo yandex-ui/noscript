@@ -81,7 +81,7 @@ ns.View.prototype._init = function(id, params, async) {
      * @type {String}
      * @private
      */
-    this._eventNS = '.no-view-' + this.id;
+    this._eventNS = '.ns-view-' + this.id;
 
     // события, которые надо забиндить сразу при создании блока
     for (var i = 0, j = this.info.createEvents.length; i < j; i++) {

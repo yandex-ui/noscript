@@ -79,53 +79,6 @@ ns.Model.prototype._bindEvents = function() {
     }
 };
 
-/**
- * При установке data в составной модели
- * инициализирует все составляющие модели
- */
-ns.Model.prototype._splitData = function(data) {
-    var info = this.info.split;
-    var newModels = [];
-    var oldModels = this.models || [];
-
-    // нужно сохранить ссылку на callback,
-    // чтобы можно было его анбиндить
-    if (!this._splitDataCallback) {
-        this._splitDataCallback = this.trigger.bind(this);
-    }
-    var callback = this._splitDataCallback;
-
-    var items = no.path(info.items, data);
-
-    // анбиндим все старые модели
-    // если они останутся в коллекции
-    // мы забиндим их снова
-    oldModels.forEach(function(model) {
-        model.off('changed', callback);
-    });
-
-    items.forEach(function(item) {
-        // собираем параметры для новой модели
-        var params = {};
-        for (var key in info.params) {
-            params[key] = no.path(info.params[key], item);
-        }
-
-        // создаём новую модель
-        // или устанавливаем новые данные для существующией
-        var model = ns.Model.create(info.model_id, params, item);
-
-        // при изменении вложенной модели
-        // тригерим нотификацию в модель-коллекцию
-        model.on('changed', callback);
-
-        newModels.push(model);
-    });
-
-    // сохраняем новый массив моделей коллекции
-    this.models = newModels;
-};
-
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
@@ -163,6 +116,8 @@ ns.Model.define = function(id, info, base) {
     if (!base) {
         if (info.uniq) {
             base = ns.ModelUniq;
+        } else if (!!info.isCollection || !!info.split) {
+            base = ns.ModelCollection;
         } else {
             base = ns.Model;
         }
@@ -242,7 +197,9 @@ ns.Model.info = function(id) {
          */
         info.isDo = /^do-/.test(id);
 
-        info.isCollection = !!info.split;
+        if (typeof info.isCollection == 'undefined') {
+            info.isCollection = !!info.split;
+        }
     }
     return info;
 };
@@ -350,20 +307,6 @@ ns.Model.prototype.set = function(jpath, value, options) {
 
 ns.Model.prototype.getData = function() {
     var result = this.data;
-
-    // если это составная модель —
-    // нужно склеить все данные
-    // из моделей её состовляющих
-    if ( this.isCollection() && this.isValid() ) {
-        // массив с хранилищем данных моделей
-        var items = no.path(this.info.split.items, this.data);
-        // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
-        items.splice(0, items.length);
-        // пишем новые
-        this.models.forEach(function(model) {
-            items.push( model.getData() );
-        });
-    }
     return result;
 };
 
@@ -376,12 +319,6 @@ ns.Model.prototype.getData = function() {
 ns.Model.prototype.setData = function(data, options) {
     if (data) {
         this.data = this.preprocessData(data);
-
-        // если это составная модель —
-        // нужно нужно разбить её на модели
-        if ( this.isCollection() ) {
-            this._splitData(data);
-        }
 
         this.error = null;
         this.status = this.STATUS.OK;

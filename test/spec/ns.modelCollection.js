@@ -4,7 +4,7 @@ describe('ns.ModelCollection', function() {
         var methodCallback = this.methodCallback = sinon.spy();
         var methodNameCallback = this.methodNameCallback = sinon.spy();
 
-        ns.ModelCollection.define('mc0', {
+        ns.Model.define('mc0', {
             params: {
                 id: null
             },

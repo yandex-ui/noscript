@@ -68,21 +68,23 @@ describe('ns.history', function() {
 
     describe('adapting hashed URLs to their original versions', function() {
 
-        ns.View.define('app');
+        beforeEach(function() {
+            ns.router.routes = {
+                route: {
+                    '/message/{message-id:int}': 'layout',
+                    '/photo/{photo-id:int}': 'layout',
+                    '/': 'layout'
+                }
+            };
+            ns.router.init();
 
-        ns.router.routes = {
-            route: {
-                '/message/{message-id:int}': 'layout',
-                '/photo/{photo-id:int}': 'layout',
-                '/': 'layout'
-            }
-        };
-
-        ns.layout.define('layout', {
-            'app': true
+            // заменяем ns.page.go на пустую функцию, нам там нечего проверять
+            sinon.stub(ns.page, 'go', no.nop);
         });
 
-        ns.init();
+        afterEach(function() {
+            ns.page.go.restore();
+        });
 
         it('should happen when the hash matches any of the defined routes', function(done) {
 

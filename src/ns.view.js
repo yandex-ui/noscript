@@ -953,8 +953,22 @@ ns.View.prototype._getModelsData = function() {
     return r;
 };
 
+/**
+ * Returns model.
+ * @param {String} id Model ID
+ * @returns {ns.Model}
+ */
 ns.View.prototype.getModel = function(id) {
-    return this.models[id].getData();
+    return this.models[id];
+};
+
+/**
+ * Returns data of model.
+ * @param {String} id Model ID
+ * @returns {*}
+ */
+ns.View.prototype.getModelData = function(id) {
+    return this.getModel(id).getData();
 };
 
 //  Быстро что-нибудь сгенерить из данных блока.

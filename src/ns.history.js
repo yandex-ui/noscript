@@ -39,11 +39,11 @@ ns.history = (function(window, ns) {
                 var pathRoute = ns.router(loc.pathname);
 
                 if (hash.length &&
-                    hashRoute && hashRoute.page !== ns.L.NOT_FOUND &&
+                    hashRoute && hashRoute.page !== ns.R.NOT_FOUND &&
 
                     // TODO: При добавлении способа задания корневого урла заменить
                     // слеш на нужное свойство/метод.
-                    (loc.pathname === '/' || pathRoute.page === ns.L.NOT_FOUND)) {
+                    (loc.pathname === '/' || pathRoute.page === ns.R.NOT_FOUND)) {
                     this.replaceState(hash + search);
                 }
 

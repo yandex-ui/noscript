@@ -155,9 +155,6 @@ var _ctors = {};
  * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
  * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
- * @param {Object} [info.noevents] Кастомные события, на которые подписывается View.
- * @param {Object} [info.noevents.init] События, на которые надо подписаться при создании DOM-элемента.
- * @param {Object} [info.noevents.show] События, на которые надо подписаться при показе DOM-элемента.
  * @param {Object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
  * @param {Function} [base=ns.View] Базовый View для наследования
  * @return {Function} Созданный View.
@@ -175,7 +172,6 @@ ns.View.define = function(id, info, base) {
 
     info.models = ns.View._prepareModels( info.models || {} );
     info.events = info.events || {};
-    info.noevents = info.noevents || {};
 
     // часть дополнительной обработки производится в ns.View.info
     // т.о. получаем lazy-определение

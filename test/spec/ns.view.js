@@ -515,4 +515,97 @@ describe('ns.View', function() {
         });
 
     });
+
+    describe('ns.View.info.params вычисление ключа view', function() {
+
+        describe('Ключ строится по параметрам моделей: view.info.params == null', function() {
+
+            beforeEach(function() {
+                ns.Model.define('photo', { params: { login: null, id: null } });
+                ns.Model.define('photo-tags', { params: { id: null, one_more: null, per_page: 10 } });
+                ns.View.define('photo', {
+                    models: [ 'photo', 'photo-tags' ]
+                });
+                ns.View.info('photo'); // это чтобы view полностью внутри проинициализировалось
+            });
+
+            it('Ключ view строится по параметрам моделей', function() {
+                var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
+                expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&one_more=xx&per_page=10');
+            });
+
+            it('Умолчательное значение параметра модели должно добавляться к ключу view', function() {
+                // Потому что это ключ для модели, а следовательно, для данных и для того, что отображается во view.
+                var params = { login: 'a', id: 4, one_more: 'xx' };
+                expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&one_more=xx&per_page=10');
+            });
+        });
+
+        describe('typeof view.info.params == "object"', function() {
+            beforeEach(function() {
+                ns.View.define('photo:v2', {
+                    params: { login: null, id: null }
+                });
+                ns.View.define('photo:v3', {
+                    params: { login: 'nop', id: null }
+                });
+
+                ns.View.info('photo:v2');
+                ns.View.info('photo:v3');
+            });
+
+            it('Все параметры есть: ключ строится', function() {
+                expect(ns.View.getKey('photo:v2', { login: 'test', id: 2 })).to.be.eql('view=photo:v2&login=test&id=2');
+            });
+
+            it('Ключ не должен строиться, если параметров не хватает', function() {
+                expect(ns.View.getKey('photo:v2', { login: 'test' })).to.be.eql(null);
+            });
+
+            it('В view.info.params задано значение для параметра (фильтр) и в params -- такое же значение', function() {
+                expect(ns.View.getKey('photo:v3', { login: 'nop', id: 3 })).to.be.eql('view=photo:v3&login=nop&id=3');
+            });
+
+            it('В view.info.params задано одно значение для параметра, а в params пришло другое', function() {
+                expect(ns.View.getKey('photo:v3', { login: 'lynn', id: 3 })).to.be.eql(null);
+            });
+
+            it('В view.info.params задано значение для параметра, а в params значение отсутствует', function() {
+                expect(ns.View.getKey('photo:v3', { id: 3 })).to.be.eql(null);
+            });
+        });
+
+        describe('typeof view.info.params == "array"', function() {
+            beforeEach(function() {
+                ns.View.define('slider', {
+                    params: [
+                        { 'context': 'contest', 'id': null },
+                        { 'context': null },
+                        { 'tag': null, 'login': null },
+                        { 'login': null, 'album': null }
+                    ]
+                });
+            });
+
+            it('Ключ по 1-ому варианту с фильтром по одному из параметров', function() {
+                expect(ns.View.getKey('slider', { login: 'nop', album: 6, context: 'contest', id: 3 })).to.be.eql('view=slider&context=contest&id=3');
+            });
+
+            it('Ключ по 2-ому варианту (для первого варианта не хватает параметров)', function() {
+                expect(ns.View.getKey('slider', { login: 'nop', album: 6, context: 'contest' })).to.be.eql('view=slider&context=contest');
+            });
+
+            it('Ключ по 3-ому варианту', function() {
+                expect(ns.View.getKey('slider', { login: 'nop', album: 6, context_new: 'tag', id: 8, tag: 'girls' })).to.be.eql('view=slider&tag=girls&login=nop');
+            });
+
+            it('Ключ по 4-ому варианту', function() {
+                expect(ns.View.getKey('slider', { login: 'nop', album: 6, context_new: 'tag', id: 8, tag_new: 'girls' })).to.be.eql('view=slider&login=nop&album=6');
+            });
+
+            it('Ни один из вариантов не подходит', function() {
+                expect(ns.View.getKey('slider', { album: 6, context_new: 'tag', id: 8, tag_new: 'girls' })).to.be.eql(null);
+            });
+        });
+    });
 });

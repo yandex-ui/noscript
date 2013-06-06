@@ -114,20 +114,48 @@ ns.View.getKeyAndParams = function(id, params, info) {
         params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
     }
 
-    var key = 'view=' + id;
+    var key;
+    var pGroups = info.pGroups || [];
+    for (var g = 0; g < pGroups.length; g++) {
 
-    var pNames = info.pNames || [];
-    for (var i = 0, l = pNames.length; i < l; i++) {
-        var pName = pNames[i];
-        var pValue = params[pName];
-        if (pValue != null) {
+        key = 'view=' + id;
+
+        var group = pGroups[g];
+        var pNames = group.pNames || [];
+        var pFilters = group.pFilters || {};
+        var pOptional = group.pOptional || {};
+
+        for (var i = 0, l = pNames.length; i < l; i++) {
+            var pName = pNames[i];
+            var pValue = params[ pName ] || pOptional[ pName ];
+            var pFilter = pFilters[pName];
+            var isOptional = pOptional[pName] != null;
+
+            if (pValue == null && isOptional) {
+                continue;
+            }
+
+            if ( pValue == null || (pFilter && pValue != pFilter) ) {
+                key = null;
+                break;
+            }
+
             key += '&' + pName + '=' + pValue;
+        }
+
+        if (key) {
+            return {
+                params: params, // параметры с учётом rewrite
+                key: key        // ключ с учётом правильных параметров
+            };
         }
     }
 
+    // XXX Не очень понятно, как реагировать на то, что для view нельзя построить ключ.
+    // throw "We could not create key for view: " + id;
     return {
-        params: params, // параметры с учётом rewrite
-        key: key        // ключ с учётом правильных параметров
+        params: params,
+        key: null
     };
 };
 
@@ -188,28 +216,15 @@ ns.View.define = function(id, info, base) {
 
 ns.View.info = function(id) {
     var info = _infos[id];
-    // если есть декларация, но еще нет pNames, то надо завершить определение View
-    if (info && !info.pNames) {
+    // если есть декларация, но еще нет pGroups, то надо завершить определение View
+    if (info && !info.pGroups) {
+        ns.View._initInfoParams(info);
         ns.View._initInfo(info);
     }
     return info;
 };
 
 ns.View._initInfo = function(info) {
-    var params = {};
-    for (var model_id in info.models) {
-        var modelInfo = ns.Model.info(model_id);
-        if (!modelInfo) {
-            throw new Error('[ns.View] Model "' + model_id + '" is not defined!');
-        }
-        no.extend( params, modelInfo.params );
-    }
-
-    if (info.params) {
-        no.extend(params, info.params);
-    }
-    info.pNames = Object.keys(params);
-
     /**
      * События, которые надо повесить сразу при создании view
      * @type {Array}
@@ -375,6 +390,49 @@ ns.View._initInfo = function(info) {
     //
 
     return info;
+};
+
+ns.View._initInfoParams = function(info) {
+    if (info.params) {
+        var groups;
+        var pGroups = [];
+        if ( !Array.isArray(info.params) ) {
+            groups = [ info.params ];
+        } else {
+            groups = info.params;
+        }
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            // Если в params задано значение параметра -- это фильтр.
+            // Опциональные параметры это параметры моделей с дефолтным значением.
+            pGroups.push({
+                pNames: Object.keys(group),
+                pFilters: group,
+                pOptional: {}
+            });
+        }
+
+        info.pGroups = pGroups;
+    } else {
+        var params = {};
+        for (var model_id in info.models) {
+            var modelInfo = ns.Model.info(model_id);
+            if (!modelInfo) {
+                throw 'Model "' + model_id + '" is not defined!';
+            }
+            no.extend( params, modelInfo.params );
+        }
+
+        // Когда параметры строятся из параметров моделей нет фильтров параметров.
+        info.pGroups = [
+            {
+                pNames: Object.keys(params),
+                pFilters: {},
+                pOptional: params
+            }
+        ];
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

@@ -652,7 +652,7 @@ ns.View.prototype._getEvents = function(type) {
  * @private
  */
 ns.View.prototype._bindEvents = function(type) {
-    var $node = $(this.node);
+    var $node = this.$node;
     var i, j, event;
     var events = this._getEvents(type);
 
@@ -702,7 +702,7 @@ ns.View.prototype._bindEvents = function(type) {
  * @private
  */
 ns.View.prototype._unbindEvents = function(type) {
-    var $node = $(this.node);
+    var $node = this.$node;
     var i, j, event;
 
     // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
@@ -1021,12 +1021,26 @@ ns.View.prototype._getDescendants = function(views) {
     return views;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
+/**
+ * Set view node
+ * @param {HTMLElement} node
+ * @private
+ */
 ns.View.prototype._setNode = function(node) {
     var STATUS = this.STATUS;
     if (node) {
+        /**
+         * View node
+         * @type {HTMLElement}
+         */
         this.node = node;
+
+        /**
+         * jQuerified view node
+         * @type {jQuery}
+         */
+        this.$node = $(node);
+
         this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
     } else {
         this.status = STATUS.NONE;

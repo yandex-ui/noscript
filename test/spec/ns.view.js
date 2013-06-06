@@ -30,6 +30,45 @@ describe('ns.View', function() {
         });
     });
 
+    describe('ns.View getModel/getModelData', function() {
+
+        beforeEach(function() {
+            ns.View.define('test-getModel', {
+                models: ['test-getModel']
+            });
+
+            ns.Model.define('test-getModel', {
+                params: {
+                    p: null
+                }
+            });
+
+            this.params = {p: 1};
+            this.modelData = 'modeldata' + Math.random();
+
+            this.model = ns.Model.create('test-getModel', this.params);
+            this.model.setData(this.modelData);
+
+            this.view = ns.View.create('test-getModel', this.params);
+        });
+
+        afterEach(function() {
+            delete this.model;
+            delete this.modelData;
+            delete this.params;
+            delete this.view;
+        });
+
+        it("getModel should returns view's model", function() {
+            expect(this.view.getModel('test-getModel')).to.be(this.model);
+        });
+
+        it("getModelData should returns view's model data", function() {
+            expect(this.view.getModelData('test-getModel')).to.be(this.modelData);
+        });
+
+    });
+
     describe('Наследование от другого view', function() {
 
         beforeEach(function() {

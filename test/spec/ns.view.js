@@ -607,5 +607,43 @@ describe('ns.View', function() {
                 expect(ns.View.getKey('slider', { album: 6, context_new: 'tag', id: 8, tag_new: 'girls' })).to.be.eql(null);
             });
         });
+
+        describe('ns.View: params+ / params-', function() {
+            beforeEach(function() {
+                ns.View.define('slider', {
+                    params: [
+                        { 'context': 'contest', 'id': null },
+                        { 'context': null }
+                    ],
+                    'params-': []
+                });
+            });
+
+            it('Нельзя указывать одновременно params и params+/-', function() {
+                expect(function() { ns.View.info('slider') }).to.throwError();
+            });
+        });
+
+        describe('ns.View: params+ / params-', function() {
+            beforeEach(function() {
+                ns.Model.define('photo', { params: { login: null, id: null } });
+                ns.Model.define('photo-tags', { params: { id: null, one_more: null, per_page: 10 } });
+                ns.View.define('photo', {
+                    models: [ 'photo', 'photo-tags' ],
+                    'params+': {
+                        'add_me': 666
+                    },
+                    'params-': [ 'one_more' ]
+                });
+                ns.View.info('photo'); // это чтобы view полностью внутри проинициализировалось
+            });
+
+            it('params+ и params- в действии', function() {
+                var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
+                expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&per_page=10&add_me=666');
+            });
+        });
+
     });
+
 });

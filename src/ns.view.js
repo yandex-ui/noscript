@@ -394,6 +394,10 @@ ns.View._initInfo = function(info) {
 
 ns.View._initInfoParams = function(info) {
     if (info.params) {
+        if ( info['params+'] || info['params-'] ) {
+            throw 'ns.View: you cannot specify params and params+/- at the same time.';
+        }
+
         var groups;
         var pGroups = [];
         if ( !Array.isArray(info.params) ) {
@@ -422,6 +426,22 @@ ns.View._initInfoParams = function(info) {
                 throw 'Model "' + model_id + '" is not defined!';
             }
             no.extend( params, modelInfo.params );
+        }
+
+        //  Массив с параметрами, которые надо исключить из ключа.
+        var exclude = info['params-'];
+        if (exclude) {
+            for (var i = 0; i < exclude.length; i++) {
+                delete params[ exclude[i] ];
+            }
+
+            delete info['params-'];
+        }
+
+        //  Дополнительные параметры (расширяют параметры от моделей или перекрывают их).
+        if (info['params+']) {
+            no.extend( params, info['params+'] );
+            delete info['params+'];
         }
 
         // Когда параметры строятся из параметров моделей нет фильтров параметров.

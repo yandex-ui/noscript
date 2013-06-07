@@ -58,6 +58,12 @@ ns.Model.prototype._reset = function(status) {
     this.retries = 0;
 
     this.timestamp = 0;
+
+    /**
+     * ModelCollection listeners
+     * @type {Object}
+     */
+    this.eventListeners = {};
 };
 
 /**
@@ -74,56 +80,28 @@ ns.Model.prototype._bindEvents = function() {
 
         for (var i = 0, j = callbacks.length; i < j; i++) {
             //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
-            this.on(event, callbacks[i]);
+            this.on(event, this._prepareCallback(callbacks[i]));
         }
     }
 };
 
 /**
- * При установке data в составной модели
- * инициализирует все составляющие модели
+ * Ищет метод в объекте по имени или возвращает переданную функцию
+ * Нужен для навешивания коллбеков
+ *
+ * @param {String | Function} method
+ * @return {Function}
  */
-ns.Model.prototype._splitData = function(data) {
-    var info = this.info.split;
-    var newModels = [];
-    var oldModels = this.models || [];
-
-    // нужно сохранить ссылку на callback,
-    // чтобы можно было его анбиндить
-    if (!this._splitDataCallback) {
-        this._splitDataCallback = this.trigger.bind(this);
+ns.Model.prototype._prepareCallback = function(method) {
+    if (typeof method === 'string') {
+        method = this[method];
     }
-    var callback = this._splitDataCallback;
 
-    var items = no.jpath(info.items, data);
+    if (typeof method !== 'function') {
+        throw new Error("[ns.View] Can't find method '" + method + "' in '" + this.id + "'");
+    }
 
-    // анбиндим все старые модели
-    // если они останутся в коллекции
-    // мы забиндим их снова
-    oldModels.forEach(function(model) {
-        model.off('changed', callback);
-    });
-
-    items.forEach(function(item) {
-        // собираем параметры для новой модели
-        var params = {};
-        for (var key in info.params) {
-            params[key] = no.jpath(info.params[key], item);
-        }
-
-        // создаём новую модель
-        // или устанавливаем новые данные для существующией
-        var model = ns.Model.create(info.model_id, params, item);
-
-        // при изменении вложенной модели
-        // тригерим нотификацию в модель-коллекцию
-        model.on('changed', callback);
-
-        newModels.push(model);
-    });
-
-    // сохраняем новый массив моделей коллекции
-    this.models = newModels;
+    return method;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -163,6 +141,8 @@ ns.Model.define = function(id, info, base) {
     if (!base) {
         if (info.uniq) {
             base = ns.ModelUniq;
+        } else if (!!info.isCollection || !!info.split) {
+            base = ns.ModelCollection;
         } else {
             base = ns.Model;
         }
@@ -242,7 +222,9 @@ ns.Model.info = function(id) {
          */
         info.isDo = /^do-/.test(id);
 
-        info.isCollection = !!info.split;
+        if (typeof info.isCollection == 'undefined') {
+            info.isCollection = !!info.split;
+        }
     }
     return info;
 };
@@ -365,19 +347,6 @@ ns.Model.prototype.set = function(jpath, value, options) {
 ns.Model.prototype.getData = function() {
     var result = this.data;
 
-    // если это составная модель —
-    // нужно склеить все данные
-    // из моделей её состовляющих
-    if ( this.isCollection() && this.isValid() ) {
-        // массив с хранилищем данных моделей
-        var items = no.jpath(this.info.split.items, this.data);
-        // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
-        items.splice(0, items.length);
-        // пишем новые
-        this.models.forEach(function(model) {
-            items.push( model.getData() );
-        });
-    }
     return result;
 };
 
@@ -389,16 +358,11 @@ ns.Model.prototype.getData = function() {
  */
 ns.Model.prototype.setData = function(data, options) {
     if (data) {
-        this.data = this.preprocessData(data);
 
-        // если это составная модель —
-        // нужно нужно разбить её на модели
-        if ( this.isCollection() ) {
-            this._splitData(data);
-        }
+        this.data = this._setData(this.preprocessData(data));
 
-        this.error = null;
         this.status = this.STATUS.OK;
+        this.error = null;
 
         this.touch();
 
@@ -421,6 +385,10 @@ ns.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
     this.status = this.STATUS.ERROR;
+};
+
+ns.Model.prototype._setData = function(data) {
+    return data;
 };
 
 ns.Model.prototype.preprocessData = function(data) {

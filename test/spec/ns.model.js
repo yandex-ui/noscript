@@ -306,65 +306,6 @@ describe('ns.Model', function() {
 
         });
 
-        describe('_splitData', function() {
-
-            beforeEach(function() {
-                this.callback = sinon.spy();
-                this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
-                this.model = ns.Model.create('split1', {p1: 1, p2: Math.random()});
-                this.model.trigger = this.callback;
-
-                this.model._splitData(this.data);
-                this.models = this.model.models;
-            });
-
-            afterEach(function() {
-                delete this.callback;
-            });
-
-            it('should create nested models', function() {
-                expect(this.models.length)
-                    .to.be(3);
-            });
-
-            it('should set data to nested models', function() {
-                expect(this.models[0].data).to.eql(this.data.item[0]);
-                expect(this.models[1].data).to.eql(this.data.item[1]);
-                expect(this.models[2].data).to.eql(this.data.item[2]);
-            });
-
-            it('should set params to nested models', function() {
-                expect(this.models[0].params).to.eql({id: 1, foo: 'foo'});
-                expect(this.models[1].params).to.eql({id: 2, foo: 'bar'});
-                expect(this.models[2].params).to.eql({id: 3, foo: 'baz'});
-            });
-
-            it('should trigger collections \'changed\' on submodel\'s \'changed\'', function() {
-                this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
-                expect(this.callback.callCount).to.be(1);
-            });
-
-            it('should not duplicate \'changed\' bindings', function() {
-                this.model._splitData(this.data);
-                this.model._splitData(this.data);
-                this.models[0].setData({id: 1, foo: 'foo', bar: 'bar'});
-                expect(this.callback.callCount).to.be(1);
-            });
-
-            it('should not trigger if submodel not in collection now', function() {
-                var data = this.data;
-                data.item = data.item.slice(1, 3);
-                var model = this.models[0];
-
-                this.model._splitData(data);
-
-                model.setData({id: 1, foo: 'foo', bar: 'bar'});
-
-                expect(this.callback.called).not.to.be.ok();
-            });
-
-        });
-
         describe('setData', function() {
 
             beforeEach(function() {
@@ -437,20 +378,6 @@ describe('ns.Model', function() {
 
                 expect(this.model.trigger.calledOnce)
                     .not.to.be.ok();
-            });
-
-            it('should call _splitData for split-models', function() {
-                var model = ns.Model.create('split1', {p1: 1, p2: 2});
-
-                sinon.spy(model, '_splitData');
-
-                model.setData(ns.Model.TESTDATA.split1);
-
-                expect(model._splitData.calledOnce)
-                    .to.be.ok();
-
-                expect(model._splitData.calledWith(ns.Model.TESTDATA.split1))
-                    .to.be.ok();
             });
 
         });

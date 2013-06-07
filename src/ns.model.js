@@ -457,6 +457,20 @@ ns.Model.store = function(model) {
     }
 };
 
+ns.Model.destroy = function(model) {
+    if ( model.isDo() ) {
+        return;
+    }
+
+    var id = model.id;
+    var key = model.key;
+
+    var cached = _cache[id][key];
+    if (cached) {
+        delete _cache[id][key];
+    }
+};
+
 //  Проверяем, есть ли модель в кэше и валидна ли она.
 ns.Model.isValid = function(id, key) {
     var model = ns.Model.get(id, key);

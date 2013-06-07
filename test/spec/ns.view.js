@@ -79,38 +79,63 @@ describe('ns.View', function() {
                 }
             });
 
-            ns.View.define('childMegaView', {
+            // inherits by class reference
+            ns.View.define('childMegaViewByFunction', {
                 methods: {
                     oneMore: function() {}
                 }
             }, parentMegaView);
 
-            this.view = ns.View.create('childMegaView', {});
+            // inherits by view name
+            ns.View.define('childMegaViewByName', {
+                methods: {
+                    oneMore: function() {}
+                }
+            }, 'parentMegaView');
         });
 
         afterEach(function() {
             delete this.view;
         });
 
-        it('наследуемый view должен быть ns.View', function() {
-            expect(this.view instanceof ns.View).to.be.ok();
-        });
+        var tests = {
+            'childMegaViewByFunction': 'inherits by class reference',
+            'childMegaViewByName': 'inherits by view name'
+        };
 
-        it('методы наследуются от базового view', function() {
-            expect(this.view.superMethod).to.be.ok();
-        });
+        for (var viewName in tests) {
+            (function(viewName, suiteName) {
 
-        it('методы от базового view не ушли в ns.View', function() {
-            expect(ns.View.prototype.superMethod).to.not.be.ok();
-        });
+                describe(suiteName, function() {
 
-        it('методы ns.View на месте', function() {
-            expect(this.view.isOk).to.be.ok();
-        });
+                    beforeEach(function() {
+                        this.view = ns.View.create(viewName, {});
+                    });
 
-        it('методы из info.methods тоже не потерялись', function() {
-            expect(this.view.oneMore).to.be.ok();
-        });
+                    it('наследуемый view должен быть ns.View', function() {
+                        expect(this.view instanceof ns.View).to.be.ok();
+                    });
+
+                    it('методы наследуются от базового view', function() {
+                        expect(this.view.superMethod).to.be.ok();
+                    });
+
+                    it('методы от базового view не ушли в ns.View', function() {
+                        expect(ns.View.prototype.superMethod).to.not.be.ok();
+                    });
+
+                    it('методы ns.View на месте', function() {
+                        expect(this.view.isOk).to.be.ok();
+                    });
+
+                    it('методы из info.methods тоже не потерялись', function() {
+                        expect(this.view.oneMore).to.be.ok();
+                    });
+
+                });
+
+            })(viewName, tests[viewName]);
+        }
     });
 
     describe('ns.View.info models parse', function() {

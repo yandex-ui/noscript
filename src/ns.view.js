@@ -156,7 +156,7 @@ var _ctors = {};
  * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
  * @param {Object} [info.events] DOM-события, на которые подписывается View.
  * @param {Object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
- * @param {Function} [base=ns.View] Базовый View для наследования
+ * @param {Function|String} [base=ns.View] Базовый View для наследования
  * @return {Function} Созданный View.
  */
 ns.View.define = function(id, info, base) {
@@ -166,9 +166,22 @@ ns.View.define = function(id, info, base) {
 
     info = info || {};
 
+    var baseClass = ns.View;
+    if (typeof base === 'string') {
+        // если указана строка, то берем декларацию ns.View
+        if (_ctors[base]) {
+            baseClass = _ctors[base];
+        } else {
+            throw new Error("[ns.View] Can't find '" + base + "' to extend '" + id +"'");
+        }
+
+    } else if (typeof base === 'function') {
+        baseClass = base;
+    }
+
     var ctor = info.ctor || function() {};
     // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
-    ctor = no.inherit(ctor, base || ns.View, info.methods);
+    ctor = no.inherit(ctor, baseClass, info.methods);
 
     info.models = ns.View._prepareModels( info.models || {} );
     info.events = info.events || {};

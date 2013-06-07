@@ -337,10 +337,11 @@ ns.Model.prototype.getData = function() {
  */
 ns.Model.prototype.setData = function(data, options) {
     if (data) {
-        this.data = this.preprocessData(data);
 
-        this.error = null;
+        this.data = this._setData(this.preprocessData(data));
+
         this.status = this.STATUS.OK;
+        this.error = null;
 
         this.touch();
 
@@ -363,6 +364,10 @@ ns.Model.prototype.setError = function(error) {
     this.data = null;
     this.error = error;
     this.status = this.STATUS.ERROR;
+};
+
+ns.Model.prototype._setData = function(data) {
+    return data;
 };
 
 ns.Model.prototype.preprocessData = function(data) {

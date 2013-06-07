@@ -9,10 +9,14 @@ ns.ModelCollection.prototype.getData = function() {
     // нужно склеить все данные
     // из моделей её состовляющих
     if ( this.isValid() ) {
-        // массив с хранилищем данных моделей
-        var items = no.path(this.info.split.items, this.data);
-        // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
-        items.splice(0, items.length);
+        var items = [];
+        if (this.info.split) {
+            // массив с хранилищем данных моделей
+            items = no.path(this.info.split.items, this.data);
+            // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
+            items.splice(0, items.length);
+        }
+
         // пишем новые
         this.models.forEach(function(model) {
             items.push( model.getData() );
@@ -23,54 +27,29 @@ ns.ModelCollection.prototype.getData = function() {
 };
 
 
-/**
- * Пока продублирую этот код из базовой модели
- * В будущем может стоит разнести каким-то образом
- */
-ns.ModelCollection.prototype.setData = function(data, options) {
-    if (data) {
-        this.data = this.preprocessData(data);
-
-        // это составная модель —
-        // нужно нужно разбить её на модели
-        this._splitData(data);
-
-        this.error = null;
-        this.status = this.STATUS.OK;
-
-        this.touch();
-
-        //  Не проверяем здесь, действительно ли data отличается от oldData --
-        //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
-        //  Можно считать, что она в этом случае всегда меняется.
-        //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
-        if (!options || !options.silent) {
-            this.trigger('changed', this.key);
-        }
-    }
-
-};
-
 ns.ModelCollection.prototype._reset = function() {
     ns.Model.prototype._reset.apply(this, arguments);
-    this.models = [];
+    this.clear();
 };
 
 /**
  * Разбивает данные через jpath описанный в info.split
  * на составные модели
  */
-ns.ModelCollection.prototype._splitData = function(data) {
-    var info = this.info.split;
-
-    var items = no.path(info.items, data);
-
-    // удалим все старые модели
+ns.ModelCollection.prototype._setData = function(data) {
     this.clear();
 
-    var models = this._splitModels(items);
+    var info = this.info.split;
+    if (info) {
+        var items = no.path(info.items, data);
+        var models = this._splitModels(items);
+    }
 
-    this.insert(models);
+    // если модели не удалось засплитить попробуем вставить данные,
+    // может в них есть модели
+    this.insert(models || data);
+
+    return data;
 };
 
 /**
@@ -107,8 +86,6 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
-
-    var info = this.info.split;
 
     // добавим нашу коллекцию с список слушающих коллекций для подмодели
     model.eventListeners = model.eventListeners || {};
@@ -153,6 +130,8 @@ ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
  */
 ns.ModelCollection.prototype.clear = function() {
 
+    this.models = this.models || [];
+
     this.models.forEach(
         this._unsubscribeSplit.bind(this)
     );
@@ -165,7 +144,8 @@ ns.ModelCollection.prototype.clear = function() {
  *
  * @param {Array <ns.Model> | ns.Model} models – одна или несколько подмоделей
  *                                                 для вставки
- * @param [{Number}] index – индекс позиции на которое вставить подмодели
+ * @param {Number} [index] – индекс позиции, на которую вставить подмодели
+ *
  * @return {Boolean} – признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
@@ -181,21 +161,21 @@ ns.ModelCollection.prototype.insert = function(models, index) {
     var info = this.info.split;
 
     models.forEach(function(model) {
+        // вставить можем только модель
+        if (ns.Model.info(model.id)) {
+            this.models.splice(index, 0, model);
+            index++;
 
-        this.models.splice(index, 0, model);
-        index++;
-
-        // не забудем подписаться на события
-        this._subscribeSplit(model);
-
+            // не забудем подписаться на события
+            this._subscribeSplit(model);
+        }
     }.bind(this));
 
-    // оповестим всех, что вставили модель
-    // причем тригерить будем на каждой модельке
-    // по-отдельности
-    models.forEach(function(model) {
-        this.trigger('insert', model);
-    }.bind(this));
+    // оповестим всех, что вставили подмодели
+    if (models.length) {
+        this.trigger('ns-insert', models);
+    }
+
 
     return true;
 };
@@ -203,48 +183,45 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 /**
  * Удаляет подмодель из коллекции
  *
- * @param {ns.Model | Number} needle – подмодель или индекс подмодели, которую надо удалить
+ * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления
  */
-ns.ModelCollection.prototype.remove = function(index) {
+ns.ModelCollection.prototype.remove = function(models) {
 
-    if (isNaN(index)) {
-        index = this.indexOf(index);
+    var modelsRemoved = [];
+
+    if (!(models instanceof Array)) {
+        models = [models];
     }
 
-    if (index >= 0) {
-        var models = this.models;
-        var model = this.models[index];
 
-        // не забудем отписаться от событий подмодели
-        this._unsubscribeSplit(model);
-        this.models.splice(index, 1);
+    models.forEach(function(modelOrIndex) {
+        var index;
 
-        this.trigger('remove', model);
+        if (isNaN(modelOrIndex)) {
+            index = this.models.indexOf(modelOrIndex);
+        } else {
+            index = modelOrIndex;
+        }
 
+        if (index >= 0) {
+            var models = this.models;
+            var model = this.models[index];
+
+            // не забудем отписаться от событий подмодели
+            this._unsubscribeSplit(model);
+            modelsRemoved.push(model);
+            this.models.splice(index, 1);
+        }
+
+    }.bind(this));
+
+    if (modelsRemoved.length) {
+        this.trigger('ns-remove', modelsRemoved);
         return true;
     }
 
     return false;
-};
-
-
-/**
- * Возвращает индекс подмодели из this.models
- *
- * @param {ns.Model} needle – подмодель
- */
-ns.ModelCollection.prototype.indexOf = function(needle) {
-    var models = this.models;
-
-    for (var index = 0, length = models.length; index < length; index++) {
-        var model = this.models[index];
-        if (model === needle) {
-            return index;
-        }
-    }
-
-    return -1;
 };
 
 })();

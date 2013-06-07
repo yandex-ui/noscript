@@ -4,6 +4,8 @@ describe('ns.ModelCollection', function() {
         var methodCallback = this.methodCallback = sinon.spy();
         var methodNameCallback = this.methodNameCallback = sinon.spy();
         var changedCallback = this.changedCallback = sinon.spy();
+        var insertCallback = this.insertCallback = sinon.spy();
+        var removeCallback = this.removeCallback = sinon.spy();
 
         ns.Model.define('mc0', {
             params: {
@@ -21,14 +23,17 @@ describe('ns.ModelCollection', function() {
 
             events: {
                 'event1': 'onEvent1',
-                // 'event1': function() {
-                //     methodNameCallback();
-                // },
                 'event2': function() {
                     methodCallback();
                 },
                 'changed': function() {
                     changedCallback();
+                },
+                'ns-insert': function() {
+                    insertCallback();
+                },
+                'ns-remove': function() {
+                    removeCallback();
                 }
             },
 
@@ -44,33 +49,45 @@ describe('ns.ModelCollection', function() {
                 id: null
             }
         });
+
+        ns.Model.define('mc1', {
+            params: {
+                id: null
+            },
+
+            isCollection: true
+        });
     });
 
     afterEach(function() {
         delete this.methodCallback;
         delete this.methodNameCallback;
         delete this.changedCallback;
-        ns.Model.undefine();
+        delete this.insertCallback;
+        delete this.removeCallback;
     });
 
     describe('prototype', function() {
 
-        describe('_splitData', function() {
+        describe('setData', function() {
 
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
                 this.model = ns.Model.create('mc0', { id: Math.random() });
 
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
 
                 this.models = this.model.models;
+
+                this.modelCollection = ns.Model.create('mc1', { id: Math.random() });
             });
 
             afterEach(function() {
                 delete this.data;
                 delete this.model;
                 delete this.models;
+                delete this.modelCollection;
             });
 
             it('should split data', function() {
@@ -89,15 +106,27 @@ describe('ns.ModelCollection', function() {
                 expect(this.models[2].params).to.eql({id: 3, foo: 'baz'});
             });
 
+            it('should call _setData for split-models', function() {
+
+                sinon.spy(this.model, '_setData');
+
+                this.model.setData(ns.Model.TESTDATA.split1);
+
+                expect(this.model._setData.calledOnce)
+                    .to.be.ok();
+
+                expect(this.model._setData.calledWith(ns.Model.TESTDATA.split1))
+                    .to.be.ok();
+            });
+
             it('should trigger `changed` event', function() {
-                // this.models[0].setData({ id: 1, foo: 'barrr' });
                 this.models[0].setData({ id: 3, foo: 'barrr' });
                 expect(this.changedCallback.callCount).to.be(1);
             });
 
             it('should not duplicate trigger `changed` event', function() {
-                this.model._splitData(this.data);
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
+                this.model.setData(this.data, { silent: true });
                 this.models[0].setData({ id: 1, foo: 'barrr' });
                 expect(this.changedCallback.callCount).to.be(1);
             });
@@ -113,15 +142,15 @@ describe('ns.ModelCollection', function() {
             });
 
             it('should not duplicate trigger events by methodName', function() {
-                this.model._splitData(this.data);
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
+                this.model.setData(this.data, { silent: true });
                 this.models[0].trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
 
             it('should not duplicate trigger events by func', function() {
-                this.model._splitData(this.data);
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
+                this.model.setData(this.data, { silent: true });
                 this.models[0].trigger('event2');
                 expect(this.methodCallback.callCount).to.be(1);
             });
@@ -131,11 +160,25 @@ describe('ns.ModelCollection', function() {
                 data.item = data.item.slice(1, 3);
                 var model = this.models[0];
 
-                this.model._splitData(data);
+                this.model.setData(data, { silent: true });
 
                 model.setData({id: 1, foo: 'foo', bar: 'bar'});
 
                 expect(this.changedCallback.called).not.to.be.ok();
+            });
+
+            it('should set models to collection without split', function() {
+                this.modelCollection.setData(this.models);
+
+                expect(this.modelCollection.models[0].data).to.eql(this.data.item[0]);
+                expect(this.modelCollection.models[1].data).to.eql(this.data.item[1]);
+                expect(this.modelCollection.models[2].data).to.eql(this.data.item[2]);
+            });
+
+            it('should trigger event on collection form other collection', function() {
+                this.modelCollection.setData(this.models);
+                this.modelCollection.models[0].trigger('event1');
+                expect(this.methodNameCallback.callCount).to.be(1);
             });
 
         });
@@ -148,7 +191,7 @@ describe('ns.ModelCollection', function() {
                 this.model = ns.Model.create('mc0', { id: Math.random() });
                 this.modelEmpty = ns.Model.create('mc0', { id: Math.random() });
 
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
                 this.models = this.model.models;
 
                 this.item1 = ns.Model.create('split1-item', { id: Math.random() }, { id: 100, value: 'item1' });
@@ -236,6 +279,15 @@ describe('ns.ModelCollection', function() {
                 expect(this.methodNameCallback.callCount).to.be(2);
             });
 
+            it('should trigger `ns-insert` event once', function() {
+                expect(this.insertCallback.callCount).to.be(1);
+            });
+
+            it('should trigger `ns-insert` event twice', function() {
+                this.model.insert(this.packItems);
+                expect(this.insertCallback.callCount).to.be(2);
+            });
+
         });
 
         describe('remove', function() {
@@ -245,7 +297,7 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.create('mc0', { id: Math.random() });
 
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
 
                 this.models = this.model.models;
 
@@ -283,6 +335,15 @@ describe('ns.ModelCollection', function() {
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
 
+            it('should not trigger `ns-remove` event', function() {
+                expect(this.removeCallback.callCount).to.be(0);
+            });
+
+            it('should trigger `ns-remove` event once', function() {
+                this.model.remove(this.item1);
+                expect(this.removeCallback.callCount).to.be(1);
+            });
+
         });
 
         describe('clear', function() {
@@ -293,7 +354,7 @@ describe('ns.ModelCollection', function() {
                 this.model = ns.Model.create('mc0', { id: Math.random() });
 
                 this.model.trigger = sinon.spy();
-                this.model._splitData(this.data);
+                this.model.setData(this.data, { silent: true });
 
                 this.item1 = this.model.models[0];
             });

@@ -380,20 +380,6 @@ describe('ns.Model', function() {
                     .not.to.be.ok();
             });
 
-            it('should call _splitData for split-models', function() {
-                var model = ns.Model.create('split1', {p1: 1, p2: 2});
-
-                sinon.spy(model, '_splitData');
-
-                model.setData(ns.Model.TESTDATA.split1);
-
-                expect(model._splitData.calledOnce)
-                    .to.be.ok();
-
-                expect(model._splitData.calledWith(ns.Model.TESTDATA.split1))
-                    .to.be.ok();
-            });
-
         });
 
         describe('getData', function() {

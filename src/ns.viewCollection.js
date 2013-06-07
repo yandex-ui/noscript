@@ -192,7 +192,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
 
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        for (var i = 0, view, prev, p; i < MC.models.length; i++) {
+        for (var i = 0, view, wasValid, prev, p; i < MC.models.length; i++) {
             // у нас тут для каждого элемента MC уже есть
             //  1. либо валидный view,
             //  2. либо невалидный view с собственным устаревшим html и новый html для него,
@@ -202,11 +202,13 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
             // Получим view для этой модели
             view = this._getView(this.info.split.view_id, p);
 
+            wasValid = view.isValid();
+
             // Если у него была старая нода, она заменится сама в _updateHTML
             view._updateHTML(newNode, null, params, updaterOptions, events);
 
-            // Если невалиден
-            if (!view.isValid()) {
+            // Если до _updateHTML был невалиден
+            if (!wasValid) {
                 // поставим ноду в правильное место
                 if (prev) {
                     // Либо после предыдущего вида

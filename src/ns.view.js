@@ -1114,8 +1114,6 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     var viewNode;
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
-        //  console.log('updateHTML', this.id);
-
         //  Ищем новую ноду блока.
         viewNode = this.extractNode(node);
 

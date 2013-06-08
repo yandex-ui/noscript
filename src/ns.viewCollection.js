@@ -155,6 +155,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
     var viewWasInvalid = !this.isValid();
     var syncUpdate     = !updaterOptions.async;
 
+    // FIXME: А ещё нужно обработать кейс, когда родительский вид обновил свою ноду
+    // сейчас при таких обстоятельствах viewCollection ломается (не показываются элементы)
+
     if (viewWasInvalid) {
         // Будем что-то делать с нодой только в 2-х случаях
         if (!this.node) {

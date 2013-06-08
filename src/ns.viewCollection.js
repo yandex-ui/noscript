@@ -156,6 +156,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
     var syncUpdate     = !updaterOptions.async;
 
     if (viewWasInvalid) {
+        // Будем что-то делать с нодой только в 2-х случаях
         if (!this.node) {
             // Если это первая отрисовка
             // Засетим ноду
@@ -168,6 +169,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
             ns.replaceNode(this.node, newNode);
             // и засетим
             this._setNode(newNode);
+        } else {
+            // В остальных случаях считаем viewCollection валидным
+            this.status = this.STATUS.OK;
         }
     }
 

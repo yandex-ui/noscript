@@ -624,7 +624,7 @@ describe('ns.View', function() {
             });
         });
 
-        describe('ns.View: params+ / params-', function() {
+        describe('ns.View: params+', function() {
             beforeEach(function() {
                 ns.Model.define('photo', { params: { login: null, id: null } });
                 ns.Model.define('photo-tags', { params: { id: null, one_more: null, per_page: 10 } });
@@ -632,15 +632,31 @@ describe('ns.View', function() {
                     models: [ 'photo', 'photo-tags' ],
                     'params+': {
                         'add_me': 666
-                    },
+                    }
+                });
+                ns.View.info('photo'); // это чтобы view полностью внутри проинициализировалось
+            });
+
+            it('params+ добавляются к ключу', function() {
+                var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
+                expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&one_more=xx&per_page=10&add_me=666');
+            });
+        });
+
+        describe('ns.View: params-', function() {
+            beforeEach(function() {
+                ns.Model.define('photo', { params: { login: null, id: null } });
+                ns.Model.define('photo-tags', { params: { id: null, one_more: null, per_page: 10 } });
+                ns.View.define('photo', {
+                    models: [ 'photo', 'photo-tags' ],
                     'params-': [ 'one_more' ]
                 });
                 ns.View.info('photo'); // это чтобы view полностью внутри проинициализировалось
             });
 
-            it('params+ и params- в действии', function() {
+            it('params- исключаются из ключа', function() {
                 var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
-                expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&per_page=10&add_me=666');
+                expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&per_page=10');
             });
         });
 

@@ -109,8 +109,8 @@ ns.View.getKeyAndParams = function(id, params, info) {
     info = info || ns.View.info(id) || {};
 
     if ('function' === typeof info.rewriteParamsOnInit) {
-        // если для view определен метод rewriteParamsOnInit и он вернул объект,
-        // то перепишем параметры
+        //  если для view определен метод rewriteParamsOnInit и он вернул объект,
+        //  то перепишем параметры
         params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
     }
 
@@ -151,12 +151,8 @@ ns.View.getKeyAndParams = function(id, params, info) {
         }
     }
 
-    // XXX Не очень понятно, как реагировать на то, что для view нельзя построить ключ.
-    // throw "We could not create key for view: " + id;
-    return {
-        params: params,
-        key: null
-    };
+    //  Не удалось построить ключ view.
+    throw new Error("[ns.View] Could not generate key for view " + id);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -395,7 +391,7 @@ ns.View._initInfo = function(info) {
 ns.View._initInfoParams = function(info) {
     if (info.params) {
         if ( info['params+'] || info['params-'] ) {
-            throw 'ns.View: you cannot specify params and params+/- at the same time.';
+            throw new Error("[ns.View] you cannot specify params and params+/- at the same time");
         }
 
         var groups;
@@ -423,7 +419,7 @@ ns.View._initInfoParams = function(info) {
         for (var model_id in info.models) {
             var modelInfo = ns.Model.info(model_id);
             if (!modelInfo) {
-                throw 'Model "' + model_id + '" is not defined!';
+                throw new Error('[ns.View] Model "' + model_id + '" is not defined!');
             }
             no.extend( params, modelInfo.params );
         }

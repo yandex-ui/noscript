@@ -559,7 +559,7 @@ describe('ns.View', function() {
             });
 
             it('Ключ не должен строиться, если параметров не хватает', function() {
-                expect(ns.View.getKey('photo:v2', { login: 'test' })).to.be.eql(null);
+                expect(function() { ns.View.getKey('photo:v2', { login: 'test' }); }).to.throwError();
             });
 
             it('В view.info.params задано значение для параметра (фильтр) и в params -- такое же значение', function() {
@@ -567,11 +567,11 @@ describe('ns.View', function() {
             });
 
             it('В view.info.params задано одно значение для параметра, а в params пришло другое', function() {
-                expect(ns.View.getKey('photo:v3', { login: 'lynn', id: 3 })).to.be.eql(null);
+                expect(function() { ns.View.getKey('photo:v3', { login: 'lynn', id: 3 }); }).to.throwError();
             });
 
             it('В view.info.params задано значение для параметра, а в params значение отсутствует', function() {
-                expect(ns.View.getKey('photo:v3', { id: 3 })).to.be.eql(null);
+                expect(function() { ns.View.getKey('photo:v3', { id: 3 }); }).to.throwError();
             });
         });
 
@@ -604,7 +604,7 @@ describe('ns.View', function() {
             });
 
             it('Ни один из вариантов не подходит', function() {
-                expect(ns.View.getKey('slider', { album: 6, context_new: 'tag', id: 8, tag_new: 'girls' })).to.be.eql(null);
+                expect(function() { ns.View.getKey('slider', { album: 6, context_new: 'tag', id: 8, tag_new: 'girls' }); }).to.throwError();
             });
         });
 

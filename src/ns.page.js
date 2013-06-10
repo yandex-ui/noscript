@@ -34,7 +34,7 @@ ns.page.go = function(url) {
     }
     var layout = ns.layout.page(route.page, route.params);
 
-    no.events.trigger('no:page-before-load', [ns.page.current, route]);
+    ns.events.trigger('no:page-before-load', [ns.page.current, route]);
     /**
      * Текущие параметры страницы.
      * @type {{page: string, params: Object}}

@@ -702,7 +702,7 @@ ns.View.prototype._bindEvents = function(type) {
     var globalNoevents = events['ns-global'];
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
-        no.events.on(event[0], event[1]);
+        ns.events.on(event[0], event[1]);
     }
 };
 
@@ -737,7 +737,7 @@ ns.View.prototype._unbindEvents = function(type) {
     var globalNoevents = events['ns-global'];
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
-        no.events.off(event[0], event[1]);
+        ns.events.off(event[0], event[1]);
     }
 };
 

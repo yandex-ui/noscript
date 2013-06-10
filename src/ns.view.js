@@ -129,7 +129,7 @@ ns.View.getKeyAndParams = function(id, params, info) {
             var pName = pNames[i];
             var pValue = params[ pName ] || pOptional[ pName ];
             var pFilter = pFilters[pName];
-            var isOptional = pOptional[pName] != null;
+            var isOptional = pName in pOptional;
 
             if (pValue == null && isOptional) {
                 continue;

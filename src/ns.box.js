@@ -10,9 +10,7 @@ ns.Box = function(id, params) {
 
     this.views = {};
 
-    //  NOTE: Нет специального метода ns.Box.getKey --
-    //  все ключи вычисляются только через ns.View.getKey.
-    this.key = ns.View.getKey(id, params);
+    this.key = 'box=' + id;
 
     this.node = null;
     this.active = {};

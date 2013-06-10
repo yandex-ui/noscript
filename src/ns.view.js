@@ -151,6 +151,14 @@ ns.View.getKeyAndParams = function(id, params, info) {
         }
     }
 
+    //  Не по чему строить ключ.
+    if (!pGroups.length) {
+        return {
+            params: params,    // параметры с учётом rewrite
+            key: 'view=' + id  // ключ с учётом правильных параметров
+        };
+    }
+
     //  Не удалось построить ключ view.
     throw new Error("[ns.View] Could not generate key for view " + id);
 };
@@ -441,13 +449,18 @@ ns.View._initInfoParams = function(info) {
         }
 
         // Когда параметры строятся из параметров моделей нет фильтров параметров.
-        info.pGroups = [
-            {
-                pNames: Object.keys(params),
-                pFilters: {},
-                pOptional: params
-            }
-        ];
+        var pNames = Object.keys(params);
+        if (pNames.length) {
+            info.pGroups = [
+                {
+                    pNames: pNames,
+                    pFilters: {},
+                    pOptional: params
+                }
+            ];
+        } else {
+            info.pGroups = [];
+        }
     }
 };
 

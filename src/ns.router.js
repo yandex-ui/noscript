@@ -8,7 +8,11 @@ ns.router = function(url) {
     var routesDef = ns.router._routes;
 
     if ( url.indexOf(baseDir) !== 0) {
-        throw new Error('[ns.router] url "' + url + '" does not match baseDir "' + baseDir + '"');
+        // Ничего подходящего не нашли.
+        return {
+            page: ns.R.NOT_FOUND,
+            params: {}
+        };
     }
 
     // Откусываем префикс урла

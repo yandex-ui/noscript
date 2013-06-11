@@ -115,6 +115,7 @@ describe('ns.router', function() {
                 }
             };
             ns.router.init();
+            this.not_found = { page: ns.R.NOT_FOUND, params: {} };
         });
 
         afterEach(function() {
@@ -123,9 +124,10 @@ describe('ns.router', function() {
             delete ns.router.baseDir
         });
 
-        it('throw an error in case url does not match baseDir', function() {
-            expect(function() { ns.router('/index') }).to.throwError();
-            expect(function() { ns.router('/ver1/index') }).to.throwError();
+        it('NOT FOUND in case url does not match baseDir', function() {
+            var that = this;
+            expect(ns.router('/index')).to.eql(that.not_found);
+            expect(ns.router('/ver1/index')).to.eql(that.not_found);
         });
 
         it('prefixed url is routed fine', function() {

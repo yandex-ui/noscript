@@ -637,13 +637,13 @@ ns.View.prototype._bindModels = function() {
                 if ('' in deps) {
                     //  При любом изменении модели нужно инвалидировать
                     //  весь view целиком.
-                    model.on('changed' + jpath, function() {
+                    model.on('ns-model-changed' + jpath, function() {
                         that.invalidate();
                     });
                 } else {
                     //  Инвалидируем только соответствующие subview:
                     (function(deps) {
-                        model.on('changed' + jpath, function() {
+                        model.on('ns-model-changed' + jpath, function() {
                             for (var subview_id in deps) {
                                 that.invalidateSubview(subview_id);
                             }
@@ -654,7 +654,7 @@ ns.View.prototype._bindModels = function() {
         } else {
             //  Для этой модели нет данных о том, какие subview она инвалидирует.
             //  Значит при изменении этой модели инвалидируем весь view целиком.
-            model.on('changed', function() {
+            model.on('ns-model-changed', function() {
                 that.invalidate();
             });
         }

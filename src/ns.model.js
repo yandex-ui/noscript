@@ -334,11 +334,11 @@ ns.Model.prototype.set = function(jpath, value, options) {
             //  если изначально jpath был `.foo.bar`, то для события `changed.foo` передавать
             //  старое значение и новое, полный jpath `.foo.bar`, текущий jpath `.foo`.
             //
-            this.trigger('changed' + _jpath, _jpath);
+            this.trigger('ns-model-changed' + _jpath, _jpath);
             l--;
         }
         //  Сообщение о том, что вообще вся модель изменилась.
-        this.trigger('changed', jpath);
+        this.trigger('ns-model-changed', jpath);
     }
 };
 
@@ -371,7 +371,7 @@ ns.Model.prototype.setData = function(data, options) {
         //  Можно считать, что она в этом случае всегда меняется.
         //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
         if (!options || !options.silent) {
-            this.trigger('changed', '');
+            this.trigger('ns-model-changed', '');
         }
     }
 

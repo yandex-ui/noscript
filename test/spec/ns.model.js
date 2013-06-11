@@ -210,8 +210,8 @@ describe('ns.Model', function() {
 
             it('should return \'events\' property', function() {
                 var decl = {
-                    'changed': function() {},
-                    'changed..data': function() {}
+                    'ns-model-changed': function() {},
+                    'ns-model-changed.data': function() {}
                 };
                 ns.Model.define('me0', {events: decl});
 
@@ -359,7 +359,7 @@ describe('ns.Model', function() {
                     .to.be(this.data);
             });
 
-            it('should trigger \'changed\' event', function() {
+            it('should trigger \'ns-model-changed\' event', function() {
                 sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data);
@@ -367,11 +367,11 @@ describe('ns.Model', function() {
                 expect(this.model.trigger.calledOnce)
                     .to.be.ok();
 
-                expect(this.model.trigger.calledWith('changed'))
+                expect(this.model.trigger.calledWith('ns-model-changed'))
                     .to.be.ok();
             });
 
-            it('should not trigger \'changed\' event when {silent: true}', function() {
+            it('should not trigger \'ns-model-changed\' event when {silent: true}', function() {
                 sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data, {silent: true});
@@ -431,8 +431,8 @@ describe('ns.Model', function() {
                 this.changedJpathCb = sinon.spy();
 
                 this.eventsDeclaration = {
-                    'changed': this.changedCb,
-                    'changed.data': this.changedJpathCb
+                    'ns-model-changed': this.changedCb,
+                    'ns-model-changed.data': this.changedJpathCb
                 };
 
                 ns.Model.define('defined-events-2', {
@@ -471,7 +471,7 @@ describe('ns.Model', function() {
 
             it('should call callback on .set() with params', function() {
                 this.model.set('.data', 2);
-                expect(this.changedJpathCb.calledWith('changed.data', '.data')).to.be.ok();
+                expect(this.changedJpathCb.calledWith('ns-model-changed.data', '.data')).to.be.ok();
             });
 
         });

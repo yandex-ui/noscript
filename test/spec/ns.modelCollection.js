@@ -26,7 +26,7 @@ describe('ns.ModelCollection', function() {
                 'event2': function() {
                     methodCallback();
                 },
-                'changed': function() {
+                'ns-model-changed': function() {
                     changedCallback();
                 },
                 'ns-model-insert': function() {
@@ -119,12 +119,12 @@ describe('ns.ModelCollection', function() {
                     .to.be.ok();
             });
 
-            it('should trigger `changed` event', function() {
+            it('should trigger `ns-model-changed` event', function() {
                 this.models[0].setData({ id: 3, foo: 'barrr' });
                 expect(this.changedCallback.callCount).to.be(1);
             });
 
-            it('should not duplicate trigger `changed` event', function() {
+            it('should not duplicate trigger `ns-model-changed` event', function() {
                 this.model.setData(this.data, { silent: true });
                 this.model.setData(this.data, { silent: true });
                 this.models[0].setData({ id: 1, foo: 'barrr' });
@@ -252,13 +252,13 @@ describe('ns.ModelCollection', function() {
 
             });
 
-            it('should binding `changed` event', function() {
+            it('should binding `ns-model-changed` event', function() {
                 this.model.insert(this.item1, 2);
                 this.models[2].setData({id: 100, value: 'ololo'});
                 expect(this.changedCallback.callCount).to.be(1);
             });
 
-            it('should binding `changed` event for few models', function() {
+            it('should binding `ns-model-changed` event for few models', function() {
                 this.model.insert(this.packItems);
                 this.models[0].setData({ id: 1, value: 'foo' });
                 this.models[3].setData({ id: 100, value: 'foo' });
@@ -316,7 +316,7 @@ describe('ns.ModelCollection', function() {
                 expect(this.models.length).to.be(2);
             });
 
-            it('should not trigger `changed` event', function() {
+            it('should not trigger `ns-model-changed` event', function() {
                 this.model.remove(this.item1);
                 this.item1.setData({ id: 1, foo: 'bar' });
                 expect(this.changedCallback.callCount).to.be(0);

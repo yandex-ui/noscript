@@ -121,7 +121,7 @@ describe('ns.router', function() {
         afterEach(function() {
             delete ns.router._routes;
             delete ns.router.routes;
-            delete ns.router.baseDir
+            ns.router.baseDir= '';
         });
 
         it('NOT FOUND in case url does not match baseDir', function() {
@@ -145,7 +145,7 @@ describe('ns.router', function() {
         afterEach(function() {
             delete ns.router._routes;
             delete ns.router.routes;
-            delete ns.router.baseDir
+            ns.router.baseDir= '';
         });
 
         // URL GENERATION
@@ -163,7 +163,7 @@ describe('ns.router', function() {
         afterEach(function() {
             delete ns.router._routes;
             delete ns.router.routes;
-            delete ns.router.baseDir
+            ns.router.baseDir= '';
         });
 
         it('generate unprefixed url when baseDir is empty', function() {

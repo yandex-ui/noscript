@@ -108,7 +108,7 @@ describe('ns.router', function() {
 
     describe('baseDir: routing', function() {
         beforeEach(function() {
-            ns.router.baseDir = '/ver2'
+            ns.router.baseDir = '/ver2';
             ns.router.routes = {
                 route: {
                     '/index': 'index'
@@ -137,7 +137,7 @@ describe('ns.router', function() {
 
     describe('baseDir: url generate with baseDir', function() {
         beforeEach(function() {
-            ns.router.baseDir = '/ver2'
+            ns.router.baseDir = '/ver2';
             ns.router.routes = {};
             ns.router.init();
         });

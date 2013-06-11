@@ -89,7 +89,7 @@ ns.View.prototype._init = function(id, params, async) {
         this.on(event[0], this._prepareCallback(event[1]));
     }
 
-    this.trigger('ns-init');
+    this.trigger('ns-view-init');
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -319,7 +319,7 @@ ns.View._initInfo = function(info) {
 
                 // событие init тригерится при создании блока, поэтому вешать его надо сразу
                 // событие async тригерится до всего, его тоже надо вешать
-                if (eventName == 'ns-init' || eventName == 'ns-async') {
+                if (eventName == 'ns-view-init' || eventName == 'ns-view-async') {
                     info.createEvents.push([eventName, handler]);
 
                 } else {
@@ -1225,8 +1225,8 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
             }
             //  вызываем htmldestory только если нода была заменена
             if (this.node && !this.isLoading()) {
-                this._hide(events['ns-hide']);
-                this._htmldestroy(events['ns-htmldestroy']);
+                this._hide(events['ns-view-hide']);
+                this._htmldestroy(events['ns-view-htmldestroy']);
             }
 
             //  новая нода должна в любом случае попасть в DOM
@@ -1238,11 +1238,11 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
             this._setNode(viewNode);
 
             if ( this.isOk() ) {
-                this._htmlinit(events['ns-htmlinit']);
+                this._htmlinit(events['ns-view-htmlinit']);
 
             } else if (this.isLoading()) {
                 // В асинхронном запросе вызываем async для view, которые являются заглушкой.
-                events['ns-async'].push(this);
+                events['ns-view-async'].push(this);
             }
         }
 
@@ -1259,8 +1259,8 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     // Второе условие относится как к перерисованным view, так и к async-view, которые полностью отрисовались
     if ( (syncUpdate || viewWasInvalid) && this.isOk() ) {
         // событие show будет вызвано, если у view поменяется this._visible
-        this._show(events['ns-show']);
-        events['ns-repaint'].push(this);
+        this._show(events['ns-view-show']);
+        events['ns-view-repaint'].push(this);
     }
 
     //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть

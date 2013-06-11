@@ -252,13 +252,13 @@ describe('ns.View', function() {
         });
     });
 
-    describe('ns-init event', function() {
+    describe('ns-view-init event', function() {
 
         it('should call event handler defined as string', function() {
             var spy = sinon.spy();
             ns.View.define('myblock', {
                 events: {
-                    'ns-init': 'initCallback'
+                    'ns-view-init': 'initCallback'
                 },
                 methods: {
                     initCallback: spy
@@ -273,7 +273,7 @@ describe('ns.View', function() {
             var spy = sinon.spy();
             ns.View.define('myblock', {
                 events: {
-                    'ns-init': 'initCallback'
+                    'ns-view-init': 'initCallback'
                 },
                 methods: {
                     initCallback: spy
@@ -288,7 +288,7 @@ describe('ns.View', function() {
             var spy = sinon.spy();
             ns.View.define('myblock', {
                 events: {
-                    'ns-init': spy
+                    'ns-view-init': spy
                 }
             });
             ns.View.create('myblock');
@@ -300,7 +300,7 @@ describe('ns.View', function() {
             var spy = sinon.spy();
             ns.View.define('myblock', {
                 events: {
-                    'ns-init': spy
+                    'ns-view-init': spy
                 }
             });
             ns.View.create('myblock');

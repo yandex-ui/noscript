@@ -55,13 +55,13 @@ ns.V.DOM_EVENTS = [
  * @constant
  */
 ns.V.NS_EVENTS = [
-    'ns-async',
-    'ns-init',
-    'ns-htmlinit',
-    'ns-show',
-    'ns-repaint',
-    'ns-hide',
-    'ns-htmldestroy'
+    'ns-view-async',
+    'ns-view-init',
+    'ns-view-htmlinit',
+    'ns-view-show',
+    'ns-view-repaint',
+    'ns-view-hide',
+    'ns-view-htmldestroy'
 ];
 
 //TODO: Pointer events support (MSIE 10)

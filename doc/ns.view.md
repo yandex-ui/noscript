@@ -59,32 +59,32 @@ ns.View.define('super-view', {
 ## Про события
 
 Список событий:
-* ```ns-hide``` - view был скрыт и больше не виден на странице
-* ```ns-htmldestroy``` - старая нода у view была заменена на новую
-* ```ns-htmlinit``` - у view появилась новая нода
-* ```ns-async``` - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view
-* ```ns-show``` - view был показан и теперь виден на странице
-* ```ns-repaint``` - view виден и был затронут в процессе обновления страницы
+* ```ns-view-hide``` - view был скрыт и больше не виден на странице
+* ```ns-view-htmldestroy``` - старая нода у view была заменена на новую
+* ```ns-view-htmlinit``` - у view появилась новая нода
+* ```ns-view-async``` - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view
+* ```ns-view-show``` - view был показан и теперь виден на странице
+* ```ns-view-repaint``` - view виден и был затронут в процессе обновления страницы
 
 1. События генерируются снизу вверх, т.е. сначала их получают дочерние view, потом родительские.
 2. События генерируются пачками, т.е. сначала одно событие у всех view, потом другое событие у всех view.
 3. События генерируются в строго определенном порядке:
 
 ```
-ns-hide
-ns-htmldestroy
-ns-htmlinit
-ns-async
-ns-show
-ns-repaint
+ns-view-hide
+ns-view-htmldestroy
+ns-view-htmlinit
+ns-view-async
+ns-view-show
+ns-view-repaint
 ```
 
 Примеры последовательностей событий:
-* инициализация view: ```ns-htmlinit -> ns-show -> ns-repaint```
-* перерисовка страница, если view валиден: ```ns-repaint```
-* view был скрыт: ```ns-hide``` (без ```ns-repaint```)
-* view был показан: ```ns-show -> ns-repaint```
-* view был обновлене: ```ns-hide -> ns-htmldestroy -> ns-htmlinit -> ns-show -> ns-repaint``` (```ns-hide``` тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на ```ns-show/ns-hide``` и при обновлении ноды, они должны быть переинициализированы)
+* инициализация view: ```ns-view-htmlinit -> ns-view-show -> ns-view-repaint```
+* перерисовка страница, если view валиден: ```ns-view-repaint```
+* view был скрыт: ```ns-view-hide``` (без ```ns-view-repaint```)
+* view был показан: ```ns-view-show -> ns-view-repaint```
+* view был обновлене: ```ns-view-hide -> ns-view-htmldestroy -> ns-view-htmlinit -> ns-view-show -> ns-view-repaint``` (```ns-view-hide``` тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на ```ns-view-show/ns-view-hide``` и при обновлении ноды, они должны быть переинициализированы)
 
 ## Subview
 `Subview` - это часть `view`, которая отвечает за небольшой кусок интерфейса (флажок важное, метка прочитанности и т.п.).

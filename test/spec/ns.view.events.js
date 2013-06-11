@@ -68,7 +68,7 @@ describe('ns.View.events', function() {
         }, 'app');
 
         var views = ['app', 'head', 'content1', 'content1-async@content1-async-model', 'content1-inner', 'content2', 'content2-inner'];
-        var events = ['ns-async', 'ns-init', 'ns-htmlinit', 'ns-show', 'ns-repaint', 'ns-hide', 'ns-htmldestroy'];
+        var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-repaint', 'ns-view-hide', 'ns-view-htmldestroy'];
 
         this.events = {};
 
@@ -112,88 +112,88 @@ describe('ns.View.events', function() {
             update.start();
         });
 
-        describe('ns-init', function() {
+        describe('ns-view-init', function() {
             genTests([
-                ['app', 'ns-init', 'calledOnce'],
-                ['head', 'ns-init', 'calledOnce'],
-                ['content1', 'ns-init', 'calledOnce'],
-                ['content1-inner', 'ns-init', 'calledOnce'],
-                ['content2', 'ns-init', 'called', false],
-                ['content2-inner', 'ns-init', 'called', false]
+                ['app', 'ns-view-init', 'calledOnce'],
+                ['head', 'ns-view-init', 'calledOnce'],
+                ['content1', 'ns-view-init', 'calledOnce'],
+                ['content1-inner', 'ns-view-init', 'calledOnce'],
+                ['content2', 'ns-view-init', 'called', false],
+                ['content2-inner', 'ns-view-init', 'called', false]
             ]);
         });
 
-        describe('ns-htmlinit', function() {
+        describe('ns-view-htmlinit', function() {
             genTests([
-                ['app', 'ns-htmlinit', 'calledOnce'],
-                ['head', 'ns-htmlinit', 'calledOnce'],
-                ['content1', 'ns-htmlinit', 'calledOnce'],
-                ['content1-inner', 'ns-htmlinit', 'calledOnce'],
-                ['content2', 'ns-htmlinit', 'called', false],
-                ['content2-inner', 'ns-htmlinit', 'called', false]
+                ['app', 'ns-view-htmlinit', 'calledOnce'],
+                ['head', 'ns-view-htmlinit', 'calledOnce'],
+                ['content1', 'ns-view-htmlinit', 'calledOnce'],
+                ['content1-inner', 'ns-view-htmlinit', 'calledOnce'],
+                ['content2', 'ns-view-htmlinit', 'called', false],
+                ['content2-inner', 'ns-view-htmlinit', 'called', false]
             ]);
         });
 
-        describe('ns-show', function() {
+        describe('ns-view-show', function() {
             genTests([
-                ['app', 'ns-show', 'calledOnce'],
-                ['head', 'ns-show', 'calledOnce'],
-                ['content1', 'ns-show', 'calledOnce'],
-                ['content1-inner', 'ns-show', 'calledOnce'],
-                ['content2', 'ns-show', 'called', false],
-                ['content2-inner', 'ns-show', 'called', false]
+                ['app', 'ns-view-show', 'calledOnce'],
+                ['head', 'ns-view-show', 'calledOnce'],
+                ['content1', 'ns-view-show', 'calledOnce'],
+                ['content1-inner', 'ns-view-show', 'calledOnce'],
+                ['content2', 'ns-view-show', 'called', false],
+                ['content2-inner', 'ns-view-show', 'called', false]
             ]);
         });
 
-        describe('ns-repaint', function() {
+        describe('ns-view-repaint', function() {
             genTests([
-                ['app', 'ns-repaint', 'calledOnce'],
-                ['head', 'ns-repaint', 'calledOnce'],
-                ['content1', 'ns-repaint', 'calledOnce'],
-                ['content1-inner', 'ns-repaint', 'calledOnce'],
-                ['content2', 'ns-repaint', 'called', false],
-                ['content2-inner', 'ns-repaint', 'called', false]
+                ['app', 'ns-view-repaint', 'calledOnce'],
+                ['head', 'ns-view-repaint', 'calledOnce'],
+                ['content1', 'ns-view-repaint', 'calledOnce'],
+                ['content1-inner', 'ns-view-repaint', 'calledOnce'],
+                ['content2', 'ns-view-repaint', 'called', false],
+                ['content2-inner', 'ns-view-repaint', 'called', false]
             ]);
         });
 
-        describe('ns-hide', function() {
+        describe('ns-view-hide', function() {
             genTests([
-                ['app', 'ns-hide', 'called', false],
-                ['head', 'ns-hide', 'called', false],
-                ['content1', 'ns-hide', 'called', false],
-                ['content1-inner', 'ns-hide', 'called', false],
-                ['content2', 'ns-hide', 'called', false],
-                ['content2-inner', 'ns-hide', 'called', false]
+                ['app', 'ns-view-hide', 'called', false],
+                ['head', 'ns-view-hide', 'called', false],
+                ['content1', 'ns-view-hide', 'called', false],
+                ['content1-inner', 'ns-view-hide', 'called', false],
+                ['content2', 'ns-view-hide', 'called', false],
+                ['content2-inner', 'ns-view-hide', 'called', false]
             ]);
         });
 
-        describe('ns-htmldestroy', function() {
+        describe('ns-view-htmldestroy', function() {
             genTests([
-                ['app', 'ns-htmldestroy', 'called', false],
-                ['head', 'ns-htmldestroy', 'called', false],
-                ['content1', 'ns-htmldestroy', 'called', false],
-                ['content1-inner', 'ns-htmldestroy', 'called', false],
-                ['content2', 'ns-htmldestroy', 'called', false],
-                ['content2-inner', 'ns-htmldestroy', 'called', false]
+                ['app', 'ns-view-htmldestroy', 'called', false],
+                ['head', 'ns-view-htmldestroy', 'called', false],
+                ['content1', 'ns-view-htmldestroy', 'called', false],
+                ['content1-inner', 'ns-view-htmldestroy', 'called', false],
+                ['content2', 'ns-view-htmldestroy', 'called', false],
+                ['content2-inner', 'ns-view-htmldestroy', 'called', false]
             ]);
         });
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'ns-htmlinit'],
-                ['content1', 'ns-htmlinit'],
-                ['head', 'ns-htmlinit'],
-                ['app', 'ns-htmlinit'],
+                ['content1-inner', 'ns-view-htmlinit'],
+                ['content1', 'ns-view-htmlinit'],
+                ['head', 'ns-view-htmlinit'],
+                ['app', 'ns-view-htmlinit'],
 
-                ['content1-inner', 'ns-show'],
-                ['content1', 'ns-show'],
-                ['head', 'ns-show'],
-                ['app', 'ns-show'],
+                ['content1-inner', 'ns-view-show'],
+                ['content1', 'ns-view-show'],
+                ['head', 'ns-view-show'],
+                ['app', 'ns-view-show'],
 
-                ['content1-inner', 'ns-repaint'],
-                ['content1', 'ns-repaint'],
-                ['head', 'ns-repaint'],
-                ['app', 'ns-repaint']
+                ['content1-inner', 'ns-view-repaint'],
+                ['content1', 'ns-view-repaint'],
+                ['head', 'ns-view-repaint'],
+                ['app', 'ns-view-repaint']
             ]);
         });
 
@@ -211,57 +211,57 @@ describe('ns.View.events', function() {
 
         genTests([
 
-            ['content2-inner', 'ns-init', 'calledOnce'],
-            ['content2-inner', 'ns-htmlinit', 'calledOnce'],
-            ['content2-inner', 'ns-show', 'calledOnce'],
-            ['content2-inner', 'ns-repaint', 'calledOnce'],
+            ['content2-inner', 'ns-view-init', 'calledOnce'],
+            ['content2-inner', 'ns-view-htmlinit', 'calledOnce'],
+            ['content2-inner', 'ns-view-show', 'calledOnce'],
+            ['content2-inner', 'ns-view-repaint', 'calledOnce'],
 
-            ['content2', 'ns-init', 'calledOnce'],
-            ['content2', 'ns-htmlinit', 'calledOnce'],
-            ['content2', 'ns-show', 'calledOnce'],
-            ['content2', 'ns-repaint', 'calledOnce'],
+            ['content2', 'ns-view-init', 'calledOnce'],
+            ['content2', 'ns-view-htmlinit', 'calledOnce'],
+            ['content2', 'ns-view-show', 'calledOnce'],
+            ['content2', 'ns-view-repaint', 'calledOnce'],
 
-            ['app', 'ns-show', 'calledOnce'],
-            ['content1-inner', 'ns-hide', 'calledOnce'],
-            ['content1', 'ns-hide', 'calledOnce'],
+            ['app', 'ns-view-show', 'calledOnce'],
+            ['content1-inner', 'ns-view-hide', 'calledOnce'],
+            ['content1', 'ns-view-hide', 'calledOnce'],
 
-            ['app', 'ns-repaint', 'calledTwice'],
-            ['head', 'ns-repaint', 'calledTwice'],
-            ['content1', 'ns-repaint', 'calledOnce'],
-            ['content1-inner', 'ns-repaint', 'calledOnce'],
-            ['content2', 'ns-repaint', 'calledOnce'],
-            ['content2-inner', 'ns-repaint', 'calledOnce']
+            ['app', 'ns-view-repaint', 'calledTwice'],
+            ['head', 'ns-view-repaint', 'calledTwice'],
+            ['content1', 'ns-view-repaint', 'calledOnce'],
+            ['content1-inner', 'ns-view-repaint', 'calledOnce'],
+            ['content2', 'ns-view-repaint', 'calledOnce'],
+            ['content2-inner', 'ns-view-repaint', 'calledOnce']
         ]);
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'ns-htmlinit', 0],
-                ['content1', 'ns-htmlinit', 0],
-                ['head', 'ns-htmlinit', 0],
-                ['app', 'ns-htmlinit', 0],
+                ['content1-inner', 'ns-view-htmlinit', 0],
+                ['content1', 'ns-view-htmlinit', 0],
+                ['head', 'ns-view-htmlinit', 0],
+                ['app', 'ns-view-htmlinit', 0],
 
-                ['content1-inner', 'ns-show', 0],
-                ['content1', 'ns-show', 0],
-                ['head', 'ns-show', 0],
-                ['app', 'ns-show', 0],
+                ['content1-inner', 'ns-view-show', 0],
+                ['content1', 'ns-view-show', 0],
+                ['head', 'ns-view-show', 0],
+                ['app', 'ns-view-show', 0],
 
-                ['content1-inner', 'ns-repaint', 0],
-                ['content1', 'ns-repaint', 0],
-                ['head', 'ns-repaint', 0],
-                ['app', 'ns-repaint', 0],
+                ['content1-inner', 'ns-view-repaint', 0],
+                ['content1', 'ns-view-repaint', 0],
+                ['head', 'ns-view-repaint', 0],
+                ['app', 'ns-view-repaint', 0],
 
-                ['content1-inner', 'ns-hide', 0],
-                ['content1', 'ns-hide', 0],
+                ['content1-inner', 'ns-view-hide', 0],
+                ['content1', 'ns-view-hide', 0],
 
-                ['content2-inner', 'ns-htmlinit', 0],
-                ['content2', 'ns-htmlinit', 0],
-                ['content2-inner', 'ns-show', 0],
-                ['content2', 'ns-show', 0],
+                ['content2-inner', 'ns-view-htmlinit', 0],
+                ['content2', 'ns-view-htmlinit', 0],
+                ['content2-inner', 'ns-view-show', 0],
+                ['content2', 'ns-view-show', 0],
 
-                ['content2-inner', 'ns-repaint', 0],
-                ['content2', 'ns-repaint', 0],
-                ['head', 'ns-repaint', 1],
-                ['app', 'ns-repaint', 1]
+                ['content2-inner', 'ns-view-repaint', 0],
+                ['content2', 'ns-view-repaint', 0],
+                ['head', 'ns-view-repaint', 1],
+                ['app', 'ns-view-repaint', 1]
             ]);
         });
     });
@@ -275,7 +275,7 @@ describe('ns.View.events', function() {
             /**
              * @type {ns.View}
              */
-            var vContent1 = this.events['content1-ns-init-spy'].getCall(0).thisValue;
+            var vContent1 = this.events['content1-ns-view-init-spy'].getCall(0).thisValue;
             vContent1.invalidate();
 
             layout = ns.layout.page('content1', {});
@@ -284,60 +284,60 @@ describe('ns.View.events', function() {
 
         describe('events', function() {
             genTests([
-                ['content1-inner', 'ns-hide', 'calledOnce'],
-                ['content1', 'ns-hide', 'calledOnce'],
+                ['content1-inner', 'ns-view-hide', 'calledOnce'],
+                ['content1', 'ns-view-hide', 'calledOnce'],
 
-                ['content1-inner', 'ns-htmldestroy', 'calledOnce'],
-                ['content1', 'ns-htmldestroy', 'calledOnce'],
+                ['content1-inner', 'ns-view-htmldestroy', 'calledOnce'],
+                ['content1', 'ns-view-htmldestroy', 'calledOnce'],
 
-                ['content1-inner', 'ns-htmlinit', 'calledTwice'],
-                ['content1', 'ns-htmlinit', 'calledTwice'],
+                ['content1-inner', 'ns-view-htmlinit', 'calledTwice'],
+                ['content1', 'ns-view-htmlinit', 'calledTwice'],
 
-                ['content1-inner', 'ns-show', 'calledTwice'],
-                ['content1', 'ns-show', 'calledTwice'],
+                ['content1-inner', 'ns-view-show', 'calledTwice'],
+                ['content1', 'ns-view-show', 'calledTwice'],
 
-                ['content1-inner', 'ns-repaint', 'calledTwice'],
-                ['content1', 'ns-repaint', 'calledTwice']
+                ['content1-inner', 'ns-view-repaint', 'calledTwice'],
+                ['content1', 'ns-view-repaint', 'calledTwice']
             ]);
         });
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'ns-htmlinit', 0],
-                ['content1', 'ns-htmlinit', 0],
-                ['head', 'ns-htmlinit', 0],
-                ['app', 'ns-htmlinit', 0],
+                ['content1-inner', 'ns-view-htmlinit', 0],
+                ['content1', 'ns-view-htmlinit', 0],
+                ['head', 'ns-view-htmlinit', 0],
+                ['app', 'ns-view-htmlinit', 0],
 
-                ['content1-inner', 'ns-show', 0],
-                ['content1', 'ns-show', 0],
-                ['head', 'ns-show', 0],
-                ['app', 'ns-show', 0],
+                ['content1-inner', 'ns-view-show', 0],
+                ['content1', 'ns-view-show', 0],
+                ['head', 'ns-view-show', 0],
+                ['app', 'ns-view-show', 0],
 
-                ['content1-inner', 'ns-repaint', 0],
-                ['content1', 'ns-repaint', 0],
-                ['head', 'ns-repaint', 0],
-                ['app', 'ns-repaint', 0],
+                ['content1-inner', 'ns-view-repaint', 0],
+                ['content1', 'ns-view-repaint', 0],
+                ['head', 'ns-view-repaint', 0],
+                ['app', 'ns-view-repaint', 0],
 
-                ['content1-inner', 'ns-hide', 0],
-                ['content1', 'ns-hide', 0],
+                ['content1-inner', 'ns-view-hide', 0],
+                ['content1', 'ns-view-hide', 0],
 
-                ['content1-inner', 'ns-htmldestroy', 0],
-                ['content1', 'ns-htmldestroy', 0],
+                ['content1-inner', 'ns-view-htmldestroy', 0],
+                ['content1', 'ns-view-htmldestroy', 0],
 
-                ['content1-inner', 'ns-htmlinit', 1],
-                ['content1', 'ns-htmlinit', 1],
-                ['content1-inner', 'ns-show', 1],
-                ['content1', 'ns-show', 1],
+                ['content1-inner', 'ns-view-htmlinit', 1],
+                ['content1', 'ns-view-htmlinit', 1],
+                ['content1-inner', 'ns-view-show', 1],
+                ['content1', 'ns-view-show', 1],
 
-                ['content1-inner', 'ns-repaint', 1],
-                ['content1', 'ns-repaint', 1],
-                ['head', 'ns-repaint', 1],
-                ['app', 'ns-repaint', 1]
+                ['content1-inner', 'ns-view-repaint', 1],
+                ['content1', 'ns-view-repaint', 1],
+                ['head', 'ns-view-repaint', 1],
+                ['app', 'ns-view-repaint', 1]
             ]);
         });
     });
 
-    describe('ns-async', function() {
+    describe('ns-view-async', function() {
 
         beforeEach(function() {
             ns.layout.define('content1-async', {
@@ -368,34 +368,34 @@ describe('ns.View.events', function() {
         describe('first pass', function() {
             describe('events', function() {
                 genTests([
-                    ['content1-async', 'ns-async', 'calledOnce'],
+                    ['content1-async', 'ns-view-async', 'calledOnce'],
 
-                    ['content1-async', 'ns-htmldestroy', 'called', false],
-                    ['content1-async', 'ns-hide', 'called', false],
-                    ['content1-async', 'ns-htmlinit', 'called', false],
-                    ['content1-async', 'ns-show', 'called', false],
-                    ['content1-async', 'ns-repaint', 'called', false],
+                    ['content1-async', 'ns-view-htmldestroy', 'called', false],
+                    ['content1-async', 'ns-view-hide', 'called', false],
+                    ['content1-async', 'ns-view-htmlinit', 'called', false],
+                    ['content1-async', 'ns-view-show', 'called', false],
+                    ['content1-async', 'ns-view-repaint', 'called', false],
 
-                    ['content1-inner', 'ns-htmldestroy', 'called', false],
-                    ['content1-inner', 'ns-hide', 'called', false],
-                    ['content1-inner', 'ns-htmlinit', 'called', false],
-                    ['content1-inner', 'ns-show', 'called', false],
-                    ['content1-inner', 'ns-repaint', 'called', false]
+                    ['content1-inner', 'ns-view-htmldestroy', 'called', false],
+                    ['content1-inner', 'ns-view-hide', 'called', false],
+                    ['content1-inner', 'ns-view-htmlinit', 'called', false],
+                    ['content1-inner', 'ns-view-show', 'called', false],
+                    ['content1-inner', 'ns-view-repaint', 'called', false]
                 ])
             });
 
             describe('order', function() {
                 genOrderTests([
-                    ['head', 'ns-htmlinit', 0],
-                    ['app', 'ns-htmlinit', 0],
+                    ['head', 'ns-view-htmlinit', 0],
+                    ['app', 'ns-view-htmlinit', 0],
 
-                    ['content1-async', 'ns-async', 0],
+                    ['content1-async', 'ns-view-async', 0],
 
-                    ['head', 'ns-show', 0],
-                    ['app', 'ns-show', 0],
+                    ['head', 'ns-view-show', 0],
+                    ['app', 'ns-view-show', 0],
 
-                    ['head', 'ns-repaint', 0],
-                    ['app', 'ns-repaint', 0]
+                    ['head', 'ns-view-repaint', 0],
+                    ['app', 'ns-view-repaint', 0]
                 ]);
             });
         });
@@ -416,45 +416,45 @@ describe('ns.View.events', function() {
 
             describe('events', function() {
                 genTests([
-                    ['content1-async', 'ns-async', 'calledOnce'],
+                    ['content1-async', 'ns-view-async', 'calledOnce'],
 
-                    ['content1-async', 'ns-htmlinit', 'calledOnce'],
-                    ['content1-async', 'ns-show', 'calledOnce'],
-                    ['content1-async', 'ns-repaint', 'calledOnce'],
+                    ['content1-async', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content1-async', 'ns-view-show', 'calledOnce'],
+                    ['content1-async', 'ns-view-repaint', 'calledOnce'],
 
-                    ['content1-inner', 'ns-htmlinit', 'calledOnce'],
-                    ['content1-inner', 'ns-show', 'calledOnce'],
-                    ['content1-inner', 'ns-repaint', 'calledOnce'],
+                    ['content1-inner', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content1-inner', 'ns-view-show', 'calledOnce'],
+                    ['content1-inner', 'ns-view-repaint', 'calledOnce'],
 
-                    ['head', 'ns-repaint', 'calledOnce'],
-                    ['app', 'ns-repaint', 'calledOnce'],
+                    ['head', 'ns-view-repaint', 'calledOnce'],
+                    ['app', 'ns-view-repaint', 'calledOnce'],
 
-                    ['content1-async', 'ns-htmldestroy', 'called', false],
-                    ['content1-inner', 'ns-htmldestroy', 'called', false]
+                    ['content1-async', 'ns-view-htmldestroy', 'called', false],
+                    ['content1-inner', 'ns-view-htmldestroy', 'called', false]
                 ])
             });
 
             describe('order', function() {
                 genOrderTests([
-                    ['head', 'ns-htmlinit', 0],
-                    ['app', 'ns-htmlinit', 0],
+                    ['head', 'ns-view-htmlinit', 0],
+                    ['app', 'ns-view-htmlinit', 0],
 
-                    ['content1-async', 'ns-async', 0],
+                    ['content1-async', 'ns-view-async', 0],
 
-                    ['head', 'ns-show', 0],
-                    ['app', 'ns-show', 0],
+                    ['head', 'ns-view-show', 0],
+                    ['app', 'ns-view-show', 0],
 
-                    ['head', 'ns-repaint', 0],
-                    ['app', 'ns-repaint', 0],
+                    ['head', 'ns-view-repaint', 0],
+                    ['app', 'ns-view-repaint', 0],
 
-                    ['content1-inner', 'ns-htmlinit', 0],
-                    ['content1-async', 'ns-htmlinit', 0],
+                    ['content1-inner', 'ns-view-htmlinit', 0],
+                    ['content1-async', 'ns-view-htmlinit', 0],
 
-                    ['content1-inner', 'ns-show', 0],
-                    ['content1-async', 'ns-show', 0],
+                    ['content1-inner', 'ns-view-show', 0],
+                    ['content1-async', 'ns-view-show', 0],
 
-                    ['content1-inner', 'ns-repaint', 0],
-                    ['content1-async', 'ns-repaint', 0]
+                    ['content1-inner', 'ns-view-repaint', 0],
+                    ['content1-async', 'ns-view-repaint', 0]
                 ]);
             })
         });

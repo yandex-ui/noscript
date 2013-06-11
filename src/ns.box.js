@@ -160,7 +160,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
             for (var i = 0, l = subviews.length; i < l; i++) {
                 // если view был скрыт
                 if (subviews[i]._hide()) {
-                    events['ns-hide'].push(subviews[i]);
+                    events['ns-view-hide'].push(subviews[i]);
                 }
             }
         }

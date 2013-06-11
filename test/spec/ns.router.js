@@ -105,4 +105,67 @@ describe('ns.router', function() {
         test_route('/messages//45?',                    'not-found', {}, '/messages//45?: MUST FAIL');
         test_route('/messages//45',                     'not-found', {}, '/messages//45: MUST FAIL');
     });
+
+    describe('baseDir: routing', function() {
+        beforeEach(function() {
+            ns.router.baseDir = '/ver2'
+            ns.router.routes = {
+                route: {
+                    '/index': 'index'
+                }
+            };
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            delete ns.router._routes;
+            delete ns.router.routes;
+            delete ns.router.baseDir
+        });
+
+        it('throw an error in case url does not match baseDir', function() {
+            expect(function() { ns.router('/index') }).to.throwError();
+            expect(function() { ns.router('/ver1/index') }).to.throwError();
+        });
+
+        it('prefixed url is routed fine', function() {
+            expect(ns.router('/ver2/index')).to.be.eql({ page: 'index', params: {} });
+        });
+    });
+
+    describe('baseDir: url generate with baseDir', function() {
+        beforeEach(function() {
+            ns.router.baseDir = '/ver2'
+            ns.router.routes = {};
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            delete ns.router._routes;
+            delete ns.router.routes;
+            delete ns.router.baseDir
+        });
+
+        // URL GENERATION
+        it('generate prefixed url when baseDir is not empty', function() {
+            expect(ns.router.url('/index')).to.be.eql('/ver2/index');
+        });
+    });
+
+    describe('baseDir: url generate without baseDir', function() {
+        beforeEach(function() {
+            ns.router.routes = {};
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            delete ns.router._routes;
+            delete ns.router.routes;
+            delete ns.router.baseDir
+        });
+
+        it('generate unprefixed url when baseDir is empty', function() {
+            expect(ns.router.url('/index')).to.be.eql('/index');
+        });
+    });
 });

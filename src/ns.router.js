@@ -4,8 +4,15 @@
  * @return {{ page: string, params: Object }|Boolean}
 */
 ns.router = function(url) {
-
+    var baseDir = ns.router.baseDir;
     var routesDef = ns.router._routes;
+
+    if ( url.indexOf(baseDir) !== 0) {
+        throw new Error('[ns.router] url "' + url + '" does not match baseDir "' + baseDir + '"');
+    }
+
+    // Откусываем префикс урла
+    url = url.substring(baseDir.length);
 
     if (url in routesDef.redirect) {
         ns.page.redirect(routesDef.redirect[url]);
@@ -59,6 +66,15 @@ ns.router = function(url) {
 };
 
 /**
+ * Generate url.
+ * @param {string} url Relative url.
+ * @return {String} Valid url that takes into consideration baseDir.
+ */
+ns.router.url = function(url) {
+    return ns.router.baseDir + url;
+};
+
+/**
  * Inititialize ns.router, compiles defined routes.
  */
 ns.router.init = function() {
@@ -80,6 +96,7 @@ ns.router.init = function() {
     _routes.route = compiledRoutes;
 
     ns.router._routes = _routes;
+    ns.router.baseDir = ns.router.baseDir || '';
 };
 
 /**
@@ -138,6 +155,12 @@ ns.router.compile = function(route) {
         defaults: defaults
     };
 };
+
+/**
+ * Базовая часть урла, относительно которой строятся урлы.
+ * @type {String}
+ */
+ns.router.baseDir = null;
 
 /**
  * Скомпилированные данные.

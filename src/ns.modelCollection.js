@@ -169,7 +169,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     // оповестим всех, что вставили подмодели
     if (models.length) {
-        this.trigger('ns-insert', models);
+        this.trigger('ns-model-insert', models);
     }
 
 
@@ -212,7 +212,7 @@ ns.ModelCollection.prototype.remove = function(models) {
     }.bind(this));
 
     if (modelsRemoved.length) {
-        this.trigger('ns-remove', modelsRemoved);
+        this.trigger('ns-model-remove', modelsRemoved);
         return true;
     }
 

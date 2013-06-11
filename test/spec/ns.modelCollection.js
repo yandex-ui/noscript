@@ -29,10 +29,10 @@ describe('ns.ModelCollection', function() {
                 'changed': function() {
                     changedCallback();
                 },
-                'ns-insert': function() {
+                'ns-model-insert': function() {
                     insertCallback();
                 },
-                'ns-remove': function() {
+                'ns-model-remove': function() {
                     removeCallback();
                 }
             },

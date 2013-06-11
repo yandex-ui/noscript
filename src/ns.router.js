@@ -100,7 +100,6 @@ ns.router.init = function() {
     _routes.route = compiledRoutes;
 
     ns.router._routes = _routes;
-    ns.router.baseDir = ns.router.baseDir || '';
 };
 
 /**
@@ -164,7 +163,7 @@ ns.router.compile = function(route) {
  * Базовая часть урла, относительно которой строятся урлы. Без слэша на конце.
  * @type {String}
  */
-ns.router.baseDir = null;
+ns.router.baseDir = '';
 
 /**
  * Скомпилированные данные.

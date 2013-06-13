@@ -56,7 +56,7 @@ ns.history = (function(window, ns) {
                     e.preventDefault();
                     e.stopPropagation();
 
-                    ns.page.go();
+                    ns.page.go('', true);
                 }, false);
 
                 // Здесь `ns.page.go` можно не вызывать, потому что после `ns.init`

@@ -107,7 +107,7 @@ describe('ns.router', function() {
                 }
             };
             ns.router.init();
-            this.not_found = { page: ns.R.NOT_FOUND, params: {} };
+            this.not_app_url = ;
         });
 
         afterEach(function() {
@@ -116,10 +116,21 @@ describe('ns.router', function() {
             ns.router.baseDir= '';
         });
 
-        it('NOT FOUND in case url does not match baseDir', function() {
+        it('NOT_APP_URL in case url does not match baseDir', function() {
             var that = this;
-            expect(ns.router('/index')).to.eql(that.not_found);
-            expect(ns.router('/ver1/index')).to.eql(that.not_found);
+            expect(ns.router('/ver1/index')).to.eql({
+                page: ns.R.NOT_APP_URL,
+                params: {},
+                redirect: '/ver1/index'
+            });
+        });
+
+        it('NOT_APP_URL in case url does not match baseDir but match route', function() {
+            expect(ns.router('/index')).to.eql({
+                page: ns.R.NOT_APP_URL,
+                params: {},
+                redirect: '/index'
+            });
         });
 
         it('prefixed url is routed fine', function() {

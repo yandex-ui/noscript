@@ -32,8 +32,10 @@ ns.page.go = function(url, preventAddingToHistory) {
     }
 
     var route = ns.router(url);
-    if (route === false) {
-        return no.Promise.rejected('no-route');
+
+    // router says "redirect"
+    if (route.page === ns.R.REDIRECT) {
+        return no.page.redirect(route.redirect);
     }
 
     var layout = ns.layout.page(route.page, route.params);
@@ -58,9 +60,14 @@ ns.page.go = function(url, preventAddingToHistory) {
     return update.start();
 };
 
+/**
+ * Redirects to given url.
+ * @param {String} url New page url.
+ * @returns {no.Promise}
+ */
 ns.page.redirect = function(url) {
     ns.history.replaceState(url);
-    ns.page.go(url, true);
+    return ns.page.go(url, true);
 };
 
 /**

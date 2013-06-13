@@ -1,15 +1,18 @@
 /**
  * Find best page for url.
  * @param {string} url
- * @return {{ page: string, params: Object }|Boolean}
+ * @return {{ page: string, params: Object }}
 */
 ns.router = function(url) {
 
     var routesDef = ns.router._routes;
 
     if (url in routesDef.redirect) {
-        ns.page.redirect(routesDef.redirect[url]);
-        return false;
+        return {
+            page: ns.R.REDIRECT,
+            params: {},
+            redirect: routesDef.redirect[url]
+        };
     }
 
     if (url in routesDef.rewriteUrl) {

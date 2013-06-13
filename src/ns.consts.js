@@ -82,14 +82,21 @@ ns.M.STATUS = {
 
 /**
  * Константы для ns.router.
- * @type {Object}
+ * @enum {String}
  * @constant
  */
 ns.R = {
     /**
      * ID необъявленной/ненайденной страницы
      */
-    NOT_FOUND: 'not-found'
+    NOT_FOUND: 'not-found',
+
+    /**
+     * ID страницы-редиректа.
+     * Тут специально выбрано длинное название,
+     * чтобы не пересечься с нормальными страницами.
+     */
+     REDIRECT: 'ns-router-redirect'
 };
 
 /**

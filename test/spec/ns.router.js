@@ -19,7 +19,7 @@ describe('ns.router', function() {
         });
     });
 
-    describe('init+compile', function() {
+    describe('routes', function() {
 
         beforeEach(function() {
             ns.router.routes = {
@@ -34,26 +34,22 @@ describe('ns.router', function() {
             ns.router.init();
         });
 
-        it('/ redirect check', function() {
-            expect(ns.router._routes.redirect['/']).to.be.eql('/inbox');
-        });
+        var test_route = function(url, params, test_name) {
+            test_name = test_name || (url + ' -> ' + params.page);
+            it(test_name, function() {
+                expect(ns.router(url)).to.be.eql(params);
+            });
+        };
 
-        it('/inbox regexp check', function() {
-            expect(ns.router._routes.route[0].regexp.toString()).to.be('/^\/inbox\/?(?:\\?(.*))?$/');
-        });
+        test_route('/', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
+        test_route('/inbox', {page: 'messages', params: {}});
+        test_route('/inbox/', {page: 'messages', params: {}});
 
-        it('/inbox tokens check', function() {
-            expect(ns.router._routes.route[0].tokens).to.be.eql([]);
-        });
+        test_route('/message', {page: ns.R.NOT_FOUND, params: {}});
+        test_route('/message/', {page: ns.R.NOT_FOUND, params: {}});
 
-        it('/message/{mid:int} regexp check', function() {
-            expect(ns.router._routes.route[1].regexp.toString()).to.be('/^/message/([0-9]+)/?(?:\\?(.*))?$/');
-        });
-
-        it('/message/{mid:int} tokens check', function() {
-            expect(ns.router._routes.route[1].tokens).to.be.eql(['mid']);
-        });
-
+        test_route('/message/12345', {page: 'message', params: {mid: '12345'}});
+        test_route('/message/12345/', {page: 'message', params: {mid: '12345'}});
     });
 
     describe('default value', function() {

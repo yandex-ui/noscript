@@ -10,8 +10,9 @@ ns.router = function(url) {
     if ( url.indexOf(baseDir) !== 0) {
         // Ничего подходящего не нашли.
         return {
-            page: ns.R.NOT_FOUND,
-            params: {}
+            page: ns.R.NOT_APP_URL,
+            params: {},
+            redirect: url
         };
     }
 

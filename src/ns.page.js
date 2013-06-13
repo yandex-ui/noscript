@@ -38,6 +38,17 @@ ns.page.go = function(url, preventAddingToHistory) {
         return ns.page.redirect(route.redirect);
     }
 
+    if (route.page === ns.R.NOT_APP_URL) {
+        if (preventAddingToHistory) {
+            window.location.replace(route.redirect);
+        } else {
+            window.location = route.redirect;
+        }
+
+        // return empty non-resolved promise becase we are redirecting now
+        return no.Promise();
+    }
+
     var layout = ns.layout.page(route.page, route.params);
 
     ns.events.trigger('ns-page-before-load', [ns.page.current, route]);

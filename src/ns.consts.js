@@ -86,6 +86,12 @@ ns.M.STATUS = {
  * @constant
  */
 ns.R = {
+
+    /**
+     * ID страницы, не относящейся к noscript приложению.
+     */
+    NOT_APP_URL: 'ns-router-not-app',
+
     /**
      * ID необъявленной/ненайденной страницы
      */

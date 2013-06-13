@@ -35,20 +35,20 @@ ns.history = (function(window, ns) {
             adapt: function() {
                 var hash = loc.hash.substr(1);
 
-                // Если в хеше уже есть какие-то query параметры,
-                // текущие надо к ним прибавить.
-                var search = hash.indexOf('?') !== -1 ? loc.search.replace(/^\?/, '&') : loc.search;
+                if (hash.length) {
 
-                var hashRoute = ns.router(hash);
-                var pathRoute = ns.router(loc.pathname);
+                    var hashRoute = ns.router(hash);
+                    if (hashRoute.page !== ns.R.NOT_FOUND && hashRoute.page !== ns.R.REDIRECT) {
 
-                if (hash.length &&
-                    hashRoute && hashRoute.page !== ns.R.NOT_FOUND &&
-
-                    // TODO: При добавлении способа задания корневого урла заменить
-                    // слеш на нужное свойство/метод.
-                    (loc.pathname === '/' || pathRoute.page === ns.R.NOT_FOUND)) {
-                    this.replaceState(hash + search);
+                        // TODO: При добавлении способа задания корневого урла заменить
+                        // слеш на нужное свойство/метод.
+                        if (loc.pathname === '/' || ns.router(loc.pathname).page === ns.R.NOT_FOUND) {
+                            // Если в хеше уже есть какие-то query параметры,
+                            // текущие надо к ним прибавить.
+                            var search = hash.indexOf('?') !== -1 ? loc.search.replace(/^\?/, '&') : loc.search;
+                            this.replaceState(hash + search);
+                        }
+                    }
                 }
 
                 window.addEventListener('popstate', function(e) {

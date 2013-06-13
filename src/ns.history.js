@@ -24,8 +24,12 @@ ns.history = (function(window, ns) {
     // API для браузеров с поддержкой HTML5 History API.
     if (!legacy) {
         return {
-            pushState: history.pushState.bind(history, null, 'mail'),
-            replaceState: history.replaceState.bind(history, null, 'mail'),
+            pushState: function(url, title) {
+                history.pushState(null, title || ns.page.title(url), url);
+            },
+            replaceState: function(url, title) {
+                history.replaceState(null, title || ns.page.title(url), url);
+            },
 
             // Редирект с хешового урла на его полноценный аналог.
             adapt: function() {

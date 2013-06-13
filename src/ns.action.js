@@ -207,7 +207,6 @@ ns.action._process = function(e) {
         //TODO: HISTORY_API_SUPPORT: hash или не хеш
         //могут быть ссылки <a href="#hash" target="_blank"/>
         if (target.getAttribute('target') != '_blank') {
-            ns.history.pushState(href);
             returnValue = ns.page.go(href);
             if (returnValue instanceof no.Promise) {
                 return false;

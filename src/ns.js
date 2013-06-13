@@ -153,5 +153,6 @@ if (window['mocha']) {
         ns.View.undefine();
         ns.Model.undefine();
         ns.request.clean();
+        ns.router.undefine();
     };
 }

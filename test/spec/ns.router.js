@@ -1,9 +1,5 @@
 describe('ns.router', function() {
 
-    afterEach(function() {
-        delete ns.router.routes;
-    });
-
     describe('API', function() {
 
         it('should be defined', function() {

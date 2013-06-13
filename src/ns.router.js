@@ -164,3 +164,11 @@ ns.router.regexps = {
     'id': '[A-Za-z_][A-Za-z0-9_-]*',
     'int': '[0-9]+'
 };
+
+if (window['mocha']) {
+
+    ns.router.undefine = function() {
+        delete ns.router._routes;
+        ns.router.routes = {};
+    };
+}

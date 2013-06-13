@@ -22,7 +22,9 @@ ns.router = function(url) {
         return {
             page: ns.R.REDIRECT,
             params: {},
-            redirect: routesDef.redirect[url]
+            // add baseDir for redirect url
+            // so I define redirect "/" -> "/main", but real url is "/basepath/" -> "/basepath/main"
+            redirect: baseDir + routesDef.redirect[url]
         };
     }
 

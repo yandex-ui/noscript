@@ -35,7 +35,7 @@ ns.page.go = function(url, preventAddingToHistory) {
 
     // router says "redirect"
     if (route.page === ns.R.REDIRECT) {
-        return no.page.redirect(route.redirect);
+        return ns.page.redirect(route.redirect);
     }
 
     var layout = ns.layout.page(route.page, route.params);

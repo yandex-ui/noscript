@@ -32,8 +32,10 @@
     },
     "main": "noscript",
     "files": [
-        "lib",
-        "noscript.js"
+        "src",
+        "external",
+        "css",
+        "yate"
     ],
     "scripts": {
         "test": "grunt"

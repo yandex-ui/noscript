@@ -33,6 +33,7 @@
     "main": "noscript",
     "files": [
         "src",
+        "external",
         "css",
         "yate"
     ],

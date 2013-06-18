@@ -200,10 +200,8 @@ ns.Model.create = function(id, params, data)  {
  * @returns {Object}
  */
 ns.Model.info = function(id) {
-    var info = _infos[id];
-    if (!info) {
-        throw new Error('[ns.Model] "' + id + '" is not defined');
-    }
+    var info = ns.Model.infoLite(id);
+
     // если есть декларация, но еще нет pNames, то надо завершить определение Model
     if (info && !info.pNames) {
         /**
@@ -227,6 +225,20 @@ ns.Model.info = function(id) {
          */
         info.isDo = /^do-/.test(id);
     }
+    return info;
+};
+
+/**
+ * Returns model's info without processing.
+ * @param {String} id Model ID.
+ * @returns {Object}
+ */
+ns.Model.infoLite = function(id) {
+    var info = _infos[id];
+    if (!info) {
+        throw new Error('[ns.Model] "' + id + '" is not defined');
+    }
+
     return info;
 };
 

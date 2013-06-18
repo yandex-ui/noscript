@@ -59,7 +59,7 @@ describe('ns.Model', function() {
                 ns.Model.define('dm1', {foo: 'bar'});
 
                 expect(ns.Model.privats()._infos['dm1'])
-                    .to.eql({foo: 'bar'});
+                    .to.eql({foo: 'bar', isCollection: false});
             });
 
             it('should fill _ctors with custom one', function() {

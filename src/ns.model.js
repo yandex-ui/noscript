@@ -138,10 +138,15 @@ ns.Model.define = function(id, info, base) {
 
     info = info || {};
 
+    // Model becomes ModelCollection if it has "isCollection" or "split" property
+    if (typeof info.isCollection == 'undefined') {
+        info.isCollection = !!info.split;
+    }
+
     if (!base) {
         if (info.uniq) {
             base = ns.ModelUniq;
-        } else if (!!info.isCollection || !!info.split) {
+        } else if (info.isCollection) {
             base = ns.ModelCollection;
         } else {
             base = ns.Model;
@@ -221,10 +226,6 @@ ns.Model.info = function(id) {
          * @type {Boolean}
          */
         info.isDo = /^do-/.test(id);
-
-        if (typeof info.isCollection == 'undefined') {
-            info.isCollection = !!info.split;
-        }
     }
     return info;
 };

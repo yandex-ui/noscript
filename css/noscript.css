@@ -1,6 +1,6 @@
 .ns-view-hidden
 {
-    display: none;
+    display: none !important;
 }
 
 .ns-view-active.ns-view-hidden,

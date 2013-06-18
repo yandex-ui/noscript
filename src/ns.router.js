@@ -19,13 +19,17 @@ ns.router = function(url) {
     // Откусываем префикс урла
     url = url.substring(baseDir.length);
 
-    if (url in routesDef.redirect) {
+    // /path/?foo=bar -> /path/
+    var urlWithoutQuery = url.split('?')[0];
+
+    // we should check redirect without query
+    if (urlWithoutQuery in routesDef.redirect) {
         return {
             page: ns.R.REDIRECT,
             params: {},
             // add baseDir for redirect url
             // so I define redirect "/" -> "/main", but real url is "/basepath/" -> "/basepath/main"
-            redirect: baseDir + routesDef.redirect[url]
+            redirect: baseDir + routesDef.redirect[urlWithoutQuery]
         };
     }
 

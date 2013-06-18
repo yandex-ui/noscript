@@ -548,6 +548,16 @@ if(window['mocha']) {
             _keySuffix: _keySuffix
         };
     };
+
+    ns.Model.clearCaches = function(id) {
+        if (id) {
+            _cache[id] = {};
+        } else {
+            for (var key in _cache) {
+                _cache[key] = {};
+            }
+        }
+    };
 }
 
 

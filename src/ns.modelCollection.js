@@ -1,5 +1,11 @@
 (function() {
 
+/**
+ * Models collection
+ * @namespace
+ * @constructor
+ * @augments ns.Model
+ */
 ns.ModelCollection = function() {};
 
 no.inherit(ns.ModelCollection, ns.Model);

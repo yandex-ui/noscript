@@ -1,27 +1,42 @@
+/**
+ * Views collection
+ * @see https://github.com/pasaran/noscript/blob/master/doc/ns.viewCollection.md
+ * @namespace
+ * @augments ns.View
+ * @constructor
+ * @borrows ns.View.define as define
+ */
 ns.ViewCollection = function() {};
 
 no.inherit(ns.ViewCollection, ns.View);
 
 ns.ViewCollection.define = function(id, info) {
-    return ns.View.define(id, info, this);
-};
+    info = info || {};
+    var ctor = ns.View.define(id, info, ns.ViewCollection);
 
-ns.ViewCollection.prototype._initModels = function() {
-    var models = this.models = {};
-
-    for (var model_id in this.info.models) {
-
-        if (ns.Model.info(model_id).isCollection) {
+    // check for modelCollection
+    for (var model_id in info.models) {
+        // get lite info to prevent info processing
+        if (ns.Model.infoLite(model_id).isCollection) {
             // Пока можно подписывать viewCollection только на одну modelCollection
-            if (this.info.modelCollectionId && model_id !== this.info.modelCollectionId) {
-                throw new Error("[ns.ViewCollection] '" + this.id + "' must depend only on one model collection");
+            if (info.modelCollectionId && model_id !== info.modelCollectionId) {
+                throw new Error("[ns.ViewCollection] '" + id + "' must depends on single ns.ModelCollection only");
+
             } else {
-                this.info.modelCollectionId = model_id;
+                info.modelCollectionId = model_id;
             }
         }
-
-        models[model_id] = ns.Model.create(model_id, this.params);
     }
+
+    if (!info.modelCollectionId) {
+        throw new Error("[ns.ViewCollection] '" + id + "' must depends on ns.ModelCollection");
+    }
+
+    if (!info.split || !info.split['view_id']) {
+        throw new Error("[ns.ViewCollection] '" + id + "' must defines split.view_id");
+    }
+
+    return ctor;
 };
 
 ns.ViewCollection.prototype._getView = function(id, params) {
@@ -43,14 +58,14 @@ ns.ViewCollection.prototype._addView = function(id, params) {
     return view;
 };
 
-ns.ViewCollection.prototype._apply = function(callback, arg) {
+ns.ViewCollection.prototype._apply = function(callback) {
     var views = this.views;
     for (var key in views) {
         callback(views[key], views[key].id);
     }
 };
 
-ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, params) {
+ns.ViewCollection.prototype._getRequestViews = function(updated) {
     /**
      * Флаг, означающий, что view грузится асинхронно.
      * @type {Boolean}
@@ -166,15 +181,28 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
             this._setNode(newNode);
             // Тут я сделал предположение, что нода этого вида вставится сама за счёт верхних
             // видов (как у бокса) и думать об этом не надо
+
         } else if (this.isLoading()) {
             // Если это вторая отрисовка async view
             // заменим ноду
             ns.replaceNode(this.node, newNode);
             // и засетим
             this._setNode(newNode);
+
         } else {
+            this._hide(events['ns-view-hide']);
+            this._htmldestroy(events['ns-view-htmldestroy']);
+
             // В остальных случаях считаем viewCollection валидным
             this.status = this.STATUS.OK;
+        }
+
+        if ( this.isOk() ) {
+            this._htmlinit(events['ns-view-htmlinit']);
+
+        } else if (this.isLoading()) {
+            // В асинхронном запросе вызываем async для view, которые являются заглушкой.
+            events['ns-view-async'].push(this);
         }
     }
 
@@ -185,8 +213,8 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
     // Второе условие относится как к перерисованным view, так и к async-view, которые полностью отрисовались
     if ( (syncUpdate || viewWasInvalid) && this.isOk() ) {
         // событие show будет вызвано, если у view поменяется this._visible
-        this._show(events['ns-show']);
-        events['ns-repaint'].push(this);
+        this._show(events['ns-view-show']);
+        events['ns-view-repaint'].push(this);
         this.timestamp = +new Date();
     }
 
@@ -232,13 +260,12 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
         }
 
         // Удалим те view, для которых нет моделей
-        this._apply(function(view) {
+        this._apply(function(/** ns.View */view) {
             // Если для вида нет модели в MC, то нужно его прихлопнуть
             if (!itemsExist[view.key]) {
                 view.invalidate();
-                view._hide(events['ns-hide']);
-                view._htmldestroy(events['ns-htmldestroy']);
-                return;
+                view._hide(events['ns-view-hide']);
+                view._htmldestroy(events['ns-view-htmldestroy']);
             }
         });
     }

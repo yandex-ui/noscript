@@ -184,3 +184,11 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
 ns.Box.prototype.isOk = no.true;
 ns.Box.prototype.isLoading = no.false;
+
+/**
+ * Returns true if box has status NONE
+ * @returns {boolean}
+ */
+ns.Box.prototype.isNone = function() {
+    return !this.node;
+};

@@ -856,6 +856,14 @@ ns.View.prototype.isLoading = function() {
     return (this.status === this.STATUS.LOADING);
 };
 
+/**
+ * Returns true if view has status NONE
+ * @returns {boolean}
+ */
+ns.View.prototype.isNone = function() {
+    return (this.status === this.STATUS.NONE);
+};
+
 //  FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
 ns.View.prototype.isSubviewsOk = function() {
     //  Возвращаем, есть ли хоть один невалидный subview.

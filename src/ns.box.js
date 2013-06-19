@@ -119,14 +119,18 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         layoutActive[id] = key;
 
         //  Достаем ранее созданный блок (в _getRequestViews).
+        /** @type {ns.View} */
         var view = views[key];
+
+        var viewWasNone = view.isNone();
 
         //  Обновляем его.
         view._updateHTML(node, layout[id].views, params, options, events);
 
-        if ( view.isOk() || view.isLoading() ) {
-            //  Выстраиваем новые активные блоки в нужном порядке.
-            //  Плюс, если это новый блок, подклеиваем его к боксу.
+        // вставляем view в DOM, только если ноды раньше не было (view.status === NONE)
+        // если нода была, то view._updateHTML() сделаем сам все свои обновления
+        // NOTE: с такой логикой порядок view никак не гарантируется! Возможно это проблема...
+        if (viewWasNone && ( view.isOk() || view.isLoading() ) ) {
             this.node.appendChild(view.node);
         }
     }

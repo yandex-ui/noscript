@@ -481,6 +481,7 @@ ns.Model.destroy = function(model) {
     var cached = _cache[id][key];
     if (cached) {
         delete _cache[id][key];
+        cached.trigger('ns-model-destroyed');
     }
 };
 

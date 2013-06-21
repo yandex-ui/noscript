@@ -250,7 +250,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
                     this.node.insertBefore(view.node, prev.node.nextSibling);
                 } else {
                     // Либо в самом начале, если предыдущего нет (т.е. это первый)
-                    this.node.appendChild(view.node);
+                    this.node.insertBefore(view.node, this.node.firstChild);
                 }
             }
 

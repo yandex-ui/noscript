@@ -1,11 +1,29 @@
 beforeEach(function() {
 
+    function genViewHTML(id, view) {
+        var html = '';
+        html += '<div class="ns-view-' + id + (view.async ? ' ns-async' : '') + '" data-key="' + view.key + '">';
+        html += genHTML(view.views);
+        html += '</div>';
+
+        return html;
+    }
+
     function genHTML(views) {
         var html = '';
         for (var id in views) {
-            html += '<div class="ns-view-' + id + (views[id].async ? ' ns-async' : '') + '">';
-            html += genHTML(views[id].views);
-            html += '</div>';
+            var view = views[id];
+
+            // collection
+            if (Array.isArray(view)) {
+                view.forEach(function(collectionItem) {
+                    html += genViewHTML(id, collectionItem);
+                });
+
+            } else {
+                html += genViewHTML(id, view);
+            }
+
         }
         return html;
     }

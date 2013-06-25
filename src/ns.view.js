@@ -567,7 +567,7 @@ ns.View.prototype._hide = function(events) {
         //  FIXME: Почему это делается на hide?
         this._unbindModels();
         this._unbindEvents('show');
-        this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
+        this._hideNode();
         this._visible = false;
         if (events) {
             events.push(this);
@@ -576,6 +576,13 @@ ns.View.prototype._hide = function(events) {
     }
 
     return false;
+};
+
+/**
+ * @private
+ */
+ns.View.prototype._hideNode = function() {
+    this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
 };
 
 /**
@@ -590,7 +597,7 @@ ns.View.prototype._show = function(events) {
         //  FIXME: Почему это делается на show?
         this._bindModels();
         this._bindEvents('show');
-        this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
+        this._showNode();
         this._visible = true;
         if (events) {
             events.push(this);
@@ -599,6 +606,13 @@ ns.View.prototype._show = function(events) {
     }
 
     return false;
+};
+
+/**
+ * @prorected
+ */
+ns.View.prototype._showNode = function() {
+    this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
 };
 
 /**

@@ -63,6 +63,10 @@ ns.ViewCollection.prototype._addView = function(id, params) {
     return view;
 };
 
+ns.ViewCollection.prototype._deleteView = function(view) {
+    delete this.views[view.key];
+};
+
 ns.ViewCollection.prototype._apply = function(callback) {
     var views = this.views;
     for (var key in views) {
@@ -276,7 +280,8 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 view.invalidate();
                 view._hide(events['ns-view-hide']);
                 view._htmldestroy(events['ns-view-htmldestroy']);
+                this._deleteView(view);
             }
-        });
+        }.bind(this));
     }
 };

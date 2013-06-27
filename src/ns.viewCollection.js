@@ -168,38 +168,43 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
-ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updaterOptions, events) {
+ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
     var newNode = ns.byClass('ns-view-' + this.id, node)[0];
 
     var viewWasInvalid = !this.isValid();
-    var syncUpdate     = !updaterOptions.async;
+    var syncUpdate     = !updateOptions.async;
 
     // FIXME: А ещё нужно обработать кейс, когда родительский вид обновил свою ноду
     // сейчас при таких обстоятельствах viewCollection ломается (не показываются элементы)
 
     if (viewWasInvalid) {
+        ns.log.debug('[ns.ViewCollection]', '_updateHTML()', this.key, 'wasInvalid -> newNode', newNode);
+
+        var hadOldNode = !!this.node;
+
+        if (!newNode) {
+            throw new Error("[ns.ViewCollection] Can't find node for '" + this.id + "'");
+        }
+
+        //  Обновляем весь блок.
+        //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
+        //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
+        //  автоматически попадут на нужное место.
+        if (updateOptions.toplevel) {
+            if (this.node) {
+                ns.replaceNode(this.node, newNode);
+            }
+            //  Все подблоки ниже уже не toplevel.
+            updateOptions.toplevel = false;
+        }
+
+        this._setNode(newNode);
+
         // Будем что-то делать с нодой только в 2-х случаях
-        if (!this.node) {
-            // Если это первая отрисовка
-            // Засетим ноду
-            this._setNode(newNode);
-            // Тут я сделал предположение, что нода этого вида вставится сама за счёт верхних
-            // видов (как у бокса) и думать об этом не надо
-
-        } else if (this.isLoading()) {
-            // Если это вторая отрисовка async view
-            // заменим ноду
-            ns.replaceNode(this.node, newNode);
-            // и засетим
-            this._setNode(newNode);
-
-        } else {
+        if (hadOldNode && !this.isLoading()) {
             this._hide(events['ns-view-hide']);
             this._htmldestroy(events['ns-view-htmldestroy']);
-
-            // В остальных случаях считаем viewCollection валидным
-            this.status = this.STATUS.OK;
         }
 
         if ( this.isOk() ) {
@@ -245,7 +250,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updater
             wasValid = view.isValid();
 
             // Если у него была старая нода, она заменится сама в _updateHTML
-            view._updateHTML(newNode, null, params, updaterOptions, events);
+            view._updateHTML(newNode, null, params, updateOptions, events);
 
             // Если до _updateHTML был невалиден
             if (!wasValid) {

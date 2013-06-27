@@ -84,10 +84,12 @@ describe('ns.ViewCollection', function() {
 
             this.model = ns.Model.create('m-collection');
             // insert first item
-            this.model.setData([ns.Model.create('m-collection-item', {p: 1})]);
+            this.model.setData([
+                ns.Model.create('m-collection-item', {p: 1}, {data: 1})
+            ]);
 
             ns.Model.define('wrap-model');
-            ns.Model.create('wrap-model').setData({data: true});
+            ns.Model.create('wrap-model', {}, {data: true});
 
             // define views
             ns.View.define('app');
@@ -124,7 +126,7 @@ describe('ns.ViewCollection', function() {
                     // set fake data to invalidate wrap-view
                     ns.Model.create('wrap-model').set('.fake', 1);
 
-                    // start update to redraw views
+                    // start update to redraw wrap-view
                     new ns.Update(this.APP, layout, layoutParams)
                         .start()
                         .done(function() {
@@ -158,7 +160,9 @@ describe('ns.ViewCollection', function() {
 
                 this.model = ns.Model.create('m-collection');
                 // insert first item
-                this.model.setData([ns.Model.create('m-collection-item', {p: 1})]);
+                this.model.setData([
+                    ns.Model.create('m-collection-item', {p: 1}, {data: 1})
+                ]);
 
                 // define views
                 ns.View.define('app');

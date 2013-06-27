@@ -539,7 +539,7 @@ ns.View.prototype._addView = function(id, params, type) {
 /**
  * Обработчик htmldestroy
  * @param {Array} [events] Массив событий.
- * @private
+ * @protected
  */
 ns.View.prototype._htmldestroy = function(events) {
     this._unbindEvents('init');
@@ -549,7 +549,7 @@ ns.View.prototype._htmldestroy = function(events) {
 /**
  * Обработчик htmlinit
  * @param {Array} [events] Массив событий.
- * @private
+ * @protected
  */
 ns.View.prototype._htmlinit = function(events) {
     this._bindEvents('init');
@@ -560,7 +560,7 @@ ns.View.prototype._htmlinit = function(events) {
  * Скрывает view
  * @param {Array} [events] Массив событий.
  * @return {Boolean}
- * @private
+ * @protected
  */
 ns.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
@@ -588,7 +588,7 @@ ns.View.prototype._hideNode = function() {
 /**
  * Показывает View
  * @param {Array} [events] Массив событий.
- * @private
+ * @protected
  * @return {Boolean}
  */
 ns.View.prototype._show = function(events) {
@@ -900,6 +900,7 @@ ns.View.prototype.isValid = function() {
 ns.View.prototype.isModelsValid = function(timestamp) {
     var models = this.models;
     for (var id in models) {
+        /** @type ns.Model */
         var model = models[id];
         if (
             // Модель является обязательной
@@ -1151,7 +1152,7 @@ ns.View.prototype._getDescendants = function(views) {
 /**
  * Set view node
  * @param {HTMLElement} node
- * @private
+ * @protected
  */
 ns.View.prototype._setNode = function(node) {
     var STATUS = this.STATUS;

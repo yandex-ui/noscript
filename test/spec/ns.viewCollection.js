@@ -67,6 +67,78 @@ describe('ns.ViewCollection', function() {
 
     });
 
+    describe('redraw ViewCollection within parent view', function() {
+
+        beforeEach(function(finish) {
+
+            // define models
+            ns.Model.define('m-collection', {
+                isCollection: true
+            });
+
+            ns.Model.define('m-collection-item', {
+                params: {
+                    p: null
+                }
+            });
+
+            this.model = ns.Model.create('m-collection');
+            // insert first item
+            this.model.setData([ns.Model.create('m-collection-item', {p: 1})]);
+
+            ns.Model.define('wrap-model');
+            ns.Model.create('wrap-model').setData({data: true});
+
+            // define views
+            ns.View.define('app');
+            ns.View.define('wrap', {
+                models: ['wrap-model']
+            });
+            ns.ViewCollection.define('v-collection', {
+                models: [ 'm-collection' ],
+                split: {
+                    view_id: 'v-collection-item'
+                }
+            });
+            ns.View.define('v-collection-item', {
+                models: [ 'm-collection-item' ]
+            });
+            this.APP = ns.View.create('app');
+
+            // define layout
+            ns.layout.define('app', {
+                'app': {
+                    'wrap': {
+                        'v-collection': {}
+                    }
+                }
+            });
+
+            // first rewdraw
+            var layoutParams = {};
+            var layout = ns.layout.page('app', layoutParams);
+
+            new ns.Update(this.APP, layout, layoutParams)
+                .start()
+                .done(function() {
+                    // set fake data to invalidate wrap-view
+                    ns.Model.create('wrap-model').set('.fake', 1);
+
+                    // start update to redraw views
+                    new ns.Update(this.APP, layout, layoutParams)
+                        .start()
+                        .done(function() {
+                            finish();
+                        });
+                }.bind(this));
+        });
+
+        it('should have 1 v-collection-item after redraw', function() {
+            expect(this.APP.node.getElementsByClassName('ns-view-v-collection')[0].childNodes).to.have.length(1);
+        });
+
+    });
+
     describe('redraw on ModelCollection changes', function() {
 
         describe('insert new model-item', function() {

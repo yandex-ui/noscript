@@ -196,11 +196,14 @@ ns.Update.prototype._update = function(async) {
     };
     this.view._getUpdateTree(tree, layout.views, params);
 
+    ns.log.debug('[ns.Update]', 'start()', this.id, 'updateTree', tree);
+
     var node;
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
         node = ns.tmpl(tree, null, '');
+        ns.log.debug('[ns.Update]', 'start()', this.id, 'new node', node.cloneNode(true));
     }
 
     var viewEvents = {

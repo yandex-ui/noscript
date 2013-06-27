@@ -9,6 +9,13 @@
     ns.log = {};
 
     /**
+     * @param {...*} str
+     */
+    ns.log.debug = function(str) {
+//        console.log.apply(console, arguments);
+    };
+
+    /**
      * Логирует сообщение.
      * @param {String} name Название сообщение.
      * @param {Object} [data] Данные

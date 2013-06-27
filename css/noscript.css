@@ -1,16 +1,13 @@
-.ns-view-hidden
-{
+.ns-view-hidden {
     display: none;
 }
 
 .ns-view-active.ns-view-hidden,
-.ns-view-visible
-{
+.ns-view-visible {
     display: block;
 }
 
-.ns-view-active
-{
+.ns-view-active {
     display: block;
     position: absolute;
     top: 0;

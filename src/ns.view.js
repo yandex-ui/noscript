@@ -1025,7 +1025,6 @@ ns.View.prototype._getViewTree = function(layout, params) {
         // есть view находится в режиме async, то модели проверять не надо
         is_models_valid: this.asyncState || this.isModelsValid(),
         //  добавляем собственные параметры блока
-        //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,
         //  FIXME: Не должно ли оно приходить в параметрах Update'а?
         page: ns.page.current,
@@ -1055,6 +1054,30 @@ ns.View.prototype._getViewTree = function(layout, params) {
     this._apply(function(view, id) {
         tree.views[id] = view._getViewTree(layout[id].views, params);
     });
+
+    return tree;
+};
+
+/**
+ * Возвращает декларацию вида для вставки плейсхолдера
+ * @param layout
+ * @param params
+ * @return {Object}
+ */
+ns.View.prototype._getPlaceholderTree = function(layout, params) {
+    var tree = {
+        // фейковое дерево, чтобы удобно матчится в yate
+        tree: {},
+        //  добавляем собственные параметры блока
+        params: this.params,
+        views: {},
+        key: this.key,
+        placeholder: true
+    };
+
+    // добавляем название view, чтобы можно было писать
+    // match .view-name ns-view-content
+    tree.tree[this.id] = true;
 
     return tree;
 };

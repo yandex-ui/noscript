@@ -162,6 +162,7 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
             if (!view.isValid()) {
                 itemsToRender.push(
                     view._getViewTree(layout, params)
+                    // view._getPlaceholderTree(layout, params)
                 );
             }
         }

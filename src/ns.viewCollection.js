@@ -39,6 +39,74 @@ ns.ViewCollection.define = function(id, info) {
     return ctor;
 };
 
+/**
+ * Биндится на изменение моделей.
+ * @private
+ */
+ns.View.prototype._bindModels = function() {
+    var that = this;
+    var models = this.models;
+
+    for (var model_id in models) {
+        models[model_id].on('ns-model-changed', function(e, o) {
+            // проинвалидируем view, только если изменилась внешняя модель
+            if (this === o.model) {
+                that.invalidate();
+            }
+        });
+    }
+};
+
+ns.ViewCollection.prototype.isValid = function() {
+    return this.isValidSelf() && this.isValidDesc();
+};
+
+ns.ViewCollection.prototype.isValidSelf = function() {
+    return this.isOk() && this.isSubviewsOk() && this.isModelsValid(this.timestamp);
+};
+
+ns.ViewCollection.prototype.isValidDesc = function() {
+    for (var key in this.views) {
+        if (!this.views[key].isValid()) {
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
+ * Возвращает true, если все модели валидны.
+ * @param {Number} [timestamp] Также проверяем, что кеш модели не свежее переданного timestamp.
+ * @return {Boolean}
+ */
+ns.ViewCollection.prototype.isModelsValid = function(timestamp) {
+    var models = this.models;
+    for (var id in models) {
+        /** @type ns.Model */
+        var model = models[id];
+        var modelTimestamp = model.timestamp;
+        // при сравнении с timestamp модели-коллекции используем timestampSelf,
+        // не зависящий от внутренних моделей
+        if (model.isCollection) {
+            modelTimestamp = model.timestampSelf;
+        }
+        if (
+            // Модель является обязательной
+            this.info.models[id] === true &&
+            (
+                // модель не валидна
+                !model.isValid() ||
+                // или ее кеш более свежий
+                (timestamp && modelTimestamp > timestamp)
+            )
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 ns.ViewCollection.prototype._getView = function(id, params) {
     var key = ns.View.getKey(id, params);
     return this._getViewByKey(key);

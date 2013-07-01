@@ -329,6 +329,8 @@ ns.Model.prototype.set = function(jpath, value, options) {
 
     no.jpath.set(jpath, data, value);
 
+    this.touch();
+
     //  FIXME: Непонятно, нужно ли сравнивать старое и новое значение.
     //  Как бы нужно, но это довольно дорого и сложно.
     //  Пока что будет версия без сравнения.
@@ -532,6 +534,7 @@ ns.Model.prototype.isCollection = function() {
 
 ns.Model.prototype.touch = function() {
     this.timestamp = +new Date();
+    this.trigger('ns-model-touched');
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //

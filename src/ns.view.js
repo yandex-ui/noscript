@@ -1316,10 +1316,12 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     //  никаких подблоков. В этом случае, нужно брать viewNode.
     viewNode = viewNode || node;
 
-    //  Рекурсивно идем вниз по дереву.
-    this._apply(function(view, id) {
-        view._updateHTML(viewNode, layout[id].views, params, options_next, events);
-    });
+    //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
+    if (!this.asyncState) {
+        this._apply(function(view, id) {
+            view._updateHTML(viewNode, layout[id].views, params, options_next, events);
+        });
+    }
 };
 
 

@@ -456,4 +456,84 @@ describe('ns.View', function() {
 
     });
 
+    describe('updateHTML', function() {
+
+        describe('redraw async view with child depens on same model', function() {
+
+            beforeEach(function(done) {
+                var that = this;
+
+                ns.layout.define('app', {
+                    'app': {
+                        'async-view&': {
+                            'async-view-child': true
+                        }
+                    }
+                });
+
+                ns.View.define('app');
+                ns.View.define('async-view', {models: ['async-view-model'] });
+                ns.View.define('async-view-child', {models: ['async-view-model'] });
+
+                ns.Model.define('async-view-model');
+
+                // set first data to model
+                var model = ns.Model.create('async-view-model', {}, {data: true});
+
+                var APP = ns.View.create('app');
+
+                this.xhr = sinon.useFakeXMLHttpRequest();
+                this.xhr.onCreate = function (xhr) {
+                    window.setTimeout(function() {
+                        xhr.respond(
+                            200,
+                            {"Content-Type": "application/json"},
+                            JSON.stringify({
+                                models: [
+                                    { data: true }
+                                ]
+                            })
+                        );
+                    }, 1);
+                };
+
+                var layout = ns.layout.page('app', {});
+                new ns.Update(APP, layout, {})
+                    .start()
+                    .done(function() {
+                        model.invalidate();
+                        that.asyncViewNode1 = APP.$node.find('.ns-view-async-view')[0];
+
+                        new ns.Update(APP, layout, {})
+                            .start()
+                            .done(function(asyncPromises) {
+                                no.Promise.wait(asyncPromises.async)
+                                    .done(function() {
+                                        that.asyncViewNode2 = APP.$node.find('.ns-view-async-view')[0];
+                                        done();
+                                    })
+                                    .fail(function() {
+                                        done('fail to init')
+                                    });
+                            });
+                    });
+            });
+
+            afterEach(function() {
+                this.xhr.restore();
+                delete this.asyncViewNode1;
+                delete this.asyncViewNode2;
+            });
+
+            it('"async-view" should have different nodes after redraw', function() {
+                expect(this.asyncViewNode2).not.to.be(this.asyncViewNode1)
+            });
+
+            it('"async-view" should have child view', function() {
+                expect($(this.asyncViewNode2).find('.ns-view-async-view-child')).to.have.length(1);
+            });
+
+        });
+
+    });
 });

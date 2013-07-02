@@ -170,7 +170,13 @@ ns.Model.define = function(id, info, base) {
     return ctor;
 };
 
-//  Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
+/**
+ * Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
+ * @param {String} id Model's name
+ * @param {Object} [params] Model's params
+ * @param [data] Model's data
+ * @returns {ns.Model}
+ */
 ns.Model.create = function(id, params, data)  {
     params = params || {};
     // не очевидно, но тут будут созданы и key и info

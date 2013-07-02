@@ -1050,12 +1050,19 @@ ns.View.prototype._getViewTree = function(layout, params) {
         return true;
     }
 
-    //  Собираем дерево рекурсивно из подблоков.
-    this._apply(function(view, id) {
-        tree.views[id] = view._getViewTree(layout[id].views, params);
-    });
+    tree.views = this._getDescViewTree(layout, params);
 
     return tree;
+};
+
+ns.View.prototype._getDescViewTree = function(layout, params) {
+    var views = {};
+    //  Собираем дерево рекурсивно из подблоков.
+    this._apply(function(view, id) {
+        views[id] = view._getViewTree(layout[id].views, params);
+    });
+
+    return views;
 };
 
 /**
@@ -1078,6 +1085,8 @@ ns.View.prototype._getPlaceholderTree = function(layout, params) {
     // добавляем название view, чтобы можно было писать
     // match .view-name ns-view-content
     tree.tree[this.id] = true;
+
+    tree.views = this._getDescViewTree(layout, params);
 
     return tree;
 };

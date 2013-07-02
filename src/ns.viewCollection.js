@@ -177,11 +177,63 @@ ns.ViewCollection.prototype._getRequestViews = function(updated) {
 };
 
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
+    var decl;
+    if (this.isValidSelf()) {
+        decl = this._getViewTree(layout, params);
+    } else {
+        decl = this._getPlaceholderTree(layout, params);
+    }
+
     // Добавим декларацию этого ViewCollection в общее дерево
-    tree.views[this.id] = this._getViewTree(layout, params);
+    tree.views[this.id] = decl;
 
     return tree;
 };
+
+ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
+    var result = {};
+    result[this.info.split.view_id] = [];
+
+    // Какие элементы коллекции рендерить, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если есть все данные
+    if (this.isModelsValid()) {
+        // ModelCollection
+        var MC = this.models[this.info.modelCollectionId];
+
+        // Проходом по элементам MC определим, какие виды нужно срендерить
+        for (var i = 0, view, p; i < MC.models.length; i++) {
+            p    = no.extend({}, params, MC.models[i].params);
+            view = this._getView(this.info.split.view_id, p);
+
+            if (!view) {
+                view = this._addView(this.info.split.view_id, p);
+            }
+
+            var decl;
+            if (this.isValidSelf()) {
+                // Если корневая нода не меняется, то перерендериваем
+                // только невалидные элементы коллекции
+                if (!view.isValid()) {
+                    decl = view._getViewTree(layout, params);
+                }
+            } else {
+                // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
+                // элементы коллекции. Невалидные - полностью, а валидные в виде placeholder'ов
+                if (view.isValid()) {
+                    decl = view._getPlaceholderTree(layout, params);
+                } else {
+                    decl = view._getViewTree(layout, params);
+                }
+            }
+
+            if (decl) {
+                result[this.info.split.view_id].push(decl);
+            }
+        }
+    }
+
+    return result;
+}
 
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     var tree = {
@@ -211,32 +263,7 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
         tree.async = true;
     }
 
-    // Какие элементы коллекции рендерить, мы можем понять только по модели
-    // Поэтому, полезем внутрь, только если есть все данные
-    if (this.isModelsValid()) {
-        // ModelCollection
-        var MC = this.models[this.info.modelCollectionId];
-        var itemsToRender = [];
-
-        // Проходом по элементам MC определим, какие виды нужно срендерить
-        for (var i = 0, view, p; i < MC.models.length; i++) {
-            p    = no.extend({}, params, MC.models[i].params);
-            view = this._getView(this.info.split.view_id, p);
-
-            if (!view) {
-                view = this._addView(this.info.split.view_id, p);
-            }
-
-            if (!view.isValid()) {
-                itemsToRender.push(
-                    view._getViewTree(layout, params)
-                    // view._getPlaceholderTree(layout, params)
-                );
-            }
-        }
-
-        tree.views[this.info.split.view_id] = itemsToRender;
-    }
+    tree.views = this._getDescViewTree(layout, params);
 
     return tree;
 };

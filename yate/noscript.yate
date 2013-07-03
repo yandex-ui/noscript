@@ -33,7 +33,7 @@ match .* ns-build-view {
         <div class="ns-view-{ name() }" data-key="{ /.key }">
             if /.placeholder {
                 @class += ' ns-view-placeholder'
-                apply . ns-view-descendants
+                apply . ns-view-desc
             } else {
                 @class += apply . ns-view-add-class
                 apply . ns-view-add-attrs
@@ -66,10 +66,16 @@ match .* ns-view-add-attrs {
 // Содержимое view
 // @public
 match .* ns-view-content {
-    apply . ns-view-descendants
+    if (/.collection) {
+        <div class="ns-view-placeholder-desc">
+            apply . ns-view-desc
+        </div>
+    } else {
+        apply . ns-view-desc
+    }
 }
 
-match .* ns-view-descendants {
+match .* ns-view-desc {
     apply /.views.* ns-view
 }
 

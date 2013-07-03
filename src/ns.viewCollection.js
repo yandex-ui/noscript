@@ -248,7 +248,8 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
         //  FIXME: Не должно ли оно приходить в параметрах Update'а?
         page: ns.page.current,
         views: {},
-        key: this.key
+        key: this.key,
+        collection: true
     };
 
     // добавляем название view, чтобы можно было писать
@@ -352,16 +353,25 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         var MC = this.models[this.info.modelCollectionId];
         var itemsExist = {};
 
+        // Контейнер потомков.
+        var containerDesc = ns.byClass('ns-view-placeholder-desc', this.node)[0];
+
+        // Без него нельзя, т.к. если например при предыдущей отрисовке
+        // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
+        // в какое место их вставлять
+        if (!containerDesc) {
+            throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-placeholder-desc element) for '" + this.id + "'");
+        }
+
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
         for (var i = 0, prev; i < MC.models.length; i++) {
             var p = no.extend({}, params, MC.models[i].params);
-            // Получим view для этой модели
+            // Получим view для вложенной модели
+            // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
             var view = this._getView(this.info.split.view_id, p);
 
-            // view для этой модели есть всегда.
             // Здесь возможны следующие ситуации:
-
             if (isOuterPlaceholder) {
                 // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
                 // нам пришёл placeholder, содержащий в себе те вложенные виды, которые нужно
@@ -375,10 +385,11 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                     // поставим ноду в правильное место
                     if (prev) {
                         // Либо после предыдущего вида
-                        this.node.insertBefore(view.node, prev.node.nextSibling);
+                        $(prev.node).after(view.node);
+                        // this.node.insertBefore(view.node, prev.node.nextSibling);
                     } else {
                         // Либо в самом начале, если предыдущего нет (т.е. это первый)
-                        this.node.insertBefore(view.node, this.node.firstChild);
+                        $(containerDesc).prepend(view.node);
                     }
                 }
             } else {

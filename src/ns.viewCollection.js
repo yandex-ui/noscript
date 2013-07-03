@@ -43,7 +43,7 @@ ns.ViewCollection.define = function(id, info) {
  * Биндится на изменение моделей.
  * @private
  */
-ns.View.prototype._bindModels = function() {
+ns.ViewCollection.prototype._bindModels = function() {
     var that = this;
     var models = this.models;
 
@@ -179,9 +179,9 @@ ns.ViewCollection.prototype._getRequestViews = function(updated) {
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
     var decl;
     if (this.isValidSelf()) {
-        decl = this._getViewTree(layout, params);
-    } else {
         decl = this._getPlaceholderTree(layout, params);
+    } else {
+        decl = this._getViewTree(layout, params);
     }
 
     // Добавим декларацию этого ViewCollection в общее дерево
@@ -201,7 +201,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
         var MC = this.models[this.info.modelCollectionId];
 
         // Проходом по элементам MC определим, какие виды нужно срендерить
-        for (var i = 0, view, p; i < MC.models.length; i++) {
+        for (var i = 0, view, p, decl; i < MC.models.length; i++) {
             p    = no.extend({}, params, MC.models[i].params);
             view = this._getView(this.info.split.view_id, p);
 
@@ -209,7 +209,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
                 view = this._addView(this.info.split.view_id, p);
             }
 
-            var decl;
+            decl = null;
             if (this.isValidSelf()) {
                 // Если корневая нода не меняется, то перерендериваем
                 // только невалидные элементы коллекции
@@ -233,7 +233,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
     }
 
     return result;
-}
+};
 
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     var tree = {
@@ -271,15 +271,12 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
     var newNode = ns.byClass('ns-view-' + this.id, node)[0];
+    var isOuterPlaceholder = $(newNode).is('.ns-view-placeholder');
 
     var viewWasInvalid = !this.isValid();
     var syncUpdate     = !updateOptions.async;
 
-    // FIXME: А ещё нужно обработать кейс, когда родительский вид обновил свою ноду
-    // сейчас при таких обстоятельствах viewCollection ломается (не показываются элементы)
-
     if (viewWasInvalid) {
-        ns.log.debug('[ns.ViewCollection]', '_updateHTML()', this.key, 'wasInvalid -> newNode', newNode);
 
         var hadOldNode = !!this.node;
 
@@ -287,21 +284,41 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             throw new Error("[ns.ViewCollection] Can't find node for '" + this.id + "'");
         }
 
-        //  Обновляем весь блок.
-        //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
-        //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
-        //  автоматически попадут на нужное место.
+        // toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
+
+        // Либо блок toplevel и ему нужно вставить html,
+        // либо его html уже вставился за счёт родителя (updateOptions.parent_added)
+
         if (updateOptions.toplevel) {
-            if (this.node) {
-                ns.replaceNode(this.node, newNode);
+
+            // Если toplevel и placeholder, то не вставляем и в options для вложенных пишем toplevel
+            // Если toplevel и не placeholder, то вставляем
+            if (isOuterPlaceholder) {
+                updateOptions.toplevel = true;
+            } else {
+                // console.log('ns.ViewCollection.prototype._updateHTML', this.node);
+                if (this.node) {
+                    ns.replaceNode(this.node, newNode);
+                }
+                //  Все подблоки ниже уже не toplevel.
+                updateOptions.toplevel = false;
+                updateOptions.parent_added = true;
+
+                this._setNode(newNode);
             }
-            //  Все подблоки ниже уже не toplevel.
-            updateOptions.toplevel = false;
+        } else {
+            // Если не toplevel и placeholder, то нужно взять placeholder и заменить его на актуальную ноду
+            // Если не toplevel и не placeholder, то ничего не делаем
+            if (isOuterPlaceholder) {
+                ns.replaceNode(newNode, this.node);
+
+                updateOptions.toplevel = false;
+                updateOptions.parent_added = true;
+            } else {
+                this._setNode(newNode);
+            }
         }
 
-        this._setNode(newNode);
-
-        // Будем что-то делать с нодой только в 2-х случаях
         if (hadOldNode && !this.isLoading()) {
             this._hide(events['ns-view-hide']);
             this._htmldestroy(events['ns-view-htmldestroy']);
@@ -329,7 +346,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
     }
 
     // Будем обновлять вложенные виды
-    // только если этот блок был не валиден и это не первая отрисовка async-view
+    // только если это не первая отрисовка async-view
     if (!this.isLoading()) {
         // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
@@ -337,30 +354,44 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        for (var i = 0, view, wasValid, prev, p; i < MC.models.length; i++) {
-            // у нас тут для каждого элемента MC уже есть
-            //  1. либо валидный view,
-            //  2. либо невалидный view с собственным устаревшим html и новый html для него,
-            //  3. либо невалидный view без собственного устаревшего html и новый html для него
-
-            p    = no.extend({}, params, MC.models[i].params);
+        for (var i = 0, prev; i < MC.models.length; i++) {
+            var p = no.extend({}, params, MC.models[i].params);
             // Получим view для этой модели
-            view = this._getView(this.info.split.view_id, p);
+            var view = this._getView(this.info.split.view_id, p);
 
-            wasValid = view.isValid();
+            // view для этой модели есть всегда.
+            // Здесь возможны следующие ситуации:
 
-            // Если у него была старая нода, она заменится сама в _updateHTML
-            view._updateHTML(newNode, null, params, updateOptions, events);
+            if (isOuterPlaceholder) {
+                // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
+                // нам пришёл placeholder, содержащий в себе те вложенные виды, которые нужно
+                // перерендерить. Поэтому если
+                //      1.1 view не валиден, то делаем _updateHtml и вставляем его в правильное
+                //          место
+                //      1.2 view валиден, то ничего не делаем
+                if (!view.isValid()) {
+                    view._updateHTML(newNode, null, params, updateOptions, events);
 
-            // Если до _updateHTML был невалиден
-            if (!wasValid) {
-                // поставим ноду в правильное место
-                if (prev) {
-                    // Либо после предыдущего вида
-                    this.node.insertBefore(view.node, prev.node.nextSibling);
+                    // поставим ноду в правильное место
+                    if (prev) {
+                        // Либо после предыдущего вида
+                        this.node.insertBefore(view.node, prev.node.nextSibling);
+                    } else {
+                        // Либо в самом начале, если предыдущего нет (т.е. это первый)
+                        this.node.insertBefore(view.node, this.node.firstChild);
+                    }
+                }
+            } else {
+                // 2. html внешнего вида только что изменился. Это значит, что он вставится в dom
+                //    вместе с внутренними видами. Для невалидных там будет новый html, а для
+                //    валидных там будет placeholder. Поэтому если
+                //      1.1 view не валиден, то он уже занял правильное место в корневом html.
+                //          Делаем _updateHtml
+                //      1.2 view валиден, то заменим placeholder на правильный html.
+                if (!view.isValid()) {
+                   view._updateHTML(newNode, null, params, updateOptions, events);
                 } else {
-                    // Либо в самом начале, если предыдущего нет (т.е. это первый)
-                    this.node.insertBefore(view.node, this.node.firstChild);
+                    ns.replaceNode(view._extractNode(newNode), view.node);
                 }
             }
 

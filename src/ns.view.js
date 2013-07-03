@@ -1209,7 +1209,7 @@ ns.View.prototype._setNode = function(node) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-ns.View.prototype.extractNode = function(node) {
+ns.View.prototype._extractNode = function(node) {
     var viewNode;
     // Найдём ноду по классу
     var viewNodes = ns.byClass('ns-view-' + this.id, node);
@@ -1257,7 +1257,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
-        viewNode = this.extractNode(node);
+        viewNode = this._extractNode(node);
 
         if (!viewNode) {
             //  TODO @nop: Может сделать метод типа:
@@ -1293,10 +1293,12 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
+
             if (updateOptions.toplevel) {
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 //  FIXME: Вот тут нужны два варианта: вся нода невалидна или же невалидные некоторое subview.
+
                 if (this.node) {
                     ns.replaceNode(this.node, viewNode);
                     options_next.parent_added = true;

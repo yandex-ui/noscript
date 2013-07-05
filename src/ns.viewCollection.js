@@ -297,7 +297,6 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             if (isOuterPlaceholder) {
                 updateOptions.toplevel = true;
             } else {
-                // console.log('ns.ViewCollection.prototype._updateHTML', this.node);
                 if (this.node) {
                     ns.replaceNode(this.node, newNode);
                 }

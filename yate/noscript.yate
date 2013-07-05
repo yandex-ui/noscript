@@ -67,7 +67,7 @@ match .* ns-view-add-attrs {
 // @public
 match .* ns-view-content {
     if (/.collection) {
-        <div class="ns-view-placeholder-desc">
+        <div class="ns-view-container-desc">
             apply . ns-view-desc
         </div>
     } else {

@@ -277,7 +277,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
     var viewWasInvalid = !this.isValid();
     var syncUpdate     = !updateOptions.async;
 
-    if (viewWasInvalid) {
+    if (!this.isValidSelf()) {
 
         var hadOldNode = !!this.node;
 
@@ -354,13 +354,18 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         var itemsExist = {};
 
         // Контейнер потомков.
-        var containerDesc = ns.byClass('ns-view-placeholder-desc', this.node)[0];
+        var containerDesc;
+        if (this.$node.is('.ns-view-container-desc')) {
+            containerDesc = this.node;
+        } else {
+            containerDesc = ns.byClass('ns-view-container-desc', this.node)[0];
+        }
 
         // Без него нельзя, т.к. если например при предыдущей отрисовке
         // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
         // в какое место их вставлять
         if (!containerDesc) {
-            throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-placeholder-desc element) for '" + this.id + "'");
+            throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
         }
 
         // Сначала сделаем добавление новых и обновление изменённых view

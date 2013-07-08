@@ -406,7 +406,11 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 if (!view.isValid()) {
                    view._updateHTML(newNode, null, params, updateOptions, events);
                 } else {
+                    // FIXME: нужно убедиться, что это все события, которые нужно перевешивать
+                    view._unbindEvents('init');
                     ns.replaceNode(view._extractNode(newNode), view.node);
+                    // FIXME: нужно убедиться, что это все события, которые нужно перевешивать
+                    view._bindEvents('init');
                 }
             }
 

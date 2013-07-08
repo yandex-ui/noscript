@@ -20,7 +20,7 @@
      * @returns {String}
      */
     ns.entityify = function(s) {
-        return s.replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
+        return s.toString().replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
     };
 
 

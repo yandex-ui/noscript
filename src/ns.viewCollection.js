@@ -272,7 +272,7 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
     var newNode = ns.byClass('ns-view-' + this.id, node)[0];
-    var isOuterPlaceholder = $(newNode).is('.ns-view-placeholder');
+    var isOuterPlaceholder = $(newNode).hasClass('ns-view-placeholder');
 
     var viewWasInvalid = !this.isValid();
     var syncUpdate     = !updateOptions.async;
@@ -406,11 +406,11 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 if (!view.isValid()) {
                    view._updateHTML(newNode, null, params, updateOptions, events);
                 } else {
-                    // FIXME: нужно убедиться, что это все события, которые нужно перевешивать
-                    view._unbindEvents('init');
+                    // здесь не нужно перевешивать события, т.к. они могут быть повешены
+                    // либо непосредственно на ноду, либо на document. В первом случае
+                    // события переедут вместе со старой нодой, а во втором останутся там,
+                    // где и были раньше
                     ns.replaceNode(view._extractNode(newNode), view.node);
-                    // FIXME: нужно убедиться, что это все события, которые нужно перевешивать
-                    view._bindEvents('init');
                 }
             }
 

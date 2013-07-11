@@ -2,12 +2,16 @@
 
     // @see http://jsperf.com/entityify-test
 
-    var ENTITYIFY_REGEXP = /[<>"]/g;
+    var ENTITYIFY_REGEXP = /[&<>"'\/]/g;
     var ENTITYIFY_REPLACER = (function() {
+        // @see https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#Output_Encoding_Rules_Summary
         var chars = {
+            '&': '&amp;',
             '<': '&lt;',
             '>': '&gt;',
-            '"': '&quot;'
+            '"': '&quot;',
+            "'": '&#x27;',
+            '/': '&#x2F;'
         };
         return function(c) {
             return chars[c];
@@ -31,10 +35,12 @@
     var DEENTITYIFY_REGEXP = /&([^&;]+);/g;
     var DEENTITYIFY_REPLACER = (function() {
         var chars = {
-            lt:   '<',
-            gt:   '>',
-            amp:  '&',
-            quot: '"'
+            'amp':  '&',
+            'lt':   '<',
+            'gt':   '>',
+            'quot': '"',
+            '#x27': "'",
+            '#x2F': "/"
         };
         return function(a, b) {
             return chars[b] || a;

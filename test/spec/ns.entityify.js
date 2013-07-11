@@ -1,27 +1,61 @@
 describe('ns.entityify', function() {
 
+    var commonTests = [
+        {'raw': '&', 'entity': '&amp;'},
+        {'raw': '&&', 'entity': '&amp;&amp;'},
+
+        {'raw': '<', 'entity': '&lt;'},
+        {'raw': '<<', 'entity': '&lt;&lt;'},
+
+        {'raw': '>', 'entity': '&gt;'},
+        {'raw': '>>', 'entity': '&gt;&gt;'},
+
+        {'raw': '"', 'entity': '&quot;'},
+        {'raw': '""', 'entity': '&quot;&quot;'},
+
+        {'raw': "'", 'entity': '&#x27;'},
+        {'raw': "''", 'entity': '&#x27;&#x27;'},
+
+        {'raw': "/", 'entity': '&#x2F;'},
+        {'raw': "//", 'entity': '&#x2F;&#x2F;'},
+
+        {'raw': '<>"', 'entity': '&lt;&gt;&quot;'}
+    ];
+
     describe('ns.entityify', function() {
 
-        var tests = [
-            {'in': '<', out: '&lt;'},
-            {'in': '<<', 'out': '&lt;&lt;'},
+        // copy
+        var entityifyTests = [].concat(commonTests);
 
-            {'in': '>', 'out': '&gt;'},
-            {'in': '>>', 'out': '&gt;&gt;'},
+        entityifyTests.push(
+            {'raw': 1, 'entity': '1'}
+        );
 
-            {'in': '"', 'out': '&quot;'},
-            {'in': '""', 'out': '&quot;&quot;'},
+        entityifyTests.forEach(function(test) {
 
-            {'in': '<>"', 'out': '&lt;&gt;&quot;'},
+            it('should process "' + test['raw'] + '" as ' + test['entity'], function() {
+                var actualResult = ns.entityify(test['raw']);
+                expect(test['entity']).to.be.eql(actualResult);
+            });
 
-            {'in': 1, 'out': '1'}
-        ];
+        });
 
-        tests.forEach(function(test) {
+    });
+    
+    describe('ns.deentityify', function() {
 
-            it('should process "' + test['in'] + '" as ' + test.out, function() {
-                var actualResult = ns.entityify(test['in']);
-                expect(test.out).to.be.eql(actualResult);
+        // copy
+        var deentityifyTests = [].concat(commonTests);
+
+        deentityifyTests.push(
+            {'raw': 1, 'entity': '1'}
+        );
+
+        deentityifyTests.forEach(function(test) {
+
+            it('should process "' + test['entity'] + '" as ' + test['raw'], function() {
+                var actualResult = ns.deentityify(test['entity']);
+                expect(test['raw']).to.be.eql(actualResult);
             });
 
         });

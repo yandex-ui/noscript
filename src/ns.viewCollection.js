@@ -421,13 +421,21 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
         // Удалим те view, для которых нет моделей
         this._apply(function(/** ns.View */view) {
-            // Если для вида нет модели в MC, то нужно его прихлопнуть
+            // Если для view нет модели в MC, то нужно его прихлопнуть
             if (!itemsExist[view.key]) {
+                // invalidate view and all subviews
                 view.invalidate();
+
+                //TODO: будет ли unbind для вложенных view?
+                // unbind events
                 view._hide(events['ns-view-hide']);
                 view._htmldestroy(events['ns-view-htmldestroy']);
+
+                // remove from collection
                 this._deleteView(view);
-                $(view.node).remove();
+
+                // remove from DOM
+                ns.removeNode(view.node);
             }
         }.bind(this));
     }

@@ -13,6 +13,17 @@ ns.replaceNode = function(oldNode, newNode) {
 };
 
 /**
+ * Removes node from DOM
+ * @param {Element} node
+ */
+ns.removeNode = function(node) {
+    var parent = node.parentNode;
+    if (parent) {
+        parent.removeChild(node);
+    }
+};
+
+/**
  * Generates DOM from HTML-string.
  * @param {String} html
  * @returns {Element}

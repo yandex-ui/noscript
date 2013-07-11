@@ -67,6 +67,8 @@ match .* ns-view-add-attrs {
 // @public
 match .* ns-view-content {
     if (/.collection) {
+        // special node child-container for view-collection
+        // so view-collection can has its own html markup
         <div class="ns-view-container-desc">
             apply . ns-view-desc
         </div>

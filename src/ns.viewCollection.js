@@ -427,6 +427,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 view._hide(events['ns-view-hide']);
                 view._htmldestroy(events['ns-view-htmldestroy']);
                 this._deleteView(view);
+                $(view.node).remove();
             }
         }.bind(this));
     }

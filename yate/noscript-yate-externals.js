@@ -7,7 +7,7 @@ var externals = yr.externals = yr.externals || {};
  * @param {string} path Relative url.
  * @return {string} Full url.
  */
-externals.url = function(path) {
+externals['ns-url'] = function(path) {
     return ns.router.url(path);
 };
 

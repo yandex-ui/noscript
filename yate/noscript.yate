@@ -2,7 +2,7 @@
  * @fileOverview Common yate templates for noscript
  */
 
-external scalar url(scalar)
+external scalar ns-url(scalar)
 
 layout-params = /.layout-params
 

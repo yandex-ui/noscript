@@ -359,15 +359,30 @@ describe('ns.Model', function() {
                     .to.be(this.data);
             });
 
+            it('should trigger only two events', function() {
+                sinon.spy(this.model, 'trigger');
+
+                this.model.setData(this.data);
+
+                expect(this.model.trigger.calledTwice)
+                    .to.be.ok();
+            });
+
             it('should trigger \'ns-model-changed\' event', function() {
                 sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data);
 
-                expect(this.model.trigger.calledOnce)
-                    .to.be.ok();
-
                 expect(this.model.trigger.calledWith('ns-model-changed'))
+                    .to.be.ok();
+            });
+
+            it('should trigger \'ns-model-touched\' event', function() {
+                sinon.spy(this.model, 'trigger');
+
+                this.model.setData(this.data);
+
+                expect(this.model.trigger.calledWith('ns-model-touched'))
                     .to.be.ok();
             });
 
@@ -376,7 +391,7 @@ describe('ns.Model', function() {
 
                 this.model.setData(this.data, {silent: true});
 
-                expect(this.model.trigger.calledOnce)
+                expect(this.model.trigger.calledWith('ns-model-changed'))
                     .not.to.be.ok();
             });
 

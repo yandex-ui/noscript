@@ -143,46 +143,51 @@ describe('ns.ViewCollection', function() {
 
     describe('redraw on ModelCollection changes', function() {
 
+        beforeEach(function(finish) {
+
+            // define models
+            ns.Model.define('m-collection', {
+                isCollection: true
+            });
+
+            ns.Model.define('m-collection-item', {
+                params: {
+                    p: null
+                }
+            });
+
+            // define views
+            ns.View.define('app');
+            ns.ViewCollection.define('v-collection', {
+                models: [ 'm-collection' ],
+                split: {
+                    view_id: 'v-collection-item'
+                }
+            });
+            ns.View.define('v-collection-item', {
+                models: [ 'm-collection-item' ]
+            });
+
+            // define layout
+            ns.layout.define('app', {
+                'app': {
+                    'v-collection': {}
+                }
+            });
+
+            finish();
+        });
+
         describe('insert new model-item', function() {
 
             beforeEach(function(finish) {
-
-                // define models
-                ns.Model.define('m-collection', {
-                    isCollection: true
-                });
-
-                ns.Model.define('m-collection-item', {
-                    params: {
-                        p: null
-                    }
-                });
-
                 this.model = ns.Model.create('m-collection');
                 // insert first item
                 this.model.setData([
                     ns.Model.create('m-collection-item', {p: 1}, {data: 1})
                 ]);
 
-                // define views
-                ns.View.define('app');
-                ns.ViewCollection.define('v-collection', {
-                    models: [ 'm-collection' ],
-                    split: {
-                        view_id: 'v-collection-item'
-                    }
-                });
-                ns.View.define('v-collection-item', {
-                    models: [ 'm-collection-item' ]
-                });
                 this.APP = ns.View.create('app');
-
-                // define layout
-                ns.layout.define('app', {
-                    'app': {
-                        'v-collection': {}
-                    }
-                });
 
                 // first rewdraw
                 var layout = ns.layout.page('app', {});
@@ -222,6 +227,68 @@ describe('ns.ViewCollection', function() {
 
             it('should add v-collection-item when I insert model-item in collection', function() {
                 expect(this.collectionViewNode1.childNodes).to.have.length(2);
+            });
+
+        });
+
+        describe('change in the root model of ModelCollection', function() {
+            beforeEach(function(finish) {
+                var model = ns.Model.create('m-collection');
+                // insert first item
+                model.setData([
+                    ns.Model.create('m-collection-item', {p: 1}, {data: 1}),
+                    ns.Model.create('m-collection-item', {p: 2}, {data: 2})
+                ]);
+
+                this.APP = ns.View.create('app');
+
+                // first rewdraw
+                var layout = ns.layout.page('app', {});
+                new ns.Update(this.APP, layout, {})
+                    .start()
+                    .done(function() {
+                        this.items = this.APP.views["v-collection"].views;
+
+                        this.nodeOld = this.APP.views["v-collection"].node;
+
+                        this.nodeOld.setAttribute('foo', 'bar');
+
+                        this.nodeItem1Old = this.items["view=v-collection-item&p=1"].node;
+                        this.nodeItem2Old = this.items["view=v-collection-item&p=2"].node;
+
+                        // touching model after a small timeout to guarantee, that
+                        // model and view will have different timeout attribute
+                        window.setTimeout(function() {
+                            model.touch();
+
+                            // start update to redraw a core view
+                            var layout = ns.layout.page('app', {});
+                            new ns.Update(this.APP, layout, {})
+                                .start()
+                                .done(function() {
+                                    finish();
+                                });
+                        }.bind(this), 10);
+                    }.bind(this));
+            });
+
+            afterEach(function() {
+                delete this.APP;
+                delete this.nodeOld;
+                delete this.nodeItem1Old;
+                delete this.nodeItem2Old;
+            });
+
+            it('should have the another node of root view', function() {
+                expect(this.APP.views["v-collection"].node).not.to.be(this.nodeOld);
+            });
+
+            it('should have the same nodes of view-items', function() {
+                var node1new = this.APP.views["v-collection"].views["view=v-collection-item&p=1"].node;
+                var node2new = this.APP.views["v-collection"].views["view=v-collection-item&p=2"].node;
+
+                expect(node1new).to.be(this.nodeItem1Old);
+                expect(node2new).to.be(this.nodeItem2Old);
             });
 
         });

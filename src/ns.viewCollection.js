@@ -39,6 +39,74 @@ ns.ViewCollection.define = function(id, info) {
     return ctor;
 };
 
+/**
+ * Биндится на изменение моделей.
+ * @private
+ */
+ns.ViewCollection.prototype._bindModels = function() {
+    var that = this;
+    var models = this.models;
+
+    for (var model_id in models) {
+        models[model_id].on('ns-model-changed', function(e, o) {
+            // проинвалидируем view, только если изменилась внешняя модель
+            if (this === o.model) {
+                that.invalidate();
+            }
+        });
+    }
+};
+
+ns.ViewCollection.prototype.isValid = function() {
+    return this.isValidSelf() && this.isValidDesc();
+};
+
+ns.ViewCollection.prototype.isValidSelf = function() {
+    return this.isOk() && this.isSubviewsOk() && this.isModelsValid(this.timestamp);
+};
+
+ns.ViewCollection.prototype.isValidDesc = function() {
+    for (var key in this.views) {
+        if (!this.views[key].isValid()) {
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
+ * Возвращает true, если все модели валидны.
+ * @param {Number} [timestamp] Также проверяем, что кеш модели не свежее переданного timestamp.
+ * @return {Boolean}
+ */
+ns.ViewCollection.prototype.isModelsValid = function(timestamp) {
+    var models = this.models;
+    for (var id in models) {
+        /** @type ns.Model */
+        var model = models[id];
+        var modelTimestamp = model.timestamp;
+        // при сравнении с timestamp модели-коллекции используем timestampSelf,
+        // не зависящий от внутренних моделей
+        if (model.isCollection) {
+            modelTimestamp = model.timestampSelf;
+        }
+        if (
+            // Модель является обязательной
+            this.info.models[id] === true &&
+            (
+                // модель не валидна
+                !model.isValid() ||
+                // или ее кеш более свежий
+                (timestamp && modelTimestamp > timestamp)
+            )
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 ns.ViewCollection.prototype._getView = function(id, params) {
     var key = ns.View.getKey(id, params);
     return this._getViewByKey(key);
@@ -109,10 +177,62 @@ ns.ViewCollection.prototype._getRequestViews = function(updated) {
 };
 
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
+    var decl;
+    if (this.isValidSelf()) {
+        decl = this._getPlaceholderTree(layout, params);
+    } else {
+        decl = this._getViewTree(layout, params);
+    }
+
     // Добавим декларацию этого ViewCollection в общее дерево
-    tree.views[this.id] = this._getViewTree(layout, params);
+    tree.views[this.id] = decl;
 
     return tree;
+};
+
+ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
+    var result = {};
+    result[this.info.split.view_id] = [];
+
+    // Какие элементы коллекции рендерить, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если есть все данные
+    if (this.isModelsValid()) {
+        // ModelCollection
+        var MC = this.models[this.info.modelCollectionId];
+
+        // Проходом по элементам MC определим, какие виды нужно срендерить
+        for (var i = 0, view, p, decl; i < MC.models.length; i++) {
+            p    = no.extend({}, params, MC.models[i].params);
+            view = this._getView(this.info.split.view_id, p);
+
+            if (!view) {
+                view = this._addView(this.info.split.view_id, p);
+            }
+
+            decl = null;
+            if (this.isValidSelf()) {
+                // Если корневая нода не меняется, то перерендериваем
+                // только невалидные элементы коллекции
+                if (!view.isValid()) {
+                    decl = view._getViewTree(layout, params);
+                }
+            } else {
+                // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
+                // элементы коллекции. Невалидные - полностью, а валидные в виде placeholder'ов
+                if (view.isValid()) {
+                    decl = view._getPlaceholderTree(layout, params);
+                } else {
+                    decl = view._getViewTree(layout, params);
+                }
+            }
+
+            if (decl) {
+                result[this.info.split.view_id].push(decl);
+            }
+        }
+    }
+
+    return result;
 };
 
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {
@@ -128,7 +248,8 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
         //  FIXME: Не должно ли оно приходить в параметрах Update'а?
         page: ns.page.current,
         views: {},
-        key: this.key
+        key: this.key,
+        collection: true
     };
 
     // добавляем название view, чтобы можно было писать
@@ -143,31 +264,7 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
         tree.async = true;
     }
 
-    // Какие элементы коллекции рендерить, мы можем понять только по модели
-    // Поэтому, полезем внутрь, только если есть все данные
-    if (this.isModelsValid()) {
-        // ModelCollection
-        var MC = this.models[this.info.modelCollectionId];
-        var itemsToRender = [];
-
-        // Проходом по элементам MC определим, какие виды нужно срендерить
-        for (var i = 0, view, p; i < MC.models.length; i++) {
-            p    = no.extend({}, params, MC.models[i].params);
-            view = this._getView(this.info.split.view_id, p);
-
-            if (!view) {
-                view = this._addView(this.info.split.view_id, p);
-            }
-
-            if (!view.isValid()) {
-                itemsToRender.push(
-                    view._getViewTree(layout, params)
-                );
-            }
-        }
-
-        tree.views[this.info.split.view_id] = itemsToRender;
-    }
+    tree.views = this._getDescViewTree(layout, params);
 
     return tree;
 };
@@ -175,15 +272,12 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
     var newNode = ns.byClass('ns-view-' + this.id, node)[0];
+    var isOuterPlaceholder = $(newNode).hasClass('ns-view-placeholder');
 
     var viewWasInvalid = !this.isValid();
     var syncUpdate     = !updateOptions.async;
 
-    // FIXME: А ещё нужно обработать кейс, когда родительский вид обновил свою ноду
-    // сейчас при таких обстоятельствах viewCollection ломается (не показываются элементы)
-
-    if (viewWasInvalid) {
-        ns.log.debug('[ns.ViewCollection]', '_updateHTML()', this.key, 'wasInvalid -> newNode', newNode);
+    if (!this.isValidSelf()) {
 
         var hadOldNode = !!this.node;
 
@@ -191,21 +285,40 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             throw new Error("[ns.ViewCollection] Can't find node for '" + this.id + "'");
         }
 
-        //  Обновляем весь блок.
-        //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
-        //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
-        //  автоматически попадут на нужное место.
+        // toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
+
+        // Либо блок toplevel и ему нужно вставить html,
+        // либо его html уже вставился за счёт родителя (updateOptions.parent_added)
+
         if (updateOptions.toplevel) {
-            if (this.node) {
-                ns.replaceNode(this.node, newNode);
+
+            // Если toplevel и placeholder, то не вставляем и в options для вложенных пишем toplevel
+            // Если toplevel и не placeholder, то вставляем
+            if (isOuterPlaceholder) {
+                updateOptions.toplevel = true;
+            } else {
+                if (this.node) {
+                    ns.replaceNode(this.node, newNode);
+                }
+                //  Все подблоки ниже уже не toplevel.
+                updateOptions.toplevel = false;
+                updateOptions.parent_added = true;
+
+                this._setNode(newNode);
             }
-            //  Все подблоки ниже уже не toplevel.
-            updateOptions.toplevel = false;
+        } else {
+            // Если не toplevel и placeholder, то нужно взять placeholder и заменить его на актуальную ноду
+            // Если не toplevel и не placeholder, то ничего не делаем
+            if (isOuterPlaceholder) {
+                ns.replaceNode(newNode, this.node);
+
+                updateOptions.toplevel = false;
+                updateOptions.parent_added = true;
+            } else {
+                this._setNode(newNode);
+            }
         }
 
-        this._setNode(newNode);
-
-        // Будем что-то делать с нодой только в 2-х случаях
         if (hadOldNode && !this.isLoading()) {
             this._hide(events['ns-view-hide']);
             this._htmldestroy(events['ns-view-htmldestroy']);
@@ -233,38 +346,71 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
     }
 
     // Будем обновлять вложенные виды
-    // только если этот блок был не валиден и это не первая отрисовка async-view
+    // только если это не первая отрисовка async-view
     if (!this.isLoading()) {
         // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
         var itemsExist = {};
 
+        // Контейнер потомков.
+        var containerDesc;
+        if (this.$node.is('.ns-view-container-desc')) {
+            containerDesc = this.node;
+        } else {
+            containerDesc = ns.byClass('ns-view-container-desc', this.node)[0];
+        }
+
+        // Без него нельзя, т.к. если например при предыдущей отрисовке
+        // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
+        // в какое место их вставлять
+        if (!containerDesc) {
+            throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
+        }
+
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        for (var i = 0, view, wasValid, prev, p; i < MC.models.length; i++) {
-            // у нас тут для каждого элемента MC уже есть
-            //  1. либо валидный view,
-            //  2. либо невалидный view с собственным устаревшим html и новый html для него,
-            //  3. либо невалидный view без собственного устаревшего html и новый html для него
+        for (var i = 0, prev; i < MC.models.length; i++) {
+            var p = no.extend({}, params, MC.models[i].params);
+            // Получим view для вложенной модели
+            // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
+            var view = this._getView(this.info.split.view_id, p);
 
-            p    = no.extend({}, params, MC.models[i].params);
-            // Получим view для этой модели
-            view = this._getView(this.info.split.view_id, p);
+            // Здесь возможны следующие ситуации:
+            if (isOuterPlaceholder) {
+                // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
+                // нам пришёл placeholder, содержащий в себе те вложенные виды, которые нужно
+                // перерендерить. Поэтому если
+                //      1.1 view не валиден, то делаем _updateHtml и вставляем его в правильное
+                //          место
+                //      1.2 view валиден, то ничего не делаем
+                if (!view.isValid()) {
+                    view._updateHTML(newNode, null, params, updateOptions, events);
 
-            wasValid = view.isValid();
-
-            // Если у него была старая нода, она заменится сама в _updateHTML
-            view._updateHTML(newNode, null, params, updateOptions, events);
-
-            // Если до _updateHTML был невалиден
-            if (!wasValid) {
-                // поставим ноду в правильное место
-                if (prev) {
-                    // Либо после предыдущего вида
-                    this.node.insertBefore(view.node, prev.node.nextSibling);
+                    // поставим ноду в правильное место
+                    if (prev) {
+                        // Либо после предыдущего вида
+                        $(prev.node).after(view.node);
+                        // this.node.insertBefore(view.node, prev.node.nextSibling);
+                    } else {
+                        // Либо в самом начале, если предыдущего нет (т.е. это первый)
+                        $(containerDesc).prepend(view.node);
+                    }
+                }
+            } else {
+                // 2. html внешнего вида только что изменился. Это значит, что он вставится в dom
+                //    вместе с внутренними видами. Для невалидных там будет новый html, а для
+                //    валидных там будет placeholder. Поэтому если
+                //      1.1 view не валиден, то он уже занял правильное место в корневом html.
+                //          Делаем _updateHtml
+                //      1.2 view валиден, то заменим placeholder на правильный html.
+                if (!view.isValid()) {
+                   view._updateHTML(newNode, null, params, updateOptions, events);
                 } else {
-                    // Либо в самом начале, если предыдущего нет (т.е. это первый)
-                    this.node.insertBefore(view.node, this.node.firstChild);
+                    // здесь не нужно перевешивать события, т.к. они могут быть повешены
+                    // либо непосредственно на ноду, либо на document. В первом случае
+                    // события переедут вместе со старой нодой, а во втором останутся там,
+                    // где и были раньше
+                    ns.replaceNode(view._extractNode(newNode), view.node);
                 }
             }
 
@@ -281,6 +427,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 view._hide(events['ns-view-hide']);
                 view._htmldestroy(events['ns-view-htmldestroy']);
                 this._deleteView(view);
+                $(view.node).remove();
             }
         }.bind(this));
     }

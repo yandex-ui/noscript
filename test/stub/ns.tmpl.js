@@ -1,8 +1,19 @@
 beforeEach(function() {
 
     function genViewHTML(id, view) {
+
         var html = '';
-        html += '<div class="ns-view-' + id + (view.async ? ' ns-async' : '') + '" data-key="' + view.key + '">';
+        var clazz = 'ns-view-' + id;
+        if (view.async) {
+            clazz += ' ns-async';
+        }
+        if (view.collection) {
+            clazz += ' ns-view-container-desc';
+        }
+        if (view.placeholder) {
+            clazz += ' ns-view-placeholder';
+        }
+        html += '<div class="' + clazz + '" data-key="' + view.key + '">';
         // don't create child views in async state
         if (!view.async) {
             html += genHTML(view.views);

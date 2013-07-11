@@ -67,6 +67,7 @@ ns.ModelCollection.prototype._setData = function(data) {
  */
 ns.ModelCollection.prototype._splitModels = function(items) {
     var info = this.info.split;
+    var that = this;
 
     var models = [];
 
@@ -80,6 +81,11 @@ ns.ModelCollection.prototype._splitModels = function(items) {
         // идентификатор подмодели берется из info.model_id
         // он коллецкия может содержать модели только одного вида
         var model = ns.Model.create(info.model_id, params, item);
+
+        // при обновлении timestamp внутренней модели обновим и у внешней
+        model.on('ns-model-touched', function() {
+            that.timestamp = this.timestamp;
+        });
 
         models.push(model);
     });
@@ -116,6 +122,16 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
             }
         };
     }
+};
+
+/**
+ * Обновляет timestamp'ы модели
+ */
+ns.ModelCollection.prototype.touch = function() {
+    ns.Model.prototype.touch.apply(this, arguments);
+    // timestampSelf показывает последнее время изменения внешней модели
+    // в то время, как timestamp - последнее время изменения внешней или внутренней модели
+    this.timestampSelf = this.timestamp;
 };
 
 /**

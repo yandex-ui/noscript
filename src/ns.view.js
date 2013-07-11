@@ -1025,7 +1025,6 @@ ns.View.prototype._getViewTree = function(layout, params) {
         // есть view находится в режиме async, то модели проверять не надо
         is_models_valid: this.asyncState || this.isModelsValid(),
         //  добавляем собственные параметры блока
-        //  NOTE @nop: Отличаются ли эти параметры от page.params?
         params: this.params,
         //  FIXME: Не должно ли оно приходить в параметрах Update'а?
         page: ns.page.current,
@@ -1051,10 +1050,43 @@ ns.View.prototype._getViewTree = function(layout, params) {
         return true;
     }
 
+    tree.views = this._getDescViewTree(layout, params);
+
+    return tree;
+};
+
+ns.View.prototype._getDescViewTree = function(layout, params) {
+    var views = {};
     //  Собираем дерево рекурсивно из подблоков.
     this._apply(function(view, id) {
-        tree.views[id] = view._getViewTree(layout[id].views, params);
+        views[id] = view._getViewTree(layout[id].views, params);
     });
+
+    return views;
+};
+
+/**
+ * Возвращает декларацию вида для вставки плейсхолдера
+ * @param layout
+ * @param params
+ * @return {Object}
+ */
+ns.View.prototype._getPlaceholderTree = function(layout, params) {
+    var tree = {
+        // фейковое дерево, чтобы удобно матчится в yate
+        tree: {},
+        //  добавляем собственные параметры блока
+        params: this.params,
+        views: {},
+        key: this.key,
+        placeholder: true
+    };
+
+    // добавляем название view, чтобы можно было писать
+    // match .view-name ns-view-content
+    tree.tree[this.id] = true;
+
+    tree.views = this._getDescViewTree(layout, params);
 
     return tree;
 };
@@ -1177,7 +1209,7 @@ ns.View.prototype._setNode = function(node) {
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
-ns.View.prototype.extractNode = function(node) {
+ns.View.prototype._extractNode = function(node) {
     var viewNode;
     // Найдём ноду по классу
     var viewNodes = ns.byClass('ns-view-' + this.id, node);
@@ -1225,7 +1257,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
-        viewNode = this.extractNode(node);
+        viewNode = this._extractNode(node);
 
         if (!viewNode) {
             //  TODO @nop: Может сделать метод типа:
@@ -1261,10 +1293,12 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
             //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
             //  автоматически попадут на нужное место.
+
             if (updateOptions.toplevel) {
                 //  Старая нода показывает место, где должен быть блок.
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
                 //  FIXME: Вот тут нужны два варианта: вся нода невалидна или же невалидные некоторое subview.
+
                 if (this.node) {
                     ns.replaceNode(this.node, viewNode);
                     options_next.parent_added = true;

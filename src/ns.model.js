@@ -231,6 +231,8 @@ ns.Model.key = function(id, params, info) {
     var defaults = info.params;
     var pNames = info.pNames;
 
+    params = params || {};
+
     var key = 'model=' + id;
 
     for (var i = 0, l = pNames.length; i < l; i++) {

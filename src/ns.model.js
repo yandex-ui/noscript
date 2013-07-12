@@ -6,7 +6,7 @@
 
 /**
  * @class Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
- * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.create().
+ * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.get().
  * @constructor
  * @namespace
  * @mixes no.Events
@@ -170,36 +170,6 @@ ns.Model.define = function(id, info, base) {
     return ctor;
 };
 
-/**
- * Фабрика для моделей. Создает инстанс нужного класса и инициализирует его.
- * @param {String} id Model's name
- * @param {Object} [params] Model's params
- * @param [data] Model's data
- * @returns {ns.Model}
- */
-ns.Model.create = function(id, params, data)  {
-    params = params || {};
-    // не очевидно, но тут будут созданы и key и info
-    var model = ns.Model.get(id, params);
-
-    if (!model) {
-        var Ctor = _ctors[id];
-        model = new Ctor();
-        model._init(id, params, data);
-
-        ns.Model.store(model);
-    } else if (data) {
-        //  Модель уже существует, а мы пытаемся создать такую же, но с непустой data.
-        //  FIXME: Все же непонятно, что нужно делать.
-        //  Может быть, нужно передавать { silent: true }?
-        model.setData(data);
-        /// throw Error('Model already exists');
-    }
-
-    return model;
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 /**
  * Returns model's info
  * @param {String} id Model ID.
@@ -376,6 +346,7 @@ ns.Model.prototype.getData = function() {
  * @param {*} data Новые данные.
  * @param {Object} [options] Флаги.
  * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
+ * @returns {ns.Model}
  */
 ns.Model.prototype.setData = function(data, options) {
     if (data) {
@@ -396,6 +367,7 @@ ns.Model.prototype.setData = function(data, options) {
         }
     }
 
+    return this;
 };
 
 ns.Model.prototype.getError = function() {
@@ -443,39 +415,30 @@ ns.Model.prototype.getRequestParams = function() {
 //  Работа с кэшем.
 
 /**
- * Возвращает модель из кеша.
- * @param {String} id Название модели.
- * @param {String|Object} key Ключ(string) или параметры(object) модели.
+ * Models factory. Returns existent instance or creates new.
  * @static
- * @return {ns.Model}
+ * @param {String} id name.
+ * @param {String|Object} params key(string) or params(object).
+ * @returns {ns.Model}
  */
-ns.Model.get = function(id, key) {
+ns.Model.get = function(id, params) {
     if (!(id in _infos)) {
         throw new Error('[ns.Model] "' + id + '" is not defined');
     }
-    key = (typeof key === 'string') ? key : ns.Model.key(id, key);
 
-    return _cache[id][key];
-};
+    var key = (typeof params === 'string') ? params : ns.Model.key(id, params);
+    var model = _cache[id][key];
 
-//  Сохраняем модель в кэше.
-ns.Model.store = function(model) {
-    if ( model.isDo() ) {
-        return;
+    if (!model) {
+        var Ctor = _ctors[id];
+        model = new Ctor();
+        model._init(id, params);
+
+        storeModel(model);
+
     }
 
-    var id = model.id;
-    var key = model.key;
-
-    var cached = _cache[id][key];
-    if (!cached) {
-        _cache[id][key] = model;
-    } else {
-        //  NOTE: Почему тут нельзя просто заменить старую модель на новую.
-        //  Потому, что в этом случае все, кто был подписан на события от старой модели
-        //  не смогут переподписаться на новую модель.
-        cached.data = model.data;
-    }
+    return model;
 };
 
 ns.Model.destroy = function(model) {
@@ -557,6 +520,24 @@ ns.Model.prototype.prepareRequest = function(requestID) {
 
     return this;
 };
+
+/**
+ * Stores model in cache.
+ * @param {ns.Model} model
+ */
+function storeModel(model) {
+    if ( model.isDo() ) {
+        return;
+    }
+
+    var id = model.id;
+    var key = model.key;
+
+    var cached = _cache[id][key];
+    if (!cached) {
+        _cache[id][key] = model;
+    }
+}
 
 // @chestozo: куда-то хочется вынести это...
 if(window['mocha']) {

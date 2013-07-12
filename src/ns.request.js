@@ -374,8 +374,6 @@ Request.prototype.extract = function(models, response) {
             model.setError(error);
         }
 
-        ns.Model.store(model);
-
         // сообщаем менеджеру о завершении запроса этой модели
         // это не означает, что завершится весь ns.request
         ns.request.Manager.done(model);
@@ -458,9 +456,7 @@ function models2params(models) {
             if (item.model && item.model instanceof ns.Model) {
                 models.push(item.model);
             } else {
-                // можно не использовать if (!model.get()) { model.create() }
-                // model.create все это умеет делать
-                models.push(ns.Model.create(item.id, item.params));
+                models.push(ns.Model.get(item.id, item.params));
             }
         }
 

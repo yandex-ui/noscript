@@ -46,7 +46,7 @@ describe('ns.View', function() {
             this.params = {p: 1};
             this.modelData = 'modeldata' + Math.random();
 
-            this.model = ns.Model.create('test-getModel', this.params);
+            this.model = ns.Model.get('test-getModel', this.params);
             this.model.setData(this.modelData);
 
             this.view = ns.View.create('test-getModel', this.params);
@@ -205,9 +205,9 @@ describe('ns.View', function() {
             });
 
             it('required models are valid, optional ones — invalid', function() {
-                var a = ns.Model.create('a', { id: 1 });
-                var b = ns.Model.create('b', { id: 2 });
-                var c = ns.Model.create('c', { id: 3 });
+                var a = ns.Model.get('a', { id: 1 });
+                var b = ns.Model.get('b', { id: 2 });
+                var c = ns.Model.get('c', { id: 3 });
 
                 a.setData({ data: 'a' });
                 b.setError({ error: 'b invalid' });
@@ -219,9 +219,9 @@ describe('ns.View', function() {
             });
 
             it('required model is invalid, the rest is valid', function() {
-                var a = ns.Model.create('a', { id: 1 });
-                var b = ns.Model.create('b', { id: 2 });
-                var c = ns.Model.create('c', { id: 3 });
+                var a = ns.Model.get('a', { id: 1 });
+                var b = ns.Model.get('b', { id: 2 });
+                var c = ns.Model.get('c', { id: 3 });
 
                 a.setError({ error: 'a invalid' });
                 b.setData({ data: 'b' });
@@ -232,9 +232,9 @@ describe('ns.View', function() {
             });
 
             it('render errors also', function() {
-                var a = ns.Model.create('a', { id: 1 });
-                var b = ns.Model.create('b', { id: 2 });
-                var c = ns.Model.create('c', { id: 3 });
+                var a = ns.Model.get('a', { id: 1 });
+                var b = ns.Model.get('b', { id: 2 });
+                var c = ns.Model.get('c', { id: 3 });
 
                 a.setData({ data: 'a' });
                 b.setError({ error: 'b invalid' });
@@ -478,7 +478,7 @@ describe('ns.View', function() {
                 ns.Model.define('async-view-model');
 
                 // set first data to model
-                var model = ns.Model.create('async-view-model', {}, {data: true});
+                var model = ns.Model.get('async-view-model', {}).setData({data: true});
 
                 var APP = ns.View.create('app');
 

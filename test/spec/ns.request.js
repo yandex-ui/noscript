@@ -159,7 +159,7 @@ describe('no.request.js', function() {
             beforeEach(function() {
                 ns.Model.define('test-model-none');
 
-                this.model = ns.Model.create('test-model-none');
+                this.model = ns.Model.get('test-model-none');
                 this.promise = no.request('test-model-none');
             });
 
@@ -213,7 +213,7 @@ describe('no.request.js', function() {
         describe('STATUS.OK', function() {
 
             beforeEach(function() {
-                var model = ns.Model.create('test-model');
+                var model = ns.Model.get('test-model');
                 model.setData(true);
             });
 
@@ -278,7 +278,7 @@ describe('no.request.js', function() {
         describe('STATUS.ERROR', function() {
 
             beforeEach(function() {
-                var model = ns.Model.create('test-model');
+                var model = ns.Model.get('test-model');
                 model.status = model.STATUS.ERROR;
             });
 
@@ -300,7 +300,7 @@ describe('no.request.js', function() {
         describe('STATUS_LOADING', function() {
 
             beforeEach(function() {
-                var model = ns.Model.create('test-model');
+                var model = ns.Model.get('test-model');
                 model.status = model.STATUS_LOADING;
                 model.promise = new no.Promise();
             });
@@ -351,7 +351,7 @@ describe('no.request.js', function() {
             beforeEach(function() {
                 ns.Model.define('test-model-failed');
 
-                this.model = ns.Model.create('test-model-failed');
+                this.model = ns.Model.get('test-model-failed');
                 this.model.status = this.model.STATUS_FAILED;
             });
 

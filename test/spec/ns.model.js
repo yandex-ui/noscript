@@ -108,7 +108,7 @@ describe('ns.Model', function() {
                     }
                 }, parent);
 
-                this.model = ns.Model.create('child', {});
+                this.model = ns.Model.get('child', {});
             });
 
             afterEach(function() {
@@ -139,29 +139,24 @@ describe('ns.Model', function() {
         describe('create', function() {
 
             it('should init model key', function() {
-                var model = ns.Model.create('m1', {p1: 1, p3: 3});
+                var model = ns.Model.get('m1', {p1: 1, p3: 3});
 
                 expect(model.key)
                     .to.be('model=m1&p1=1&p2=2&p3=3&p4=foo');
             });
 
             it('should init model info', function() {
-                var model = ns.Model.create('m1', {p1: 1, p3: 4});
+                var model = ns.Model.get('m1', {p1: 1, p3: 4});
 
                 expect(model.info)
                     .to.have.keys(['params', 'events', 'pNames', 'isDo', 'isCollection']);
             });
 
-            it('should update data in existing model', function() {
-                var old = ns.Model.create('m1', {p1: 1, p3: 5});
-
-                sinon.spy(old, 'setData');
-
-                var model = ns.Model.create('m1', {p1: 1, p3: 5}, {foo: 1});
+            it('should return cached model', function() {
+                var old = ns.Model.get('m1', {p1: 1, p3: 5});
+                var model = ns.Model.get('m1', {p1: 1, p3: 5});
 
                 expect(model).to.be(old);
-
-                expect(old.setData.calledWith({foo: 1})).to.be.ok();
             });
 
         });
@@ -259,7 +254,7 @@ describe('ns.Model', function() {
         describe('_reset', function() {
 
             beforeEach(function() {
-                this.model = ns.Model.create('m1', {p1: 1, p2: 2, p3: 3, p4: 4}, {foo: 'bar'});
+                this.model = ns.Model.get('m1', {p1: 1, p2: 2, p3: 3, p4: 4}).setData({foo: 'bar'});
             });
 
             it('should null all properties', function() {
@@ -309,7 +304,7 @@ describe('ns.Model', function() {
         describe('setData', function() {
 
             beforeEach(function() {
-                this.model = ns.Model.create('m1', {p1: 1, p3: Math.random()});
+                this.model = ns.Model.get('m1', {p1: 1, p3: Math.random()});
                 this.data = {foo: 'bar'};
             });
 
@@ -401,12 +396,12 @@ describe('ns.Model', function() {
 
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
-                this.model = ns.Model.create('split1', {p1: 1, p2: 2}, this.data);
+                this.model = ns.Model.get('split1', {p1: 1, p2: 2}).setData(this.data);
             });
 
             it('should return model\'s data', function() {
                 var data = {foo: 'bar'};
-                var model = ns.Model.create('m1', {p1: 1, p3: 2});
+                var model = ns.Model.get('m1', {p1: 1, p3: 2});
                 model.setData(data);
 
                 expect( model.getData() )
@@ -414,7 +409,7 @@ describe('ns.Model', function() {
             });
 
             it('should return no data if model is invalid', function() {
-                var model = ns.Model.create('m1', {p1: 1, p3: 2});
+                var model = ns.Model.get('m1', {p1: 1, p3: 2});
 
                 expect( model.getData() )
                     .to.be(null);
@@ -454,7 +449,7 @@ describe('ns.Model', function() {
                     events: this.eventsDeclaration
                 });
 
-                this.model = ns.Model.create('defined-events-2');
+                this.model = ns.Model.get('defined-events-2');
                 this.model.setData({data: 1});
             });
 

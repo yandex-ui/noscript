@@ -82,14 +82,14 @@ describe('ns.ViewCollection', function() {
                 }
             });
 
-            this.model = ns.Model.create('m-collection');
+            this.model = ns.Model.get('m-collection');
             // insert first item
             this.model.setData([
-                ns.Model.create('m-collection-item', {p: 1}, {data: 1})
+                ns.Model.get('m-collection-item', {p: 1}).setData({data: 1})
             ]);
 
             ns.Model.define('wrap-model');
-            ns.Model.create('wrap-model', {}, {data: true});
+            ns.Model.get('wrap-model', {}).setData({data: true});
 
             // define views
             ns.View.define('app');
@@ -124,7 +124,7 @@ describe('ns.ViewCollection', function() {
                 .start()
                 .done(function() {
                     // set fake data to invalidate wrap-view
-                    ns.Model.create('wrap-model').set('.fake', 1);
+                    ns.Model.get('wrap-model').set('.fake', 1);
 
                     // start update to redraw wrap-view
                     new ns.Update(this.APP, layout, layoutParams)
@@ -181,10 +181,10 @@ describe('ns.ViewCollection', function() {
         describe('insert new model-item', function() {
 
             beforeEach(function(finish) {
-                this.model = ns.Model.create('m-collection');
+                this.model = ns.Model.get('m-collection');
                 // insert first item
                 this.model.setData([
-                    ns.Model.create('m-collection-item', {p: 1}, {data: 1})
+                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1})
                 ]);
 
                 this.APP = ns.View.create('app');
@@ -197,7 +197,7 @@ describe('ns.ViewCollection', function() {
                         this.collectionViewNode1 = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
 
                         // insert another model-item in collection
-                        this.model.insert([ns.Model.create('m-collection-item', {p: 2})]);
+                        this.model.insert([ns.Model.get('m-collection-item', {p: 2})]);
 
                         // start update to redraw views
                         var layout = ns.layout.page('app', {});
@@ -233,11 +233,11 @@ describe('ns.ViewCollection', function() {
 
         describe('change in the root model of ModelCollection', function() {
             beforeEach(function(finish) {
-                var model = ns.Model.create('m-collection');
+                var model = ns.Model.get('m-collection');
                 // insert first item
                 model.setData([
-                    ns.Model.create('m-collection-item', {p: 1}, {data: 1}),
-                    ns.Model.create('m-collection-item', {p: 2}, {data: 2})
+                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
+                    ns.Model.get('m-collection-item', {p: 2}).setData({data: 2})
                 ]);
 
                 this.APP = ns.View.create('app');

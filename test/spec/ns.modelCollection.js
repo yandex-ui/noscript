@@ -74,13 +74,13 @@ describe('ns.ModelCollection', function() {
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
-                this.model = ns.Model.create('mc0', { id: Math.random() });
+                this.model = ns.Model.get('mc0', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
 
                 this.models = this.model.models;
 
-                this.modelCollection = ns.Model.create('mc1', { id: Math.random() });
+                this.modelCollection = ns.Model.get('mc1', { id: Math.random() });
             });
 
             afterEach(function() {
@@ -188,15 +188,15 @@ describe('ns.ModelCollection', function() {
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
-                this.model = ns.Model.create('mc0', { id: Math.random() });
-                this.modelEmpty = ns.Model.create('mc0', { id: Math.random() });
+                this.model = ns.Model.get('mc0', { id: Math.random() });
+                this.modelEmpty = ns.Model.get('mc0', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
                 this.models = this.model.models;
 
-                this.item1 = ns.Model.create('split1-item', { id: Math.random() }, { id: 100, value: 'item1' });
-                this.item2 = ns.Model.create('split1-item', { id: Math.random() }, { id: 101, value: 'item2' });
-                this.item3 = ns.Model.create('split1-item', { id: Math.random() }, { id: 103, value: 'item3' });
+                this.item1 = ns.Model.get('split1-item', { id: Math.random() }).setData({ id: 100, value: 'item1' });
+                this.item2 = ns.Model.get('split1-item', { id: Math.random() }).setData({ id: 101, value: 'item2' });
+                this.item3 = ns.Model.get('split1-item', { id: Math.random() }).setData({ id: 103, value: 'item3' });
 
                 this.packItems = [this.item1, this.item2, this.item3];
             });
@@ -295,7 +295,7 @@ describe('ns.ModelCollection', function() {
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
-                this.model = ns.Model.create('mc0', { id: Math.random() });
+                this.model = ns.Model.get('mc0', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
 
@@ -351,7 +351,7 @@ describe('ns.ModelCollection', function() {
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
-                this.model = ns.Model.create('mc0', { id: Math.random() });
+                this.model = ns.Model.get('mc0', { id: Math.random() });
 
                 this.model.trigger = sinon.spy();
                 this.model.setData(this.data, { silent: true });

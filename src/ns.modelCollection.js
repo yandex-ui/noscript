@@ -80,7 +80,7 @@ ns.ModelCollection.prototype._splitModels = function(items) {
 
         // идентификатор подмодели берется из info.model_id
         // он коллецкия может содержать модели только одного вида
-        var model = ns.Model.create(info.model_id, params, item);
+        var model = ns.Model.get(info.model_id, params).setData(item);
 
         // при обновлении timestamp внутренней модели обновим и у внешней
         model.on('ns-model-touched', function() {

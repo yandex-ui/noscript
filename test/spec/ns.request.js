@@ -1,10 +1,9 @@
-describe('no.request.js', function() {
+describe('ns.request.js', function() {
 
-    describe('no.request()', function() {
+    describe('ns.request()', function() {
 
         beforeEach(function() {
-            this._requestModels = no.request.models;
-            no.request.models = sinon.spy();
+            sinon.stub(ns.request, 'models', no.nop);
 
             ns.Model.define('test-model');
             ns.Model.define('test-model2');
@@ -16,81 +15,89 @@ describe('no.request.js', function() {
         });
 
         afterEach(function() {
-            no.request.models = this._requestModels
+            ns.request.models.restore();
         });
 
-        describe('no.request("modelName")', function() {
+        describe('ns.request("modelName")', function() {
 
-            it('should call no.request.models once', function() {
-                no.request('test-model');
+            it('should call ns.request.models once', function() {
+                ns.request('test-model');
 
-                expect(no.request.models.calledOnce).to.be.ok();
+                expect(ns.request.models.calledOnce).to.be.ok();
             });
 
-            it('should call no.request.models with requested model', function() {
-                no.request('test-model');
+            it('should call ns.request.models with requested model', function() {
+                ns.request('test-model');
 
                 var model = ns.Model.get('test-model');
-                expect(no.request.models.calledWithExactly([model])).to.be.ok();
+                expect(
+                    ns.request.models.calledWith([model])
+                ).to.be.ok();
             });
         });
 
-        describe('no.request("modelName", params)', function() {
+        describe('ns.request("modelName", params)', function() {
 
             beforeEach(function() {
-                no.request('test-model-with-params', {id: 1});
+                ns.request('test-model-with-params', {id: 1});
             });
 
-            it('should call no.request.models once', function() {
-                expect(no.request.models.calledOnce).to.be.ok();
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models.calledOnce).to.be.ok();
             });
 
-            it('should call no.request.models with requested model', function() {
+            it('should call ns.request.models with requested model', function() {
                 var model = ns.Model.get('test-model-with-params', {id: 1});
-                expect(no.request.models.calledWithExactly([model])).to.be.ok();
+                expect(
+                    ns.request.models.calledWith([model])
+                ).to.be.ok();
             });
         });
 
-        describe('no.request( ["modelName1", "modelName2"] )', function() {
+        describe('ns.request( ["modelName1", "modelName2"] )', function() {
 
             beforeEach(function() {
-                no.request(['test-model', 'test-model-with-params']);
+                ns.request(['test-model', 'test-model-with-params']);
             });
 
-            it('should call no.request.models once', function() {
-                expect(no.request.models.calledOnce).to.be.ok();
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models.calledOnce).to.be.ok();
             });
 
-            it('should call no.request.models with requested models', function() {
+            it('should call ns.request.models with requested models', function() {
                 var model1 = ns.Model.get('test-model');
                 var model2 = ns.Model.get('test-model-with-params', {});
 
-                expect(no.request.models.calledWithExactly([model1, model2])).to.be.ok();
+                expect(
+                    ns.request.models.calledWith([model1, model2])
+                ).to.be.ok();
             });
         });
 
-        describe('no.request( ["modelName1", "modelName2"], params )', function() {
+        describe('ns.request( ["modelName1", "modelName2"], params )', function() {
 
             beforeEach(function() {
-                no.request(['test-model', 'test-model-with-params'], {id: 1});
+                ns.request(['test-model', 'test-model-with-params'], {id: 1});
             });
 
-            it('should call no.request.models once', function() {
-                expect(no.request.models.calledOnce).to.be.ok();
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models.calledOnce).to.be.ok();
             });
 
-            it('should call no.request.models with requested models', function() {
+            it('should call ns.request.models with requested models', function() {
                 var model1 = ns.Model.get('test-model');
                 var model2 = ns.Model.get('test-model-with-params', {id: 1});
 
-                expect(no.request.models.calledWithExactly([model1, model2])).to.be.ok();
+                expect(
+                    ns.request.models.calledWith([model1, model2])
+                ).to.be.ok();
             });
         });
 
-        describe('no.request( [{id: "modelName1"}] )', function() {
+        describe('ns.request( [{id: "modelName1"}] )', function() {
 
             beforeEach(function() {
-                no.request([
+                ns.request([
                     {
                         id: 'test-model'
                     },
@@ -103,41 +110,43 @@ describe('no.request.js', function() {
                 ]);
             });
 
-            it('should call no.request.models once', function() {
-                expect(no.request.models.calledOnce).to.be.ok();
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models.calledOnce).to.be.ok();
             });
 
-            it('should call no.request.models with requested models', function() {
+            it('should call ns.request.models with requested models', function() {
                 var model1 = ns.Model.get('test-model');
                 var model2 = ns.Model.get('test-model-with-params', {id: 2});
 
-                expect(no.request.models.calledWithExactly([model1, model2])).to.be.ok();
+                expect(
+                    ns.request.models.calledWith([model1, model2])
+                ).to.be.ok();
             });
         });
 
     });
 
-    describe('no.forcedRequest', function() {
+    describe('ns.forcedRequest', function() {
 
         beforeEach(function() {
             ns.Model.define('test-forcedRequest');
-            sinon.stub(no.request, 'models');
+            sinon.stub(ns.request, 'models', no.nop);
         });
 
         afterEach(function() {
-            no.request.models.restore();
+            ns.request.models.restore();
         });
 
-        it('should call no.request.models with "forced" flag', function() {
-            no.forcedRequest('test-forcedRequest');
+        it('should call ns.request.models with "forced" flag', function() {
+            ns.forcedRequest('test-forcedRequest');
 
-            expect(no.request.models.getCall(0).args[1]).to.be(true);
+            expect(
+                ns.request.models.getCall(0).args[1]['forced']
+            ).to.be(true);
         });
     });
 
     describe('no.reques.models()', function(){
-        // sinon.useFakeXMLHttpRequest() гадит в window
-        mocha.setup({ignoreLeaks: true});
 
         beforeEach(function() {
             ns.Model.define('test-model');
@@ -160,11 +169,7 @@ describe('no.request.js', function() {
                 ns.Model.define('test-model-none');
 
                 this.model = ns.Model.get('test-model-none');
-                this.promise = no.request('test-model-none');
-            });
-
-            afterEach(function() {
-                this.model.invalidate();
+                this.promise = ns.request('test-model-none');
             });
 
             it('should create http request for model', function() {
@@ -184,10 +189,6 @@ describe('no.request.js', function() {
                 expect(this.model.retries).to.be(1);
             });
 
-            it('should set status to STATUS_LOADING', function() {
-                expect(this.model.status).to.be(this.model.STATUS_LOADING);
-            });
-
             it('should set requestID', function() {
                 expect(this.model.requestID).to.be.ok();
             });
@@ -201,9 +202,11 @@ describe('no.request.js', function() {
                 this.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
-                    JSON.stringify([
-                        {result: true}
-                    ])
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
                 );
 
                 expect(result).to.be.ok();
@@ -219,13 +222,13 @@ describe('no.request.js', function() {
 
             describe('regular', function() {
                 it('should not create http request for model', function() {
-                    no.request('test-model');
+                    ns.request('test-model');
                     expect(this.requests.length).to.be(0);
                 });
 
                 it('should resolve promise immediately for model', function() {
                     var result = false;
-                    no.request('test-model').then(function() {
+                    ns.request('test-model').then(function() {
                         result = true;
                     });
 
@@ -236,7 +239,7 @@ describe('no.request.js', function() {
             describe('forced', function() {
 
                 beforeEach(function() {
-                    this.requestPromise = no.forcedRequest('test-model');
+                    this.requestPromise = ns.forcedRequest('test-model');
                 });
 
                 afterEach(function() {
@@ -265,9 +268,11 @@ describe('no.request.js', function() {
                     this.requests[0].respond(
                         200,
                         {"Content-Type": "application/json"},
-                        JSON.stringify([
-                            {result: true}
-                        ])
+                        JSON.stringify({
+                            models: [
+                                {data: true}
+                            ]
+                        })
                     );
 
                     expect(result).to.be.ok();
@@ -275,6 +280,7 @@ describe('no.request.js', function() {
             });
         });
 
+        /*
         describe('STATUS.ERROR', function() {
 
             beforeEach(function() {
@@ -352,11 +358,7 @@ describe('no.request.js', function() {
                 ns.Model.define('test-model-failed');
 
                 this.model = ns.Model.get('test-model-failed');
-                this.model.status = this.model.STATUS_FAILED;
-            });
-
-            afterEach(function() {
-                this.model.invalidate();
+                this.model.status = ns.M.STATUS.FAILED;
             });
 
             describe('common', function() {
@@ -366,7 +368,7 @@ describe('no.request.js', function() {
                         return false;
                     });
 
-                    this.promise = no.request.models([this.model]);
+                    this.promise = ns.request.models([this.model]);
                 });
 
                 it('should call model.canRetry', function() {
@@ -384,7 +386,7 @@ describe('no.request.js', function() {
                     this.model.canRetry = function() {
                         return false;
                     };
-                    this.promise = no.request.models([this.model]);
+                    this.promise = ns.request.models([this.model]);
                 });
 
                 it('should not create http request', function() {
@@ -411,15 +413,11 @@ describe('no.request.js', function() {
                     this.model.canRetry = function() {
                         return true;
                     };
-                    this.promise = no.request.models([this.model]);
+                    this.promise = ns.request.models([this.model]);
                 });
 
                 it('should create http request', function() {
                     expect(this.requests.length).to.be(1);
-                });
-
-                it('should set status to STATUS_LOADING', function() {
-                    expect(this.model.status).to.be(this.model.STATUS_LOADING);
                 });
 
                 it('should not resolve promise immediately', function() {
@@ -433,14 +431,14 @@ describe('no.request.js', function() {
             });
 
         });
+        */
 
-        mocha.setup({ignoreLeaks: false});
     });
 
     describe('addRequestParams', function() {
 
         beforeEach(function() {
-            sinon.stub(no, 'http', function() {
+            sinon.stub(ns, 'http', function() {
                 return new no.Promise();
             });
 
@@ -450,29 +448,29 @@ describe('no.request.js', function() {
                 a: 1,
                 b: 2
             };
-            no.request.requestParams = no.extend({}, this.originalParams);
-            sinon.spy(no.request, 'addRequestParams');
+            ns.request.requestParams = no.extend({}, this.originalParams);
+            sinon.spy(ns.request, 'addRequestParams');
 
-            no.request('test-model-addRequestParams');
+            ns.request('test-model-addRequestParams');
         });
 
         afterEach(function() {
-            no.request.addRequestParams.restore();
-            no.http.restore();
+            ns.request.addRequestParams.restore();
+            ns.http.restore();
         });
 
-        it('request should call no.request.addRequestParams', function() {
-            expect(no.request.addRequestParams.calledOnce).to.be.ok();
+        it('request should call ns.request.addRequestParams', function() {
+            expect(ns.request.addRequestParams.calledOnce).to.be.ok();
         });
 
-        it('request should add no.request.requestParams to xhr.params', function() {
-            for (var prop in no.request.requestParams) {
-                expect(no.http.getCall(0).args[1]).to.have.property(prop, no.request.requestParams[prop]);
+        it('request should add ns.request.requestParams to xhr.params', function() {
+            for (var prop in ns.request.requestParams) {
+                expect(ns.http.getCall(0).args[1]).to.have.property(prop, ns.request.requestParams[prop]);
             }
         });
 
-        it('request should not modify no.request.requestParams', function() {
-            expect(no.request.requestParams).to.eql(this.originalParams);
+        it('request should not modify ns.request.requestParams', function() {
+            expect(ns.request.requestParams).to.eql(this.originalParams);
         });
 
     });
@@ -488,23 +486,27 @@ describe('no.request.js', function() {
 
                 var promises = this.promises = [];
 
-                sinon.stub(no, 'http', function() {
+                sinon.stub(ns, 'http', function() {
                     var promise = new no.Promise();
                     promises.push(promise);
                     return promise;
                 });
 
-                this.request1 = no.request('test-model-two-equal-requests');
-                this.request2 = no.request('test-model-two-equal-requests');
+                this.request1 = ns.request('test-model-two-equal-requests');
+                this.request2 = ns.request('test-model-two-equal-requests');
 
-                this.promises[0].resolve([{result: true}]);
+                this.promises[0].resolve({
+                    models: [
+                        {data: true}
+                    ]
+                });
             });
 
             afterEach(function() {
                 delete this.request1;
                 delete this.request2;
                 delete this.promises;
-                no.http.restore();
+                ns.http.restore();
             });
 
             it('resolve first request', function() {
@@ -530,21 +532,21 @@ describe('no.request.js', function() {
 
                 var promises = this.promises = [];
 
-                sinon.stub(no, 'http', function() {
+                sinon.stub(ns, 'http', function() {
                     var promise = new no.Promise();
                     promises.push(promise);
                     return promise;
                 });
 
-                this.request1 = no.request('test-model-two-equal-requests');
-                this.request2 = no.forcedRequest('test-model-two-equal-requests');
+                this.request1 = ns.request('test-model-two-equal-requests');
+                this.request2 = ns.forcedRequest('test-model-two-equal-requests');
             });
 
             afterEach(function() {
                 delete this.request1;
                 delete this.request2;
                 delete this.promises;
-                no.http.restore();
+                ns.http.restore();
             });
 
             it('should create two requests', function() {
@@ -552,33 +554,41 @@ describe('no.request.js', function() {
             });
 
             it('should not resolve first promise after first response', function() {
-                this.promises[0].resolve([
-                    {result: true}
-                ]);
+                this.promises[0].resolve({
+                    models: [
+                        {data: true}
+                    ]
+                });
 
                 expect(promiseIsResolved(this.request1)).to.be(false);
             });
 
             it('should not resolve second promise after first response', function() {
-                this.promises[0].resolve([
-                    {result: true}
-                ]);
+                this.promises[0].resolve({
+                    models: [
+                        {data: true}
+                    ]
+                });
 
                 expect(promiseIsResolved(this.request2)).to.be(false);
             });
 
             it('should resolve first promise after second response', function() {
-                this.promises[1].resolve([
-                    {result: 'second response1'}
-                ]);
+                this.promises[1].resolve({
+                    models: [
+                        {data: 'second response1'}
+                    ]
+                });
 
                 expect(promiseIsResolved(this.request1)).to.be(true);
             });
 
             it('should resolve second promise after second response', function() {
-                this.promises[1].resolve([
-                    {result: 'second response2'}
-                ]);
+                this.promises[1].resolve({
+                    models: [
+                        {data: 'second response2'}
+                    ]
+                });
 
                 expect(promiseIsResolved(this.request2)).to.be(true);
             });

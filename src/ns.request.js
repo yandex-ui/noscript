@@ -152,7 +152,16 @@ ns.request.Manager = {
             }
 
         } else {
-            if (model.isValid() && !forced) {
+            if (model.isValid()) {
+
+                // модель валидна, но запрос форсирован и это не этот же запрос
+                // проверка model.requestID !== requestId нужна, чтобы зарезолвить промис после окончания запроса
+                // иначе forcedModel будет валида, но будет перезапрашиваться из-за forced === true
+                if (forced && model.requestID !== requestId) {
+                    this._createRequest(model, requestId);
+                    return true;
+                }
+
                 // если модель валидна и запрос не форсирован - ничего не деалем
                 return false;
 
@@ -279,7 +288,7 @@ Request.prototype.request = function(loading, requesting) {
         ns.request.addRequestParams(params);
         // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
         // мог зарезолвится без завершения http-запроса
-        httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params, 'POST'); // FIXME: Урл к серверной ручке.
+        httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params, {type: 'POST'});
 
         all = all.concat( requesting.map(model2Promise) );
 

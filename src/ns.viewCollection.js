@@ -163,7 +163,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated) {
             // прекращаем обработку
             return updated;
         }
-    } else if (!this.isValid()) {
+    } else if (!this.isValidSelf()) {
         // если обычный блок не валиден
         updated.sync.push(this);
     }

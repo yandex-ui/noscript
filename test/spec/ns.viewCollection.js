@@ -175,7 +175,78 @@ describe('ns.ViewCollection', function() {
                 }
             });
 
+            sinon.spy(ns.request, 'models');
+
             finish();
+        });
+
+        afterEach(function() {
+            ns.request.models.restore();
+        });
+
+        describe('update model-item', function() {
+
+            beforeEach(function(finish) {
+                ns.Model.get('m-collection')
+                    .setData([
+                        ns.Model.get('m-collection-item', {p: 1}).setData({data: 1})
+                    ]);
+
+                this.APP = ns.View.create('app');
+
+                // first rewdraw
+                var layout = ns.layout.page('app', {});
+                new ns.Update(this.APP, layout, {})
+                    .start()
+                    .done(function() {
+                        this.collectionViewNode1 = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
+                        this.collectionViewItemNode1 = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
+
+                        // update model collection item
+                        ns.Model.get('m-collection-item', {p: 1}).set('.newdata', 1);
+
+                        // start update to redraw views
+                        var layout = ns.layout.page('app', {});
+                        new ns.Update(this.APP, layout, {})
+                            .start()
+                            .done(function() {
+                                finish();
+                            });
+                    }.bind(this));
+            });
+
+            afterEach(function() {
+                delete this.APP;
+                delete this.collectionViewNode1;
+                delete this.collectionViewItemNode1;
+            });
+
+            it('should create view-collection node', function() {
+                expect(this.collectionViewNode1).to.be.an(Node);
+            });
+
+            it('should not request m-collection twice', function() {
+                expect(
+                    ns.request.models.getCall(1).calledWith([])
+                ).to.be.ok();
+            });
+
+            it('view-collection node should be the same after second update', function() {
+                expect(this.collectionViewNode1).to.be(
+                    this.APP.node.getElementsByClassName('ns-view-v-collection')[0]
+                );
+            });
+
+            it('should have one v-collection-item', function() {
+                expect(this.collectionViewNode1.childNodes).to.have.length(1);
+            });
+
+            it('view-collection-item node should not be the same after second update', function() {
+                expect(this.collectionViewItemNode1).to.not.be(
+                    this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0]
+                );
+            });
+
         });
 
         describe('insert new model-item', function() {

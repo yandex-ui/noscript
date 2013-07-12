@@ -443,6 +443,10 @@ ns.Model.get = function(id, params) {
     return model;
 };
 
+/**
+ * Completely destroy model and delete it from cache.
+ * @param {ns.Model} model
+ */
 ns.Model.destroy = function(model) {
     if ( model.isDo() ) {
         return;
@@ -453,8 +457,12 @@ ns.Model.destroy = function(model) {
 
     var cached = _cache[id][key];
     if (cached) {
+        // remove from cache
         delete _cache[id][key];
-        cached.trigger('ns-model-destroyed');
+
+        // invalidate model to unsubsribe it from all listeners
+        model.invalidate();
+        model.trigger('ns-model-destroyed');
     }
 };
 

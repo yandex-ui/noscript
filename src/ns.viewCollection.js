@@ -271,7 +271,7 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
 
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
-    var newNode = ns.byClass('ns-view-' + this.id, node)[0];
+    var newNode = this._extractNode(node);
     var isOuterPlaceholder = $(newNode).hasClass('ns-view-placeholder');
 
     var viewWasInvalid = !this.isValid();

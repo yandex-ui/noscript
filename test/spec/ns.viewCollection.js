@@ -141,7 +141,37 @@ describe('ns.ViewCollection', function() {
 
     });
 
-    describe('redraw on ModelCollection changes', function() {
+    describe('ViewCollection view in case on ModelCollection changes', function() {
+
+        function shouldNotRequestMCollectionTwice() {
+            it('should not request m-collection twice', function() {
+                expect(
+                    ns.request.models.getCall(1).calledWith([])
+                ).to.be.ok();
+            });
+        }
+
+        function shouldSaveVCollectionNode() {
+            it('should save view-collection node', function() {
+                var newVCollectionNode = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
+                expect(newVCollectionNode).to.be(this.vCollectionNodeList[0])
+            });
+        }
+
+        function shouldSaveNVCollectionItemNode(n) {
+            it('should save view-collection-item[' + n + '] node', function() {
+                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[n];
+                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[n])
+            });
+        }
+
+        function shouldHaveNViewColelectionItemNodes(n) {
+            it('should have ' + n + ' view-collection-item nodes', function() {
+                expect(
+                    this.APP.node.getElementsByClassName('ns-view-v-collection-item')
+                ).to.have.length(n)
+            });
+        }
 
         beforeEach(function(finish) {
 
@@ -155,6 +185,12 @@ describe('ns.ViewCollection', function() {
                     p: null
                 }
             });
+
+            // insert items in collection
+            ns.Model.get('m-collection').setData([
+                ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
+                ns.Model.get('m-collection-item', {p: 2}).setData({data: 2})
+            ]);
 
             // define views
             ns.View.define('app');
@@ -177,190 +213,166 @@ describe('ns.ViewCollection', function() {
 
             sinon.spy(ns.request, 'models');
 
-            finish();
+            // initiate first rendering
+            this.APP = ns.View.create('app');
+            var layout = ns.layout.page('app', {});
+            new ns.Update(this.APP, layout, {})
+                .start()
+                .done(function() {
+                    // copy nodes with [].concat(nodes)
+                    this.vCollectionNodeList =  Array.prototype.concat.apply([], this.APP.node.getElementsByClassName('ns-view-v-collection'));
+                    this.vCollectionItemNodeList = Array.prototype.concat.apply([], this.APP.node.getElementsByClassName('ns-view-v-collection-item'));
+
+                    finish();
+                }.bind(this));
         });
 
         afterEach(function() {
             ns.request.models.restore();
+            delete this.APP;
+            delete this.vCollectionNodeList;
+            delete this.vCollectionItemNodeList;
         });
 
-        describe('update model-item', function() {
+        describe('first rendering', function() {
 
-            beforeEach(function(finish) {
-                ns.Model.get('m-collection')
-                    .setData([
-                        ns.Model.get('m-collection-item', {p: 1}).setData({data: 1})
-                    ]);
-
-                this.APP = ns.View.create('app');
-
-                // first rewdraw
-                var layout = ns.layout.page('app', {});
-                new ns.Update(this.APP, layout, {})
-                    .start()
-                    .done(function() {
-                        this.collectionViewNode1 = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
-                        this.collectionViewItemNode1 = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
-
-                        // update model collection item
-                        ns.Model.get('m-collection-item', {p: 1}).set('.newdata', 1);
-
-                        // start update to redraw views
-                        var layout = ns.layout.page('app', {});
-                        new ns.Update(this.APP, layout, {})
-                            .start()
-                            .done(function() {
-                                finish();
-                            });
-                    }.bind(this));
-            });
-
-            afterEach(function() {
-                delete this.APP;
-                delete this.collectionViewNode1;
-                delete this.collectionViewItemNode1;
-            });
-
-            it('should create view-collection node', function() {
-                expect(this.collectionViewNode1).to.be.an(Node);
-            });
-
-            it('should not request m-collection twice', function() {
+            it('should have view-collection node', function() {
                 expect(
-                    ns.request.models.getCall(1).calledWith([])
+                    this.vCollectionNodeList
+                ).to.have.length(1)
+            });
+
+            shouldHaveNViewColelectionItemNodes(2);
+
+            it('should request m-collection once', function() {
+                expect(
+                    ns.request.models.calledWith( [ns.Model.get('m-collection')] )
                 ).to.be.ok();
             });
 
-            it('view-collection node should be the same after second update', function() {
-                expect(this.collectionViewNode1).to.be(
-                    this.APP.node.getElementsByClassName('ns-view-v-collection')[0]
-                );
-            });
-
-            it('should have one v-collection-item', function() {
-                expect(this.collectionViewNode1.childNodes).to.have.length(1);
-            });
-
-            it('view-collection-item node should not be the same after second update', function() {
-                expect(this.collectionViewItemNode1).to.not.be(
-                    this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0]
-                );
-            });
-
         });
 
-        describe('insert new model-item', function() {
+        describe('refresh layout without models changes', function() {
 
             beforeEach(function(finish) {
-                this.model = ns.Model.get('m-collection');
-                // insert first item
-                this.model.setData([
-                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1})
-                ]);
-
-                this.APP = ns.View.create('app');
-
-                // first rewdraw
                 var layout = ns.layout.page('app', {});
                 new ns.Update(this.APP, layout, {})
                     .start()
                     .done(function() {
-                        this.collectionViewNode1 = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
-
-                        // insert another model-item in collection
-                        this.model.insert([ns.Model.get('m-collection-item', {p: 2})]);
-
-                        // start update to redraw views
-                        var layout = ns.layout.page('app', {});
-                        new ns.Update(this.APP, layout, {})
-                            .start()
-                            .done(function() {
-                                finish();
-                            });
-                    }.bind(this));
+                        finish();
+                    });
             });
 
-            afterEach(function() {
-                delete this.APP;
-                delete this.collectionViewNode1;
-                delete this.model;
-            });
-
-            it('should create view-collection node', function() {
-                expect(this.collectionViewNode1).to.be.an(Node);
-            });
-
-            it('view-collection node should be the same after second update', function() {
-                expect(this.collectionViewNode1).to.be(
-                    this.APP.node.getElementsByClassName('ns-view-v-collection')[0]
-                );
-            });
-
-            it('should add v-collection-item when I insert model-item in collection', function() {
-                expect(this.collectionViewNode1.childNodes).to.have.length(2);
-            });
+            shouldNotRequestMCollectionTwice();
+            shouldSaveVCollectionNode();
+            shouldSaveNVCollectionItemNode(0);
+            shouldSaveNVCollectionItemNode(1);
 
         });
 
-        describe('change in the root model of ModelCollection', function() {
+        describe('refresh layout after model-item update', function() {
+
             beforeEach(function(finish) {
-                var model = ns.Model.get('m-collection');
-                // insert first item
-                model.setData([
-                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
-                    ns.Model.get('m-collection-item', {p: 2}).setData({data: 2})
-                ]);
+                // update model collection item
+                ns.Model.get('m-collection-item', {p: 1}).set('.newdata', 1);
 
-                this.APP = ns.View.create('app');
-
-                // first rewdraw
+                // start update to redraw views
                 var layout = ns.layout.page('app', {});
                 new ns.Update(this.APP, layout, {})
                     .start()
                     .done(function() {
-                        this.items = this.APP.views["v-collection"].views;
-
-                        this.nodeOld = this.APP.views["v-collection"].node;
-
-                        this.nodeOld.setAttribute('foo', 'bar');
-
-                        this.nodeItem1Old = this.items["view=v-collection-item&p=1"].node;
-                        this.nodeItem2Old = this.items["view=v-collection-item&p=2"].node;
-
-                        // touching model after a small timeout to guarantee, that
-                        // model and view will have different timeout attribute
-                        window.setTimeout(function() {
-                            model.touch();
-
-                            // start update to redraw a core view
-                            var layout = ns.layout.page('app', {});
-                            new ns.Update(this.APP, layout, {})
-                                .start()
-                                .done(function() {
-                                    finish();
-                                });
-                        }.bind(this), 10);
-                    }.bind(this));
+                        finish();
+                    });
             });
 
-            afterEach(function() {
-                delete this.APP;
-                delete this.nodeOld;
-                delete this.nodeItem1Old;
-                delete this.nodeItem2Old;
+            shouldNotRequestMCollectionTwice();
+            shouldSaveVCollectionNode();
+            shouldHaveNViewColelectionItemNodes(2);
+
+            it('should render new view-collection-item[0] node', function() {
+                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
+                expect(newVCollectionItemNode).to.not.be(this.vCollectionItemNodeList[0])
             });
 
-            it('should have the another node of root view', function() {
-                expect(this.APP.views["v-collection"].node).not.to.be(this.nodeOld);
+            shouldSaveNVCollectionItemNode(1);
+
+        });
+
+        describe('refresh layout after insert new model-item', function() {
+
+            beforeEach(function(finish) {
+                // insert another model-item in collection
+                ns.Model.get('m-collection').insert([ns.Model.get('m-collection-item', {p: 3})]);
+
+                // start update to redraw views
+                var layout = ns.layout.page('app', {});
+                new ns.Update(this.APP, layout, {})
+                    .start()
+                    .done(function() {
+                        finish();
+                    });
             });
 
-            it('should have the same nodes of view-items', function() {
-                var node1new = this.APP.views["v-collection"].views["view=v-collection-item&p=1"].node;
-                var node2new = this.APP.views["v-collection"].views["view=v-collection-item&p=2"].node;
+            shouldNotRequestMCollectionTwice();
+            shouldHaveNViewColelectionItemNodes(3);
+            shouldSaveVCollectionNode();
+            shouldSaveNVCollectionItemNode(0);
+            shouldSaveNVCollectionItemNode(1);
 
-                expect(node1new).to.be(this.nodeItem1Old);
-                expect(node2new).to.be(this.nodeItem2Old);
+        });
+
+        describe('refresh layout after remove model-item', function() {
+
+            beforeEach(function(finish) {
+                // remove model-item from collection
+                ns.Model.get('m-collection').remove(0);
+
+                // start update to redraw views
+                var layout = ns.layout.page('app', {});
+                new ns.Update(this.APP, layout, {})
+                    .start()
+                    .done(function() {
+                        finish();
+                    });
             });
+
+            shouldNotRequestMCollectionTwice();
+            shouldHaveNViewColelectionItemNodes(1);
+            shouldSaveVCollectionNode();
+
+            it('should save view-collection-item[1] node', function() {
+                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
+                // we've removed first item, so new item[0] should be the same with old[1]
+                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
+            });
+
+        });
+
+        describe('refresh layout after model-collection update', function() {
+
+            beforeEach(function(finish) {
+                // touching model after a small timeout to guarantee, that
+                // model and view will have different timeout attribute
+                window.setTimeout(function() {
+                    ns.Model.get('m-collection').touch();
+
+                    // start update to redraw a core view
+                    var layout = ns.layout.page('app', {});
+                    new ns.Update(this.APP, layout, {})
+                        .start()
+                        .done(function() {
+                            finish();
+                        });
+                }.bind(this), 10);
+            });
+
+            it('should render new view-collection node', function() {
+                var newVCollectionNode = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
+                expect(newVCollectionNode).to.not.be(this.vCollectionNodeList[0])
+            });
+
+            shouldSaveNVCollectionItemNode(0);
+            shouldSaveNVCollectionItemNode(1);
 
         });
 

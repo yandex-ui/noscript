@@ -13,7 +13,7 @@ beforeEach(function() {
         if (view.placeholder) {
             clazz += ' ns-view-placeholder';
         }
-        html += '<div class="' + clazz + '" data-key="' + view.key + '">';
+        html += '<div class="' + clazz + '" data-key="' + view.key + '" data-random="' + Math.random() + '">';
         // don't create child views in async state
         if (!view.async) {
             html += genHTML(view.views);

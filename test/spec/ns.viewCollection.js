@@ -219,9 +219,20 @@ describe('ns.ViewCollection', function() {
             new ns.Update(this.APP, layout, {})
                 .start()
                 .done(function() {
-                    // copy nodes with [].concat(nodes)
-                    this.vCollectionNodeList =  Array.prototype.concat.apply([], this.APP.node.getElementsByClassName('ns-view-v-collection'));
-                    this.vCollectionItemNodeList = Array.prototype.concat.apply([], this.APP.node.getElementsByClassName('ns-view-v-collection-item'));
+                    var i, j;
+
+                    // copy nodes for phantom
+                    var vCollection = this.APP.node.getElementsByClassName('ns-view-v-collection');
+                    this.vCollectionNodeList = [];
+                    for (i = 0, j = vCollection.length; i < j; i++) {
+                         this.vCollectionNodeList.push(vCollection[i]);
+                    }
+
+                    var vCollectionItem = this.APP.node.getElementsByClassName('ns-view-v-collection-item');
+                    this.vCollectionItemNodeList = [];
+                    for (i = 0, j = vCollectionItem.length; i < j; i++) {
+                         this.vCollectionItemNodeList.push(vCollectionItem[i]);
+                    }
 
                     finish();
                 }.bind(this));

@@ -136,6 +136,42 @@ describe('ns.Model', function() {
             });
         });
 
+        describe('ns.Model.find():', function() {
+
+            it('should return undefined if model doesn\'t exists', function() {
+                expect(ns.Model.find('m1')).to.be(undefined);
+            });
+
+            it('should return model if exists', function() {
+                var m = ns.Model.get('m1');
+                expect(ns.Model.find('m1')).to.be.ok(m);
+            });
+
+            it('should throw exception if model is not defined', function() {
+                var exists = function() { ns.Model.find('non-exists-model'); };
+                expect(exists).to.throwException();
+            });
+
+        });
+
+        describe('ns.Model.get():', function() {
+
+            it('should always return model', function() {
+                expect(ns.Model.get('m1')).to.not.be(ns.Model);
+            });
+
+            it('should return cached model if exists', function() {
+                var m = ns.Model.get('m1');
+                expect(ns.Model.get('m1')).to.be(m);
+            });
+
+            it('should throw exception if model is not defined', function() {
+                var exists = function() { ns.Model.find('non-exists-model'); };
+                expect(exists).to.throwException();
+            });
+
+        });
+
         describe('create', function() {
 
             it('should init model key', function() {

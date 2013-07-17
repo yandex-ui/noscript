@@ -417,30 +417,42 @@ ns.Model.prototype.getRequestParams = function() {
 //  Работа с кэшем.
 
 /**
- * Models factory. Returns existent instance or creates new.
+ * Models factory. Returns cached instance or creates new.
  * @static
- * @param {String} id name.
- * @param {String|Object} params key(string) or params(object).
+ * @param {String} id Model's ID.
+ * @param {Object} [params] Model's params.
  * @returns {ns.Model}
  */
 ns.Model.get = function(id, params) {
-    if (!(id in _infos)) {
-        throw new Error('[ns.Model] "' + id + '" is not defined');
-    }
-
-    var key = (typeof params === 'string') ? params : ns.Model.key(id, params);
-    var model = _cache[id][key];
+    var model = ns.Model.find(id, params);
 
     if (!model) {
         var Ctor = _ctors[id];
         model = new Ctor();
         model._init(id, params);
 
-        storeModel(model);
-
+        // stores model in cache except do-models
+        if ( !model.isDo() ) {
+            _cache[ id ][ model.key ] = model;
+        }
     }
 
     return model;
+};
+
+/**
+ * Returns cached model instance.
+ * @param {String} id Model's ID.
+ * @param {Object} [params] Model's params
+ * @returns {ns.Model|undefined}
+ */
+ns.Model.find = function(id, params) {
+    if (!(id in _infos)) {
+        throw new Error('[ns.Model] "' + id + '" is not defined');
+    }
+
+    var key = ns.Model.key(id, params);
+    return _cache[id][key];
 };
 
 /**
@@ -530,24 +542,6 @@ ns.Model.prototype.prepareRequest = function(requestID) {
 
     return this;
 };
-
-/**
- * Stores model in cache.
- * @param {ns.Model} model
- */
-function storeModel(model) {
-    if ( model.isDo() ) {
-        return;
-    }
-
-    var id = model.id;
-    var key = model.key;
-
-    var cached = _cache[id][key];
-    if (!cached) {
-        _cache[id][key] = model;
-    }
-}
 
 // @chestozo: куда-то хочется вынести это...
 if(window['mocha']) {

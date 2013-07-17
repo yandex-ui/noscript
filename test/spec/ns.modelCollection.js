@@ -54,7 +54,14 @@ describe('ns.ModelCollection', function() {
             params: {
                 id: null
             },
+            isCollection: true,
+            collectionItemsJpath: '.collectionItemsJpath'
+        });
 
+        ns.Model.define('mc2', {
+            params: {
+                id: null
+            },
             isCollection: true
         });
     });
@@ -189,6 +196,8 @@ describe('ns.ModelCollection', function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
                 this.model = ns.Model.get('mc0', { id: Math.random() });
+                this.modelC = ns.Model.get('mc1', { id: Math.random() });
+                this.modelC2 = ns.Model.get('mc2', { id: Math.random() });
                 this.modelEmpty = ns.Model.get('mc0', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
@@ -204,6 +213,8 @@ describe('ns.ModelCollection', function() {
             afterEach(function() {
                 delete this.data;
                 delete this.model;
+                delete this.modelC;
+                delete this.modelC2;
                 delete this.modelEmpty;
                 delete this.models;
                 delete this.item1;
@@ -250,6 +261,22 @@ describe('ns.ModelCollection', function() {
                 expect(this.models[4].data).to.eql(this.item3.data);
                 expect(this.models[5].data).to.eql(this.data.item[2]);
 
+            });
+
+            it('Collection.getData should return all model\'s data in .collectionItemsJpath, if it\'s exists', function() {
+                this.modelC.insert(this.packItems);
+                this.modelC.status = 'ok';
+                expect(this.modelC.getData().collectionItemsJpath[0]).to.eql(this.item1.getData());
+                expect(this.modelC.getData().collectionItemsJpath[1]).to.eql(this.item2.getData());
+                expect(this.modelC.getData().collectionItemsJpath[2]).to.eql(this.item3.getData());
+            });
+
+            it('Collection.getData should return all model\'s data in .items', function() {
+                this.modelC2.insert(this.packItems);
+                this.modelC2.status = 'ok';
+                expect(this.modelC2.getData().items[0]).to.eql(this.item1.getData());
+                expect(this.modelC2.getData().items[1]).to.eql(this.item2.getData());
+                expect(this.modelC2.getData().items[2]).to.eql(this.item3.getData());
             });
 
             it('should binding `ns-model-changed` event', function() {

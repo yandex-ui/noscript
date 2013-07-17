@@ -16,11 +16,22 @@ ns.ModelCollection.prototype.getData = function() {
     // из моделей её состовляющих
     if ( this.isValid() ) {
         var items = [];
+
         if (this.info.split) {
             // массив с хранилищем данных моделей
             items = no.jpath(this.info.split.items, this.data);
             // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
             items.splice(0, items.length);
+        } else if (this.info.collectionItemsJpath && this.data) {
+            // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
+            no.jpath.set(this.info.collectionItemsJpath, this.data, []);
+            // массив с хранилищем данных моделей
+            items = no.jpath(this.info.collectionItemsJpath, this.data);
+        } else if (this.data) {
+            // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
+            no.jpath.set('.items', this.data, []);
+            // массив с хранилищем данных моделей
+            items = no.jpath('.items', this.data);
         }
 
         // пишем новые
@@ -28,7 +39,6 @@ ns.ModelCollection.prototype.getData = function() {
             items.push( model.getData() );
         });
     }
-
     return this.data;
 };
 

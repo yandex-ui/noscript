@@ -180,7 +180,6 @@ describe('ns.ModelCollection', function() {
                 this.modelCollection.models[0].trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
-
         });
 
         describe('insert', function() {
@@ -190,6 +189,7 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.get('mc0', { id: Math.random() });
                 this.modelEmpty = ns.Model.get('mc0', { id: Math.random() });
+                this.modelEmptyWithoutSplit = ns.Model.get('mc1', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
                 this.models = this.model.models;
@@ -205,11 +205,23 @@ describe('ns.ModelCollection', function() {
                 delete this.data;
                 delete this.model;
                 delete this.modelEmpty;
+                delete this.modelEmptyWithoutSplit;
                 delete this.models;
                 delete this.item1;
                 delete this.item2;
                 delete this.item3;
                 delete this.packItems;
+            });
+
+            it('should insert item in empty collection without split', function() {
+                this.modelEmptyWithoutSplit.insert(this.item1);
+                expect(this.modelEmptyWithoutSplit.models[0].data).to.eql(this.item1.data);
+            });
+
+            it('should insert item in non empty collection without split', function() {
+                this.modelEmptyWithoutSplit.setData({someData: 'a', someOtherData: 'b'});
+                this.modelEmptyWithoutSplit.insert(this.item1);
+                expect(this.modelEmptyWithoutSplit.models[0].data).to.eql(this.item1.data);
             });
 
             it('should insert item', function() {

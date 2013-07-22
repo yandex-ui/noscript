@@ -44,6 +44,7 @@ body {
 }
 #mocha .test pre.error {
     color: #B03911;
+    width: 100%;
 }
 
 #mocha .test.pass .duration {

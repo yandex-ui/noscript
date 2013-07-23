@@ -84,9 +84,7 @@ describe('ns.ViewCollection', function() {
 
             this.model = ns.Model.get('m-collection');
             // insert first item
-            this.model.setData([
-                ns.Model.get('m-collection-item', {p: 1}).setData({data: 1})
-            ]);
+            this.model.insert(ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}));
 
             ns.Model.define('wrap-model');
             ns.Model.get('wrap-model', {}).setData({data: true});
@@ -312,6 +310,13 @@ describe('ns.ViewCollection', function() {
         describe('refresh layout after insert new model-item', function() {
 
             beforeEach(function(finish) {
+                var model = ns.Model.get('m-collection');
+                // insert first item
+                model.insert([
+                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
+                    ns.Model.get('m-collection-item', {p: 2}).setData({data: 2})
+                ]);
+
                 // insert another model-item in collection
                 ns.Model.get('m-collection').insert([ns.Model.get('m-collection-item', {p: 3})]);
 

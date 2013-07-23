@@ -265,7 +265,6 @@ describe('ns.ModelCollection', function() {
 
             it('Collection.getData should return all model\'s data in .collectionItemsJpath, if it\'s exists', function() {
                 this.modelC.insert(this.packItems);
-                this.modelC.status = 'ok';
                 expect(this.modelC.getData().collectionItemsJpath[0]).to.eql(this.item1.getData());
                 expect(this.modelC.getData().collectionItemsJpath[1]).to.eql(this.item2.getData());
                 expect(this.modelC.getData().collectionItemsJpath[2]).to.eql(this.item3.getData());
@@ -273,7 +272,6 @@ describe('ns.ModelCollection', function() {
 
             it('Collection.getData should return all model\'s data in .items', function() {
                 this.modelC2.insert(this.packItems);
-                this.modelC2.status = 'ok';
                 expect(this.modelC2.getData().items[0]).to.eql(this.item1.getData());
                 expect(this.modelC2.getData().items[1]).to.eql(this.item2.getData());
                 expect(this.modelC2.getData().items[2]).to.eql(this.item3.getData());

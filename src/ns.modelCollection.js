@@ -14,23 +14,28 @@ ns.ModelCollection.prototype.getData = function() {
     // это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
-    if ( this.isValid() ) {
+    if (this.isValid()) {
         var items = [];
+
+        // если нет поля data сделаем его
+        if (!this.data) {
+            this.data = {};
+        }
 
         if (this.info.split) {
             // массив с хранилищем данных моделей
             items = no.jpath(this.info.split.items, this.data);
             // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
             items.splice(0, items.length);
-        } else if (this.info.collectionItemsJpath && this.data) {
-            // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
+        } else if (this.info.collectionItemsJpath) {
+            // делаем нужное поле в .data
             no.jpath.set(this.info.collectionItemsJpath, this.data, []);
-            // массив с хранилищем данных моделей
+            // ссылка куда вставлять данные моделей
             items = no.jpath(this.info.collectionItemsJpath, this.data);
-        } else if (this.data) {
-            // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
+        } else {
+            // делаем нужное поле в .data
             no.jpath.set('.items', this.data, []);
-            // массив с хранилищем данных моделей
+            // ссылка куда вставлять данные моделей
             items = no.jpath('.items', this.data);
         }
 
@@ -41,7 +46,6 @@ ns.ModelCollection.prototype.getData = function() {
     }
     return this.data;
 };
-
 
 ns.ModelCollection.prototype._reset = function() {
     ns.Model.prototype._reset.apply(this, arguments);
@@ -238,6 +242,13 @@ ns.ModelCollection.prototype.insert = function(models, index) {
     } else {
         return false;
     }
+
+    // если данных не было, при insert говорим что данные появились
+    if (this.status == this.STATUS.NONE) {
+        this.status = this.STATUS.OK;
+    }
+
+    return true;
 };
 
 /**

@@ -24,6 +24,7 @@ ns.ViewCollection.define = function(id, info) {
 
             } else {
                 info.modelCollectionId = model_id;
+                info.isCollection = true;
             }
         }
     }
@@ -214,7 +215,11 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
                 // Если корневая нода не меняется, то перерендериваем
                 // только невалидные элементы коллекции
                 if (!view.isValid()) {
-                    decl = view._getViewTree(layout, params);
+                    if (view.info.isCollection && view.isValidSelf()) {
+                        decl = view._getPlaceholderTree(layout, params);
+                    } else {
+                        decl = view._getViewTree(layout, params);
+                    }
                 }
             } else {
                 // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все

@@ -296,19 +296,23 @@ describe('ns.ModelCollection', function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
 
                 this.model = ns.Model.get('mc0', { id: Math.random() });
+                this.modelEmpty = ns.Model.get('mc0', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
 
                 this.models = this.model.models;
 
                 this.item1 = this.models[0];
+                this.item2 = this.models[1];
             });
 
             afterEach(function() {
                 delete this.data;
                 delete this.model;
+                delete this.modelEmpty;
                 delete this.models;
                 delete this.item1;
+                delete this.item2;
             });
 
             it('should remove item', function() {
@@ -342,6 +346,25 @@ describe('ns.ModelCollection', function() {
             it('should trigger `ns-remove` event once', function() {
                 this.model.remove(this.item1);
                 expect(this.removeCallback.callCount).to.be(1);
+            });
+
+            it('should automatically remove destroyed models', function() {
+                // Test `setData`-inserted model.
+                ns.Model.destroy(this.item1);
+
+                expect(this.model.models.length).to.be(2);
+                expect(this.removeCallback.callCount).to.be(1);
+
+                // Test `insert`-ed model.
+                this.modelEmpty.insert(this.item2);
+                expect(this.modelEmpty.models.length).to.be(1);
+
+                ns.Model.destroy(this.item2);
+                expect(this.modelEmpty.models.length).to.be(0);
+
+                // `item2` was simultaneously removed from both
+                // `model` and `modelEmpty`.
+                expect(this.removeCallback.callCount).to.be(3);
             });
 
         });

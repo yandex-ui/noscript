@@ -47,6 +47,8 @@ ns.ModelCollection.prototype._bindEvents = function() {
 
     // При уничтожении вложенной модели коллекция выносит останки.
     this.on('ns-model-destroyed', function(e, data) {
+        // Убедимся, что удалился именно элемент коллекции, а не сама коллекция.
+        // Пока это возможно только по наличию data.model в аргументах
         if (data && data.model) {
             this.remove(data.model);
         }

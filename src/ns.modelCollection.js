@@ -39,6 +39,21 @@ ns.ModelCollection.prototype._reset = function() {
 };
 
 /**
+ * Регистрирует обработчики событий.
+ * @private
+ */
+ns.ModelCollection.prototype._bindEvents = function() {
+    ns.Model.prototype._bindEvents.apply(this, arguments);
+
+    // При уничтожении вложенной модели коллекция выносит останки.
+    this.on('ns-model-destroyed', function(e, data) {
+        if (data && data.model) {
+            this.remove(data.model);
+        }
+    });
+};
+
+/**
  * Разбивает данные через jpath описанный в info.split
  * на составные модели
  */

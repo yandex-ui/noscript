@@ -472,9 +472,11 @@ ns.Model.destroy = function(model) {
         // remove from cache
         delete _cache[id][key];
 
+        // notify subscribers about disappearance
+        model.trigger('ns-model-destroyed');
+
         // invalidate model to unsubsribe it from all listeners
         model.invalidate();
-        model.trigger('ns-model-destroyed');
     }
 };
 

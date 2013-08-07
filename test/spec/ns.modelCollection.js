@@ -288,6 +288,33 @@ describe('ns.ModelCollection', function() {
                 expect(this.insertCallback.callCount).to.be(2);
             });
 
+            it('should not insert duplicate models', function() {
+                this.modelEmpty.insert(this.item1);
+                this.modelEmpty.insert([this.item1, this.item2]);
+                expect(this.modelEmpty.models.length).to.be(2);
+                expect(this.modelEmpty.models[0]).to.eql(this.item1);
+                expect(this.modelEmpty.models[1]).to.eql(this.item2);
+            });
+
+            it('should not trigger event on duplicate insertion', function() {
+                this.model.insert(this.item1);
+                this.model.insert(this.item1);
+
+                // 2 is expected since one insertion has already happened.
+                expect(this.insertCallback.callCount).to.be(2);
+            });
+
+            it('should return false for completely duplicate insertion only', function() {
+                this.modelEmpty.insert(this.item1);
+                this.modelEmpty.insert(this.item2);
+
+                var completelyDuplicate = this.modelEmpty.insert([this.item1, this.item2]);
+                var partiallyDuplicate = this.modelEmpty.insert(this.packItems);
+
+                expect(completelyDuplicate).to.be(false);
+                expect(partiallyDuplicate).to.be(true);
+            });
+
         });
 
         describe('remove', function() {

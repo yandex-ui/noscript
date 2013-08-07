@@ -186,33 +186,35 @@ ns.ModelCollection.prototype.clear = function() {
  * @return {Boolean} – признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
+    if (isNaN(index)) {
+        index = this.models.length;
+    }
 
-    index = isNaN(index) ? this.models.length : index;
-
-    // если переданная модель не массив
+    // Для удобства, одиночная модель оборачивается в массив.
     if (!(models instanceof Array)) {
-        // обернем ее в массив
         models = [models];
     }
 
-    models.forEach(function(model) {
-        // вставить можем только модель
-        if (ns.Model.info(model.id)) {
-            this.models.splice(index, 0, model);
-            index++;
+    // Вставить можно только объявленную модель
+    // и повторная вставка модели запрещена
+    var insertion = models.filter(function(model) {
+        return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id);
+    }, this);
 
-            // не забудем подписаться на события
-            this._subscribeSplit(model);
-        }
-    }.bind(this));
+    insertion.forEach(function(model, i) {
+        this.models.splice(index + i, 0, model);
+
+        // не забудем подписаться на события
+        this._subscribeSplit(model);
+    }, this);
 
     // оповестим всех, что вставили подмодели
-    if (models.length) {
-        this.trigger('ns-model-insert', models);
+    if (insertion.length > 0) {
+        this.trigger('ns-model-insert', insertion);
+        return true;
+    } else {
+        return false;
     }
-
-
-    return true;
 };
 
 /**

@@ -88,9 +88,10 @@ ns.ViewCollection.prototype.isModelsValid = function(timestamp) {
         var modelTimestamp = model.timestamp;
         // при сравнении с timestamp модели-коллекции используем timestampSelf,
         // не зависящий от внутренних моделей
-        if (model.isCollection) {
+        if (model.isCollection()) {
             modelTimestamp = model.timestampSelf;
         }
+
         if (
             // Модель является обязательной
             this.info.models[id] === true &&

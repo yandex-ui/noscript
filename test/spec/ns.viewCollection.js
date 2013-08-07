@@ -510,4 +510,65 @@ describe('ns.ViewCollection', function() {
 
     });
 
+
+    describe('ViewCollection.isModelsValid', function() {
+
+        describe('ViewCollection with one ns.ModelCollection and one ns.Model', function() {
+            beforeEach(function() {
+
+                ns.Model.define('model-collection', {
+                    isCollection: true
+                });
+
+                ns.Model.define('model');
+                ns.Model.define('model-item');
+
+
+                ns.View.define('view');
+                ns.ViewCollection.define('view-collection', {
+                    models: ['model-collection', 'model'],
+                    split: {
+                        view_id: 'view'
+                    }
+                });
+
+                ns.Model.get('model-collection').setData([
+                    ns.Model.get('model-item').setData({ foo: 1})
+                ]);
+                ns.Model.get('model').setData({ foo: 1});
+
+                ns.layout.define('app', {
+                    'view-collection': {}
+                });
+
+                this.viewCollection = ns.View.create('view-collection');
+
+                var layout = ns.layout.page('app', {});
+                new ns.Update(this.viewCollection, ns.layout.page('app', {}), {}).start();
+
+            });
+
+            afterEach(function() {
+                delete this.viewCollection;
+            })
+
+            it('view should have valid models', function() {
+                expect(
+                    this.viewCollection.isModelsValid(this.viewCollection.timestamp)
+                ).to.be.ok();
+            });
+
+            it('view should have not valid models after touch model', function(done) {
+                setTimeout(function() {
+                    this.viewCollection.models.model.set('.foo', 2);
+                    expect(
+                        this.viewCollection.isModelsValid(this.viewCollection.timestamp)
+                    ).not.to.be.ok();
+                    done();
+                }.bind(this), 1);
+            });
+        });
+
+
+    });
 });

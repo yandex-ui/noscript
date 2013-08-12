@@ -58,11 +58,11 @@ ns.action.copy = function(existentAction, newAction) {
 // ----------------------------------------------------------------------------------------------------------------- //
 
 /**
- *
- * @param {String} id
- * @param {Object} params
- * @param {Element} node
- * @param {Event} event
+ * Run action by name
+ * @param {String} id Action name
+ * @param {Object} [params] Params
+ * @param {Element} [node]
+ * @param {Event} [event]
  * @return {*}
  */
 ns.action.run = function(id, params, node, event) {

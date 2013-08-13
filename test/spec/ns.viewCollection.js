@@ -554,11 +554,11 @@ describe('ns.ViewCollection', function() {
 
             afterEach(function() {
                 delete this.viewCollection;
-            })
+            });
 
             it('view should have valid models', function() {
                 expect(
-                    this.viewCollection.isModelsValid(this.viewCollection.timestamp)
+                    this.viewCollection.isModelsValidWithVersions()
                 ).to.be.ok();
             });
 
@@ -566,7 +566,7 @@ describe('ns.ViewCollection', function() {
                 setTimeout(function() {
                     this.viewCollection.models.model.set('.foo', 2);
                     expect(
-                        this.viewCollection.isModelsValid(this.viewCollection.timestamp)
+                        this.viewCollection.isModelsValidWithVersions()
                     ).not.to.be.ok();
                     done();
                 }.bind(this), 1);

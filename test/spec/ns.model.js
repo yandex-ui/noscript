@@ -302,7 +302,7 @@ describe('ns.Model', function() {
                 expect(this.model.status).to.be(this.model.STATUS.NONE);
                 expect(this.model.retries).to.be(0);
 
-                expect(this.model.timestamp).to.be(0);
+                expect(this.model.getVersion()).to.be(0);
             });
 
             it('should null all properties with custom status', function() {

@@ -62,9 +62,11 @@ ns.ViewCollection.prototype.isValid = function() {
     return this.isValidSelf() && this.isValidDesc();
 };
 
-ns.ViewCollection.prototype.isValidSelf = function() {
-    return this.isOk() && this.isSubviewsOk() && this.isModelsValid(this.timestamp);
-};
+/**
+ * Check self validity (except items).
+ * @returns {Boolean}
+ */
+ns.ViewCollection.prototype.isValidSelf = ns.View.prototype.isValid;
 
 ns.ViewCollection.prototype.isValidDesc = function() {
     for (var key in this.views) {
@@ -77,19 +79,19 @@ ns.ViewCollection.prototype.isValidDesc = function() {
 
 /**
  * Возвращает true, если все модели валидны.
- * @param {Number} [timestamp] Также проверяем, что кеш модели не свежее переданного timestamp.
+ * @param {Object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
  * @return {Boolean}
  */
-ns.ViewCollection.prototype.isModelsValid = function(timestamp) {
+ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
     var models = this.models;
     for (var id in models) {
-        /** @type ns.Model */
+        /** @type ns.Model|ns.ModelCollection */
         var model = models[id];
-        var modelTimestamp = model.timestamp;
-        // при сравнении с timestamp модели-коллекции используем timestampSelf,
+        var modelVersion = model.getVersion();
+        // при сравнении с версией модели-коллекции используем versionSelf,
         // не зависящий от внутренних моделей
         if (model.isCollection()) {
-            modelTimestamp = model.timestampSelf;
+            modelVersion = model.getSelfVersion();
         }
 
         if (
@@ -99,7 +101,7 @@ ns.ViewCollection.prototype.isModelsValid = function(timestamp) {
                 // модель не валидна
                 !model.isValid() ||
                 // или ее кеш более свежий
-                (timestamp && modelTimestamp > timestamp)
+                (modelsVersions && modelVersion > modelsVersions[id])
             )
         ) {
             return false;
@@ -348,7 +350,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         // событие show будет вызвано, если у view поменяется this._visible
         this._show(events['ns-view-show']);
         events['ns-view-repaint'].push(this);
-        this.timestamp = +new Date();
+        this._safeModelsVersions();
     }
 
     // Будем обновлять вложенные виды

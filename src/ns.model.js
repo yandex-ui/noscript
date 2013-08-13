@@ -57,7 +57,12 @@ ns.Model.prototype._reset = function(status) {
     this.status = status || this.STATUS.NONE;
     this.retries = 0;
 
-    this.timestamp = 0;
+    /**
+     * Data version.
+     * @type {number}
+     * @private
+     */
+    this._version = 0;
 
     /**
      * ModelCollection listeners
@@ -523,10 +528,16 @@ ns.Model.prototype.isCollection = function() {
     return this.info.isCollection;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+/**
+ * Returns data version.
+ * @returns {number}
+ */
+ns.Model.prototype.getVersion = function() {
+    return this._version;
+};
 
 ns.Model.prototype.touch = function() {
-    this.timestamp = +new Date();
+    this._version++;
     this.trigger('ns-model-touched');
 };
 

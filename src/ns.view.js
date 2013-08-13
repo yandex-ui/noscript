@@ -70,7 +70,12 @@ ns.View.prototype._init = function(id, params, async) {
      */
     this.status = this.STATUS.NONE;
 
-    this.timestamp = 0;
+    /**
+     * Save models version to track changes.
+     * @type {object}
+     * @protected
+     */
+    this._modelsVersions = {};
 
     /**
      * jquery-namespace для событий.
@@ -889,15 +894,23 @@ ns.View.prototype.isSubviewsOk = function() {
  * @return {Boolean}
  */
 ns.View.prototype.isValid = function() {
-    return this.isOk() && this.isSubviewsOk() && this.isModelsValid(this.timestamp);
+    return this.isOk() && this.isSubviewsOk() && this.isModelsValidWithVersions();
+};
+
+/**
+ * Returns true if models are valid and not be updated after last view update.
+ * @returns {boolean}
+ */
+ns.View.prototype.isModelsValidWithVersions = function() {
+    return this.isModelsValid(this._modelsVersions);
 };
 
 /**
  * Возвращает true, если все модели валидны.
- * @param {Number} [timestamp] Также проверяем, что кеш модели не свежее переданного timestamp.
+ * @param {Object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
  * @return {Boolean}
  */
-ns.View.prototype.isModelsValid = function(timestamp) {
+ns.View.prototype.isModelsValid = function(modelsVersions) {
     var models = this.models;
     for (var id in models) {
         /** @type ns.Model */
@@ -909,7 +922,7 @@ ns.View.prototype.isModelsValid = function(timestamp) {
                 // модель не валидна
                 !model.isValid() ||
                 // или ее кеш более свежий
-                (timestamp && model.timestamp > timestamp)
+                (modelsVersions && model.getVersion() > modelsVersions[id])
             )
         ) {
             //  FIXME: А не нужно ли тут поменять статус блока?
@@ -1332,7 +1345,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
         //  Все subview теперь валидны.
         this._subviews = {};
 
-        this.timestamp = +new Date();
+        this._safeModelsVersions();
     }
 
     // Если view валидный и не в async-режиме, то вызывается show и repaint
@@ -1355,6 +1368,16 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
         this._apply(function(view, id) {
             view._updateHTML(viewNode, layout[id].views, params, options_next, events);
         });
+    }
+};
+
+/**
+ * Safe models versions to track changes.
+ * @protected
+ */
+ns.View.prototype._safeModelsVersions = function() {
+    for (var modelId in this.models) {
+        this._modelsVersions[modelId] = this.models[modelId].getVersion();
     }
 };
 

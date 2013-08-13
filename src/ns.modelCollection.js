@@ -99,9 +99,9 @@ ns.ModelCollection.prototype._splitModels = function(items) {
         // он коллецкия может содержать модели только одного вида
         var model = ns.Model.get(info.model_id, params).setData(item);
 
-        // при обновлении timestamp внутренней модели обновим и у внешней
+        // при обновлении _version внутренней модели обновим и у внешней
         model.on('ns-model-touched', function() {
-            that.timestamp = this.timestamp;
+            that._version = this._version;
         });
 
         models.push(model);
@@ -142,13 +142,26 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
 };
 
 /**
- * Обновляет timestamp'ы модели
+ * Returns data version (included items version).
+ * @returns {number}
+ */
+ns.ModelCollection.prototype.getSelfVersion = function() {
+    return this._versionSelf;
+};
+
+/**
+ * Обновляет _version модели
  */
 ns.ModelCollection.prototype.touch = function() {
     ns.Model.prototype.touch.apply(this, arguments);
-    // timestampSelf показывает последнее время изменения внешней модели
-    // в то время, как timestamp - последнее время изменения внешней или внутренней модели
-    this.timestampSelf = this.timestamp;
+
+    /**
+     * _versionSelf показывает версию изменений внешней модели
+     * в то время, как _version - последнее время изменения внешней или внутренней модели
+     * @type {*}
+     * @private
+     */
+    this._versionSelf = this._version;
 };
 
 /**

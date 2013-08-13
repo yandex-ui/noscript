@@ -99,9 +99,9 @@ ns.ModelCollection.prototype._splitModels = function(items) {
         // он коллецкия может содержать модели только одного вида
         var model = ns.Model.get(info.model_id, params).setData(item);
 
-        // при обновлении _version внутренней модели обновим и у внешней
         model.on('ns-model-touched', function() {
-            that._version = this._version;
+            // increment modelCollection version on collection-item update
+            that._version++;
         });
 
         models.push(model);

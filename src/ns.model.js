@@ -60,7 +60,7 @@ ns.Model.prototype._reset = function(status) {
     /**
      * Data version.
      * @type {number}
-     * @private
+     * @protected
      */
     this._version = 0;
 

@@ -350,7 +350,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         // событие show будет вызвано, если у view поменяется this._visible
         this._show(events['ns-view-show']);
         events['ns-view-repaint'].push(this);
-        this._safeModelsVersions();
+        this._saveModelsVersions();
     }
 
     // Будем обновлять вложенные виды

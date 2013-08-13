@@ -1345,7 +1345,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
         //  Все subview теперь валидны.
         this._subviews = {};
 
-        this._safeModelsVersions();
+        this._saveModelsVersions();
     }
 
     // Если view валидный и не в async-режиме, то вызывается show и repaint
@@ -1375,7 +1375,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
  * Safe models versions to track changes.
  * @protected
  */
-ns.View.prototype._safeModelsVersions = function() {
+ns.View.prototype._saveModelsVersions = function() {
     for (var modelId in this.models) {
         this._modelsVersions[modelId] = this.models[modelId].getVersion();
     }

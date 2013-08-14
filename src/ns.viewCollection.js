@@ -204,6 +204,11 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
         // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
 
+        // Если views еще не определены (первая отрисовка)
+        if (!this.views) {
+            this.views = {};
+        }
+
         // Проходом по элементам MC определим, какие виды нужно срендерить
         for (var i = 0, view, p, decl; i < MC.models.length; i++) {
             p    = no.extend({}, params, MC.models[i].params);

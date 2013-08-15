@@ -46,7 +46,7 @@ ns.page.go = function(url, preventAddingToHistory) {
         }
 
         // return empty non-resolved promise becase we are redirecting now
-        return no.Promise();
+        return no.promise();
     }
 
     var layout = ns.layout.page(route.page, route.params);

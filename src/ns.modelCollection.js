@@ -14,13 +14,29 @@ ns.ModelCollection.prototype.getData = function() {
     // это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
-    if ( this.isValid() ) {
+    if (this.isValid()) {
         var items = [];
+
+        // если нет поля data сделаем его
+        if (!this.data) {
+            this.data = {};
+        }
+
         if (this.info.split) {
             // массив с хранилищем данных моделей
             items = no.jpath(this.info.split.items, this.data);
             // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
             items.splice(0, items.length);
+        } else if (this.info.jpathItems) {
+            // делаем нужное поле в .data
+            no.jpath.set(this.info.jpathItems, this.data, []);
+            // ссылка куда вставлять данные моделей
+            items = no.jpath(this.info.jpathItems, this.data);
+        } else {
+            // делаем нужное поле в .data
+            no.jpath.set('.items', this.data, []);
+            // ссылка куда вставлять данные моделей
+            items = no.jpath('.items', this.data);
         }
 
         // пишем новые
@@ -28,10 +44,8 @@ ns.ModelCollection.prototype.getData = function() {
             items.push( model.getData() );
         });
     }
-
     return this.data;
 };
-
 
 ns.ModelCollection.prototype._reset = function() {
     ns.Model.prototype._reset.apply(this, arguments);
@@ -223,6 +237,11 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     // оповестим всех, что вставили подмодели
     if (insertion.length > 0) {
+        // если данных не было, при insert говорим что данные появились
+        if (this.status == this.STATUS.NONE) {
+            this.status = this.STATUS.OK;
+        }
+
         this.trigger('ns-model-insert', insertion);
         return true;
     } else {

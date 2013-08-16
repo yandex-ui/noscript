@@ -55,7 +55,7 @@ describe('ns.ModelCollection', function() {
                 id: null
             },
             isCollection: true,
-            collectionItemsJpath: '.collectionItemsJpath'
+            jpathItems: '.jpathItems'
         });
 
         ns.Model.define('mc2', {
@@ -263,11 +263,11 @@ describe('ns.ModelCollection', function() {
 
             });
 
-            it('Collection.getData should return all model\'s data in .collectionItemsJpath, if it\'s exists', function() {
+            it('Collection.getData should return all model\'s data in .jpathItems, if it\'s exists', function() {
                 this.modelC.insert(this.packItems);
-                expect(this.modelC.getData().collectionItemsJpath[0]).to.eql(this.item1.getData());
-                expect(this.modelC.getData().collectionItemsJpath[1]).to.eql(this.item2.getData());
-                expect(this.modelC.getData().collectionItemsJpath[2]).to.eql(this.item3.getData());
+                expect(this.modelC.getData().jpathItems[0]).to.eql(this.item1.getData());
+                expect(this.modelC.getData().jpathItems[1]).to.eql(this.item2.getData());
+                expect(this.modelC.getData().jpathItems[2]).to.eql(this.item3.getData());
             });
 
             it('Collection.getData should return all model\'s data in .items', function() {

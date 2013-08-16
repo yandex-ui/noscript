@@ -27,11 +27,11 @@ ns.ModelCollection.prototype.getData = function() {
             items = no.jpath(this.info.split.items, this.data);
             // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
             items.splice(0, items.length);
-        } else if (this.info.collectionItemsJpath) {
+        } else if (this.info.jpathItems) {
             // делаем нужное поле в .data
-            no.jpath.set(this.info.collectionItemsJpath, this.data, []);
+            no.jpath.set(this.info.jpathItems, this.data, []);
             // ссылка куда вставлять данные моделей
-            items = no.jpath(this.info.collectionItemsJpath, this.data);
+            items = no.jpath(this.info.jpathItems, this.data);
         } else {
             // делаем нужное поле в .data
             no.jpath.set('.items', this.data, []);

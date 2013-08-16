@@ -185,7 +185,7 @@ describe('ns.ViewCollection', function() {
             });
 
             // insert items in collection
-            ns.Model.get('m-collection').setData([
+            ns.Model.get('m-collection').insert([
                 ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
                 ns.Model.get('m-collection-item', {p: 2}).setData({data: 2})
             ]);
@@ -310,13 +310,6 @@ describe('ns.ViewCollection', function() {
         describe('refresh layout after insert new model-item', function() {
 
             beforeEach(function(finish) {
-                var model = ns.Model.get('m-collection');
-                // insert first item
-                model.insert([
-                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
-                    ns.Model.get('m-collection-item', {p: 2}).setData({data: 2})
-                ]);
-
                 // insert another model-item in collection
                 ns.Model.get('m-collection').insert([ns.Model.get('m-collection-item', {p: 3})]);
 
@@ -541,7 +534,7 @@ describe('ns.ViewCollection', function() {
                     }
                 });
 
-                ns.Model.get('model-collection').setData([
+                ns.Model.get('model-collection').insert([
                     ns.Model.get('model-item').setData({ foo: 1})
                 ]);
                 ns.Model.get('model').setData({ foo: 1});

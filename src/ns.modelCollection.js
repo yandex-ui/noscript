@@ -237,18 +237,16 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     // оповестим всех, что вставили подмодели
     if (insertion.length > 0) {
+        // если данных не было, при insert говорим что данные появились
+        if (this.status == this.STATUS.NONE) {
+            this.status = this.STATUS.OK;
+        }
+
         this.trigger('ns-model-insert', insertion);
         return true;
     } else {
         return false;
     }
-
-    // если данных не было, при insert говорим что данные появились
-    if (this.status == this.STATUS.NONE) {
-        this.status = this.STATUS.OK;
-    }
-
-    return true;
 };
 
 /**

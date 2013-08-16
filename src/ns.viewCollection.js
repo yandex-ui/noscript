@@ -40,6 +40,12 @@ ns.ViewCollection.define = function(id, info) {
     return ctor;
 };
 
+ns.ViewCollection.prototype._init = function() {
+    ns.View.prototype._init.apply(this, arguments);
+
+    this.views = {};
+};
+
 /**
  * Биндится на изменение моделей.
  * @private
@@ -170,11 +176,6 @@ ns.ViewCollection.prototype._getRequestViews = function(updated) {
     } else if (!this.isValidSelf()) {
         // если обычный блок не валиден
         updated.sync.push(this);
-    }
-
-    // Если views еще не определены (первая отрисовка)
-    if (!this.views) {
-        this.views = {};
     }
 
     return updated;

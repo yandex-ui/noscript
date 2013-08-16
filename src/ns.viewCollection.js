@@ -40,6 +40,12 @@ ns.ViewCollection.define = function(id, info) {
     return ctor;
 };
 
+ns.ViewCollection.prototype._init = function() {
+    ns.View.prototype._init.apply(this, arguments);
+
+    this.views = {};
+};
+
 /**
  * Биндится на изменение моделей.
  * @private
@@ -172,11 +178,6 @@ ns.ViewCollection.prototype._getRequestViews = function(updated) {
         updated.sync.push(this);
     }
 
-    // Если views еще не определены (первая отрисовка)
-    if (!this.views) {
-        this.views = {};
-    }
-
     return updated;
 };
 
@@ -203,11 +204,6 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
     if (this.isModelsValid()) {
         // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
-
-        // Если views еще не определены (первая отрисовка)
-        if (!this.views) {
-            this.views = {};
-        }
 
         // Проходом по элементам MC определим, какие виды нужно срендерить
         for (var i = 0, view, p, decl; i < MC.models.length; i++) {

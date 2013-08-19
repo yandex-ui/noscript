@@ -175,15 +175,15 @@ describe('ns.ModelCollection', function() {
             });
 
             it('should set models to collection without split', function() {
-                this.modelCollection.setData(this.models);
+                this.modelCollection.insert(this.models);
 
                 expect(this.modelCollection.models[0].data).to.eql(this.data.item[0]);
                 expect(this.modelCollection.models[1].data).to.eql(this.data.item[1]);
                 expect(this.modelCollection.models[2].data).to.eql(this.data.item[2]);
             });
 
-            it('should trigger event on collection form other collection', function() {
-                this.modelCollection.setData(this.models);
+            it('should trigger event on collection from other collection', function() {
+                this.modelCollection.insert(this.models);
                 this.modelCollection.models[0].trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
@@ -226,13 +226,13 @@ describe('ns.ModelCollection', function() {
 
             it('should insert item in empty collection without split', function() {
                 this.modelEmptyWithoutSplit.insert(this.item1);
-                expect(this.modelEmptyWithoutSplit.models[0].data).to.eql(this.item1.data);
+                expect(this.modelEmptyWithoutSplit.models[0]).to.eql(this.item1);
             });
 
             it('should insert item in non empty collection without split', function() {
                 this.modelEmptyWithoutSplit.setData({someData: 'a', someOtherData: 'b'});
                 this.modelEmptyWithoutSplit.insert(this.item1);
-                expect(this.modelEmptyWithoutSplit.models[0].data).to.eql(this.item1.data);
+                expect(this.modelEmptyWithoutSplit.models[0]).to.eql(this.item1);
             });
 
             it('should insert item', function() {

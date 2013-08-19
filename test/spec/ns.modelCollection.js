@@ -226,13 +226,13 @@ describe('ns.ModelCollection', function() {
 
             it('should insert item in empty collection without split', function() {
                 this.modelEmptyWithoutSplit.insert(this.item1);
-                expect(this.modelEmptyWithoutSplit.models[0]).to.eql(this.item1);
+                expect(this.modelEmptyWithoutSplit.getData().jpathItems[0]).to.eql(this.item1.getData());
             });
 
             it('should insert item in non empty collection without split', function() {
                 this.modelEmptyWithoutSplit.setData({someData: 'a', someOtherData: 'b'});
                 this.modelEmptyWithoutSplit.insert(this.item1);
-                expect(this.modelEmptyWithoutSplit.models[0]).to.eql(this.item1);
+                expect(this.modelEmptyWithoutSplit.getData().jpathItems[0]).to.eql(this.item1.getData());
             });
 
             it('should insert item', function() {

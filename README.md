@@ -1,6 +1,20 @@
 noscript
 ========
+[![Build Status](https://travis-ci.org/yandex-ui/noscript.png?branch=master)](https://travis-ci.org/yandex-ui/noscript)
 
 JS MVC framework
 
-[![Build Status](https://travis-ci.org/yandex-ui/noscript.png?branch=master)](https://travis-ci.org/yandex-ui/noscript)
+#### Changelog
+
+##### 0.1.1
+- Fix #146 `ns.action` поломал инициализацию наноблоков
+- #129 Ошибка при setData для модели коллекции без split
+- Merge pull request #131 from yandex-ui/collection-key
+- Merge pull request #141 from yandex-ui/view-collection-async
+- Merge pull request #139 from yandex-ui/view-collection-doc
+- Merge pull request #143 from yandex-ui/ns-page-typo
+
+
+##### 0.1.0
+Более менее стабильная версия. Попытка начать версионировать процесс.
+

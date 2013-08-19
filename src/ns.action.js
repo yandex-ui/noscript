@@ -209,7 +209,9 @@ ns.action._process = function(e) {
         if (target.getAttribute('target') != '_blank') {
             returnValue = ns.page.go(href);
             if (returnValue instanceof no.Promise) {
-                return false;
+                // stop go to link, but not bubbling
+                e.preventDefault();
+                return true;
             }
         }
     }

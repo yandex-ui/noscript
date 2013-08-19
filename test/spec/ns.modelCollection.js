@@ -175,19 +175,18 @@ describe('ns.ModelCollection', function() {
             });
 
             it('should set models to collection without split', function() {
-                this.modelCollection.setData(this.models);
+                this.modelCollection.insert(this.models);
 
                 expect(this.modelCollection.models[0].data).to.eql(this.data.item[0]);
                 expect(this.modelCollection.models[1].data).to.eql(this.data.item[1]);
                 expect(this.modelCollection.models[2].data).to.eql(this.data.item[2]);
             });
 
-            it('should trigger event on collection form other collection', function() {
-                this.modelCollection.setData(this.models);
+            it('should trigger event on collection from other collection', function() {
+                this.modelCollection.insert(this.models);
                 this.modelCollection.models[0].trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
-
         });
 
         describe('insert', function() {
@@ -199,6 +198,7 @@ describe('ns.ModelCollection', function() {
                 this.modelC = ns.Model.get('mc1', { id: Math.random() });
                 this.modelC2 = ns.Model.get('mc2', { id: Math.random() });
                 this.modelEmpty = ns.Model.get('mc0', { id: Math.random() });
+                this.modelEmptyWithoutSplit = ns.Model.get('mc1', { id: Math.random() });
 
                 this.model.setData(this.data, { silent: true });
                 this.models = this.model.models;
@@ -216,11 +216,23 @@ describe('ns.ModelCollection', function() {
                 delete this.modelC;
                 delete this.modelC2;
                 delete this.modelEmpty;
+                delete this.modelEmptyWithoutSplit;
                 delete this.models;
                 delete this.item1;
                 delete this.item2;
                 delete this.item3;
                 delete this.packItems;
+            });
+
+            it('should insert item in empty collection without split', function() {
+                this.modelEmptyWithoutSplit.insert(this.item1);
+                expect(this.modelEmptyWithoutSplit.getData().jpathItems[0]).to.eql(this.item1.getData());
+            });
+
+            it('should insert item in non empty collection without split', function() {
+                this.modelEmptyWithoutSplit.setData({someData: 'a', someOtherData: 'b'});
+                this.modelEmptyWithoutSplit.insert(this.item1);
+                expect(this.modelEmptyWithoutSplit.getData().jpathItems[0]).to.eql(this.item1.getData());
             });
 
             it('should insert item', function() {

@@ -81,11 +81,8 @@ ns.ModelCollection.prototype._setData = function(data) {
     if (info) {
         var items = no.jpath(info.items, data);
         models = this._splitModels(items);
+        this.insert(models);
     }
-
-    // если модели не удалось засплитить попробуем вставить данные,
-    // может в них есть модели
-    this.insert(models);
 
     return data;
 };

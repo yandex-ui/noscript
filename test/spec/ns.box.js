@@ -25,6 +25,12 @@ describe('ns.Box', function() {
             }
         }, 'app');
 
+        ns.layout.define('content4', {
+            'app content@': {
+                'content4': {}
+            }
+        }, 'app');
+
         ns.View.define('app');
         ns.View.define('content1', {
             params: {
@@ -36,11 +42,24 @@ describe('ns.Box', function() {
             models: ['model3']
         });
 
+        ns.View.define('content4', {
+            params: {
+                pOwn: null
+            },
+            rewriteParamsOnInit: function(params) {
+                return {
+                    pOwn: ns.Model.find('model4').get('.value')
+                };
+            }
+        });
+
         ns.Model.define('model3', {
             params: {
                 p: null
             }
         });
+
+        ns.Model.define('model4', {});
 
         this.xhr = sinon.useFakeXMLHttpRequest();
         var requests = this.requests = [];
@@ -264,6 +283,40 @@ describe('ns.Box', function() {
                     ).to.have.length(1)
                 });
 
+            });
+
+        });
+
+        describe('"content4"(pOwn=1) -> "content4"(pOwn=2), where pOwn depends only of models', function() {
+
+            beforeEach(function() {
+                var model = ns.Model.get('model4');
+                model.setData({'value': 1});
+
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('content4', {}),
+                    {}
+                ).start();
+
+                model.set('.value', 2);
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('content4', {}),
+                    {}
+                ).start();
+            });
+
+            it('should have two nodes for "content4" ', function() {
+                expect($(this.APP.node).find('.ns-view-content4')).to.have.length(2);
+            });
+
+            it('should have first hidden node for "content4" ', function() {
+                expect($(this.APP.node).find('.ns-view-content4:eq(0)').hasClass('ns-view-hidden')).to.be.ok();
+            });
+
+            it('should have second visible node for "content4" ', function() {
+                expect($(this.APP.node).find('.ns-view-content4:eq(1)').hasClass('ns-view-visible')).to.be.ok();
             });
 
         });

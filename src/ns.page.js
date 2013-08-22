@@ -1,8 +1,21 @@
+(function() {
+
 /**
  * Модуль управления "страницей" и переходами между ними.
  * @namespace
  */
 ns.page = {};
+
+/**
+ * Current page params
+ * @type {{page: string, params: Object}}
+ */
+ns.page.current = {};
+ns.page.currentUrl = {};
+
+
+ns.page._stop = false;
+ns.page._lastUrl = '';
 
 /**
  * Осуществляем переход по ссылке.
@@ -53,16 +66,14 @@ ns.page.go = function(url, preventAddingToHistory) {
 
     ns.events.trigger('ns-page-before-load', [ns.page.current, route]);
 
-    /**
-     * Текущие параметры страницы.
-     * @type {{page: string, params: Object}}
-     */
     ns.page.current = route;
     ns.page.currentUrl = url;
 
     if (!preventAddingToHistory) {
         // записываем в историю все переходы
         ns.history.pushState(url);
+
+        _history.push(url);
     }
 
     document.title = ns.page.title(url);
@@ -145,3 +156,31 @@ ns.page.block.check = function(url) {
 
     return true;
 };
+
+
+/**
+ * Array with visited urls.
+ */
+var _history = [];
+
+/**
+ * Go to previous page.
+ */
+ns.page.goBack = function() {
+    var previousPage = _history.pop();
+    if (!previousPage) {
+        previousPage = ns.page.getDefaultUrl();
+    }
+
+    return ns.page.go(previousPage, true);
+};
+
+/**
+ * Returns default url for NoScript application.
+ * Should be redefined.
+ */
+ns.page.getDefaultUrl = function() {
+    return ns.router.url('/');
+};
+
+})();

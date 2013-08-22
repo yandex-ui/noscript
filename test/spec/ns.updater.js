@@ -403,7 +403,7 @@ describe('no.Updater', function() {
                     'main': {
                         'async': false,
                         'models': {},
-                        'page': undefined,
+                        'page': {},
                         'params': {},
                         'tree': {
                             'main': true

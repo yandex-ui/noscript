@@ -201,7 +201,7 @@ ns.router.regexps = {
 if (window['mocha']) {
 
     ns.router.undefine = function() {
-        delete ns.router._routes;
+        ns.router._routes = null;
         ns.router.routes = {};
     };
 }

@@ -155,5 +155,7 @@ if (window['mocha']) {
         ns.request.clean();
         ns.router.undefine();
         ns.page.current = {};
+
+        ns.MAIN_VIEW = null;
     };
 }

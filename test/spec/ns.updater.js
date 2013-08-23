@@ -193,6 +193,8 @@ describe('no.Updater', function() {
         describe('update+async update', function() {
 
             beforeEach(function(finish) {
+                sinon.stub(ns.history, 'pushState', no.nop);
+
                 ns.layout.define('page1', {
                     app: {
                         'box@': {
@@ -209,6 +211,14 @@ describe('no.Updater', function() {
                     }
                 });
 
+                ns.router.routes = {
+                    'route': {
+                        '/page1': 'page1',
+                        '/page2': 'page2'
+                    }
+                };
+                ns.router.init();
+
                 ns.Model.define('my_model1');
                 ns.Model.define('my_model2');
 
@@ -223,20 +233,15 @@ describe('no.Updater', function() {
                 });
 
                 var that = this;
-                this.view = ns.View.create('app');
+                ns.MAIN_VIEW = ns.View.create('app');
 
-                var layout = ns.layout.page('page1', {});
-                // start global update
-                new ns.Update(this.view, layout, {})
-                    .start()
+                ns.page.go('/page1')
                     .done(function() {
 
                         // don't wait for async view
                         // start new global update
 
-                        var layout = ns.layout.page('page2', {});
-                        new ns.Update(that.view, layout, {})
-                            .start()
+                        ns.page.go('/page2')
                             .done(function() {
 
                                 // get response for async-view
@@ -267,12 +272,12 @@ describe('no.Updater', function() {
 
             afterEach(function() {
                 delete this.promise;
-                delete this.view;
+
+                ns.history.pushState.restore();
             });
 
             it('should save state for page2', function() {
-                console.log(this.view.node);
-                expect(this.view.$node.find('.ns-view-my_view2').hasClass('ns-view-visible')).to.be.ok();
+                expect(ns.MAIN_VIEW.$node.find('.ns-view-my_view2').hasClass('ns-view-visible')).to.be.ok();
             });
 
         });

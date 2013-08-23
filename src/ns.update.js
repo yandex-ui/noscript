@@ -34,11 +34,6 @@ ns.Update = function(view, layout, params, options) {
 
     this.params = params;
 
-    /**
-     * Update ID
-     * @type {number}
-     * @private
-     */
     this.id = ++update_id;
 
     options = options || {};
@@ -76,14 +71,6 @@ ns.Update.prototype.STATUS = ns.U.STATUS;
  * @private
  */
 ns.Update.prototype._EVENTS_ORDER = ['ns-view-hide', 'ns-view-htmldestroy', 'ns-view-htmlinit', 'ns-view-async', 'ns-view-show', 'ns-view-repaint'];
-
-/**
- * Check that this update is still actual (no new ns.Update is started).
- * @returns {boolean}
- */
-ns.Update.prototype.iAmActual = function() {
-    return this.id === update_id;
-};
 
 /**
  * Начинает работу updater'а.
@@ -173,15 +160,10 @@ ns.Update.prototype.start = function(async) {
 
             var fakeLayout = {};
             fakeLayout[that.view.id] = that.layout;
-
-            // if this update is still actual
-            if (that.iAmActual()) {
-                // start update for async views
-                new ns.Update(that.view, fakeLayout, that.params, {execFlag: ns.U.EXEC.ASYNC})
-                    .start(true)
-                    // pipes ns.Update promise to asyncPromise
-                    .pipe(asyncUpdaterPromises[asyncViewId]);
-            }
+            new ns.Update(that.view, fakeLayout, that.params, {execFlag: ns.U.EXEC.ASYNC})
+                .start(true)
+                // pipes ns.Update promise to asyncPromise
+                .pipe(asyncUpdaterPromises[asyncViewId]);
 
         }).fail(function(result) {
             //FIXME: ns.request.models can't reject promise this time, we should fix it
@@ -202,10 +184,7 @@ ns.Update.prototype.start = function(async) {
  * @private
  */
 ns.Update.prototype._update = function(async) {
-    // check that this update is still actual
-    if (!this.iAmActual()) {
-        return;
-    }
+    //  TODO: Проверить, что не начался уже более новый апдейт.
 
     var params = this.params;
     var layout = this.layout;

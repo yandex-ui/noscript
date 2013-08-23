@@ -190,6 +190,92 @@ describe('no.Updater', function() {
 
         });
 
+        describe('update+async update', function() {
+
+            beforeEach(function(finish) {
+                ns.layout.define('page1', {
+                    app: {
+                        'box@': {
+                            'my_view1&': true
+                        }
+                    }
+                });
+
+                ns.layout.define('page2', {
+                    app: {
+                        'box@': {
+                            'my_view2': true
+                        }
+                    }
+                });
+
+                ns.Model.define('my_model1');
+                ns.Model.define('my_model2');
+
+                ns.Model.get('my_model2').setData({data: true});
+
+                ns.View.define('app');
+                ns.View.define('my_view1', {
+                    models: ['my_model1']
+                });
+                ns.View.define('my_view2', {
+                    models: ['my_model2']
+                });
+
+                var that = this;
+                this.view = ns.View.create('app');
+
+                var layout = ns.layout.page('page1', {});
+                // start global update
+                new ns.Update(this.view, layout, {})
+                    .start()
+                    .done(function() {
+
+                        // don't wait for async view
+                        // start new global update
+
+                        var layout = ns.layout.page('page2', {});
+                        new ns.Update(that.view, layout, {})
+                            .start()
+                            .done(function() {
+
+                                // get response for async-view
+                                that.requests[0].respond(
+                                    200,
+                                    {"Content-Type": "application/json"},
+                                    JSON.stringify({
+                                        models: [
+                                            {data: true}
+                                        ]
+                                    })
+                                );
+
+                                window.setTimeout(function() {
+                                    finish();
+                                }, 100)
+
+                            })
+                            .fail(function() {
+                                finish('ns.Update fails');
+                            });
+
+                    })
+                    .fail(function() {
+                        finish('ns.Update fails');
+                    });
+            });
+
+            afterEach(function() {
+                delete this.promise;
+                delete this.view;
+            });
+
+            it('should save state for page2', function() {
+                console.log(this.view.node);
+                expect(this.view.$node.find('.ns-view-my_view2').hasClass('ns-view-visible')).to.be.ok();
+            });
+
+        });
     });
 
     describe('.start()', function() {

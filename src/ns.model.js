@@ -91,6 +91,28 @@ ns.Model.prototype._bindEvents = function() {
 };
 
 /**
+ * Модель должна удалиться вместе с переданными моделями
+ * @param { ns.Model | ns.Model[] } models - модель или массив моделей
+ */
+ns.Model.prototype.destroyWith = function(models) {
+    if (!Array.isArray(models)) {
+        models = [models];
+    }
+
+    for (var i = 0, len = models.length; i < len; i++) {
+        var model = models[i];
+        if (model instanceof ns.Model) {
+            // при уничтожении модели, с которой связана текущая - она тоже должна быть уничтожена
+            model.on('ns-model-destroyed', function() {
+                ns.Model.destroy(this);
+            }.bind(this));
+        } else {
+            throw new Error("[ns.Model] " + this.id + " destroyWith expected ns.Model or Array of ns.Model in argument");
+        }
+    }
+};
+
+/**
  * Ищет метод в объекте по имени или возвращает переданную функцию
  * Нужен для навешивания коллбеков
  *

@@ -11,7 +11,7 @@ ns.page = {};
  * @type {{page: string, params: Object}}
  */
 ns.page.current = {};
-ns.page.currentUrl = {};
+ns.page.currentUrl = null;
 
 
 ns.page._stop = false;
@@ -74,10 +74,9 @@ ns.page.go = function(url, preventAddingToHistory) {
     if (!preventAddingToHistory) {
         // записываем в историю все переходы
         ns.history.pushState(url);
-
-        _history.push(url);
     }
 
+    ns.page.history.push(url);
     document.title = ns.page.title(url);
 
     var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
@@ -159,30 +158,95 @@ ns.page.block.check = function(url) {
     return true;
 };
 
-
-/**
- * Array with visited urls.
- */
-var _history = [];
-
-/**
- * Go to previous page.
- */
-ns.page.goBack = function() {
-    var previousPage = _history.pop();
-    if (!previousPage) {
-        previousPage = ns.page.getDefaultUrl();
-    }
-
-    return ns.page.go(previousPage, true);
-};
-
 /**
  * Returns default url for NoScript application.
  * Should be redefined.
  */
 ns.page.getDefaultUrl = function() {
     return ns.router.url('/');
+};
+
+/**
+ * Object to work with application history.
+ * @namespace
+ */
+ns.page.history = {};
+
+/**
+ * Current application url.
+ * @type {string}
+ * @private
+ */
+ns.page.history._current = null;
+
+/**
+ * History of application urls.
+ * @type {Array}
+ * @private
+ */
+ns.page.history._history = [];
+
+/**
+ * Saves url in history.
+ * @param {string} url
+ */
+ns.page.history.push = function(url) {
+    var nsHistory = ns.page.history;
+
+    // save previous url to history
+    if (nsHistory._current) {
+
+        // prevent duplicates
+        if (nsHistory._current !== url) {
+            var prevPage = ns.page.history.getPrevious();
+
+            // user pressed back button in browser
+            if (prevPage == url) {
+                nsHistory._history.pop();
+
+            } else {
+                nsHistory._history.push(nsHistory._current);
+            }
+        }
+    }
+
+    nsHistory._current = url;
+};
+
+/**
+ * Go to previous page and delete it from history.
+ * @returns {no.Promise}
+ */
+ns.page.history.back = function() {
+    var nsHistory = ns.page.history;
+
+    var previousPage = nsHistory.getPrevious();
+    if (previousPage) {
+        // removes last entry
+        nsHistory._history.pop();
+
+    } else {
+        // get default url
+        previousPage = ns.page.getDefaultUrl();
+    }
+
+    // delete current history url
+    nsHistory._current = null;
+
+    return ns.page.go(previousPage, true);
+};
+
+/**
+ * Returns previous page.
+ * @param {number} [n=0] N pages ago
+ * @returns {string}
+ */
+ns.page.history.getPrevious = function(n) {
+    n = n || 0;
+    var history = ns.page.history._history;
+    var l = history.length;
+    // Предыдущая страница, если есть.
+    return history[l - n - 1];
 };
 
 })();

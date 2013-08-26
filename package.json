@@ -5,12 +5,12 @@
         "url": "https://github.com/pasaran"
     },
     "name": "noscript",
-    "description": "noscript",
+    "description": "JavaScript MVC framework",
     "version": "0.1.1",
-    "homepage": "https://github.com/pasaran/noscript",
+    "homepage": "https://github.com/yandex-ui/noscript",
     "repository": {
         "type": "git",
-        "url": "git://github.com/pasaran/noscript.git"
+        "url": "git://github.com/yandex-ui/noscript.git"
     },
     "dependencies": {
         "nommon": "0.0.23"
@@ -30,7 +30,6 @@
     "engines": {
         "node": "*"
     },
-    "main": "noscript",
     "files": [
         "css",
         "dist",

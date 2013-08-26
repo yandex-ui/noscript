@@ -522,6 +522,50 @@ describe('ns.Model', function() {
 
         });
 
+
+        describe('destroyWith', function() {
+
+            beforeEach(function() {
+
+                ns.Model.define('model1', {
+                    params: {
+                        id: null
+                    }
+                });
+                this.model1 = ns.Model.get('model1', {id: 1}).setData({key: 1});
+
+                ns.Model.define('model2', {
+                    params: {
+                        id: null
+                    }
+                });
+                this.model2 = ns.Model.get('model2', {id: 1}).setData({key: 1});
+
+                this.model2.destroyWith(this.model1);
+
+                ns.Model.destroy(this.model1);
+
+                ns.Model.define('model3');
+                this.model3 = ns.Model.get('model3');
+            });
+
+            afterEach(function() {
+                delete this.model1;
+                delete this.model2;
+                delete this.model3;
+            });
+
+            it('should not find model after destroy linked model', function() {
+                expect(ns.Model.find('model2', { id: 1 })).not.to.be.ok();
+            });
+
+            it('should throw on linked model is not model', function() {
+                var getmodel = function() { this.model3.destroyWith('string'); };
+                expect(getmodel).to.throwException();
+
+            });
+        });
+
     });
 
 });

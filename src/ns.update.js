@@ -86,14 +86,20 @@ ns.Update.prototype.start = function(async) {
         return this.promise;
     }
 
+    ns.log.debug('[ns.Update]', 'start()', this.id, 'layout', this.layout);
+
     var updated = this.view._getRequestViews({
         sync: [],
         async: []
     }, this.layout.views, this.params);
 
+    ns.log.debug('[ns.Update]', 'start()', this.id, 'request views', updated);
+
     var that = this;
 
     var models = views2models(updated.sync);
+
+    ns.log.debug('[ns.Update]', 'start()', this.id, 'models', models);
 
     // create promise for each async view
     var asyncUpdaterPromises = updated.async.map(function() {

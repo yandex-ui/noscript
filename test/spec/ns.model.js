@@ -522,6 +522,48 @@ describe('ns.Model', function() {
 
         });
 
+
+        describe('destroyWith', function() {
+
+            beforeEach(function() {
+
+                ns.Model.define('model1', {
+                    params: {
+                        id: null
+                    }
+                });
+                this.model1 = ns.Model.get('model1', {id: 1}).setData({key: 1});
+
+                ns.Model.define('model2', {
+                    params: {
+                        id: null
+                    }
+                });
+                this.model2 = ns.Model.get('model2', {id: 1}).setData({key: 1});
+            });
+
+            afterEach(function() {
+                delete this.model1;
+                delete this.model2;
+            });
+
+            it('should destroy model2 after destroying model1', function() {
+                this.model2.destroyWith(this.model1);
+                ns.Model.destroy(this.model1);
+
+                expect(ns.Model.find('model2', { id: 1 })).not.to.be.ok();
+            });
+
+            it('should throw error if tried to destroy ns.Model with string', function() {
+                expect(function() { this.model1.destroyWith('string'); }).to.throwException();
+            });
+
+            it('should throw error if tried to destroy ns.Model with undefined', function() {
+                expect(function() { this.model1.destroyWith(ns.Model.find('model2', {id: 2})); }).to.throwException();
+
+            });
+        });
+
     });
 
 });

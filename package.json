@@ -13,10 +13,10 @@
         "url": "git://github.com/pasaran/noscript.git"
     },
     "dependencies": {
-        "nommon": "*",
-        "es5-shim": "*"
+        "nommon": "0.0.23"
     },
     "devDependencies": {
+        "borschik": "0.4.x",
         "expect.js": "*",
         "grunt": "*",
         "grunt-cli": "*",
@@ -32,12 +32,13 @@
     },
     "main": "noscript",
     "files": [
-        "src",
-        "external",
         "css",
+        "dist",
+        "src",
         "yate"
     ],
     "scripts": {
+        "prepublish": "borschik -i noscript.borschik.js -o dist/noscript.js -m no && borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes",
         "test": "grunt"
     }
 }

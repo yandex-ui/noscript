@@ -92,13 +92,9 @@ ns.Model.prototype._bindEvents = function() {
 
 /**
  * Модель должна удалиться вместе с переданными моделями
- * @param {Model| Array} models - модель или массив моделей
+ * @param { ns.Model | ns.Model[] } models - модель или массив моделей
  */
 ns.Model.prototype.destroyWith = function(models) {
-    if (!models) {
-        throw new Error("[ns.Model] destroyWith'param in " + this.id + " is undefined");
-    }
-
     if (!Array.isArray(models)) {
         models = [models];
     }
@@ -111,7 +107,7 @@ ns.Model.prototype.destroyWith = function(models) {
                 ns.Model.destroy(this);
             }.bind(this));
         } else {
-            throw new Error("[ns.Model] destroyWith'param in " + this.id + " is not ns.Model");
+            throw new Error("[ns.Model] " + this.id + " destroyWith expected ns.Model or Array of ns.Model in argument");
         }
     }
 };

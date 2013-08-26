@@ -547,21 +547,19 @@ describe('ns.Model', function() {
                 delete this.model2;
             });
 
-            it('should not find model after destroy linked model', function() {
+            it('should destroy model2 after destroying model1', function() {
                 this.model2.destroyWith(this.model1);
                 ns.Model.destroy(this.model1);
 
                 expect(ns.Model.find('model2', { id: 1 })).not.to.be.ok();
             });
 
-            it('should throw on linked model is not nsModel', function() {
-                var getmodel = function() { this.model1.destroyWith('string'); };
-                expect(getmodel).to.throwException();
+            it('should throw error if tried to destroy ns.Model with string', function() {
+                expect(function() { this.model1.destroyWith('string'); }).to.throwException();
             });
 
-            it('should throw on linked model is undefined', function() {
-                var getmodel = function() { this.model1.destroyWith(ns.Model.find('model2', {id: 2})); };
-                expect(getmodel).to.throwException();
+            it('should throw error if tried to destroy ns.Model with undefined', function() {
+                expect(function() { this.model1.destroyWith(ns.Model.find('model2', {id: 2})); }).to.throwException();
 
             });
         });

@@ -4,7 +4,6 @@
     "jquery": true,
     "node": true,
     "globals": {
-        "Modernizr": false,
         "no": false,
         "ns": true,
         "yr": false

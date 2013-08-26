@@ -18,7 +18,10 @@ ns.events = no.extend( {}, no.Events );
  * @const
  * @type {Boolean}
  */
-ns.IS_TOUCH = Boolean(window['Modernizr'] && Modernizr.touch && window['$'] && $.mobile);
+ns.IS_TOUCH = Boolean(
+    'ontouchstart' in window ||
+    (window.DocumentTouch && document instanceof DocumentTouch)
+);
 
 /**
  * FIXME: зачем оно тут?

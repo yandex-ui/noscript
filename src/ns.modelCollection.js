@@ -15,29 +15,25 @@ ns.ModelCollection.prototype.getData = function() {
     // нужно склеить все данные
     // из моделей её состовляющих
     if (this.isValid()) {
-        var items = [];
+        var jpathItems;
+
+        if (this.info.split) {
+            jpathItems = this.info.split.items;
+        } else if (this.info.jpathItems) {
+            jpathItems = this.info.jpathItems;
+        } else {
+            jpathItems = '.items';
+        }
 
         // если нет поля data сделаем его
         if (!this.data) {
             this.data = {};
         }
 
-        if (this.info.split) {
-            // массив с хранилищем данных моделей
-            items = no.jpath(this.info.split.items, this.data);
-            // удаляем все старые данные, но оставляем массив, чтобы сохранить ссылку
-            items.splice(0, items.length);
-        } else if (this.info.jpathItems) {
-            // делаем нужное поле в .data
-            no.jpath.set(this.info.jpathItems, this.data, []);
-            // ссылка куда вставлять данные моделей
-            items = no.jpath(this.info.jpathItems, this.data);
-        } else {
-            // делаем нужное поле в .data
-            no.jpath.set('.items', this.data, []);
-            // ссылка куда вставлять данные моделей
-            items = no.jpath('.items', this.data);
-        }
+        // делаем нужное поле в .data и делаем его пустым
+        no.jpath.set(jpathItems, this.data, []);
+        // ссылка куда вставлять данные моделей
+        var items = no.jpath(jpathItems, this.data);
 
         // пишем новые
         this.models.forEach(function(model) {

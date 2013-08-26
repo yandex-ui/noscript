@@ -224,6 +224,8 @@ describe('ns.ModelCollection', function() {
                 delete this.packItems;
             });
 
+            // FIXME: отрефакторить бы этот набор тестов. Какой-то он непонятный и длинный
+
             it('should insert item in empty collection without split', function() {
                 this.modelEmptyWithoutSplit.insert(this.item1);
                 expect(this.modelEmptyWithoutSplit.getData().jpathItems[0]).to.eql(this.item1.getData());
@@ -273,6 +275,13 @@ describe('ns.ModelCollection', function() {
                 expect(this.models[4].data).to.eql(this.item3.data);
                 expect(this.models[5].data).to.eql(this.data.item[2]);
 
+            });
+
+            it('.getData of splitted modelCollection should return data of nested models, located in split.items jpath', function() {
+                this.modelEmpty.insert(this.packItems);
+                expect(this.modelEmpty.getData().item[0]).to.eql(this.item1.getData());
+                expect(this.modelEmpty.getData().item[1]).to.eql(this.item2.getData());
+                expect(this.modelEmpty.getData().item[2]).to.eql(this.item3.getData());
             });
 
             it('Collection.getData should return all model\'s data in .jpathItems, if it\'s exists', function() {

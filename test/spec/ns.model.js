@@ -540,27 +540,27 @@ describe('ns.Model', function() {
                     }
                 });
                 this.model2 = ns.Model.get('model2', {id: 1}).setData({key: 1});
-
-                this.model2.destroyWith(this.model1);
-
-                ns.Model.destroy(this.model1);
-
-                ns.Model.define('model3');
-                this.model3 = ns.Model.get('model3');
             });
 
             afterEach(function() {
                 delete this.model1;
                 delete this.model2;
-                delete this.model3;
             });
 
             it('should not find model after destroy linked model', function() {
+                this.model2.destroyWith(this.model1);
+                ns.Model.destroy(this.model1);
+
                 expect(ns.Model.find('model2', { id: 1 })).not.to.be.ok();
             });
 
-            it('should throw on linked model is not model', function() {
-                var getmodel = function() { this.model3.destroyWith('string'); };
+            it('should throw on linked model is not nsModel', function() {
+                var getmodel = function() { this.model1.destroyWith('string'); };
+                expect(getmodel).to.throwException();
+            });
+
+            it('should throw on linked model is undefined', function() {
+                var getmodel = function() { this.model1.destroyWith(ns.Model.find('model2', {id: 2})); };
                 expect(getmodel).to.throwException();
 
             });

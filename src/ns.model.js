@@ -96,22 +96,22 @@ ns.Model.prototype._bindEvents = function() {
  */
 ns.Model.prototype.destroyWith = function(models) {
     if (!models) {
-        return;
+        throw new Error("[ns.Model] destroyWith'param in " + this.id + " is undefined");
     }
 
     if (!Array.isArray(models)) {
         models = [models];
     }
 
-    for (var i in models) {
+    for (var i = 0, len = models.length; i < len; i++) {
         var model = models[i];
-        if (!model ||  !(model instanceof ns.Model)) {
-            throw new Error("[ns.Model] Item of linkedModels is not ns.Model ");
-        } else {
+        if (model instanceof ns.Model) {
             // при уничтожении модели, с которой связана текущая - она тоже должна быть уничтожена
             model.on('ns-model-destroyed', function() {
                 ns.Model.destroy(this);
             }.bind(this));
+        } else {
+            throw new Error("[ns.Model] destroyWith'param in " + this.id + " is not ns.Model");
         }
     }
 };

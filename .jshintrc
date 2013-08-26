@@ -6,6 +6,7 @@
     "globals": {
         "no": false,
         "ns": true,
+        "DocumentTouch": false,
         "yr": false
     },
 

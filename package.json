@@ -17,12 +17,12 @@
     },
     "devDependencies": {
         "borschik": "0.4.x",
+        "es5-shim": "2.1.0",
         "expect.js": "*",
         "grunt": "*",
         "grunt-cli": "*",
         "grunt-contrib-jshint": "*",
         "grunt-mocha": "*",
-        "mocha": "*",
         "sinon": "*",
         "yate": "*"
     },

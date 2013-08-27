@@ -19,8 +19,9 @@ ns.router = function(url) {
     // Откусываем префикс урла
     url = url.substring(baseDir.length);
 
+    var urlChunks = url.split('?');
     // /path/?foo=bar -> /path/
-    var urlWithoutQuery = url.split('?')[0];
+    var urlWithoutQuery = urlChunks.shift();
 
     // we should check redirect without query
     if (urlWithoutQuery in routesDef.redirect) {
@@ -33,8 +34,10 @@ ns.router = function(url) {
         };
     }
 
-    if (url in routesDef.rewriteUrl) {
-        url = routesDef.rewriteUrl[url];
+    if (urlWithoutQuery in routesDef.rewriteUrl) {
+        var urlQuery = urlChunks.join('?');
+        // rewrite url and add query
+        url = routesDef.rewriteUrl[urlWithoutQuery] + (urlQuery ? '?' + urlQuery : '');
     }
 
     var routes = routesDef.route;

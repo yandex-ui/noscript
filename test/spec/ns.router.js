@@ -172,4 +172,52 @@ describe('ns.router', function() {
             expect(ns.router.url('/index')).to.be.eql('/index');
         });
     });
+
+    describe('rewrite', function() {
+
+        beforeEach(function() {
+            ns.router.routes = {
+                rewriteUrl: {
+                    '/page1': '/page/1'
+                },
+                route: {
+                    '/page/{id:int}': 'layout'
+                }
+            };
+            ns.router.init();
+        });
+
+        var tests = [
+            {
+                'url': '/page1',
+                'route': {
+                    'page': 'layout',
+                    'params': {
+                        'id': 1
+                    }
+                }
+            },
+
+            {
+                'url': '/page1?foo=bar',
+                'route': {
+                    'page': 'layout',
+                    'params': {
+                        'id': 1,
+                        'foo': 'bar'
+                    }
+                }
+            }
+        ];
+
+        tests.forEach(function(test) {
+
+            it('should process "' + test.url + '" as "' + JSON.stringify(test.route) + '"', function() {
+                console.log('test', test.url);
+                expect(ns.router(test.url)).to.be.eql(test.route);
+            });
+
+        });
+
+    });
 });

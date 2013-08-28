@@ -213,7 +213,6 @@ describe('ns.router', function() {
         tests.forEach(function(test) {
 
             it('should process "' + test.url + '" as "' + JSON.stringify(test.route) + '"', function() {
-                console.log('test', test.url);
                 expect(ns.router(test.url)).to.be.eql(test.route);
             });
 

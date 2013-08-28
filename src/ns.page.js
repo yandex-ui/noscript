@@ -231,9 +231,9 @@ ns.page.history.back = function() {
     }
 
     // delete current history url
-    nsHistory._current = null;
+    nsHistory._current = previousPage;
 
-    return ns.page.go(previousPage, true);
+    return ns.page.go(previousPage);
 };
 
 /**

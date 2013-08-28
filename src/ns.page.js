@@ -67,6 +67,8 @@ ns.page.go = function(url, preventAddingToHistory) {
     ns.events.trigger('ns-page-before-load', [ns.page.current, route]);
 
     ns.page.current = route;
+    // save layout for async-view updates
+    ns.page.current.layout = layout;
     ns.page.currentUrl = url;
 
     if (!preventAddingToHistory) {

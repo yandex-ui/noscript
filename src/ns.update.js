@@ -164,9 +164,22 @@ ns.Update.prototype.start = function(async) {
                 }
             }
 
-            var fakeLayout = {};
-            fakeLayout[that.view.id] = that.layout;
-            new ns.Update(that.view, fakeLayout, that.params, {execFlag: ns.U.EXEC.ASYNC})
+            var layout;
+            var params;
+            // start new async update with current page params to prevent problems
+            // if other updates had been completed
+            if (ns.page.current.layout) {
+                var currentPage = ns.page.current;
+                layout = currentPage.layout;
+                params = currentPage.params;
+
+            } else {
+                layout = {};
+                layout[that.view.id] = that.layout;
+                params = that.params;
+            }
+
+            new ns.Update(that.view, layout, params, {execFlag: ns.U.EXEC.ASYNC})
                 .start(true)
                 // pipes ns.Update promise to asyncPromise
                 .pipe(asyncUpdaterPromises[asyncViewId]);

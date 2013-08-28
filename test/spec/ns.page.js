@@ -55,47 +55,4 @@ describe('ns.page', function() {
 
     });
 
-    describe('goBack', function() {
-
-        beforeEach(function() {
-            ns.router.routes = {
-                route: {
-                    '/': 'messages',
-                    '/inbox': 'messages'
-                }
-            };
-            ns.router.init();
-            ns.layout.define('messages', {'app':{}});
-            ns.layout.define('not-found', {'app':{}});
-            ns.MAIN_VIEW = {id: 'app'};
-
-            sinon.spy(ns.page, 'go');
-            sinon.stub(ns.page, 'getDefaultUrl', no.nop);
-            sinon.stub(ns.Update.prototype, 'start', no.nop);
-            sinon.stub(ns.history, 'pushState', no.nop);
-        });
-
-        afterEach(function() {
-            ns.page.go.restore();
-            ns.page.getDefaultUrl.restore();
-            ns.Update.prototype.start.restore();
-            ns.history.pushState.restore();
-        });
-
-        it('ns.page.go should add url to _history', function() {
-            var url = '/inbox?test=' + Math.random();
-
-            ns.page.go(url);
-            ns.page.goBack();
-
-            expect(ns.page.go.getCall(1).calledWithExactly(url, true)).to.be.ok();
-        });
-
-        it('goBack should call getDefaultUrl if no urls in history', function() {
-            ns.page.goBack();
-            expect(ns.page.getDefaultUrl.calledOnce).to.be.ok();
-        });
-
-    });
-
 });

@@ -46,14 +46,15 @@ ns.router = function(url) {
 
         var r = route.regexp.exec(url);
         if (r) {
-            var tokens = route.tokens;
-            var defaults = route.defaults;
+            var rparams = route.params;
             var params = {};
 
-            // Вытаскиваем параметры из основной части урла. Имена параметров берем из массива tokens.
-            var l = tokens.length;
+            // Вытаскиваем параметры из основной части урла.
+            var l = rparams.length;
+            var rparam;
             for (var k = 0; k < l; k++) {
-                params[ tokens[k] ] = r[ k + 1 ] || defaults[ tokens[k] ];
+                rparam = rparams[k];
+                params[rparam.name] = r[k + 1] || rparam.default_value;
             }
 
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
@@ -83,15 +84,6 @@ ns.router = function(url) {
 };
 
 /**
- * Generate url.
- * @param {string} url Relative url.
- * @return {String} Valid url that takes into consideration baseDir.
- */
-ns.router.url = function(url) {
-    return ns.router.baseDir + url;
-};
-
-/**
  * Inititialize ns.router, compiles defined routes.
  */
 ns.router.init = function() {
@@ -102,17 +94,138 @@ ns.router.init = function() {
     _routes.rewriteUrl = routes.rewriteUrl || {};
     _routes.rewriteParams = routes.rewriteParams || {};
 
+    // FIXME вообще конечно лучше бы route был массивом, потому что нам важен порядок рутов... пока не трогаем )
     var rawRoutes = routes.route || {};
 
     var compiledRoutes = [];
+    var compiledRoutesHash = {};
     for (var route in rawRoutes) {
+        var page = rawRoutes[route];
         var compiled = ns.router.compile(route);
-        compiled.page = rawRoutes[route];
+        compiled.page = page;
         compiledRoutes.push(compiled);
+        compiledRoutesHash[page] = compiledRoutesHash[page] || [];
+        compiledRoutesHash[page].push(compiled);
     }
     _routes.route = compiledRoutes;
+    _routes.routeHash = compiledRoutesHash;
 
     ns.router._routes = _routes;
+
+    // Типы нужны при генерации урла.
+    ns.router._regexps = {};
+    for (var id in ns.router.regexps) {
+        ns.router._regexps[id] = new RegExp( ns.router.regexps[id] );
+    }
+};
+
+/**
+ * Generate url.
+ * @param {string} url Relative url.
+ * @return {String} Valid url that takes into consideration baseDir.
+ */
+ns.router.url = function(url) {
+    return (ns.router.baseDir + url) || '/';
+};
+
+/**
+ * @param {Object} def Url definition.
+ * @param {Object} params Url generation params.
+ * @return {?string} Generated url.
+ */
+ns.router.generateUrl = function(id, params) {
+    var url;
+    var routes = ns.router._routes.routeHash[id];
+    params = params || {};
+
+    if (!routes || !routes.length) {
+        throw new Error("[ns.router] Could not find route with id '" + id + "'!");
+    }
+
+    for (var i = 0; i < routes.length; i++) {
+        url = ns.router._generateUrl(routes[i], params);
+        if (url) {
+            break;
+        }
+    }
+
+    if (url === null) {
+        throw new Error("[ns.router] Could not generate url for layout id '" + id + "'!");
+    }
+
+    return ns.router.url(url);
+};
+
+ns.router._generateUrl = function(def, params) {
+    var url;
+    var result = [];
+    var query = no.extend({}, params);
+    var rewrites = ns.router._routes.rewriteUrl;
+
+    var section;
+    var svalue;
+    var pvalue;
+    var param;
+
+    for (var i = 0; i < def.sections.length; i++) {
+        section = def.sections[i];
+        svalue = '';
+
+        for (var j = 0; j < section.items.length; j++) {
+            param = section.items[j];
+
+            if (!param.name) {
+                // Добавляем статический кусок урла как есть.
+                svalue += param.default_value;
+            } else {
+                var pvalue = params[param.name] || param.default_value;
+
+                // Обязательный параметр должен быть указан.
+                if (!param.is_optional && !pvalue) {
+                    return null;
+                }
+
+                // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
+                if (param.is_optional && !(param.name in params)) {
+                    continue;
+                }
+
+                // Проверка типа.
+                if (!ns.router._regexps[param.type].test(pvalue)) {
+                    return null;
+                }
+
+                svalue += pvalue;
+                delete query[param.name];
+            }
+        }
+
+        // Не добавляем пустую секцию, если она опциональна.
+        if (!svalue && section.is_optional) {
+            continue;
+        }
+
+        result.push(svalue);
+    }
+
+    url = result.join('/');
+    url = (url) ? ('/' + url) : '';
+
+    // Разворачиваем rewrite правила, чтобы получить красивый урл до rewrite-ов.
+    var rewrote = true;
+    while (rewrote) {
+        rewrote = false;
+        for (var srcUrl in rewrites) {
+            if (url === rewrites[srcUrl]) {
+                url = srcUrl;
+                rewrote = true;
+            }
+        }
+    }
+
+    // Дописываем query string.
+    var queryString = $.param(query);
+    return (queryString) ? (url + '?' + queryString) : url;
 };
 
 /**
@@ -121,54 +234,147 @@ ns.router.init = function() {
  * @return {{ regexp: RegExp, tokens: Array.<string> }}
 */
 ns.router.compile = function(route) {
-    //  Отрезаем последний слэш, он ниже добавится как необязательный.
-    var regexp = route.replace(/\/$/, '');
+    // Удаляем слеши в начале и в конце урла.
+    route = route
+        .replace(/^\//, '')
+        .replace(/\/$/, '');
 
-    var tokens = [];
-    var defaults = {};
+    var parts = route.split('/');
+    var sections = parts.map(ns.router._parseSection);
+    var sregexps = sections.map(ns.router._generateSectionRegexp);
+    var regexp = sregexps.join('');
 
-    //  Заменяем {name} на кусок регэкспа соответствующего типу токена name.
-    //  Матч на слеш нужен, чтобы сделать слеш опциональным.
-    regexp = regexp.replace(/(\/?){(.*?)}/g, function(_, slash, token) {
-        var tokenParts = token.split(':');
-        slash = slash || '';
-
-        var type = tokenParts[1] || 'id';
-        var rx_part = ns.router.regexps[type];
-        if (!rx_part) {
-            throw new Error("[ns.router] Can't find regexp for '" + type + "'!");
-        }
-
-        var tokenName = tokenParts[0];
-        var equalSignIndex = tokenName.indexOf('=');
-
-        if (equalSignIndex > 0) {
-            var tokenDefault = tokenName.substring(equalSignIndex + 1);
-            tokenName = tokenName.substring(0, equalSignIndex);
-
-            tokens.push(tokenName);
-            defaults[tokenName] = tokenDefault;
-            if (slash) {
-                return '(?:' + slash + '(' + rx_part + '))?';
-            } else {
-                return '(' + rx_part + ')?';
-            }
-
-        } else {
-            //  Запоминаем имя токена, оно нужно при парсинге урлов.
-            tokens.push(tokenName);
-            return slash + '(' + rx_part + ')';
-        }
+    // Вычленяем только параметры.
+    var params = [];
+    sections.forEach(function(s) {
+        params = params.concat(s.items.filter(function(p) { return !!p.name; }));
     });
-    //  Добавляем "якоря" ^ и $;
-    //  Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+
+    // Добавляем "якоря" ^ и $;
+    // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
     regexp = '^' + regexp + '\/?(?:\\?(.*))?$';
 
     return {
         regexp: new RegExp(regexp),
-        tokens: tokens,
-        defaults: defaults
+        params: params,
+        sections: sections
     };
+};
+
+ns.router._parseSection = function(rawSection) {
+    var curIndex = 0;
+    var openBraketIndex = -1;
+    var closeBraketIndex = -1;
+    var items = [];
+
+    while(true) {
+        openBraketIndex = rawSection.indexOf('{', curIndex);
+        if (openBraketIndex < 0) {
+            break;
+        }
+
+        closeBraketIndex = rawSection.indexOf('}', openBraketIndex);
+        if (closeBraketIndex < 0) {
+            throw '[ns.router] could not parse parameter in url section: ' + rawSection;
+        }
+
+        // Добавляем всё, что до { как константу.
+        if (openBraketIndex > curIndex) {
+            items.push({
+                default_value: rawSection.substr(curIndex, openBraketIndex - curIndex)
+            });
+        }
+
+        // Дальше идёт переменная.
+        items.push(ns.router._parseParam(rawSection.substr(openBraketIndex + 1, closeBraketIndex - openBraketIndex - 1)));
+
+        curIndex = closeBraketIndex + 1;
+    }
+
+    // Добавляем оставшуюся часть секции .
+    if (curIndex < rawSection.length) {
+        items.push({
+            default_value: rawSection.substr(curIndex)
+        });
+    }
+
+    return {
+        // Секция опциональна когда все параметры опциональны.
+        is_optional: items.length && items.filter(function(p) { return p.is_optional; }).length === items.length,
+        items: items
+    };
+};
+
+/**
+ * Парсит декларацию параметра (то, что внутри фигурных скобок.
+ * Пример:
+ *      name=default:type
+ */
+ns.router._parseParam = function(param) {
+    var type_parts;
+    var default_parts;
+    var param_type;
+    var param_default;
+    var param_is_optional;
+
+    // parameter type (defaults to id)
+    type_parts = param.split(':');
+    param_type = type_parts[1] || 'id';
+
+    // parameter default value and if parameter is optional
+    param = type_parts[0];
+    default_parts = param.split('=');
+    param_default = default_parts[1];
+    param_is_optional = (default_parts.length > 1);
+
+    // section parsed
+    param = default_parts[0];
+    return {
+        name: param,
+        type: param_type,
+        default_value: param_default,
+        is_optional: param_is_optional
+    };
+};
+
+ns.router._generateSectionRegexp = function(section) {
+    var re = '';
+
+    section.items.forEach(function(p) {
+        re += ns.router._generateParamRegexp(p);
+    });
+
+    if (section.is_optional) {
+        re = '(?:/(?!/)' + re + ')?';
+    } else {
+        re = '/' + re;
+    }
+
+    return re;
+};
+
+ns.router._generateParamRegexp = function(p) {
+    var re;
+    var regexps = ns.router.regexps;
+
+    // static text
+    if (p.default_value && !p.name) {
+        return p.default_value;
+    }
+
+    // validate parameter type is known (if specified)
+    if (p.type && !(p.type in regexps)) {
+        throw new Error("[ns.router] Could not find regexp for '" + p.type + "'!");
+    }
+
+    re = regexps[p.type];
+    re = '(' + re + ')';
+
+    if (p.is_optional) {
+        re = '(?:' + re + ')?';
+    }
+
+    return re;
 };
 
 /**
@@ -201,7 +407,6 @@ ns.router.regexps = {
 };
 
 if (window['mocha']) {
-
     ns.router.undefine = function() {
         ns.router._routes = null;
         ns.router.routes = {};

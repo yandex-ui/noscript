@@ -322,4 +322,59 @@ describe('ns.Box', function() {
         });
     });
 
+    describe('box -> box', function() {
+
+        beforeEach(function(done) {
+
+            ns.layout.define('box1', {
+                'app content@': {
+                    'box1@': {}
+                }
+            }, 'app');
+
+            ns.layout.define('box2', {
+                'app content@': {
+                    'box2@': {}
+                }
+            }, 'app');
+
+
+            new ns.Update(
+                this.APP,
+                ns.layout.page('box1', {}),
+                {}
+            ).start().done(function() {
+
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('box2', {}),
+                    {}
+                ).start().done(function() {
+                    done();
+                });
+
+            }.bind(this));
+
+        });
+
+        it('should have two boxes in "content@"', function() {
+            expect(
+                this.APP.node.querySelector('.ns-view-content').childNodes
+            ).to.have.length(2)
+        });
+
+        it('should set "box1@" as hidden', function() {
+            expect(
+                this.APP.node.querySelector('.ns-view-box1').classList.contains('ns-view-hidden')
+            ).to.equal(true)
+        });
+
+        it('should set "box2@" as visible', function() {
+            expect(
+                this.APP.node.querySelector('.ns-view-box2').classList.contains('ns-view-visible')
+            ).to.equal(true)
+        });
+
+    });
+
 });

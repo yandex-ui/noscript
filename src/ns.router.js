@@ -134,7 +134,7 @@ ns.router.generateUrl = function(id, params) {
     params = params || {};
 
     if (!routes || !routes.length) {
-        throw new Error("[ns.router] Could not find route with id '" + id  +"'!");
+        throw new Error("[ns.router] Could not find route with id '" + id + "'!");
     }
 
     for (var i = 0; i < routes.length; i++) {
@@ -145,7 +145,7 @@ ns.router.generateUrl = function(id, params) {
     }
 
     if (url === null) {
-        throw new Error("[ns.router] Could not generate url for layout id '" + id  +"'!");
+        throw new Error("[ns.router] Could not generate url for layout id '" + id + "'!");
     }
 
     return ns.router.url(url);
@@ -160,7 +160,7 @@ ns.router._generateUrl = function(def, params) {
     var url;
     var part;
     var pvalue;
-    var result= [];
+    var result = [];
 
     for (var i = 0; i < def.parts.length; i++) {
         part = def.parts[i];
@@ -228,10 +228,10 @@ ns.router._parseParam = function(param) {
     var param_default;
     var param_is_optional;
 
-    // it can be a parameter (in curly braces)
-    // the most complex case: name=default:type
+    // Параметр (указывается в фигурных скобках)
     param_extract = /{([^}]+)}/.exec(param);
     if (param_extract) {
+        // Самый сложный вариант: {name=default:type}
         param = param_extract[1];
 
         // parameter type (defaults to id)
@@ -252,9 +252,8 @@ ns.router._parseParam = function(param) {
             default_value: param_default,
             is_optional: param_is_optional
         };
-    }
-    // it can be a static text
-    else {
+    } else {
+        // статический кусок урла
         return {
             default_value: param
         };
@@ -272,7 +271,7 @@ ns.router._generateParamRegexp = function(p) {
 
     // validate parameter type is known (if specified)
     if (p.type && !(p.type in regexps)) {
-        throw new Error("[ns.router] Could not find regexp for '" + p.type +"'!");
+        throw new Error("[ns.router] Could not find regexp for '" + p.type + "'!");
     }
 
     re = regexps[p.type];

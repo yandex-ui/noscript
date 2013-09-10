@@ -110,14 +110,13 @@ ns.Box.prototype._getViewTree = function(layout, params) {
 
 //  Обновляем бокс.
 ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
-    //  Ищем новую ноду бокса.
-    var newNode = ns.byClass('ns-view-' + this.id, node)[0];
-
     // Если старой ноды не было
     // Или есть новая нода и этот box не toplevel (т.е. родительский view обновил свою ноду)
-    if (!this.node || newNode && !options.toplevel) {
+    if (!this.node || !options.toplevel) {
+        //  Ищем новую ноду бокса.
+        var newNode = ns.byClass('ns-view-' + this.id, node)[0];
         // Если есть старая нода
-        if (this.node) {
+        if (this.node && newNode) {
             // Переложим из неё ноды валидных view в новую
             for (var k in this.views) {
                 var view = this.views[k];

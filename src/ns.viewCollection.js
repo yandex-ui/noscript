@@ -286,6 +286,13 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
     var viewWasInvalid = !this.isValid();
     var syncUpdate     = !updateOptions.async;
 
+    var options_next;
+    if (updateOptions.toplevel) {
+        options_next = no.extend({}, updateOptions);
+    } else {
+        options_next = updateOptions;
+    }
+
     if (!this.isValidSelf()) {
 
         var hadOldNode = !!this.node;
@@ -304,14 +311,14 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             // Если toplevel и placeholder, то не вставляем и в options для вложенных пишем toplevel
             // Если toplevel и не placeholder, то вставляем
             if (isOuterPlaceholder) {
-                updateOptions.toplevel = true;
+                options_next.toplevel = true;
             } else {
                 if (this.node) {
                     ns.replaceNode(this.node, newNode);
                 }
                 //  Все подблоки ниже уже не toplevel.
-                updateOptions.toplevel = false;
-                updateOptions.parent_added = true;
+                options_next.toplevel = false;
+                options_next.parent_added = true;
 
                 this._setNode(newNode);
             }
@@ -321,8 +328,8 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             if (isOuterPlaceholder) {
                 ns.replaceNode(newNode, this.node);
 
-                updateOptions.toplevel = false;
-                updateOptions.parent_added = true;
+                options_next.toplevel = false;
+                options_next.parent_added = true;
             } else {
                 this._setNode(newNode);
             }
@@ -393,7 +400,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //          место
                 //      1.2 view валиден, то ничего не делаем
                 if (!view.isValid()) {
-                    view._updateHTML(newNode, null, params, updateOptions, events);
+                    view._updateHTML(newNode, null, params, options_next, events);
 
                     // поставим ноду в правильное место
                     if (prev) {
@@ -413,7 +420,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //          Делаем _updateHtml
                 //      1.2 view валиден, то заменим placeholder на правильный html.
                 if (!view.isValid()) {
-                   view._updateHTML(newNode, null, params, updateOptions, events);
+                   view._updateHTML(newNode, null, params, options_next, events);
                 } else {
                     // здесь не нужно перевешивать события, т.к. они могут быть повешены
                     // либо непосредственно на ноду, либо на document. В первом случае

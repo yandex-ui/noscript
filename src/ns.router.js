@@ -94,26 +94,47 @@ ns.router.url = function(url) {
 
 ns.router.generateUrl = function(id, params) {
     params = params || {};
+    var url;
+    var _routeDefs = ns.router._routes.routeHash[id];
 
-    var result = [];
-    var _routeDef = ns.router._routes.routeHash[id];
-
-    if (!_routeDef) {
+    if (!_routeDefs || !_routeDefs.length) {
         throw new Error("[ns.router] Could not find route with id '" + id  +"'!");
     }
 
+    for (var i = 0; i < _routeDefs.length; i++) {
+        url = ns.router.__generateUrl(_routeDefs[i], params);
+        if (url) {
+            break;
+        }
+    }
+
+    if (url === null) {
+        throw new Error("[ns.router] Could not generate url for layout id '" + id  +"'!");
+    }
+
+    return ns.router.url(url);
+};
+
+/**
+ * @param {Object} def Url definition.
+ * @param {Object} params Url generation params.
+ * @return {?string} Generated url.
+ */
+ns.router.__generateUrl = function(def, params) {
     var _rpart;
     var pvalue;
-    for (var i = 0; i < _routeDef.parts.length; i++) {
-        _rpart = _routeDef.parts[i];
+    var result= [];
+    for (var i = 0; i < def.parts.length; i++) {
+        _rpart = def.parts[i];
         if (!_rpart.name) {
+            // Добавляем статический кусок урла как есть.
             result.push(_rpart.default_value);
         } else {
             pvalue = params[_rpart.name] || _rpart.default_value;
 
             // Обязательный параметр должен быть указан.
             if (!_rpart.is_optional && !pvalue) {
-                throw new Error("[ns.router] Parameter '" + _rpart.name + "' must be specified");
+                return null;
             }
 
             // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
@@ -123,7 +144,7 @@ ns.router.generateUrl = function(id, params) {
 
             // Проверка типа.
             if (!ns.router._regexps[_rpart.type].test(pvalue)) {
-                throw new Error("[ns.router] Parameter '" + _rpart.name + "' type must be '" + _rpart.type + "'");
+                return null;
             }
 
             result.push(pvalue);
@@ -131,8 +152,7 @@ ns.router.generateUrl = function(id, params) {
     }
 
     var _url = result.join('/');
-    _url = _url ? ('/' + _url) : '';
-    return ns.router.url(_url);
+    return _url ? ('/' + _url) : '';
 };
 
 /**
@@ -146,15 +166,18 @@ ns.router.init = function() {
     _routes.rewriteUrl = routes.rewriteUrl || {};
     _routes.rewriteParams = routes.rewriteParams || {};
 
+    // FIXME вообще конечно лучше бы route был массивом, потому что нам важен порядок рутов... пока не трогаем )
     var rawRoutes = routes.route || {};
 
     var compiledRoutes = [];
     var compiledRoutesHash = {};
     for (var route in rawRoutes) {
+        var page = rawRoutes[route];
         var compiled = ns.router.compile(route);
-        compiled.page = rawRoutes[route];
+        compiled.page = page;
         compiledRoutes.push(compiled);
-        compiledRoutesHash[ rawRoutes[route] ] = compiled;
+        compiledRoutesHash[page] = compiledRoutesHash[page] || [];
+        compiledRoutesHash[page].push(compiled);
     }
     _routes.route = compiledRoutes;
     _routes.routeHash = compiledRoutesHash;

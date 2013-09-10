@@ -142,9 +142,9 @@ describe('generate url', function() {
         beforeEach(function() {
             ns.router.routes = {
                 route: {
-                    '/compose': 'compose',
+                    '/compose/{oper:id}/{mid:int}': 'compose',
                     '/compose/{mid:int}': 'compose',
-                    '/compose/{oper:id}/{mid:int}': 'compose'
+                    '/compose': 'compose'
                 }
             };
             ns.router.init();

@@ -13,7 +13,6 @@ ns.page = {};
 ns.page.current = {};
 ns.page.currentUrl = null;
 
-
 ns.page._stop = false;
 ns.page._lastUrl = '';
 

@@ -29,4 +29,3 @@ ns.http = function(url, params, options) {
 
     return promise;
 };
-

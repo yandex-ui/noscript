@@ -2,7 +2,6 @@
  * @fileOverview noscript dom helpers
  */
 
-
 /**
  * Replaces oldNode with newNode
  * @param {Element} oldNode

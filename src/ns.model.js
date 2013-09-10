@@ -184,7 +184,6 @@ ns.Model.define = function(id, info, base) {
     // Нужно унаследоваться от base и добавить в прототип info.methods.
     ctor = no.inherit(ctor, base, info.methods);
 
-
     // часть дополнительной обработки производится в ns.Model.info
     // т.о. получаем lazy-определение
 
@@ -579,7 +578,7 @@ ns.Model.prototype.prepareRequest = function(requestID) {
 };
 
 // @chestozo: куда-то хочется вынести это...
-if(window['mocha']) {
+if (window['mocha']) {
     /**
      * Удаляет определение модели.
      * Используется только в юнит-тестах.
@@ -617,7 +616,6 @@ if(window['mocha']) {
     };
 }
 
-
 /**
  * Это набор хэлперов для модели, делающего групповые запросы,
  * т.е. в качестве параметра у него есть массив
@@ -626,7 +624,7 @@ if(window['mocha']) {
  * @class
  * @augments ns.Model
  */
-ns.ModelUniq = function(){};
+ns.ModelUniq = function() {};
 
 no.inherit(ns.ModelUniq, ns.Model);
 
@@ -645,7 +643,7 @@ ns.ModelUniq.prototype._init = function(id) {
         var uniq = this.params[this.uniqName];
         if (!this.uniqCached) { this.uniqCached = {}; }
 
-        $.each(uniq, function(i, v){ that.uniqCached[v] = true; });
+        $.each(uniq, function(i, v) { that.uniqCached[v] = true; });
     };
 
     if (Array.isArray(onchangedCallbacks)) {
@@ -791,4 +789,3 @@ ns.ModelUniq.prototype.getData = function(params) {
 };
 
 })();
-

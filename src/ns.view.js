@@ -216,7 +216,7 @@ ns.View.define = function(id, info, base) {
         if (_ctors[base]) {
             baseClass = _ctors[base];
         } else {
-            throw new Error("[ns.View] Can't find '" + base + "' to extend '" + id +"'");
+            throw new Error("[ns.View] Can't find '" + base + "' to extend '" + id + "'");
         }
 
     } else if (typeof base === 'function') {
@@ -775,7 +775,9 @@ ns.View.prototype._getEvents = function(type) {
  */
 ns.View.prototype._bindEvents = function(type) {
     var $node = this.$node;
-    var i, j, event;
+    var i;
+    var j;
+    var event;
     var events = this._getEvents(type);
 
     // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
@@ -825,7 +827,9 @@ ns.View.prototype._bindEvents = function(type) {
  */
 ns.View.prototype._unbindEvents = function(type) {
     var $node = this.$node;
-    var i, j, event;
+    var i;
+    var j;
+    var event;
 
     // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
     var eventNS = this._eventNS + '-' + type;
@@ -950,9 +954,11 @@ ns.View.prototype._apply = function(callback) {
 /**
  * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
  * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
- * @param updated
- * @param pageLayout
- * @param params
+ * @param {Object} updated Hash for sync and async views.
+ * @param {ns.View[]} updated.sync Sync views.
+ * @param {ns.View[]} updated.async Sync views.
+ * @param {Object} pageLayout Currently processing layout.
+ * @param {Object} params Params.
  * @return {*}
  */
 ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
@@ -1024,8 +1030,8 @@ ns.View.prototype._getUpdateTree = function(tree, layout, params) {
 
 /**
  * Строим дерево блоков.
- * @param layout
- * @param params
+ * @param {Object} layout Currently processing layout.
+ * @param {Object} params Params.
  * @return {Object}
  */
 ns.View.prototype._getViewTree = function(layout, params) {
@@ -1080,8 +1086,8 @@ ns.View.prototype._getDescViewTree = function(layout, params) {
 
 /**
  * Возвращает декларацию вида для вставки плейсхолдера
- * @param layout
- * @param params
+ * @param {Object} layout Currently processing layout.
+ * @param {Object} params Params.
  * @return {Object}
  */
 ns.View.prototype._getPlaceholderTree = function(layout, params) {
@@ -1381,7 +1387,6 @@ ns.View.prototype._saveModelsVersions = function() {
         this._modelsVersions[modelId] = this.models[modelId].getVersion();
     }
 };
-
 
 if (window['mocha']) {
     /**

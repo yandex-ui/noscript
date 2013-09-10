@@ -78,7 +78,7 @@ ns.parseQuery = function(s) {
             } else {
                 try {
                     value = decodeURIComponent(value);
-                } catch (e) {
+                } catch(e) {
                     value = '';
                     ns.log.info('ns.parseQuery.invalid-param', {
                         query: s,

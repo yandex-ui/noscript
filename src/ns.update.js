@@ -74,7 +74,7 @@ ns.Update.prototype._EVENTS_ORDER = ['ns-view-hide', 'ns-view-htmldestroy', 'ns-
 
 /**
  * Начинает работу updater'а.
- * @param [async=false] Флаг асинхронного updater'а.
+ * @param {boolean} [async=false] Флаг асинхронного updater'а.
  * @return {no.Promise}
  */
 ns.Update.prototype.start = function(async) {
@@ -199,7 +199,7 @@ ns.Update.prototype.start = function(async) {
 
 /**
  * Обновляет DOM и триггерит нужные события
- * @param [async=false] Флаг асинхронного updater'а.
+ * @param {boolean} [async=false] Флаг асинхронного updater'а.
  * @private
  */
 ns.Update.prototype._update = function(async) {
@@ -275,7 +275,7 @@ ns.Update.prototype.abort = function() {
 
 /**
  * @private
- * @param result
+ * @param {*} result Result data.
  */
 ns.Update.prototype.done = function(result) {
     this.removeFromQueue();
@@ -284,7 +284,7 @@ ns.Update.prototype.done = function(result) {
 
 /**
  * @private
- * @param result
+ * @param {*} result Error data.
  */
 ns.Update.prototype.error = function(result) {
     this.removeFromQueue();
@@ -323,7 +323,8 @@ ns.Update.prototype.addToQueue = function(newUpdate) {
     var FLAG_ASYNC = FLAGS.ASYNC;
 
     var newRunExecutionFlag = newUpdate.EXEC_FLAG;
-    var i,j;
+    var i;
+    var j;
 
     // if newUpdate is global we should terminate all non-parallel updates
     if (newRunExecutionFlag === FLAG_GLOBAL) {
@@ -384,4 +385,3 @@ function views2models(views) {
 }
 
 })();
-

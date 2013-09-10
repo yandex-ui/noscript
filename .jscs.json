@@ -55,7 +55,6 @@
     "requireLeftStickedOperators": [","],
     "disallowImplicitTypeConversion": [
         "numeric",
-        "boolean",
         "binary",
         "string"
     ],

@@ -1,7 +1,7 @@
 /**
  * @class Box - это тип View, который умеет выбирать какие View показывать.
- * @param id
- * @param params
+ * @param {string} id
+ * @param {object} params
  * @constructor
  */
 ns.Box = function(id, params) {
@@ -211,7 +211,6 @@ ns.Box.prototype._show = function() {
 
 /**
  * Скрывает view
- * @param {Array} [events] Массив событий.
  * @return {Boolean}
  * @protected
  */

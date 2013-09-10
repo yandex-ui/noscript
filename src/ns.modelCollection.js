@@ -256,7 +256,6 @@ ns.ModelCollection.prototype.remove = function(models) {
         models = [models];
     }
 
-
     models.forEach(function(modelOrIndex) {
         var index;
 

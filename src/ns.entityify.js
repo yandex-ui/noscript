@@ -27,7 +27,6 @@
         return s.toString().replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
     };
 
-
     /**
      * Регулярка для поиска html-entity.
      * @type {RegExp}

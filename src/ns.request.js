@@ -45,7 +45,7 @@ ns.forcedRequest = function(items, params, options) {
 ns.request.models = function(models, options) {
 
     // Загрузка порционных данных. В этом случае грузим не саму модель, а порцию данных.
-    models = $.map(models, function(model){
+    models = $.map(models, function(model) {
         return model.getRequest ? model.getRequest() : model;
     });
 
@@ -358,7 +358,8 @@ Request.prototype.extract = function(models, response) {
             continue;
         }
 
-        var data, error;
+        var data;
+        var error;
         if (!result) {
             error = {
                 id: 'NO_DATA',
@@ -416,8 +417,8 @@ function models2params(models) {
 
     /**
      * Приводит запрашиваемые модели к формату №3 из ns.request.
-     * @param items Массив названией моделей.
-     * @param params Параметры моделей.
+     * @param {Array} items Массив названией моделей.
+     * @param {Object} params Параметры моделей.
      * @return {Array}
      */
     function normalizeItems(items, params) {

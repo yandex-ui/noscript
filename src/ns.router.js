@@ -136,7 +136,7 @@ ns.router.compile = function(route) {
         var type = tokenParts[1] || 'id';
         var rx_part = ns.router.regexps[type];
         if (!rx_part) {
-            throw new Error("[ns.router] Can't find regexp for '" + type +"'!");
+            throw new Error("[ns.router] Can't find regexp for '" + type + "'!");
         }
 
         var tokenName = tokenParts[0];
@@ -150,8 +150,7 @@ ns.router.compile = function(route) {
             defaults[tokenName] = tokenDefault;
             if (slash) {
                 return '(?:' + slash + '(' + rx_part + '))?';
-            }
-            else {
+            } else {
                 return '(' + rx_part + ')?';
             }
 

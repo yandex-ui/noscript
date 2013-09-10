@@ -16,6 +16,8 @@ ns.Box = function(id, params) {
 
     this.node = null;
     this.active = {};
+
+    this._visible = false;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -44,11 +46,15 @@ ns.Box.prototype._getDescendants = function(descs) {
     var views = this.views;
     var active = this.active;
 
+    descs.push(this);
+
     for (var id in active) {
         var view = views[ active[id] ];
         descs.push(view);
         view._getDescendants(descs);
     }
+
+    return descs;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -68,10 +74,15 @@ ns.Box.prototype._getRequestViews = function(updated, layout, params) {
 
 //  Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
 ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
-    var views = this.views;
-    for (var id in layout) {
-        var key = ns.View.getKey(id, params);
-        views[key]._getUpdateTree(tree, layout[id].views, params);
+    if ( this.isNone() ) {
+        tree.views[this.id] = this._getViewTree(layout, params);
+
+    } else {
+        var views = this.views;
+        for (var id in layout) {
+            var key = ns.View.getKey(id, params);
+            views[key]._getUpdateTree(tree, layout[id].views, params);
+        }
     }
 };
 
@@ -180,6 +191,45 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
     //  Запоминаем новый active.
     this.active = newActive;
+
+    this._show();
+};
+
+ns.Box.prototype._show = function() {
+    if (this._visible === false) {
+        this._showNode();
+        this._visible = true;
+//        return true;
+    }
+
+    return false;
+};
+
+/**
+ * Скрывает view
+ * @param {Array} [events] Массив событий.
+ * @return {Boolean}
+ * @protected
+ */
+ns.Box.prototype._hide = function() {
+    if (this._visible === true) {
+        this._hideNode();
+        this._visible = false;
+//        return true;
+    }
+
+    return false;
+};
+
+/**
+ * @private
+ */
+ns.Box.prototype._hideNode = function() {
+    this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
+};
+
+ns.Box.prototype._showNode = function() {
+    this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
 };
 
 ns.Box.prototype.isOk = no.true;

@@ -113,6 +113,10 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     if (!this.node) {
         //  Ищем новую ноду бокса.
         this.node = ns.byClass('ns-view-' + this.id, node)[0];
+
+        if (!this.node) {
+            throw new Error("[ns.Box] Can't find node for '" + this.id + "'");
+        }
     }
 
     var views = this.views;
@@ -199,7 +203,7 @@ ns.Box.prototype._show = function() {
     if (this._visible === false) {
         this._showNode();
         this._visible = true;
-//        return true;
+        // always returns false to prevent events trigger
     }
 
     return false;
@@ -215,7 +219,7 @@ ns.Box.prototype._hide = function() {
     if (this._visible === true) {
         this._hideNode();
         this._visible = false;
-//        return true;
+        // always returns false to prevent events trigger
     }
 
     return false;

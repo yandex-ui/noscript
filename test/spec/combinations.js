@@ -67,16 +67,8 @@ describe('Combinations of entities', function() {
             delete this.APP;
         });
 
-        it('should have 2 nodes for view vChild', function() {
-            expect(this.APP.node.getElementsByClassName('ns-view-vChild').length).to.be(2);
-        });
-
         it('should have 1 visible node for view vChild', function() {
-            expect(this.APP.node.getElementsByClassName('ns-view-vChild').length).to.be(1);
-        });
-
-        it('should have 1 hidden node for view vChild', function() {
-            expect(this.APP.node.getElementsByClassName('ns-view-vChild').length).to.be(1);
+            expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be(1);
         });
 
     });

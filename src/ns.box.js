@@ -99,9 +99,28 @@ ns.Box.prototype._getViewTree = function(layout, params) {
 
 //  Обновляем бокс.
 ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
+    //  Ищем новую ноду бокса.
+    var newNode = ns.byClass('ns-view-' + this.id, node)[0];
+
+    // Если есть новая нода и не toplevel (т.е. родительский view обновил свою ноду)
+    if (newNode && !options.toplevel) {
+        // Если есть старая нода
+        if (this.node) {
+            // Переложим из неё ноды валидных view в новую
+            for (var k in this.views) {
+                var view = this.views[k];
+                if (view.isValid()) {
+                    newNode.appendChild(view.node);
+                }
+            }
+        }
+
+        // Обновим ноду бокса
+        this.node = newNode;
+    }
+
     if (!this.node) {
-        //  Ищем новую ноду бокса.
-        this.node = ns.byClass('ns-view-' + this.id, node)[0];
+        throw new Error("[ns.Box] Can't find node for '" + this.id + "'");
     }
 
     var views = this.views;

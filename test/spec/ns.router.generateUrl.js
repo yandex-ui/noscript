@@ -137,4 +137,48 @@ describe('generate url', function() {
         });
     });
 
+    describe('same layout with various params', function() {
+
+        beforeEach(function() {
+            ns.router.routes = {
+                route: {
+                    '/compose': 'compose',
+                    '/compose/{mid:int}': 'compose',
+                    '/compose/{oper:id}/{mid:int}': 'compose'
+                }
+            };
+            ns.router.init();
+        });
+
+        var TESTS = [
+            {
+                layout: 'compose',
+                params: {},
+                url: '/compose'
+            },
+            {
+                layout: 'compose',
+                params: {mid: '1'},
+                url: '/compose/1'
+            },
+            {
+                layout: 'compose',
+                params: {mid: '2', oper: 'reply'},
+                url: '/compose/reply/2'
+            }
+        ];
+
+        TESTS.forEach(function(test) {
+
+            it('should generate "' + test.url +'" for "' + test.layout + '" ' + JSON.stringify(test.params), function() {
+                expect(
+                    ns.router.generateUrl(test.layout, test.params)
+                ).to.be(test.url)
+            });
+
+        });
+
+
+    });
+
 });

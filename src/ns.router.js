@@ -84,78 +84,6 @@ ns.router = function(url) {
 };
 
 /**
- * Generate url.
- * @param {string} url Relative url.
- * @return {String} Valid url that takes into consideration baseDir.
- */
-ns.router.url = function(url) {
-    return (ns.router.baseDir + url) || '/';
-};
-
-ns.router.generateUrl = function(id, params) {
-    params = params || {};
-    var url;
-    var _routeDefs = ns.router._routes.routeHash[id];
-
-    if (!_routeDefs || !_routeDefs.length) {
-        throw new Error("[ns.router] Could not find route with id '" + id  +"'!");
-    }
-
-    for (var i = 0; i < _routeDefs.length; i++) {
-        url = ns.router.__generateUrl(_routeDefs[i], params);
-        if (url) {
-            break;
-        }
-    }
-
-    if (url === null) {
-        throw new Error("[ns.router] Could not generate url for layout id '" + id  +"'!");
-    }
-
-    return ns.router.url(url);
-};
-
-/**
- * @param {Object} def Url definition.
- * @param {Object} params Url generation params.
- * @return {?string} Generated url.
- */
-ns.router.__generateUrl = function(def, params) {
-    var _rpart;
-    var pvalue;
-    var result= [];
-    for (var i = 0; i < def.parts.length; i++) {
-        _rpart = def.parts[i];
-        if (!_rpart.name) {
-            // Добавляем статический кусок урла как есть.
-            result.push(_rpart.default_value);
-        } else {
-            pvalue = params[_rpart.name] || _rpart.default_value;
-
-            // Обязательный параметр должен быть указан.
-            if (!_rpart.is_optional && !pvalue) {
-                return null;
-            }
-
-            // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
-            if (_rpart.is_optional && !(_rpart.name in params)) {
-                continue;
-            }
-
-            // Проверка типа.
-            if (!ns.router._regexps[_rpart.type].test(pvalue)) {
-                return null;
-            }
-
-            result.push(pvalue);
-        }
-    }
-
-    var _url = result.join('/');
-    return _url ? ('/' + _url) : '';
-};
-
-/**
  * Inititialize ns.router, compiles defined routes.
  */
 ns.router.init = function() {
@@ -192,23 +120,97 @@ ns.router.init = function() {
 };
 
 /**
+ * Generate url.
+ * @param {string} url Relative url.
+ * @return {String} Valid url that takes into consideration baseDir.
+ */
+ns.router.url = function(url) {
+    return (ns.router.baseDir + url) || '/';
+};
+
+ns.router.generateUrl = function(id, params) {
+    var url;
+    var routes = ns.router._routes.routeHash[id];
+    params = params || {};
+
+    if (!routes || !routes.length) {
+        throw new Error("[ns.router] Could not find route with id '" + id  +"'!");
+    }
+
+    for (var i = 0; i < routes.length; i++) {
+        url = ns.router._generateUrl(routes[i], params);
+        if (url) {
+            break;
+        }
+    }
+
+    if (url === null) {
+        throw new Error("[ns.router] Could not generate url for layout id '" + id  +"'!");
+    }
+
+    return ns.router.url(url);
+};
+
+/**
+ * @param {Object} def Url definition.
+ * @param {Object} params Url generation params.
+ * @return {?string} Generated url.
+ */
+ns.router._generateUrl = function(def, params) {
+    var url;
+    var part;
+    var pvalue;
+    var result= [];
+
+    for (var i = 0; i < def.parts.length; i++) {
+        part = def.parts[i];
+        if (!part.name) {
+            // Добавляем статический кусок урла как есть.
+            result.push(part.default_value);
+        } else {
+            pvalue = params[part.name] || part.default_value;
+
+            // Обязательный параметр должен быть указан.
+            if (!part.is_optional && !pvalue) {
+                return null;
+            }
+
+            // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
+            if (part.is_optional && !(part.name in params)) {
+                continue;
+            }
+
+            // Проверка типа.
+            if (!ns.router._regexps[part.type].test(pvalue)) {
+                return null;
+            }
+
+            result.push(pvalue);
+        }
+    }
+
+    url = result.join('/');
+    return (url) ? ('/' + url) : '';
+};
+
+/**
  * Compile route.
  * @param {String} route
  * @return {{ regexp: RegExp, tokens: Array.<string> }}
 */
 ns.router.compile = function(route) {
-    //  /a/b/ -> a/b
+    // Удаляем слеши в начале и в конце урла.
     route = route
         .replace(/^\//, '')
         .replace(/\/$/, '');
 
     var parts = route.split('/');
-    var params = parts.map(ns.router.__parseParam);
-    var pregexps = params.map(ns.router.__generateParamRegexp);
+    var params = parts.map(ns.router._parseParam);
+    var pregexps = params.map(ns.router._generateParamRegexp);
     var regexp = pregexps.join('');
 
-    //  Добавляем "якоря" ^ и $;
-    //  Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
+    // Добавляем "якоря" ^ и $;
+    // Плюс матчим необязательный query-string в конце урла, вида ?param1=value1&param2=value2...
     regexp = '^' + regexp + '\/?(?:\\?(.*))?$';
 
     return {
@@ -218,7 +220,7 @@ ns.router.compile = function(route) {
     };
 };
 
-ns.router.__parseParam = function(param) {
+ns.router._parseParam = function(param) {
     var param_extract;
     var type_parts;
     var default_parts;
@@ -259,7 +261,7 @@ ns.router.__parseParam = function(param) {
     }
 };
 
-ns.router.__generateParamRegexp = function(p) {
+ns.router._generateParamRegexp = function(p) {
     var re;
     var regexps = ns.router.regexps;
 

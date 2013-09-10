@@ -28,7 +28,7 @@ describe('router: new route parsing method', function() {
 
         for (var test in _tests) {
             it(test, function() {
-                expect(ns.router.__parseParam(test)).to.be.eql(_tests[test]);
+                expect(ns.router._parseParam(test)).to.be.eql(_tests[test]);
             });
         }
     });
@@ -46,7 +46,7 @@ describe('router: new route parsing method', function() {
 
         for (var test in _tests) {
             it(test, function() {
-                expect( ns.router.__generateParamRegexp( ns.router.__parseParam(test) )).to.be(_tests[test] );
+                expect( ns.router._generateParamRegexp( ns.router._parseParam(test) )).to.be(_tests[test] );
             });
         }
     });

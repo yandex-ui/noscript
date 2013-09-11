@@ -118,10 +118,10 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         if (newNode) {
             // Если есть старая нода
             if (this.node) {
-                // Переложим из неё ноды валидных view в новую
+                // Переложим из неё ноды вложенных view в новую
                 for (var k in this.views) {
                     var view = this.views[k];
-                    if (view.isValid()) {
+                    if (view.node) {
                         newNode.appendChild(view.node);
                     }
                 }

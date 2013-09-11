@@ -68,7 +68,7 @@ describe('generate url', function() {
         it('not specified', function() {
             expect( ns.router.generateUrl('folder') ).to.be('/folder');
             expect( ns.router.generateUrl('folder', {}) ).to.be('/folder');
-            expect( ns.router.generateUrl('folder', { id: 5 }) ).to.be('/folder');
+            expect( ns.router.generateUrl('folder', { id: 5 }) ).to.be('/folder?id=5');
         });
 
         it('tail optional parameter', function() {
@@ -178,7 +178,75 @@ describe('generate url', function() {
 
         });
 
+    });
 
+    describe('reverse rewrites', function() {
+        beforeEach(function() {
+            ns.router.routes = {
+                rewriteUrl: {
+                    '/': '/inbox',
+                    '/inbox': '/folder/inbox',
+                    '/shortcut': '/page/1'
+                },
+                route: {
+                    '/page/{id:int}': 'page',
+                    '/folder/{name}': 'folder'
+                }
+            };
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            ns.router.baseDir = '';
+            ns.router.undefine();
+        });
+
+        it('no matching rewrites', function() {
+            expect(ns.router.generateUrl('page', { id: 2 })).to.be.eql('/page/2');
+        });
+
+        it('1 matching rewrite', function() {
+            expect(ns.router.generateUrl('page', { id: 1 })).to.be.eql('/shortcut');
+        });
+
+        it('multiple matching rewrites', function() {
+            expect(ns.router.generateUrl('folder', { name: 'inbox' })).to.be.eql('/');
+        });
+    });
+
+    describe('generate url with query', function() {
+        beforeEach(function() {
+            ns.router.routes = {
+                rewriteUrl: {
+                    '/shortcut': '/page/1'
+                },
+                route: {
+                    '/page/{id:int}': 'page'
+                }
+            };
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            ns.router.baseDir = '';
+            ns.router.undefine();
+        });
+
+        it('empty query', function() {
+            expect(ns.router.generateUrl('page', { id: 2 })).to.be.eql('/page/2');
+        });
+
+        it('1 parameter goes into query', function() {
+            expect(ns.router.generateUrl('page', { id: 2, page: 7 })).to.be.eql('/page/2?page=7');
+        });
+
+        it('more than 1 parameter goes into query', function() {
+            expect(ns.router.generateUrl('page', { id: 2, page: 7, nc: '0123' })).to.be.eql('/page/2?page=7&nc=0123');
+        });
+
+        it('reverse rewrite and query', function() {
+            expect(ns.router.generateUrl('page', { id: 1, page: 7, nc: '0123' })).to.be.eql('/shortcut?page=7&nc=0123');
+        });
     });
 
 });

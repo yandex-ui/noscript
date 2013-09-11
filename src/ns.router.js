@@ -161,6 +161,8 @@ ns.router._generateUrl = function(def, params) {
     var part;
     var pvalue;
     var result = [];
+    var query = no.extend({}, params);
+    var rewrites = ns.router._routes.rewriteUrl;
 
     for (var i = 0; i < def.parts.length; i++) {
         part = def.parts[i];
@@ -186,11 +188,28 @@ ns.router._generateUrl = function(def, params) {
             }
 
             result.push(pvalue);
+            delete query[part.name];
         }
     }
 
     url = result.join('/');
-    return (url) ? ('/' + url) : '';
+    url = (url) ? ('/' + url) : '';
+
+    // Разворачиваем rewrite правила, чтобы получить красивый урл до rewrite-ов.
+    var rewrote = true;
+    while (rewrote) {
+        rewrote = false;
+        for (var srcUrl in rewrites) {
+            if (url === rewrites[srcUrl]) {
+                url = srcUrl;
+                rewrote = true;
+            }
+        }
+    }
+
+    // Дописываем query string.
+    var queryString = $.param(query);
+    return (queryString) ? (url + '?' + queryString) : url;
 };
 
 /**

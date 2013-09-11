@@ -134,7 +134,6 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
     //  this.active -- это объект (упорядоченный!), в котором лежат ключи
     //  активных (видимых) в данный момент блоков.
-    var oldActive = this.active;
     var layoutActive = {};
 
     //  Строим новый active согласно layout'у.

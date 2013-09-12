@@ -55,7 +55,14 @@ ns.ViewCollection.prototype._bindModels = function() {
     var models = this.models;
 
     for (var model_id in models) {
-        models[model_id].on('ns-model-changed', function(e, o) {
+        var model = models[model_id];
+
+        model.on('ns-model-destroyed', function() {
+            delete that.models[this.id];
+            that._initModel(this.id);
+        });
+
+        model.on('ns-model-changed', function(e, o) {
             // проинвалидируем view, только если изменилась внешняя модель
             if (this === o.model) {
                 that.invalidate();

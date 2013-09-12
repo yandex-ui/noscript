@@ -387,12 +387,8 @@ describe('ns.ViewCollection', function() {
 
     });
 
-    describe('ViewCollection after ModelCollection destruction', function() {
+    describe('ViewCollection update after ModelCollection destruction', function() {
         beforeEach(function(finish) {
-
-            // 1. Сделать MC со split, заполнить её данными по какому-то ключу
-            // 2. Сделать ей destroy
-            // 3. Заполнить MC новыми данными по тому же ключу
 
             // define models
             ns.Model.define('mCollection', {

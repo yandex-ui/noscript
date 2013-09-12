@@ -536,4 +536,54 @@ describe('ns.View', function() {
         });
 
     });
+
+    describe('ns.View update after model destruction', function() {
+        beforeEach(function(finish) {
+
+            ns.Model.define('mSimple');
+
+            // set data to collection
+            ns.Model.get('mSimple').setData({foo: 'bar'});
+
+            // define views
+            ns.View.define('app');
+
+            ns.View.define('vSimple', {
+                models: [ 'mSimple' ]
+            });
+
+            // define layout
+            ns.layout.define('app', {
+                'app': {
+                    'vSimple': {}
+                }
+            });
+
+            // initiate first rendering
+            this.APP = ns.View.create('app');
+            var layout = ns.layout.page('app', {});
+            new ns.Update(this.APP, layout, {})
+                .start()
+                .done(function() {
+                    ns.Model.destroy(ns.Model.get('mSimple'));
+
+                    ns.Model.get('mSimple').setData({foo: 'bar2'});
+
+                    new ns.Update(this.APP, layout, {})
+                        .start()
+                        .done(function() {
+                            finish();
+                        }.bind(this));
+                }.bind(this));
+        });
+
+        afterEach(function() {
+            delete this.APP;
+        });
+
+        it('should have 1 node for view vSimple', function() {
+            expect(this.APP.node.querySelectorAll('.ns-view-vSimple').length).to.be(1);
+        });
+
+    });
 });

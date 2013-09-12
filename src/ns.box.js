@@ -110,20 +110,30 @@ ns.Box.prototype._getViewTree = function(layout, params) {
 
 //  Обновляем бокс.
 ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
-    if (!this.node) {
-        //  Ищем новую ноду бокса.
-        this.node = ns.byClass('ns-view-' + this.id, node)[0];
-
-        if (!this.node) {
-            throw new Error("[ns.Box] Can't find node for '" + this.id + "'");
+    var oldNode;
+    // Если
+    //  - старой ноды не было
+    //  - или этот box не toplevel (т.е. родительский view обновил свою ноду)
+    if (!this.node || !options.toplevel) {
+        // Ищем новую ноду бокса.
+        var newNode = ns.byClass('ns-view-' + this.id, node)[0];
+        // И если есть
+        if (newNode) {
+            // Сохраним ссылку на старую ноду
+            oldNode = this.node;
+            // Обновим ноду бокса
+            this.node = newNode;
         }
+    }
+
+    if (!this.node) {
+        throw new Error("[ns.Box] Can't find node for '" + this.id + "'");
     }
 
     var views = this.views;
 
     //  this.active -- это объект (упорядоченный!), в котором лежат ключи
     //  активных (видимых) в данный момент блоков.
-    var oldActive = this.active;
     var layoutActive = {};
 
     //  Строим новый active согласно layout'у.
@@ -150,48 +160,35 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         }
     }
 
-    //  Строим новый active, но уже не по layout'у,
-    //  а по актуальным блокам. В частности, заглушки в новый active не попадают.
-    //  Вместо них берем старые блоки, если они были.
+    //  Строим новый active, но уже не по layout'у, а по актуальным блокам.
     var newActive = {};
     for (var activeId in layoutActive) {
         var activeKey = layoutActive[activeId];
-
-        /*
-        if ( views[activeKey].isLoading() ) {
-            activeKey = oldActive[activeId];
-            if (activeKey) {
-                newActive[activeId] = activeKey;
-            }
-        } else {
-        */
-            newActive[activeId] = activeKey;
-        /*
-        }
-        */
+        newActive[activeId] = activeKey;
     }
 
-    //  Прячем все блоки, которые были в старом active, но не попали в новый.
-    for (var oldActiveId in oldActive) {
-        var oldActiveKey = oldActive[oldActiveId];
-        if (newActive[oldActiveId] !== oldActiveKey) {
-            var subviews = views[oldActiveKey]._getDescendants( [] );
-            for (var i = 0, l = subviews.length; i < l; i++) {
+    // Пройдёмся по всем вложенным видам, чтобы
+    //  1. Спрятать виды, которые не попали в layout
+    //  2. Перенести ноды вложенных видов в новую ноду бокса (если есть)
+    for (var key in this.views) {
+        var view = this.views[key];
+        // Если вид не входит в новый active
+        if (newActive[view.id] !== view.key) {
+            // Скроем виды, не попавшие в layout
+            var descs = view._getDescendants( [] );
+            for (var i = 0, l = descs.length; i < l; i++) {
                 // если view был скрыт
-                if (subviews[i]._hide()) {
-                    events['ns-view-hide'].push(subviews[i]);
+                if (descs[i]._hide()) {
+                    events['ns-view-hide'].push(descs[i]);
                 }
             }
+            // Если нода вида лежит в старой ноде бокса
+            if (oldNode && oldNode.contains(view.node)) {
+                // Перенесём её в новую ноду бокса
+                this.node.appendChild(view.node);
+            }
         }
     }
-
-    //  Показываем все блоки, которые видны в новом active.
-    /*
-    for (var id in newActive) {
-        var key = newActive[id];
-        views[key]._show();
-    }
-    */
 
     //  Запоминаем новый active.
     this.active = newActive;

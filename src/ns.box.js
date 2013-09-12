@@ -182,11 +182,11 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
                     events['ns-view-hide'].push(descs[i]);
                 }
             }
-        }
-        // Если нода вида лежит в старой ноде бокса
-        if (oldNode && oldNode.contains(view.node)) {
-            // Перенесём её в новую ноду бокса
-            this.node.appendChild(view.node);
+            // Если нода вида лежит в старой ноде бокса
+            if (oldNode && oldNode.contains(view.node)) {
+                // Перенесём её в новую ноду бокса
+                this.node.appendChild(view.node);
+            }
         }
     }
 

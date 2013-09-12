@@ -8,6 +8,10 @@ JS MVC framework
 
 #### Changelog
 
+##### 0.1.5 (12.09.2013)
+- Улучшение поведение `ns.Box` [#157](https://github.com/yandex-ui/noscript/pull/157)
+- Добавлен метод `ns.router.generateUrl` для генерации урлов по параметрам [#154](https://github.com/yandex-ui/noscript/pull/157)
+
 ##### 0.1.3 (28.08.2013)
 - Новый `ns.page.history` объект для манипуляций с историей приложения
 - Исправлена проблема с конкурентными async-обновлениями.

@@ -387,6 +387,76 @@ describe('ns.ViewCollection', function() {
 
     });
 
+    describe('ViewCollection update after ModelCollection destruction', function() {
+        beforeEach(function(finish) {
+
+            // define models
+            ns.Model.define('mCollection', {
+                split: {
+                    model_id: 'mItem',
+                    items: '.data',
+                    params: {
+                        id: '.id'
+                    }
+                }
+            });
+
+            ns.Model.define('mItem', {
+                params: {
+                    id: null
+                }
+            });
+
+            // set data to collection
+            ns.Model.get('mCollection').setData({data: [{id: '0'}, {id: '1'}]});
+
+            // define views
+            ns.View.define('app');
+            
+            ns.ViewCollection.define('vCollection', {
+                models: [ 'mCollection' ],
+                split: {
+                    view_id: 'vItem'
+                }
+            });
+            ns.View.define('vItem', {
+                models: [ 'mItem' ]
+            });
+
+            // define layout
+            ns.layout.define('app', {
+                'app': {
+                    'vCollection': {}
+                }
+            });
+
+            // initiate first rendering
+            this.APP = ns.View.create('app');
+            var layout = ns.layout.page('app', {});
+            new ns.Update(this.APP, layout, {})
+                .start()
+                .done(function() {
+                    ns.Model.destroy(ns.Model.get('mCollection'));
+
+                    ns.Model.get('mCollection').setData({data: [{id: 3}]});
+
+                    new ns.Update(this.APP, layout, {})
+                        .start()
+                        .done(function() {
+                            finish();
+                        }.bind(this));
+                }.bind(this));
+        });
+
+        afterEach(function() {
+            delete this.APP;
+        });
+
+        it('should have 1 node for view vItem', function() {
+            expect(this.APP.node.querySelectorAll('.ns-view-vItem').length).to.be(1);
+        });
+
+    });
 
     describe('Update of recursive view collections', function() {
         before(function() {

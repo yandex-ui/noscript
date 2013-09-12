@@ -31,6 +31,26 @@ describe('ns.Box', function() {
             }
         }, 'app');
 
+        ns.layout.define('parent1', {
+            'app': {
+                'parent': {
+                    'content@': {
+                        'content1': true
+                    }
+                }
+            }
+        });
+
+        ns.layout.define('parent2', {
+            'app': {
+                'parent': {
+                    'content@': {
+                        'content2': true
+                    }
+                }
+            }
+        });
+
         ns.View.define('app');
         ns.View.define('content1', {
             params: {
@@ -51,6 +71,10 @@ describe('ns.Box', function() {
                     pOwn: ns.Model.find('model4').get('.value')
                 };
             }
+        });
+
+        ns.View.define('parent', {
+            p: null
         });
 
         ns.Model.define('model3', {
@@ -320,6 +344,190 @@ describe('ns.Box', function() {
             });
 
         });
+
+        describe('"parent1"(p=1) -> "parent1"(p=2)', function() {
+            beforeEach(function() {
+                var params1 = {p: 1};
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('parent1', params1),
+                    params1
+                ).start();
+
+                var params2 = {p: 2};
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('parent1', params2),
+                    params2
+                ).start();
+            });
+
+            it('should have two nodes for view "content1" ', function() {
+                expect($(this.APP.node).find('.ns-view-content1').length).to.be(2);
+            });
+
+            it('should have one visible node for view "content1" ', function() {
+                expect($(this.APP.node).find('.ns-view-content1.ns-view-visible').length).to.be(1);
+            });
+        });
+
+        describe('"parent2"(p=1) -> "parent2"(p=2)', function() {
+            beforeEach(function() {
+                var params1 = {p: 1};
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('parent2', params1),
+                    params1
+                ).start();
+
+                var params2 = {p: 2};
+                new ns.Update(
+                    this.APP,
+                    ns.layout.page('parent2', params2),
+                    params2
+                ).start();
+            });
+
+            it('should have one node for view "content2" ', function() {
+                expect($(this.APP.node).find('.ns-view-content2').length).to.be(1);
+            });
+
+            it('should have one visible for view "content2" ', function() {
+                expect($(this.APP.node).find('.ns-view-content2:eq(0)').hasClass('ns-view-visible')).to.be.ok();
+            });
+        });
+
+        describe('Update of ns.Box`s parent and child at the same time', function() {
+            beforeEach(function() {
+
+                // layout
+                ns.layout.define('parent3', {
+                    'app': {
+                        'vParent': {
+                            'box@': {
+                                'vChild': true
+                            }
+                        }
+                    }
+                });
+
+                // define models
+                ns.Model.define('mParent', {});
+
+                ns.Model.define('mChild', {
+                    params: {
+                        p: null
+                    }
+                });
+
+                // set models data
+                ns.Model.get('mParent', {}).setData({'foo': 'bar'});
+
+                ns.Model.get('mChild', {p: 1}).setData({'foo': 'bar'});
+                ns.Model.get('mChild', {p: 2}).setData({'foo': 'bar2'});
+
+                // define views
+                ns.View.define('vParent', {
+                    models: ['mParent']
+                });
+
+                ns.View.define('vChild', {
+                    models: ['mChild']
+                });
+
+            });
+
+            afterEach(function() {
+                delete this.APP;
+            });
+
+            describe('single redraw', function() {
+                beforeEach(function(done) {
+                    var APP = this.APP;
+
+                    // update 1
+                    new ns.Update(
+                        this.APP,
+                        ns.layout.page('parent3', {p: 1}),
+                        {p: 1}
+                    ).start().done(function() {
+
+                        ns.Model.get('mParent', {}).set('.foo', 'bar2');
+                        // update 2
+                        new ns.Update(
+                            APP,
+                            ns.layout.page('parent3', {p: 2}),
+                            {p: 2}
+                        ).start()
+                            .done(function() {
+                                done();
+                            });
+                    });
+                });
+
+                it('should have 2 visible nodes for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be(2);
+                });
+
+                it('should have 1 visible node for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be(1);
+                });
+
+                it('should have 1 hidden node for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be(1);
+                });
+            });
+
+            describe('multiple redraw', function() {
+                beforeEach(function(done) {
+                    var APP = this.APP;
+
+                    // update 1
+                    new ns.Update(
+                        this.APP,
+                        ns.layout.page('parent3', {p: 1}),
+                        {p: 1}
+                    ).start().done(function() {
+
+                        ns.Model.get('mParent', {}).set('.foo', 'bar2');
+                        // update 2
+                        new ns.Update(
+                            APP,
+                            ns.layout.page('parent3', {p: 2}),
+                            {p: 2}
+                        ).start()
+                            .done(function() {
+
+                                ns.Model.get('mParent', {}).set('.foo', 'bar3');
+                                // update 2
+                                new ns.Update(
+                                    APP,
+                                    ns.layout.page('parent3', {p: 1}),
+                                    {p: 1}
+                                ).start()
+                                    .done(function() {
+                                        done();
+                                    });
+
+                            });
+                    });
+                });
+
+                it('should have 2 visible nodes for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be(2);
+                });
+
+                it('should have 1 visible node for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be(1);
+                });
+
+                it('should have 1 hidden node for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be(1);
+                });
+            });
+
+        });
+
     });
 
     describe('box -> box', function() {

@@ -98,10 +98,16 @@ ns.View.prototype._init = function(id, params, async) {
  */
 ns.View.prototype._initModels = function() {
     // Создаёи модели или берем их из кэша, если они уже есть
-    var models = this.models = {};
     for (var model_id in this.info.models) {
-        models[model_id] = ns.Model.get(model_id, this.params);
+        this._initModel(model_id);
     }
+};
+
+ns.View.prototype._initModel = function(id) {
+    if (!this.models) {
+        this.models = {};
+    }
+    this.models[id] = ns.Model.get(id, this.params);
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -645,6 +651,12 @@ ns.View.prototype._bindModels = function() {
 
     for (var model_id in models) {
         var model = models[model_id];
+
+        model.on('ns-model-destroyed', function() {
+            delete that.models[this.id];
+            that._initModel(this.id);
+        });
+
         var jpaths = subviews[model_id];
 
         if (jpaths) {

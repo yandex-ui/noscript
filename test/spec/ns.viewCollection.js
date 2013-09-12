@@ -442,9 +442,7 @@ describe('ns.ViewCollection', function() {
                 .done(function() {
                     ns.Model.destroy(ns.Model.get('mCollection'));
 
-                    ns.Model.get('mCollection').setData({data: []});
-
-                    console.log(ns.Model.get('mCollection'));
+                    ns.Model.get('mCollection').setData({data: [{id: 3}]});
 
                     new ns.Update(this.APP, layout, {})
                         .start()
@@ -458,9 +456,10 @@ describe('ns.ViewCollection', function() {
             delete this.APP;
         });
 
-        it('should boom', function() {
-            console.log(this.APP);
+        it('should have 1 node for view vItem', function() {
+            expect(this.APP.node.querySelectorAll('.ns-view-vItem').length).to.be(1);
         });
+
     });
 
     describe('Update of recursive view collections', function() {

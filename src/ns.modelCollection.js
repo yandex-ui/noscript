@@ -102,8 +102,8 @@ ns.ModelCollection.prototype._splitModels = function(items) {
             params[key] = no.jpath(info.params[key], item);
         }
 
-        // идентификатор подмодели берется из info.model_id
-        // он коллецкия может содержать модели только одного вида
+        // идентификатор подмодели берётся из info.model_id
+        // коллекция может содержать модели только одного вида
         var model = ns.Model.get(info.model_id, params).setData(item);
 
         model.on('ns-model-touched', function() {
@@ -118,19 +118,21 @@ ns.ModelCollection.prototype._splitModels = function(items) {
 };
 
 /**
- * Подписывает коллекию на события из подмоделей
+ * Подписывает коллекию на события подмодели
  *
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
 
-    // добавим нашу коллекцию с список слушающих коллекций для подмодели
+    // добавим нашу коллекцию в список слушающих коллекций для подмодели
     model.eventListeners[this.key] = this;
 
     // если ранее мы не переопределяли прототипный тригер
     // то переопеделим его
+    // XXX это очень жёсткий bad practice... Лучше модэли элементы коллекции тогда наследовать от какого-то ns.Model.CollectionItem, где всё это прописать.
     if (ns.Model.prototype.trigger === model.trigger) {
         model.trigger = function(evt, data) {
+            // FIXME лучше apply(this, arguments)
             ns.Model.prototype.trigger.call(this, evt, data);
 
             var collData = {

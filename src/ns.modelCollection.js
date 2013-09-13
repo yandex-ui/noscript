@@ -263,7 +263,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
  *
  * @return {Boolean} признак успешности вставки
 */
-ns.ModelCollection.prototype.setModels = function(models, index) {
+ns.ModelCollection.prototype.setItems = function(models, index) {
     if (typeof index === 'undefined') {
         index = this.models.length;
     }

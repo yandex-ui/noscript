@@ -199,12 +199,13 @@ ns.ModelCollection.prototype.clear = function() {
 };
 
 /**
- * Вставляет подмодели в коллекцию
+ * Вставляет подмодели в коллекцию начиная с определённого индекса.
+ * Если индекс не передан — вставляет элементы в конец коллекции.
  *
- * @param {Array<ns.Model> | ns.Model} models Одна или несколько подмоделей для вставки
- * @param {тumber=} index Индекс позиции, на которую вставить подмодели
+ * @param { Array<ns.Model> | ns.Model } models - одна или несколько подмоделей для вставки
+ * @param { Number= } index - индекс позиции, на которую вставить подмодели
  *
- * @return {Boolean} Признак успешности вставки
+ * @return {Boolean} признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
     if (typeof index === 'undefined') {
@@ -212,7 +213,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
     }
 
     // Для удобства, одиночная модель оборачивается в массив.
-    if (!(models instanceof Array)) {
+    if ( !Array.isArray(models) ) {
         models = [models];
     }
 
@@ -241,10 +242,9 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         }
 
         this.trigger('ns-model-insert', inserted);
-        return true;
-    } else {
-        return false;
     }
+
+    return !!inserted.length;
 };
 
 /**

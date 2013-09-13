@@ -199,14 +199,13 @@ ns.ModelCollection.prototype.clear = function() {
 /**
  * Вставляет подмодели в коллекцию
  *
- * @param {Array <ns.Model> | ns.Model} models – одна или несколько подмоделей
- *                                                 для вставки
- * @param {Number} [index] – индекс позиции, на которую вставить подмодели
+ * @param {Array<ns.Model> | ns.Model} models Одна или несколько подмоделей для вставки
+ * @param {тumber=} index Индекс позиции, на которую вставить подмодели
  *
- * @return {Boolean} – признак успешности вставки
+ * @return {Boolean} Признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
-    if (isNaN(index)) {
+    if (typeof index === 'undefined') {
         index = this.models.length;
     }
 
@@ -215,27 +214,31 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         models = [models];
     }
 
-    // Вставить можно только объявленную модель
-    // и повторная вставка модели запрещена
-    var insertion = models.filter(function(model) {
-        return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id);
-    }, this);
+    var model;
+    var inserted = [];
+    for (var i = 0; i < models.length; i++) {
+        model = models[i];
 
-    insertion.forEach(function(model, i) {
-        this.models.splice(index + i, 0, model);
+        // Вставить можно только объявленную модель
+        // и повторная вставка модели запрещена
+        // FIXME может быть надо делать replace
+        if ( this.models.indexOf(model) >= 0 || !ns.Model.infoLite(model.id) ) {
+            continue;
+        }
 
-        // не забудем подписаться на события
+        this.models[index + i] = model;
         this._subscribeSplit(model);
-    }, this);
+        inserted.push(model);
+    }
 
     // оповестим всех, что вставили подмодели
-    if (insertion.length > 0) {
+    if (inserted.length) {
         // если данных не было, при insert говорим что данные появились
         if (this.status == this.STATUS.NONE) {
             this.status = this.STATUS.OK;
         }
 
-        this.trigger('ns-model-insert', insertion);
+        this.trigger('ns-model-insert', inserted);
         return true;
     } else {
         return false;

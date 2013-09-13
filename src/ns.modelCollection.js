@@ -13,7 +13,7 @@ no.inherit(ns.ModelCollection, ns.Model);
 ns.ModelCollection.prototype.getData = function() {
     // это составная модель —
     // нужно склеить все данные
-    // из моделей её состовляющих
+    // из моделей её составляющих
     if (this.isValid()) {
         var jpathItems;
 
@@ -35,9 +35,9 @@ ns.ModelCollection.prototype.getData = function() {
         // ссылка куда вставлять данные моделей
         var items = no.jpath(jpathItems, this.data);
 
-        // пишем новые
-        this.models.forEach(function(model) {
-            items.push( model.getData() );
+        // пишем новые (тут тоже могут быть разреженные данные)
+        this.models.forEach(function(model, index) {
+            items[index] = model.getData();
         });
     }
     return this.data;

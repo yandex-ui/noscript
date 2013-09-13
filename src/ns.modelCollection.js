@@ -224,7 +224,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
     // и повторная вставка модели запрещена
     // FIXME может быть модель, которая уже в коллекции, надо вынуть из текущего места и вставить в новое?
     var inserted = models.filter(function(m) {
-        return that.models.indexOf(m) < 0 && ns.Model.infoLite(m.id)
+        return that.models.indexOf(m) < 0 && ns.Model.infoLite(m.id);
     });
 
     // splice() не умеет вставлять элементы с индексом больше текущей длины массива.

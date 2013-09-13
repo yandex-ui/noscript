@@ -222,8 +222,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     // Вставить можно только объявленную модель
     // и повторная вставка модели запрещена
-    // FIXME может быть модель, которая уже в коллекции, надо вынуть из текущего места и вставить в новое?
-    var inserted = models.filter(function(m) {
+    var insertedModels = models.filter(function(m) {
         return that.models.indexOf(m) < 0 && ns.Model.infoLite(m.id);
     });
 
@@ -235,24 +234,24 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     // А вот теперь уже можно вставлять новые модели.
     // Такой хитрый вызов через прототип массива, потому что у splice дурацкая сигнатура!
-    Array.prototype.splice.apply(this.models, [index, 0].concat(inserted));
+    Array.prototype.splice.apply(this.models, [index, 0].concat(insertedModels));
 
     // Помечаем новые элементы как зависящие от текущей коллекции.
-    inserted.forEach(function(m) {
+    insertedModels.forEach(function(m) {
         that._subscribeSplit(m);
     });
 
     // оповестим всех, что вставили подмодели
-    if (inserted.length) {
+    if (insertedModels.length) {
         // если данных не было, при insert говорим что данные появились
         if (this.status == this.STATUS.NONE) {
             this.status = this.STATUS.OK;
         }
 
-        this.trigger('ns-model-insert', inserted);
+        this.trigger('ns-model-insert', insertedModels);
     }
 
-    return !!inserted.length;
+    return !!insertedModels.length;
 };
 
 /**
@@ -274,7 +273,7 @@ ns.ModelCollection.prototype.setItems = function(models, index) {
     }
 
     var model;
-    var inserted = [];
+    var insertedModels = [];
     for (var i = 0; i < models.length; i++) {
         model = models[i];
 
@@ -286,22 +285,27 @@ ns.ModelCollection.prototype.setItems = function(models, index) {
             continue;
         }
 
+        // Если затирается элемент коллекции надо его явно затереть.
+        if ( this.models[index + i] ) {
+            this.unsetModels(this.models[index + i]);
+        }
+
         this.models[index + i] = model;
         this._subscribeSplit(model);
-        inserted.push(model);
+        insertedModels.push(model);
     }
 
     // оповестим всех, что вставили подмодели
-    if (inserted.length) {
+    if (insertedModels.length) {
         // если данных не было, при insert говорим что данные появились
         if (this.status == this.STATUS.NONE) {
             this.status = this.STATUS.OK;
         }
 
-        this.trigger('ns-model-insert', inserted);
+        this.trigger('ns-model-insert', insertedModels);
     }
 
-    return !!inserted.length;
+    return !!insertedModels.length;
 };
 
 /**

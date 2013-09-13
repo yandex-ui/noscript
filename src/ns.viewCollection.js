@@ -417,11 +417,25 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        for (var i = 0, prev; i < MC.models.length; i++) {
-            var p = no.extend({}, params, MC.models[i].params);
+        for (var i = 0; i < MC.models.length; i++) {
+            var model = MC.models[i];
+            var p;
+            var prev;
+            var itemViewId;
+
+            if (!model) {
+                // Модели ещё нет (разреженная коллекция).
+                p = no.extend({}, params, { index: i });
+                itemViewId = 'ns-collection-item-fake';
+
+            } else {
+                p = no.extend({}, params, model.params);
+                itemViewId = this.info.split.view_id;
+            }
+
             // Получим view для вложенной модели
             // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
-            var view = this._getView(this.info.split.view_id, p);
+            var view = this._getView(itemViewId, p);
 
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {

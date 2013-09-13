@@ -200,6 +200,7 @@ ns.ModelCollection.prototype.clear = function() {
 
 /**
  * Вставляет подмодели в коллекцию начиная с определённого индекса.
+ * Коллекция при этом раздвигается.
  * Если индекс не передан — вставляет элементы в конец коллекции.
  *
  * @param { Array<ns.Model> | ns.Model } models - одна или несколько подмоделей для вставки
@@ -208,6 +209,61 @@ ns.ModelCollection.prototype.clear = function() {
  * @return {Boolean} признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
+    var that = this;
+
+    if (typeof index === 'undefined') {
+        index = this.models.length;
+    }
+
+    // Для удобства, одиночная модель оборачивается в массив.
+    if ( !Array.isArray(models) ) {
+        models = [models];
+    }
+
+    // Вставить можно только объявленную модель
+    // и повторная вставка модели запрещена
+    // FIXME может быть модель, которая уже в коллекции, надо вынуть из текущего места и вставить в новое?
+    var inserted = models.filter(function(m) {
+        return that.models.indexOf(m) < 0 && ns.Model.infoLite(m.id)
+    });
+
+    // splice() не умеет вставлять элементы с индексом больше текущей длины массива.
+    // Поэтому вначале надо расширить массив.
+    if (index > this.models.length) {
+        this.models.length = index;
+    }
+
+    // А вот теперь уже можно вставлять новые модели.
+    // Такой хитрый вызов через прототип массива, потому что у splice дурацкая сигнатура!
+    Array.prototype.splice.apply(this.models, [index, 0].concat(inserted));
+
+    // Помечаем новые элементы как зависящие от текущей коллекции.
+    inserted.forEach(function(m) {
+        that._subscribeSplit(m);
+    });
+
+    // оповестим всех, что вставили подмодели
+    if (inserted.length) {
+        // если данных не было, при insert говорим что данные появились
+        if (this.status == this.STATUS.NONE) {
+            this.status = this.STATUS.OK;
+        }
+
+        this.trigger('ns-model-insert', inserted);
+    }
+
+    return !!inserted.length;
+};
+
+/**
+ * Перезаписывает модели в коллекции.
+ * В отличие от insert() этот метод перезатрёт существующие модели.
+ * @param { Array<ns.Model> | ns.Model } models - одна или несколько подмоделей для вставки
+ * @param { Number= } index - индекс позиции, на которую вставить подмодели
+ *
+ * @return {Boolean} признак успешности вставки
+*/
+ns.ModelCollection.prototype.setModels = function(models, index) {
     if (typeof index === 'undefined') {
         index = this.models.length;
     }
@@ -225,6 +281,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         // Вставить можно только объявленную модель
         // и повторная вставка модели запрещена
         // FIXME может быть надо делать replace
+        // FIXME теперь тут уже по факту replace
         if ( this.models.indexOf(model) >= 0 || !ns.Model.infoLite(model.id) ) {
             continue;
         }

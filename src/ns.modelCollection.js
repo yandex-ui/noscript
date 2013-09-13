@@ -305,12 +305,39 @@ ns.ModelCollection.prototype.setItems = function(models, index) {
 };
 
 /**
- * Удаляет подмодели из коллекции
+ * Удаляет подмодели коллекции.
  *
  * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления
  */
 ns.ModelCollection.prototype.remove = function(models) {
+    var that = this;
+    return this._remove(models, function(index) {
+        that.models.splice(index, 1);
+    });
+};
+
+/**
+ * Затирает подмодели коллекции.
+ *
+ * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
+ * @return {Boolean} – признак успешности удаления
+ */
+ns.ModelCollection.prototype.unsetItems = function(models) {
+    var that = this;
+    return this._remove(models, function(index) {
+        delete that.models[index];
+    });
+};
+
+/**
+ * Удаляет / затираем подмодели коллекции.
+ *
+ * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмоделей, которые надо удалить.
+ * @param {function(number)} removeAction - метод удаления / затирания для модели по индексу модели в массиве this.models.
+ * @return {Boolean} – признак успешности удаления
+ */
+ns.ModelCollection.prototype._remove = function(models, removeAction) {
     var that = this;
     var modelsRemoved = [];
 
@@ -338,7 +365,7 @@ ns.ModelCollection.prototype.remove = function(models) {
             // не забудем отписаться от событий подмодели
             that._unsubscribeSplit(model);
             modelsRemoved.push(model);
-            that.models.splice(index, 1);
+            removeAction(index);
         }
     });
 

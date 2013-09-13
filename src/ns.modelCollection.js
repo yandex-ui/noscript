@@ -248,45 +248,48 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 };
 
 /**
- * Удаляет подмодель из коллекции
+ * Удаляет подмодели из коллекции
  *
  * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления
  */
 ns.ModelCollection.prototype.remove = function(models) {
-
+    var that = this;
     var modelsRemoved = [];
 
-    if (!(models instanceof Array)) {
+    if ( !Array.isArray(models) ) {
         models = [models];
     }
 
     models.forEach(function(modelOrIndex) {
         var index;
 
-        if (isNaN(modelOrIndex)) {
-            index = this.models.indexOf(modelOrIndex);
-        } else {
+        if (typeof modelOrIndex === 'number') {
             index = modelOrIndex;
+        } else {
+            index = that.models.indexOf(modelOrIndex);
         }
 
         if (index >= 0) {
-            var model = this.models[index];
+            var model = that.models[index];
+
+            // Модели может и не быть (в разреженной коллекции).
+            if (!model) {
+                return;
+            }
 
             // не забудем отписаться от событий подмодели
-            this._unsubscribeSplit(model);
+            that._unsubscribeSplit(model);
             modelsRemoved.push(model);
-            this.models.splice(index, 1);
+            that.models.splice(index, 1);
         }
-
-    }.bind(this));
+    });
 
     if (modelsRemoved.length) {
         this.trigger('ns-model-remove', modelsRemoved);
-        return true;
     }
 
-    return false;
+    return !!modelsRemoved.length;
 };
 
 })();

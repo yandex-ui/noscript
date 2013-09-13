@@ -349,6 +349,7 @@ ns.ModelCollection.prototype._remove = function(models, removeAction) {
         models = [models];
     }
 
+    var removeIndexes = [];
     models.forEach(function(modelOrIndex) {
         var index;
 
@@ -359,19 +360,26 @@ ns.ModelCollection.prototype._remove = function(models, removeAction) {
         }
 
         if (index >= 0) {
-            var model = that.models[index];
-
-            // Модели может и не быть (в разреженной коллекции).
-            if (!model) {
-                return;
-            }
-
-            // не забудем отписаться от событий подмодели
-            that._unsubscribeSplit(model);
-            modelsRemoved.push(model);
-            removeAction(index);
+            removeIndexes.push(index);
         }
     });
+
+    // Удаляем элементы с конца, чтобы не нарушить индексацию элементов в массиве.
+    removeIndexes = removeIndexes.sort();
+    for (var i = removeIndexes.length - 1; i >= 0; i--) {
+        var index = removeIndexes[i];
+        var model = this.models[index];
+
+        // Модели может и не быть (в разреженной коллекции).
+        if (!model) {
+            continue;
+        }
+
+        // не забудем отписаться от событий подмодели
+        this._unsubscribeSplit(model);
+        modelsRemoved.push(model);
+        removeAction(index);
+    }
 
     if (modelsRemoved.length) {
         this.trigger('ns-model-remove', modelsRemoved);

@@ -35,6 +35,10 @@ ns.ModelCollection.prototype.getData = function() {
         // ссылка куда вставлять данные моделей
         var items = no.jpath(jpathItems, this.data);
 
+        // Это мега хак: когда у нас совсем нет данных, нужно вернуть массив с пустыми элементами.
+        // К примеру: у нас уже есть 5 пустых элементов. Надо вернуть массив с 5ью пустыми элементами.
+        items.length = this.models.length;
+
         // пишем новые (тут тоже могут быть разреженные данные)
         this.models.forEach(function(model, index) {
             items[index] = model.getData();

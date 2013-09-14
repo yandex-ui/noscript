@@ -1,10 +1,3 @@
-// Специальная модель заглушка для отсутствующих элементов коллекции.
-ns.View.define('ns-collection-item-fake', {
-    params: {
-        'index': null
-    }
-});
-
 /**
  * Views collection
  * @see https://github.com/pasaran/noscript/blob/master/doc/ns.viewCollection.md
@@ -215,8 +208,9 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
 };
 
 ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
+    var split = this.info.split;
     var result = {};
-    result[this.info.split.view_id] = [];
+    result[split.view_id] = [];
 
     // Какие элементы коллекции рендерить, мы можем понять только по модели
     // Поэтому, полезем внутрь, только если есть все данные
@@ -229,21 +223,26 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
         // Для дыр надо отрендерить вьюшки-заглушки.
         for (var i = 0; i < MC.models.length; i++) {
             var model = MC.models[i];
-            var p;
+            var itemParams;
             var itemViewId;
 
             if (!model) {
-                // Для пустого элемента коллекции создаём специальное view.
-                itemViewId = 'ns-collection-item-fake';
-                p = no.extend({}, params, { index: i });
+                // Если не задана view для пустых элементов коллекции - не рендерим их.
+                if (!split.empty_view_id) {
+                    continue;
+                }
+
+                // Т.к. задано вью для пустых элементов - надо их отрендерить.
+                itemViewId = split.empty_view_id;
+                itemParams = no.extend({}, params, { index: i });
             } else {
-                itemViewId = this.info.split.view_id;
-                p = no.extend({}, params, model.params);
+                itemViewId = split.view_id;
+                itemParams = no.extend({}, params, model.params);
             }
 
-            var view = this._getView(itemViewId, p);
+            var view = this._getView(itemViewId, itemParams);
             if (!view) {
-                view = this._addView(itemViewId, p);
+                view = this._addView(itemViewId, itemParams);
             }
 
             var decl = null;
@@ -268,7 +267,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
             }
 
             if (decl) {
-                result[this.info.split.view_id].push(decl);
+                result[split.view_id].push(decl);
             }
         }
     }
@@ -311,6 +310,7 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
 };
 
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
+    var split = this.info.split;
     // Для VC нам всегда прийдёт новая нода
     var newNode = this._extractNode(node);
     var isOuterPlaceholder = $(newNode).hasClass('ns-view-placeholder');
@@ -419,23 +419,27 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
         for (var i = 0; i < MC.models.length; i++) {
             var model = MC.models[i];
-            var p;
+            var itemParams;
             var prev;
             var itemViewId;
 
             if (!model) {
-                // Модели ещё нет (разреженная коллекция).
-                p = no.extend({}, params, { index: i });
-                itemViewId = 'ns-collection-item-fake';
+                // Если для пустых элементов не задано view не рендерим их.
+                if (!split.empty_view_id) {
+                    continue;
+                }
 
+                // Задано view для пустых элементов колекции - значит их надо рендерить.
+                itemViewId = split.empty_view_id;
+                itemParams = no.extend({}, params, { index: i });
             } else {
-                p = no.extend({}, params, model.params);
-                itemViewId = this.info.split.view_id;
+                itemViewId = split.view_id;
+                itemParams = no.extend({}, params, model.params);
             }
 
             // Получим view для вложенной модели
             // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
-            var view = this._getView(itemViewId, p);
+            var view = this._getView(itemViewId, itemParams);
 
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {

@@ -129,7 +129,7 @@ ns.router.url = function(url) {
 };
 
 /**
- * @param {Object} def Url definition.
+ * @param {string} id Page (layout) name.
  * @param {Object} params Url generation params.
  * @return {?string} Generated url.
  */
@@ -267,7 +267,7 @@ ns.router._parseSection = function(rawSection) {
     var closeBraketIndex = -1;
     var items = [];
 
-    while(true) {
+    while (true) {
         openBraketIndex = rawSection.indexOf('{', curIndex);
         if (openBraketIndex < 0) {
             break;

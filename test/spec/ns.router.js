@@ -223,7 +223,7 @@ describe('ns.router', function() {
 
     });
 
-    describe.only('special case: parameter is a path', function() {
+    describe('special case: parameter is a path', function() {
 
         beforeEach(function() {
             ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';

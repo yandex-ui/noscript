@@ -38,6 +38,7 @@ describe('ns.router', function() {
             });
         };
 
+        test_route('', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/?foo=bar', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/inbox', {page: 'messages', params: {}});

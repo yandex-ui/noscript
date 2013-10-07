@@ -19,6 +19,11 @@ ns.router = function(url) {
     // Откусываем префикс урла
     url = url.substring(baseDir.length);
 
+    // empty url consider as app root ("/")
+    if (!url) {
+        url = '/';
+    }
+
     var urlChunks = url.split('?');
     // /path/?foo=bar -> /path/
     var urlWithoutQuery = urlChunks.shift();

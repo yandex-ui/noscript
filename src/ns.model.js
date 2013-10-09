@@ -340,7 +340,10 @@ ns.Model.prototype.set = function(jpath, value, options) {
     //  Пока что будет версия без сравнения.
 
     if ( !(options && options.silent) ) {
-        //  Кидаем сообщения о том, что модель (или ее часть) изменилась.
+        //  Сообщение о том, что вообще вся модель изменилась.
+        this.trigger('ns-model-changed', jpath);
+
+        //  Кидаем сообщения о том, что изменились части модели.
         //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'changed.foo.bar' и 'changed.foo'.
         //  В качестве параметра (пока что) этот же самый jpath.
         //
@@ -356,8 +359,6 @@ ns.Model.prototype.set = function(jpath, value, options) {
             this.trigger('ns-model-changed' + _jpath, _jpath);
             l--;
         }
-        //  Сообщение о том, что вообще вся модель изменилась.
-        this.trigger('ns-model-changed', jpath);
     }
 };
 

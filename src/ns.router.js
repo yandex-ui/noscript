@@ -59,7 +59,23 @@ ns.router = function(url) {
             var rparam;
             for (var k = 0; k < l; k++) {
                 rparam = rparams[k];
-                params[rparam.name] = r[k + 1] || rparam.default_value;
+
+                var paramValueFromURL = r[k + 1];
+                if (paramValueFromURL) {
+                    // try to decode
+                    try {
+                        paramValueFromURL = decodeURIComponent(paramValueFromURL);
+                    } catch(e) {
+                        // fallback to default value
+                        paramValueFromURL = '';
+                    }
+                }
+
+                if (!paramValueFromURL) {
+                    paramValueFromURL = rparam.default_value
+                }
+
+                params[rparam.name] = paramValueFromURL;
             }
 
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...

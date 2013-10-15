@@ -25,10 +25,19 @@ describe('ns.router', function() {
                 route: {
                     '/inbox': 'messages',
                     '/message/{mid:int}': 'message',
-                    '/page/prefix{page:int}': 'url-with-prefix'
+                    '/page/prefix{page:int}': 'url-with-prefix',
+                    '/search/{request:any}': 'search'
+
                 }
             };
+
+            ns.router.regexps['any'] = '.+?';
+
             ns.router.init();
+        });
+
+        afterEach(function() {
+            delete ns.router.regexps['any'];
         });
 
         var test_route = function(url, params, test_name) {
@@ -51,6 +60,11 @@ describe('ns.router', function() {
         test_route('/message/12345/', {page: 'message', params: {mid: '12345'}});
 
         test_route('/page/prefix1/', {page: 'url-with-prefix', params: {page: '1'}});
+
+        test_route('/search/request/', {page: 'search', params: {request: 'request'}});
+        test_route('/search/' + encodeURIComponent('/') + '/', {page: 'search', params: {request: '/'}});
+        // test for invalid urlencode
+        test_route('/search/' + encodeURIComponent('/') + '%F/', {page: 'search', params: {request: undefined}});
     });
 
     describe('default value', function() {

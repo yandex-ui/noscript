@@ -72,7 +72,7 @@ ns.router = function(url) {
                 }
 
                 if (!paramValueFromURL) {
-                    paramValueFromURL = rparam.default_value
+                    paramValueFromURL = rparam.default_value;
                 }
 
                 params[rparam.name] = paramValueFromURL;

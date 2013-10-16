@@ -11,14 +11,19 @@ ns.page = {};
  * @type {{page: string, params: Object}}
  */
 ns.page.current = {};
-ns.page.currentUrl = null;
+ns.page.currentUrl = (function(location) {
+    var origin = location.protocol + '//' + location.host;
+
+    // Возвращается текущий URL с включая querystring и хеш.
+    return location.href.substr(origin.length);
+})(window.location);
 
 ns.page._stop = false;
 ns.page._lastUrl = '';
 
 /**
  * Осуществляем переход по ссылке.
- * @param {String} [url=location.pathname + location.search]
+ * @param {String} [url=ns.page.currentUrl]
  * @param {Boolean} [preventAddingToHistory=false] Не добавлять урл в историю браузера.
  * @return {no.Promise}
  */
@@ -29,9 +34,7 @@ ns.page.go = function(url, preventAddingToHistory) {
         return no.Promise.rejected('transaction');
     }
 
-    var loc = window.location;
-
-    url = url || (ns.history.legacy ? loc.hash.substr(1) : (loc.pathname + loc.search));
+    url = url || ns.page.currentUrl;
 
     // возможность заблокировать переход
     if (!ns.page.block.check(url)) {

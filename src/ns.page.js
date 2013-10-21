@@ -11,19 +11,14 @@ ns.page = {};
  * @type {{page: string, params: Object}}
  */
 ns.page.current = {};
-ns.page.currentUrl = (function(location) {
-    var origin = location.protocol + '//' + location.host;
-
-    // Возвращается текущий URL с включая querystring и хеш.
-    return location.href.substr(origin.length);
-})(window.location);
+ns.page.currentUrl = null;
 
 ns.page._stop = false;
 ns.page._lastUrl = '';
 
 /**
  * Осуществляем переход по ссылке.
- * @param {String} [url=ns.page.currentUrl]
+ * @param {String} [url=ns.page.getCurrentUrl()]
  * @param {Boolean} [preventAddingToHistory=false] Не добавлять урл в историю браузера.
  * @return {no.Promise}
  */
@@ -34,7 +29,7 @@ ns.page.go = function(url, preventAddingToHistory) {
         return no.Promise.rejected('transaction');
     }
 
-    url = url || ns.page.currentUrl;
+    url = url || ns.page.getCurrentUrl();
 
     // возможность заблокировать переход
     if (!ns.page.block.check(url)) {
@@ -166,6 +161,13 @@ ns.page.block.check = function(url) {
  */
 ns.page.getDefaultUrl = function() {
     return ns.router.url('/');
+};
+
+/**
+ * Calculates current application url, fed as default value for `ns.page.go`.
+ */
+ns.page.getCurrentUrl = function() {
+    return window.location.pathname + window.location.search;
 };
 
 /**

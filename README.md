@@ -8,6 +8,9 @@ JS MVC framework
 
 #### Changelog
 
+##### 0.1.9 (22.10.2013)
+- Drop History API support for old browsers. Use polyfill insted. [#171](https://github.com/yandex-ui/noscript/pull/171)
+
 ##### 0.1.8 (15.10.2013)
 - `ns.router` decodes params from url [#168](https://github.com/yandex-ui/noscript/pull/168)
 - `ns.Model.set` triggers `ns-model-changed` event first, then `ns-model-changed.<jpath>` [#165](https://github.com/yandex-ui/noscript/pull/165)

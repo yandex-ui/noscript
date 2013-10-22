@@ -198,8 +198,8 @@ ns.action._process = function(e) {
             return true;
         }
 
-        // если host ссылки не равен нашему хосту
-        if (target.host != window.location.host) {
+        // если hostname ссылки не равен нашему хосту
+        if (target.hostname != window.location.hostname) {
             return true;
         }
 

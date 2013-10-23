@@ -71,6 +71,8 @@ ns.page.go = function(url, preventAddingToHistory) {
     if (!preventAddingToHistory) {
         // записываем в историю все переходы
         ns.history.pushState(url);
+    } else {
+        ns.history.replaceState(url);
     }
 
     ns.page.history.push(url);

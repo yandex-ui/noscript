@@ -3,6 +3,7 @@
  */
 
 external scalar ns-url(scalar)
+external scalar ns-generate-url(scalar, object)
 
 layout-params = /.layout-params
 

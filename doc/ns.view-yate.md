@@ -89,3 +89,20 @@ match .my-view-collection ns-view-content {
 }
 ```
 
+## Структура JSON для отрисовки
+
+```js
+{
+    async: false // boolean, view находится в async-режиме
+    is_models_valid: true // boolean, флаг валидности моделей
+    key: 'view=app' // string, ключ view
+    models: { // object, объект с данными моделей
+        model1: {} // данные модели1
+        model2: {} // данные модели2
+    },
+    page: {} // object, параметры страницы, идентичен ns.page.current
+    params: {} // object, параметры view
+    views: {} // object, объект c дочерними view
+}
+```
+

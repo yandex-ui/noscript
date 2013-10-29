@@ -89,6 +89,11 @@ match .my-view-collection ns-view-content {
 }
 ```
 
+## Yate-хелперы
+
+`model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому предпочтительнее jpath `/.models.model-name`
+`ns-generate-url` - external-функция для `ns.router.generateUrl`
+
 ## Структура JSON для отрисовки
 
 ```js

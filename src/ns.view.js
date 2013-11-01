@@ -652,7 +652,6 @@ ns.View.prototype._bindModels = function() {
         var model = models[model_id];
 
         model.on('ns-model-destroyed', function() {
-            delete that.models[this.id];
             that.invalidate();
         });
 
@@ -999,12 +998,6 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
  * если запрос необходим
  */
 ns.View.prototype._tryPushToRequest = function(updated) {
-    // Вид мог быть проинвалидирован удалением модели
-    // В таком случае нужно заново проинициализировать модели
-    if (ns.V.STATUS.INVALID === this.status) {
-        this._initModels();
-    }
-
     /**
      * Флаг, означающий, что view грузится асинхронно.
      * @type {Boolean}

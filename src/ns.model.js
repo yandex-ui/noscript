@@ -451,7 +451,8 @@ ns.Model.prototype.getRequestParams = function() {
  * @returns {ns.Model}
  */
 ns.Model.get = function(id, params) {
-    var model = ns.Model.find(id, params);
+
+    var model = this._find(id, params);
 
     if (!model) {
         var Ctor = _ctors[id];
@@ -468,18 +469,32 @@ ns.Model.get = function(id, params) {
 };
 
 /**
+ * Returns valid cached model instance.
+ * @param {String} id Model's ID.
+ * @param {Object} [params] Model's params
+ * @returns {ns.Model|null}
+ */
+ns.Model.find = function(id, params) {
+    var model = this._find(id, params);
+    if (model && model.isValid()) {
+        return model;
+    }
+    return null;
+};
+
+/**
  * Returns cached model instance.
  * @param {String} id Model's ID.
  * @param {Object} [params] Model's params
- * @returns {ns.Model|undefined}
+ * @returns {ns.Model|null}
  */
-ns.Model.find = function(id, params) {
+ns.Model._find = function(id, params) {
     if (!(id in _infos)) {
         throw new Error('[ns.Model] "' + id + '" is not defined');
     }
 
     var key = ns.Model.key(id, params);
-    return _cache[id][key];
+    return _cache[id][key] || null;
 };
 
 /**
@@ -496,9 +511,6 @@ ns.Model.destroy = function(model) {
 
     var cached = _cache[id][key];
     if (cached) {
-        // remove from cache
-        delete _cache[id][key];
-
         // notify subscribers about disappearance
         model.trigger('ns-model-destroyed');
 
@@ -508,8 +520,8 @@ ns.Model.destroy = function(model) {
 };
 
 //  Проверяем, есть ли модель в кэше и валидна ли она.
-ns.Model.isValid = function(id, key) {
-    var model = ns.Model.get(id, key);
+ns.Model.isValid = function(id, params) {
+    var model = ns.Model.get(id, params);
     if (!model) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
 
     return model.isValid();

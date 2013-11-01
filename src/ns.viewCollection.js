@@ -58,7 +58,6 @@ ns.ViewCollection.prototype._bindModels = function() {
         var model = models[model_id];
 
         model.on('ns-model-destroyed', function() {
-            delete that.models[this.id];
             that.invalidate();
         });
 

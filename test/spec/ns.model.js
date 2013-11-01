@@ -138,12 +138,13 @@ describe('ns.Model', function() {
 
         describe('ns.Model.find():', function() {
 
-            it('should return undefined if model doesn\'t exists', function() {
-                expect(ns.Model.find('m1')).to.be(undefined);
+            it('should return null if model doesn\'t exists', function() {
+                expect(ns.Model.find('m1')).to.be(null);
             });
 
-            it('should return model if exists', function() {
+            it('should return valid model if exists', function() {
                 var m = ns.Model.get('m1');
+                m.setData({foo: 'bar'});
                 expect(ns.Model.find('m1')).to.be.ok(m);
             });
 

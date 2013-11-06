@@ -474,7 +474,7 @@ ns.Model.get = function(id, params) {
  * @param {Object} [params] Model's params
  * @returns {ns.Model|null}
  */
-ns.Model.find = function(id, params) {
+ns.Model.getValid = function(id, params) {
     var model = this._find(id, params);
     if (model && model.isValid()) {
         return model;

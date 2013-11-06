@@ -455,8 +455,8 @@ describe('ns.ViewCollection', function() {
         });
 
         it('shouldn`t find destroyed models', function() {
-            expect(ns.Model.find('mItem', {id: '0'})).not.to.be.ok();
-            expect(ns.Model.find('mItem', {id: '1'})).not.to.be.ok();
+            expect(ns.Model.getValid('mItem', {id: '0'})).not.to.be.ok();
+            expect(ns.Model.getValid('mItem', {id: '1'})).not.to.be.ok();
         });
 
         it('should have 1 node for view vItem', function() {

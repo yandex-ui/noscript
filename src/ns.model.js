@@ -304,18 +304,34 @@ ns.Model.prototype.isValid = function() {
     return (this.status === this.STATUS.OK);
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-//  Возвращает данные, находящиеся по пути path.
-//
-//      var foo = model.get('foo'); // model.data.foo.
-//      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
-//
+/**
+ * Returns data matched by jpath.
+ * @param {string} jpath
+ * @returns {*}
+ * @example
+ * var foo = model.get('.foo'); // model.data.foo.
+ * var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo существует).
+ */
 ns.Model.prototype.get = function(jpath) {
     var data = this.data;
     if (data) {
         return no.jpath(jpath, data);
     }
+};
+
+/**
+ * Returns data matched by jpath.
+ * This methods always returns array of results.
+ * @param {string} jpath
+ * @returns {array}
+ */
+ns.Model.prototype.select = function(jpath) {
+    var data = this.data;
+    if (data) {
+        return no.jpath.raw(jpath, data).toArray();
+    }
+
+    return [];
 };
 
 /**

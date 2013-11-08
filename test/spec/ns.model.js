@@ -288,6 +288,18 @@ describe('ns.Model', function() {
 
     describe('prototype', function() {
 
+        describe('.get()', function() {
+
+            beforeEach(function() {
+                this.model = ns.Model.get('m0').setData({foo: 'bar'});
+            });
+
+            it('should returns .foo as string', function() {
+                expect(this.model.get('.foo')).to.be.equal('bar');
+            });
+
+        });
+
         describe('_reset', function() {
 
             beforeEach(function() {
@@ -334,6 +346,18 @@ describe('ns.Model', function() {
                     .to.be( ns.Model.key('m1', {p1: 1, p2: 2, p3: 3, p4: 4}), model.info );
 
                 expect(model._bindEvents.calledOnce).to.be.ok();
+            });
+
+        });
+
+        describe('.select()', function() {
+
+            beforeEach(function() {
+                this.model = ns.Model.get('m0').setData({foo: 'bar'});
+            });
+
+            it('should returns .foo as array', function() {
+                expect(this.model.select('.foo')).to.be.eql(['bar']);
             });
 
         });

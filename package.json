@@ -23,7 +23,7 @@
         "grunt-cli": "*",
         "grunt-contrib-jshint": "*",
         "grunt-mocha": "*",
-        "jscs": "1.0.5",
+        "jscs": "1.0.11",
         "sinon": "*",
         "yate": "*"
     },

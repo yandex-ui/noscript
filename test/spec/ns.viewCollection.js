@@ -437,8 +437,10 @@ describe('ns.ViewCollection', function() {
                 .start()
                 .done(function() {
                     ns.Model.destroy(ns.Model.get('mCollection'));
+                    ns.Model.destroy(ns.Model.get('mItem', {id: '0'}));
+                    ns.Model.destroy(ns.Model.get('mItem', {id: '1'}));
 
-                    ns.Model.get('mCollection').setData({data: [{id: 3}]});
+                    ns.Model.get('mCollection').setData({data: [{id: '2'}]});
 
                     new ns.Update(this.APP, layout, {})
                         .start()
@@ -450,6 +452,11 @@ describe('ns.ViewCollection', function() {
 
         afterEach(function() {
             delete this.APP;
+        });
+
+        it('shouldn`t find destroyed models', function() {
+            expect(ns.Model.getValid('mItem', {id: '0'})).not.to.be.ok();
+            expect(ns.Model.getValid('mItem', {id: '1'})).not.to.be.ok();
         });
 
         it('should have 1 node for view vItem', function() {

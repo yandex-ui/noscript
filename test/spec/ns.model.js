@@ -136,19 +136,20 @@ describe('ns.Model', function() {
             });
         });
 
-        describe('ns.Model.find():', function() {
+        describe('ns.Model.getValid():', function() {
 
-            it('should return undefined if model doesn\'t exists', function() {
-                expect(ns.Model.find('m1')).to.be(undefined);
+            it('should return null if model doesn\'t exists', function() {
+                expect(ns.Model.getValid('m1')).to.be(null);
             });
 
-            it('should return model if exists', function() {
+            it('should return valid model if exists', function() {
                 var m = ns.Model.get('m1');
-                expect(ns.Model.find('m1')).to.be.ok(m);
+                m.setData({foo: 'bar'});
+                expect(ns.Model.getValid('m1')).to.be.ok(m);
             });
 
             it('should throw exception if model is not defined', function() {
-                var exists = function() { ns.Model.find('non-exists-model'); };
+                var exists = function() { ns.Model.getValid('non-exists-model'); };
                 expect(exists).to.throwException();
             });
 
@@ -166,7 +167,7 @@ describe('ns.Model', function() {
             });
 
             it('should throw exception if model is not defined', function() {
-                var exists = function() { ns.Model.find('non-exists-model'); };
+                var exists = function() { ns.Model.getValid('non-exists-model'); };
                 expect(exists).to.throwException();
             });
 
@@ -551,7 +552,7 @@ describe('ns.Model', function() {
                 this.model2.destroyWith(this.model1);
                 ns.Model.destroy(this.model1);
 
-                expect(ns.Model.find('model2', { id: 1 })).not.to.be.ok();
+                expect(ns.Model.getValid('model2', { id: 1 })).not.to.be.ok();
             });
 
             it('should throw error if tried to destroy ns.Model with string', function() {
@@ -559,7 +560,7 @@ describe('ns.Model', function() {
             });
 
             it('should throw error if tried to destroy ns.Model with undefined', function() {
-                expect(function() { this.model1.destroyWith(ns.Model.find('model2', {id: 2})); }).to.throwException();
+                expect(function() { this.model1.destroyWith(ns.Model.getValid('model2', {id: 2})); }).to.throwException();
 
             });
         });

@@ -8,6 +8,10 @@ JS MVC framework
 
 #### Changelog
 
+##### 0.1.10 (08.11.2013)
+- Model destruction refactoring [#174](https://github.com/yandex-ui/noscript/pull/174). `ns.Model.find` renamed to `ns.Model.getValid`.
+- Add method `ns.Model.prototype.select` which always returns array of results [#170](https://github.com/yandex-ui/noscript/issues/170)
+
 ##### 0.1.9 (22.10.2013)
 - Drop History API support for old browsers. Use polyfill insted. [#171](https://github.com/yandex-ui/noscript/pull/171)
 

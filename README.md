@@ -8,6 +8,9 @@ JS MVC framework
 
 #### Changelog
 
+##### 0.1.11 (12.11.2013)
+- Fix bug with bind/unbind global events
+
 ##### 0.1.10 (08.11.2013)
 - Model destruction refactoring [#174](https://github.com/yandex-ui/noscript/pull/174). `ns.Model.find` renamed to `ns.Model.getValid`.
 - Add method `ns.Model.prototype.select` which always returns array of results [#170](https://github.com/yandex-ui/noscript/issues/170)

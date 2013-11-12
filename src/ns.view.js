@@ -1,5 +1,11 @@
 (function() {
 
+/**
+ * Uniq View ID counter
+ * @type {number}
+ */
+var VIEW_ID = 0;
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 //  ns.View
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -78,11 +84,18 @@ ns.View.prototype._init = function(id, params, async) {
     this._modelsVersions = {};
 
     /**
-     * jquery-namespace для событий.
+     * Uniq View ID
+     * @type {number}
+     * @private
+     */
+    this._uniqID = VIEW_ID++;
+
+    /**
+     * Uniq namespace for events so view can bind/unbind events properly.
      * @type {String}
      * @private
      */
-    this._eventNS = '.ns-view-' + this.id;
+    this._eventNS = '.ns-view-' + this.id + '-' + this._uniqID;
 
     // события, которые надо забиндить сразу при создании блока
     for (var i = 0, j = this.info.createEvents.length; i < j; i++) {

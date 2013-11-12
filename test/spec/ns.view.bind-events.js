@@ -358,3 +358,76 @@ describe('ns.View bind events', function() {
     });
 
 });
+
+describe('ns.View bind events2', function() {
+
+    describe('bind global events with uniq namespace', function() {
+
+        beforeEach(function(cb) {
+            sinon.stub($.fn, 'on', no.nop);
+            sinon.stub($.fn, 'off', no.nop);
+
+            // creates 2 layouts with same view in different boxes
+            ns.layout.define('page1', {
+                'app': {
+                    'content@': {
+                        'page1-box@': {
+                            'view1': true
+                        }
+                    }
+                }
+            });
+
+            ns.layout.define('page2', {
+                'app': {
+                    'content@': {
+                        'page2-box@': {
+                            'view1': true
+                        }
+                    }
+                }
+            });
+
+            ns.View.define('app');
+
+            // view1 has global scroll event
+            ns.View.define('view1', {
+                events: {
+                    'scroll window': no.nop
+                }
+            });
+
+            var app = ns.View.create('app');
+
+            var params = {};
+            var layout1 = ns.layout.page('page1', params);
+            var layout2 = ns.layout.page('page2', params);
+
+            new ns.Update(app, layout1, params)
+                .start()
+                .then(function() {
+
+                    new ns.Update(app, layout2, params)
+                        .start()
+                        .then(function() {
+                            cb();
+                        });
+
+                });
+        });
+
+        afterEach(function() {
+            $.fn.on.restore();
+            $.fn.off.restore();
+        });
+
+        it('should bind global events with different namespace', function() {
+            var view1Event = $.fn.on.getCall(0).args[0];
+            var view2Event = $.fn.on.getCall(1).args[0];
+
+            expect(view1Event).to.not.equal(view2Event);
+        })
+
+    });
+
+});

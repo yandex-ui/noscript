@@ -24,10 +24,20 @@ describe('ns.router', function() {
                 },
                 route: {
                     '/inbox': 'messages',
-                    '/message/{mid:int}': 'message'
+                    '/message/{mid:int}': 'message',
+                    '/page/prefix{page:int}': 'url-with-prefix',
+                    '/search/{request:any}': 'search'
+
                 }
             };
+
+            ns.router.regexps['any'] = '.+?';
+
             ns.router.init();
+        });
+
+        afterEach(function() {
+            delete ns.router.regexps['any'];
         });
 
         var test_route = function(url, params, test_name) {
@@ -37,6 +47,7 @@ describe('ns.router', function() {
             });
         };
 
+        test_route('', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/?foo=bar', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/inbox', {page: 'messages', params: {}});
@@ -47,6 +58,13 @@ describe('ns.router', function() {
 
         test_route('/message/12345', {page: 'message', params: {mid: '12345'}});
         test_route('/message/12345/', {page: 'message', params: {mid: '12345'}});
+
+        test_route('/page/prefix1/', {page: 'url-with-prefix', params: {page: '1'}});
+
+        test_route('/search/request/', {page: 'search', params: {request: 'request'}});
+        test_route('/search/' + encodeURIComponent('/') + '/', {page: 'search', params: {request: '/'}});
+        // test for invalid urlencode
+        test_route('/search/' + encodeURIComponent('/') + '%F/', {page: 'search', params: {request: undefined}});
     });
 
     describe('default value', function() {
@@ -218,5 +236,36 @@ describe('ns.router', function() {
 
         });
 
+    });
+
+    describe('special case: parameter is a path', function() {
+
+        beforeEach(function() {
+            ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
+            ns.router.regexps.dialog = 'copy|move'
+            ns.router.regexps.divider = '\\|';
+
+            ns.router.routes = {
+                route: {
+                    '/from{from-path:path}/{dialog:dialog}{div:divider}{to-path:path}': 'page',
+                    '/from{from-path:path}/{dialog:dialog}{div:divider}': 'page',
+                    '/from{from-path:path}/{dialog:dialog}': 'page',
+                    '/from{from-path:path}': 'page',
+                }
+            };
+            ns.router.init();
+        });
+
+        var test_route = function(url, params, test_name) {
+            test_name = test_name || (url + ' -> ' + params.page);
+            it(test_name, function() {
+                expect(ns.router(url)).to.be.eql(params);
+            });
+        };
+
+        test_route('/from/var/logs/nginx/copy|/users/me/local', { page: 'page', params: { dialog: 'copy', div: '|', 'from-path': '/var/logs/nginx', 'to-path': '/users/me/local' } } );
+        test_route('/from/var/logs/nginx/copy|', { page: 'page', params: { dialog: 'copy', div: '|', 'from-path': '/var/logs/nginx' } } );
+        test_route('/from/var/logs/nginx/copy', { page: 'page', params: { dialog: 'copy', 'from-path': '/var/logs/nginx' } } );
+        test_route('/from/var/logs/nginx', { page: 'page', params: { 'from-path': '/var/logs/nginx' } } );
     });
 });

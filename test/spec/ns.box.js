@@ -68,7 +68,7 @@ describe('ns.Box', function() {
             },
             rewriteParamsOnInit: function(params) {
                 return {
-                    pOwn: ns.Model.find('model4').get('.value')
+                    pOwn: ns.Model.getValid('model4').get('.value')
                 };
             }
         });

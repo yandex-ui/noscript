@@ -301,10 +301,8 @@ ns.ModelCollection.prototype.setItems = function(models, index) {
 
     // оповестим всех, что вставили подмодели
     if (insertedModels.length) {
-        // если данных не было, при insert говорим что данные появились
-        if (this.status == this.STATUS.NONE) {
-            this.status = this.STATUS.OK;
-        }
+        // если вставка данных состоялась, считаем модель валидной
+        this.status = this.STATUS.OK;
 
         this.trigger('ns-model-insert', insertedModels);
     }

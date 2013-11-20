@@ -63,8 +63,7 @@ ns.ViewCollection.prototype._bindModels = function() {
         var model = models[model_id];
 
         model.on('ns-model-destroyed', function() {
-            delete that.models[this.id];
-            that._initModel(this.id);
+            that.invalidate();
         });
 
         model.on('ns-model-changed', function(evt, data) {
@@ -79,12 +78,6 @@ ns.ViewCollection.prototype._bindModels = function() {
 ns.ViewCollection.prototype.isValid = function() {
     return this.isValidSelf() && this.isValidDesc();
 };
-
-/**
- * Check self validity (except items).
- * @returns {Boolean}
- */
-ns.ViewCollection.prototype.isValidSelf = ns.View.prototype.isValid;
 
 ns.ViewCollection.prototype.isValidDesc = function() {
     for (var key in this.views) {
@@ -164,34 +157,7 @@ ns.ViewCollection.prototype._apply = function(callback) {
     }
 };
 
-ns.ViewCollection.prototype._getRequestViews = function(updated) {
-    /**
-     * Флаг, означающий, что view грузится асинхронно.
-     * @type {Boolean}
-     */
-    this.asyncState = false;
-
-    if (this.async) {
-        var hasValidModels = this.isModelsValid();
-        var hasValidStatus = this.isOk();
-        if (hasValidModels && !hasValidStatus) {
-            // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его синхронно
-            updated.sync.push(this);
-
-        } else if (!hasValidModels) {
-            this.asyncState = true;
-            // если асинхронный блок имеет невалидные модели, то его не надо рисовать
-            updated.async.push(this);
-            // прекращаем обработку
-            return updated;
-        }
-    } else if (!this.isValidSelf()) {
-        // если обычный блок не валиден
-        updated.sync.push(this);
-    }
-
-    return updated;
-};
+ns.ViewCollection.prototype._getRequestViews = ns.View.prototype._tryPushToRequest;
 
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
     var decl;

@@ -1,5 +1,11 @@
 (function() {
 
+/**
+ * Uniq View ID counter
+ * @type {number}
+ */
+var VIEW_ID = 0;
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 //  ns.View
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -78,11 +84,18 @@ ns.View.prototype._init = function(id, params, async) {
     this._modelsVersions = {};
 
     /**
-     * jquery-namespace для событий.
+     * Uniq View ID
+     * @type {number}
+     * @private
+     */
+    this._uniqID = VIEW_ID++;
+
+    /**
+     * Uniq namespace for events so view can bind/unbind events properly.
      * @type {String}
      * @private
      */
-    this._eventNS = '.ns-view-' + this.id;
+    this._eventNS = '.ns-view-' + this.id + '-' + this._uniqID;
 
     // события, которые надо забиндить сразу при создании блока
     for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
@@ -97,17 +110,16 @@ ns.View.prototype._init = function(id, params, async) {
  * Инициализирует модели
  */
 ns.View.prototype._initModels = function() {
-    // Создаёи модели или берем их из кэша, если они уже есть
-    for (var model_id in this.info.models) {
-        this._initModel(model_id);
-    }
-};
-
-ns.View.prototype._initModel = function(id) {
     if (!this.models) {
         this.models = {};
     }
-    this.models[id] = ns.Model.get(id, this.params);
+
+    // Создаём модели или берем их из кэша, если они уже есть
+    for (var id in this.info.models) {
+        if (!this.models[id]) {
+            this.models[id] = ns.Model.get(id, this.params);
+        }
+    }
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
@@ -653,8 +665,7 @@ ns.View.prototype._bindModels = function() {
         var model = models[model_id];
 
         model.on('ns-model-destroyed', function() {
-            delete that.models[this.id];
-            that._initModel(this.id);
+            that.invalidate();
         });
 
         var jpaths = subviews[model_id];
@@ -909,7 +920,7 @@ ns.View.prototype.isSubviewsOk = function() {
  * Возвращает true, если блок валиден.
  * @return {Boolean}
  */
-ns.View.prototype.isValid = function() {
+ns.View.prototype.isValid = ns.View.prototype.isValidSelf = function() {
     return this.isOk() && this.isSubviewsOk() && this.isModelsValidWithVersions();
 };
 
@@ -974,6 +985,32 @@ ns.View.prototype._apply = function(callback) {
  * @return {*}
  */
 ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+
+    // При необходимости добавим текущий вид в список "запрашиваемых"
+    this._tryPushToRequest(updated);
+
+    // Если views еще не определены (первая отрисовка)
+    if (!this.views) {
+        //  FIXME: Почему бы это в конструкторе не делать?
+        this.views = {};
+        // Создаем подблоки
+        for (var view_id in pageLayout) {
+            this._addView(view_id, params, pageLayout[view_id].type);
+        }
+    }
+
+    this._apply(function(view, id) {
+        view._getRequestViews(updated, pageLayout[id].views, params);
+    });
+
+    return updated;
+};
+
+/**
+ * Добавляет вид в соответствующий список "запрашиваемых" видов в случае,
+ * если запрос необходим
+ */
+ns.View.prototype._tryPushToRequest = function(updated) {
     /**
      * Флаг, означающий, что view грузится асинхронно.
      * @type {Boolean}
@@ -994,24 +1031,10 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
             // прекращаем обработку
             return updated;
         }
-    } else if (!this.isValid()) {
+    } else if (!this.isValidSelf()) {
         // если обычный блок не валиден
         updated.sync.push(this);
     }
-
-    // Если views еще не определены (первая отрисовка)
-    if (!this.views) {
-        //  FIXME: Почему бы это в конструкторе не делать?
-        this.views = {};
-        // Создаем подблоки
-        for (var view_id in pageLayout) {
-            this._addView(view_id, params, pageLayout[view_id].type);
-        }
-    }
-
-    this._apply(function(view, id) {
-        view._getRequestViews(updated, pageLayout[id].views, params);
-    });
 
     return updated;
 };

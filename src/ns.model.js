@@ -304,18 +304,34 @@ ns.Model.prototype.isValid = function() {
     return (this.status === this.STATUS.OK);
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-//  Возвращает данные, находящиеся по пути path.
-//
-//      var foo = model.get('foo'); // model.data.foo.
-//      var bar = model.get('foo.bar'); // model.data.foo.bar (если foo существует).
-//
+/**
+ * Returns data matched by jpath.
+ * @param {string} jpath
+ * @returns {*}
+ * @example
+ * var foo = model.get('.foo'); // model.data.foo.
+ * var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo существует).
+ */
 ns.Model.prototype.get = function(jpath) {
     var data = this.data;
     if (data) {
         return no.jpath(jpath, data);
     }
+};
+
+/**
+ * Returns data matched by jpath.
+ * This methods always returns array of results.
+ * @param {string} jpath
+ * @returns {array}
+ */
+ns.Model.prototype.select = function(jpath) {
+    var data = this.data;
+    if (data) {
+        return no.jpath.raw(jpath, data).toArray();
+    }
+
+    return [];
 };
 
 /**
@@ -340,7 +356,10 @@ ns.Model.prototype.set = function(jpath, value, options) {
     //  Пока что будет версия без сравнения.
 
     if ( !(options && options.silent) ) {
-        //  Кидаем сообщения о том, что модель (или ее часть) изменилась.
+        //  Сообщение о том, что вообще вся модель изменилась.
+        this.trigger('ns-model-changed', jpath);
+
+        //  Кидаем сообщения о том, что изменились части модели.
         //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'changed.foo.bar' и 'changed.foo'.
         //  В качестве параметра (пока что) этот же самый jpath.
         //
@@ -356,8 +375,6 @@ ns.Model.prototype.set = function(jpath, value, options) {
             this.trigger('ns-model-changed' + _jpath, _jpath);
             l--;
         }
-        //  Сообщение о том, что вообще вся модель изменилась.
-        this.trigger('ns-model-changed', jpath);
     }
 };
 
@@ -450,7 +467,8 @@ ns.Model.prototype.getRequestParams = function() {
  * @returns {ns.Model}
  */
 ns.Model.get = function(id, params) {
-    var model = ns.Model.find(id, params);
+
+    var model = this._find(id, params);
 
     if (!model) {
         var Ctor = _ctors[id];
@@ -467,18 +485,32 @@ ns.Model.get = function(id, params) {
 };
 
 /**
+ * Returns valid cached model instance.
+ * @param {String} id Model's ID.
+ * @param {Object} [params] Model's params
+ * @returns {ns.Model|null}
+ */
+ns.Model.getValid = function(id, params) {
+    var model = this._find(id, params);
+    if (model && model.isValid()) {
+        return model;
+    }
+    return null;
+};
+
+/**
  * Returns cached model instance.
  * @param {String} id Model's ID.
  * @param {Object} [params] Model's params
- * @returns {ns.Model|undefined}
+ * @returns {ns.Model|null}
  */
-ns.Model.find = function(id, params) {
+ns.Model._find = function(id, params) {
     if (!(id in _infos)) {
         throw new Error('[ns.Model] "' + id + '" is not defined');
     }
 
     var key = ns.Model.key(id, params);
-    return _cache[id][key];
+    return _cache[id][key] || null;
 };
 
 /**
@@ -495,9 +527,6 @@ ns.Model.destroy = function(model) {
 
     var cached = _cache[id][key];
     if (cached) {
-        // remove from cache
-        delete _cache[id][key];
-
         // notify subscribers about disappearance
         model.trigger('ns-model-destroyed');
 
@@ -507,8 +536,8 @@ ns.Model.destroy = function(model) {
 };
 
 //  Проверяем, есть ли модель в кэше и валидна ли она.
-ns.Model.isValid = function(id, key) {
-    var model = ns.Model.get(id, key);
+ns.Model.isValid = function(id, params) {
+    var model = ns.Model.get(id, params);
     if (!model) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
 
     return model.isValid();

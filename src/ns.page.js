@@ -18,7 +18,7 @@ ns.page._lastUrl = '';
 
 /**
  * Осуществляем переход по ссылке.
- * @param {String} [url=location.pathname + location.search]
+ * @param {String} [url=ns.page.getCurrentUrl()]
  * @param {Boolean} [preventAddingToHistory=false] Не добавлять урл в историю браузера.
  * @return {no.Promise}
  */
@@ -29,9 +29,7 @@ ns.page.go = function(url, preventAddingToHistory) {
         return no.Promise.rejected('transaction');
     }
 
-    var loc = window.location;
-
-    url = url || (ns.history.legacy ? loc.hash.substr(1) : (loc.pathname + loc.search));
+    url = url || ns.page.getCurrentUrl();
 
     // возможность заблокировать переход
     if (!ns.page.block.check(url)) {
@@ -73,6 +71,8 @@ ns.page.go = function(url, preventAddingToHistory) {
     if (!preventAddingToHistory) {
         // записываем в историю все переходы
         ns.history.pushState(url);
+    } else {
+        ns.history.replaceState(url);
     }
 
     ns.page.history.push(url);
@@ -163,6 +163,13 @@ ns.page.block.check = function(url) {
  */
 ns.page.getDefaultUrl = function() {
     return ns.router.url('/');
+};
+
+/**
+ * Calculates current application url, fed as default value for `ns.page.go`.
+ */
+ns.page.getCurrentUrl = function() {
+    return window.location.pathname + window.location.search;
 };
 
 /**

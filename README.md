@@ -8,6 +8,23 @@ JS MVC framework
 
 #### Changelog
 
+##### 0.1.11 (12.11.2013)
+- Fix bug with bind/unbind global events
+
+##### 0.1.10 (08.11.2013)
+- Model destruction refactoring [#174](https://github.com/yandex-ui/noscript/pull/174). `ns.Model.find` renamed to `ns.Model.getValid`.
+- Add method `ns.Model.prototype.select` which always returns array of results [#170](https://github.com/yandex-ui/noscript/issues/170)
+
+##### 0.1.9 (22.10.2013)
+- Drop History API support for old browsers. Use polyfill insted. [#171](https://github.com/yandex-ui/noscript/pull/171)
+
+##### 0.1.8 (15.10.2013)
+- `ns.router` decodes params from url [#168](https://github.com/yandex-ui/noscript/pull/168)
+- `ns.Model.set` triggers `ns-model-changed` event first, then `ns-model-changed.<jpath>` [#165](https://github.com/yandex-ui/noscript/pull/165)
+
+##### 0.1.7 (7.10.2013)
+- New method `ns.router.generateUrl` [#154](https://github.com/yandex-ui/noscript/pull/154)
+
 ##### 0.1.5 (12.09.2013)
 - Улучшение поведение `ns.Box` [#157](https://github.com/yandex-ui/noscript/pull/157)
 - Добавлен метод `ns.router.generateUrl` для генерации урлов по параметрам [#154](https://github.com/yandex-ui/noscript/pull/157)

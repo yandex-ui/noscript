@@ -245,6 +245,18 @@ describe('ns.ModelCollection', function() {
                 expect(this.models[3].data).to.eql(this.item1.data);
             });
 
+            it('should be valid after inserting, if was "none"', function() {
+                this.model.insert(this.item1);
+                expect(this.model.isValid()).to.be(true);
+            });
+
+            it('should be valid after inserting, if was "invalid"', function() {
+                this.model.insert(this.item1);
+                this.model.invalidate();
+                this.model.insert(this.item2);
+                expect(this.model.isValid()).to.be(true);
+            });
+
             it('should insert item in begin', function() {
                 this.model.insert(this.item1, 0);
                 expect(this.models.length).to.be(4);

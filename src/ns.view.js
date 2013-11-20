@@ -157,15 +157,15 @@ ns.View.getKeyAndParams = function(id, params, info) {
 
         for (var i = 0, l = pNames.length; i < l; i++) {
             var pName = pNames[i];
-            var pValue = params[ pName ] || pOptional[ pName ];
+            var pValue = (typeof params[pName] === 'undefined') ? pOptional[pName] : params[pName];
             var pFilter = pFilters[pName];
             var isOptional = pName in pOptional;
 
-            if (pValue == null && isOptional) {
+            if (typeof pValue === 'undefined' && isOptional) {
                 continue;
             }
 
-            if ( pValue == null || (pFilter && pValue != pFilter) ) {
+            if ( typeof pValue === 'undefined' || (pFilter && pValue != pFilter) ) {
                 key = null;
                 break;
             }

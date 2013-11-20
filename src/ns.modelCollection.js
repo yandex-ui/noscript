@@ -13,7 +13,7 @@ no.inherit(ns.ModelCollection, ns.Model);
 ns.ModelCollection.prototype.getData = function() {
     // это составная модель —
     // нужно склеить все данные
-    // из моделей её состовляющих
+    // из моделей её составляющих
     if (this.isValid()) {
         var jpathItems;
 
@@ -35,9 +35,13 @@ ns.ModelCollection.prototype.getData = function() {
         // ссылка куда вставлять данные моделей
         var items = no.jpath(jpathItems, this.data);
 
-        // пишем новые
-        this.models.forEach(function(model) {
-            items.push( model.getData() );
+        // Это мега хак: когда у нас совсем нет данных, нужно вернуть массив с пустыми элементами.
+        // К примеру: у нас уже есть 5 пустых элементов. Надо вернуть массив с 5ью пустыми элементами.
+        items.length = this.models.length;
+
+        // пишем новые (тут тоже могут быть разреженные данные)
+        this.models.forEach(function(model, index) {
+            items[index] = model.getData();
         });
     }
     return this.data;
@@ -102,8 +106,8 @@ ns.ModelCollection.prototype._splitModels = function(items) {
             params[key] = no.jpath(info.params[key], item);
         }
 
-        // идентификатор подмодели берется из info.model_id
-        // он коллецкия может содержать модели только одного вида
+        // идентификатор подмодели берётся из info.model_id
+        // коллекция может содержать модели только одного вида
         var model = ns.Model.get(info.model_id, params).setData(item);
 
         model.on('ns-model-touched', function() {
@@ -118,19 +122,21 @@ ns.ModelCollection.prototype._splitModels = function(items) {
 };
 
 /**
- * Подписывает коллекию на события из подмоделей
+ * Подписывает коллекию на события подмодели
  *
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
 
-    // добавим нашу коллекцию с список слушающих коллекций для подмодели
+    // добавим нашу коллекцию в список слушающих коллекций для подмодели
     model.eventListeners[this.key] = this;
 
     // если ранее мы не переопределяли прототипный тригер
     // то переопеделим его
+    // XXX это очень жёсткий bad practice... Лучше модэли элементы коллекции тогда наследовать от какого-то ns.Model.CollectionItem, где всё это прописать.
     if (ns.Model.prototype.trigger === model.trigger) {
         model.trigger = function(evt, data) {
+            // FIXME лучше apply(this, arguments)
             ns.Model.prototype.trigger.call(this, evt, data);
 
             var collData = {
@@ -197,89 +203,191 @@ ns.ModelCollection.prototype.clear = function() {
 };
 
 /**
- * Вставляет подмодели в коллекцию
+ * Вставляет подмодели в коллекцию начиная с определённого индекса.
+ * Коллекция при этом раздвигается.
+ * Если индекс не передан — вставляет элементы в конец коллекции.
  *
- * @param {Array <ns.Model> | ns.Model} models – одна или несколько подмоделей
- *                                                 для вставки
- * @param {Number} [index] – индекс позиции, на которую вставить подмодели
+ * @param { Array<ns.Model> | ns.Model } models - одна или несколько подмоделей для вставки
+ * @param { Number= } index - индекс позиции, на которую вставить подмодели
  *
- * @return {Boolean} – признак успешности вставки
+ * @return {Boolean} признак успешности вставки
  */
 ns.ModelCollection.prototype.insert = function(models, index) {
-    if (isNaN(index)) {
+    var that = this;
+
+    if (typeof index === 'undefined') {
         index = this.models.length;
     }
 
     // Для удобства, одиночная модель оборачивается в массив.
-    if (!(models instanceof Array)) {
+    if ( !Array.isArray(models) ) {
         models = [models];
     }
 
     // Вставить можно только объявленную модель
     // и повторная вставка модели запрещена
-    var insertion = models.filter(function(model) {
-        return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id);
-    }, this);
+    var insertedModels = models.filter(function(m) {
+        return that.models.indexOf(m) < 0 && ns.Model.infoLite(m.id);
+    });
 
-    insertion.forEach(function(model, i) {
-        this.models.splice(index + i, 0, model);
+    // splice() не умеет вставлять элементы с индексом больше текущей длины массива.
+    // Поэтому вначале надо расширить массив.
+    if (index > this.models.length) {
+        this.models.length = index;
+    }
 
-        // не забудем подписаться на события
-        this._subscribeSplit(model);
-    }, this);
+    // А вот теперь уже можно вставлять новые модели.
+    // Такой хитрый вызов через прототип массива, потому что у splice дурацкая сигнатура!
+    Array.prototype.splice.apply(this.models, [index, 0].concat(insertedModels));
+
+    // Помечаем новые элементы как зависящие от текущей коллекции.
+    insertedModels.forEach(function(m) {
+        that._subscribeSplit(m);
+    });
 
     // оповестим всех, что вставили подмодели
-    if (insertion.length > 0) {
-        // если вставка данных состоялась, считаем модель валидной
-        this.status = this.STATUS.OK;
+    if (insertedModels.length) {
+        // если данных не было, при insert говорим что данные появились
+        if (this.status == this.STATUS.NONE) {
+            this.status = this.STATUS.OK;
+        }
 
-        this.trigger('ns-model-insert', insertion);
-        return true;
-    } else {
-        return false;
+        this.trigger('ns-model-insert', insertedModels);
     }
+
+    return !!insertedModels.length;
 };
 
 /**
- * Удаляет подмодель из коллекции
+ * Перезаписывает модели в коллекции.
+ * В отличие от insert() этот метод перезатрёт существующие модели.
+ * @param { Array<ns.Model> | ns.Model } models - одна или несколько подмоделей для вставки
+ * @param { Number= } index - индекс позиции, на которую вставить подмодели
+ *
+ * @return {Boolean} признак успешности вставки
+*/
+ns.ModelCollection.prototype.setItems = function(models, index) {
+    if (typeof index === 'undefined') {
+        index = this.models.length;
+    }
+
+    // Для удобства, одиночная модель оборачивается в массив.
+    if ( !Array.isArray(models) ) {
+        models = [models];
+    }
+
+    var model;
+    var insertedModels = [];
+    for (var i = 0; i < models.length; i++) {
+        model = models[i];
+
+        // Вставить можно только объявленную модель
+        // и повторная вставка модели запрещена
+        // FIXME может быть надо делать replace
+        // FIXME теперь тут уже по факту replace
+        if ( this.models.indexOf(model) >= 0 || !ns.Model.infoLite(model.id) ) {
+            continue;
+        }
+
+        // Если затирается элемент коллекции надо его явно затереть.
+        if ( this.models[index + i] ) {
+            this.unsetModels(this.models[index + i]);
+        }
+
+        this.models[index + i] = model;
+        this._subscribeSplit(model);
+        insertedModels.push(model);
+    }
+
+    // оповестим всех, что вставили подмодели
+    if (insertedModels.length) {
+        // если вставка данных состоялась, считаем модель валидной
+        this.status = this.STATUS.OK;
+
+        this.trigger('ns-model-insert', insertedModels);
+    }
+
+    return !!insertedModels.length;
+};
+
+/**
+ * Удаляет подмодели коллекции.
  *
  * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления
  */
 ns.ModelCollection.prototype.remove = function(models) {
+    var that = this;
+    return this._remove(models, function(index) {
+        that.models.splice(index, 1);
+    });
+};
 
+/**
+ * Затирает подмодели коллекции.
+ *
+ * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
+ * @return {Boolean} – признак успешности удаления
+ */
+ns.ModelCollection.prototype.unsetItems = function(models) {
+    var that = this;
+    return this._remove(models, function(index) {
+        delete that.models[index];
+    });
+};
+
+/**
+ * Удаляет / затираем подмодели коллекции.
+ *
+ * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмоделей, которые надо удалить.
+ * @param {function(number)} removeAction - метод удаления / затирания для модели по индексу модели в массиве this.models.
+ * @return {Boolean} – признак успешности удаления
+ */
+ns.ModelCollection.prototype._remove = function(models, removeAction) {
+    var that = this;
     var modelsRemoved = [];
 
-    if (!(models instanceof Array)) {
+    if ( !Array.isArray(models) ) {
         models = [models];
     }
 
+    var removeIndexes = [];
     models.forEach(function(modelOrIndex) {
         var index;
 
-        if (isNaN(modelOrIndex)) {
-            index = this.models.indexOf(modelOrIndex);
-        } else {
+        if (typeof modelOrIndex === 'number') {
             index = modelOrIndex;
+        } else {
+            index = that.models.indexOf(modelOrIndex);
         }
 
         if (index >= 0) {
-            var model = this.models[index];
+            removeIndexes.push(index);
+        }
+    });
 
-            // не забудем отписаться от событий подмодели
-            this._unsubscribeSplit(model);
-            modelsRemoved.push(model);
-            this.models.splice(index, 1);
+    // Удаляем элементы с конца, чтобы не нарушить индексацию элементов в массиве.
+    removeIndexes = removeIndexes.sort();
+    for (var i = removeIndexes.length - 1; i >= 0; i--) {
+        var index = removeIndexes[i];
+        var model = this.models[index];
+
+        // Модели может и не быть (в разреженной коллекции).
+        if (!model) {
+            continue;
         }
 
-    }.bind(this));
+        // не забудем отписаться от событий подмодели
+        this._unsubscribeSplit(model);
+        modelsRemoved.push(model);
+        removeAction(index);
+    }
 
     if (modelsRemoved.length) {
         this.trigger('ns-model-remove', modelsRemoved);
-        return true;
     }
 
-    return false;
+    return !!modelsRemoved.length;
 };
 
 })();

@@ -59,7 +59,7 @@ ns.ViewCollection.prototype._bindModels = function() {
 
         model.on('ns-model-destroyed', function(e, o) {
             // проинвалидируем view, только если изменилась внешняя модель
-            if (this === o.model) {
+            if (!o || this === o.model) {
                 that.invalidate();
             }
         });

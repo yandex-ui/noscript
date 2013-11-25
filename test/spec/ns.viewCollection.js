@@ -213,6 +213,7 @@ describe('ns.ViewCollection', function() {
 
             // initiate first rendering
             this.APP = ns.View.create('app');
+
             var layout = ns.layout.page('app', {});
             new ns.Update(this.APP, layout, {})
                 .start()
@@ -331,8 +332,8 @@ describe('ns.ViewCollection', function() {
         });
 
         describe('refresh layout after remove model-item', function() {
-
             beforeEach(function(finish) {
+
                 // remove model-item from collection
                 ns.Model.get('m-collection').remove(0);
 
@@ -355,6 +356,26 @@ describe('ns.ViewCollection', function() {
                 expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
             });
 
+        });
+
+        describe('refresh layout after model-item destroy', function() {
+            beforeEach(function(finish) {
+                var that = this;
+                var layout = ns.layout.page('app', {});
+
+                ns.Model.destroy(ns.Model.get('m-collection-item', {p: 1}));
+
+                new ns.Update(this.APP, layout, {})
+                    .start()
+                    .done(function() {
+                        finish();
+                    });
+            });
+
+            it('should save view-collection-item[1] node', function() {
+                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
+                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
+            });
         });
 
         describe('refresh layout after model-collection update', function() {

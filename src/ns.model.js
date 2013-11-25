@@ -528,7 +528,7 @@ ns.Model.destroy = function(model) {
     var cached = _cache[id][key];
     if (cached) {
         // notify subscribers about disappearance
-        model.trigger('ns-model-destroyed');
+        model.trigger('ns-model-destroyed', model);
 
         // invalidate model to unsubsribe it from all listeners
         model.invalidate();

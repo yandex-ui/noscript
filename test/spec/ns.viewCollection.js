@@ -163,7 +163,7 @@ describe('ns.ViewCollection', function() {
             });
         }
 
-        function shouldHaveNViewColelectionItemNodes(n) {
+        function shouldHaveNViewCollectionItemNodes(n) {
             it('should have ' + n + ' view-collection-item nodes', function() {
                 expect(
                     this.APP.node.getElementsByClassName('ns-view-v-collection-item')
@@ -213,6 +213,7 @@ describe('ns.ViewCollection', function() {
 
             // initiate first rendering
             this.APP = ns.View.create('app');
+
             var layout = ns.layout.page('app', {});
             new ns.Update(this.APP, layout, {})
                 .start()
@@ -251,7 +252,7 @@ describe('ns.ViewCollection', function() {
                 ).to.have.length(1)
             });
 
-            shouldHaveNViewColelectionItemNodes(2);
+            shouldHaveNViewCollectionItemNodes(2);
 
             it('should request m-collection once', function() {
                 expect(
@@ -296,7 +297,7 @@ describe('ns.ViewCollection', function() {
 
             shouldNotRequestMCollectionTwice();
             shouldSaveVCollectionNode();
-            shouldHaveNViewColelectionItemNodes(2);
+            shouldHaveNViewCollectionItemNodes(2);
 
             it('should render new view-collection-item[0] node', function() {
                 var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
@@ -323,7 +324,7 @@ describe('ns.ViewCollection', function() {
             });
 
             shouldNotRequestMCollectionTwice();
-            shouldHaveNViewColelectionItemNodes(3);
+            shouldHaveNViewCollectionItemNodes(3);
             shouldSaveVCollectionNode();
             shouldSaveNVCollectionItemNode(0);
             shouldSaveNVCollectionItemNode(1);
@@ -331,8 +332,8 @@ describe('ns.ViewCollection', function() {
         });
 
         describe('refresh layout after remove model-item', function() {
-
             beforeEach(function(finish) {
+
                 // remove model-item from collection
                 ns.Model.get('m-collection').remove(0);
 
@@ -346,7 +347,7 @@ describe('ns.ViewCollection', function() {
             });
 
             shouldNotRequestMCollectionTwice();
-            shouldHaveNViewColelectionItemNodes(1);
+            shouldHaveNViewCollectionItemNodes(1);
             shouldSaveVCollectionNode();
 
             it('should save view-collection-item[1] node', function() {
@@ -355,6 +356,26 @@ describe('ns.ViewCollection', function() {
                 expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
             });
 
+        });
+
+        describe('refresh layout after model-item destroy', function() {
+            beforeEach(function(finish) {
+                var that = this;
+                var layout = ns.layout.page('app', {});
+
+                ns.Model.destroy(ns.Model.get('m-collection-item', {p: 1}));
+
+                new ns.Update(this.APP, layout, {})
+                    .start()
+                    .done(function() {
+                        finish();
+                    });
+            });
+
+            it('should save view-collection-item[1] node', function() {
+                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
+                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
+            });
         });
 
         describe('refresh layout after model-collection update', function() {
@@ -412,7 +433,7 @@ describe('ns.ViewCollection', function() {
 
             // define views
             ns.View.define('app');
-            
+
             ns.ViewCollection.define('vCollection', {
                 models: [ 'mCollection' ],
                 split: {

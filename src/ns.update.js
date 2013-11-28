@@ -114,17 +114,17 @@ ns.Update.prototype.start = function(async) {
                 });
 
             } else {
-                //FIXME: we should delete this loop when ns.request will can reject promise
-                // check that all models is valid
-                for (var i = 0, j = models.length; i < j; i++) {
-                    if (!models[i].isValid()) {
-                        that.error({
-                            error: that.STATUS.MODELS,
-                            models: models
-                        });
-                        return;
-                    }
-                }
+                // //FIXME: we should delete this loop when ns.request will can reject promise
+                // // check that all models is valid
+                // for (var i = 0, j = models.length; i < j; i++) {
+                //     if (!models[i].isValid()) {
+                //         that.error({
+                //             error: that.STATUS.MODELS,
+                //             models: models
+                //         });
+                //         return;
+                //     }
+                // }
 
                 that._update(async);
                 // resolve main promise and return promises for async views

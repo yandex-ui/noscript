@@ -31,27 +31,27 @@ match .* ns-view {
 // Содержимое view определяется модой ns-view-content
 // @private
 match .* ns-build-view {
-        <div class="ns-view-{ name() }" data-key="{ /.key }">
-            if /.placeholder {
-                @class += ' ns-view-placeholder'
-                apply . ns-view-desc
+    <div class="ns-view-{ name() }" data-key="{ /.key }">
+        if /.placeholder {
+            @class += ' ns-view-placeholder'
+            apply . ns-view-desc
+        } else {
+            @class += apply . ns-view-add-class
+            apply . ns-view-add-attrs
+            if /.async {
+                apply . ns-view-async-content
             } else {
-                @class += apply . ns-view-add-class
-                apply . ns-view-add-attrs
-                if /.async {
-                    apply . ns-view-async-content
+
+                // у ns.Box и ns.ViewCollection не бывает is_models_valid
+                if ( /.is_models_valid == false() ) {
+                    apply . ns-view-error-content
+
                 } else {
-
-                    // у ns.Box и ns.ViewCollection не бывает is_models_valid
-                    if ( /.is_models_valid == false() ) {
-                        apply . ns-view-error-content
-
-                    } else {
-                        apply . ns-view-content
-                    }
+                    apply . ns-view-content
                 }
             }
-        </div>
+        }
+    </div>
 }
 
 // Возможность добавить к блоку view какой-либо класс

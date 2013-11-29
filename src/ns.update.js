@@ -375,7 +375,7 @@ ns.Update.prototype.isGlobal = function() {
 
 /**
  * Global error handler.
- * @param {{ error: string, models: Array.<ns.Model>, modelErrors: Array.<Object> }} error An object with error code and models / model errors.
+ * @param {{ error: string, models: Array.<ns.Model> }} error Error summary object.
  * @param {ns.Update} update Update instance so that we can abort it if we want to.
  * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
  */

@@ -365,6 +365,10 @@ ns.Update.prototype.addToQueue = function(newUpdate) {
     return true;
 };
 
+/**
+ * Whether this update is a global update (main update) or not.
+ * @returns Boolean.
+ */
 ns.Update.prototype.isGlobal = function() {
     return this.EXEC_FLAG === ns.U.EXEC.GLOBAL;
 };

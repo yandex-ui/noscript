@@ -19,10 +19,10 @@ ns.page._lastUrl = '';
 /**
  * Осуществляем переход по ссылке.
  * @param {String} [url=ns.page.getCurrentUrl()]
- * @param {Boolean} [preventAddingToHistory=false] Не добавлять урл в историю браузера.
+ * @param {String} [historyItem='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
  * @return {no.Promise}
  */
-ns.page.go = function(url, preventAddingToHistory) {
+ns.page.go = function(url, historyItem) {
     if (ns.page._stop) {
         ns.page._lastUrl = url;
 
@@ -49,7 +49,7 @@ ns.page.go = function(url, preventAddingToHistory) {
     }
 
     if (route.page === ns.R.NOT_APP_URL) {
-        if (preventAddingToHistory) {
+        if (historyItem === true || historyItem === 'replace') {
             window.location.replace(route.redirect);
         } else {
             window.location = route.redirect;
@@ -68,10 +68,10 @@ ns.page.go = function(url, preventAddingToHistory) {
     ns.page.current.layout = layout;
     ns.page.currentUrl = url;
 
-    if (!preventAddingToHistory) {
+    if (!historyItem || historyItem === 'push') {
         // записываем в историю все переходы
         ns.history.pushState(url);
-    } else {
+    } else if (historyItem === true || historyItem === 'replace') {
         ns.history.replaceState(url);
     }
 

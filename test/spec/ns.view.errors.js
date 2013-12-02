@@ -37,7 +37,7 @@ describe('ns.View error handling', function() {
             delete this.update;
         });
 
-        it('render error view content', function(done) {
+        it('render .ns-view-error-content template', function(finish) {
             var that = this;
             var update = this.update;
             ns.Update.handleError = function(_error, _update) {
@@ -47,10 +47,45 @@ describe('ns.View error handling', function() {
             };
             this.update.start().done(function() {
                 expect($('.ns-view-letter', that.APP.node).html()).to.be('view-error-content');
-                done();
+                finish();
             });
         });
 
-        // TODO errors are passed in the render tree
+        it('pass error objects while rendering html', function(finish) {
+            ns.Update.handleError = function(_error, _update) {
+                return true;
+            };
+            this.update.start().done(function() {
+                var renderJSON = {
+                    'views': {
+                        'app': {
+                            'is_models_valid': true,
+                            'models': {},
+                            'errors': {},
+                            'views': {
+                                'letter': {
+                                    'is_models_valid': false,
+                                    'models': {},
+                                    'errors': {
+                                        'letter': 'letter not found'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.ok();
+                finish();
+            });
+        });
+
+        it('if ns.Update.handleError() returns `false` update is rejected', function(finish) {
+            ns.Update.handleError = function(_error, _update) {
+                return false;
+            };
+            this.update.start().fail(function() {
+                finish();
+            });
+        })
     });
 });

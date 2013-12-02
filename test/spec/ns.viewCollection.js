@@ -598,10 +598,20 @@ describe('ns.ViewCollection', function() {
         });
 
         it('should correctly update nested nodes', function() {
-            expect(this.collectionViewNode.childNodes).to.have.length(2);
-            expect(this.collectionViewNode.firstChild.childNodes).to.have.length(2);
-            expect(this.collectionViewNode.firstChild.firstChild.childNodes).to.have.length(1);
-            expect(this.collectionViewNode.lastChild.childNodes).to.have.length(0);
+            var cols = {};
+            cols['1'] = $('.ns-view-v-collection-2[data-key="view=v-collection-2&id=1"]', this.collectionViewNode);
+            cols['2'] = $('.ns-view-v-collection-2[data-key="view=v-collection-2&id=2"]', this.collectionViewNode);
+            cols['1.1'] = cols['1'].find('.ns-view-v-collection-2[data-key="view=v-collection-2&id=1.1"]');
+            cols['1.2'] = cols['1'].find('.ns-view-v-collection-2[data-key="view=v-collection-2&id=1.2"]');
+            cols['1.1.1'] = cols['1.1'].find('.ns-view-v-collection-2[data-key="view=v-collection-2&id=1.1.1"]');
+            cols['2.x'] = cols['2'].find('.ns-view-v-collection-2');
+
+            expect(cols['1'].length).to.be(1);
+            expect(cols['2'].length).to.be(1);
+            expect(cols['1.1'].length).to.be(1);
+            expect(cols['1.2'].length).to.be(1);
+            expect(cols['1.1.1'].length).to.be(1);
+            expect(cols['2.x'].length).to.be(0);
         });
 
         after(function() {

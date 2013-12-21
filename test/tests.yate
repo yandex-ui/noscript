@@ -17,3 +17,8 @@ match .* ns-view-async-content {
     @class += ' ns-async'
     "async-view-content"
 }
+
+// Это шаблон для проверки того, что yate сбилжен для тестов.
+match / check-yate-is-ready {
+    "Ready"
+}

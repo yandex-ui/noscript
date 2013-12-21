@@ -40,7 +40,7 @@
         "noscript.borschik.js"
     ],
     "scripts": {
-        "prepublish": "mkdir -p dist && borschik -i noscript.borschik.js -o dist/noscript.js -m no && borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes",
+        "prepublish": "make yate && mkdir -p dist && borschik -i noscript.borschik.js -o dist/noscript.js -m no && borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes",
         "test": "grunt && jscs ."
     }
 }

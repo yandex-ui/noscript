@@ -1,3 +1,5 @@
+/* jshint unused: false */
+
 (function() {
 
 /**
@@ -108,33 +110,35 @@ ns.Update.prototype.start = function(async) {
 
     var syncModelsPromise = ns.request.models(models)
         .done(function(models) {
+            var error = null;
+            models = models || [];
+
             if (that._expired()) {
-                that.error({
-                    error: that.STATUS.EXPIRED
-                });
-
-            } else {
-                //FIXME: we should delete this loop when ns.request will can reject promise
-                // check that all models is valid
-                for (var i = 0, j = models.length; i < j; i++) {
-                    if (!models[i].isValid()) {
-                        that.error({
-                            error: that.STATUS.MODELS,
-                            models: models
-                        });
-                        return;
-                    }
-                }
-
-                that._update(async);
-                // resolve main promise and return promises for async views
-                that.done({
-                    async: asyncUpdaterPromises
-                });
+                error = {
+                    error: that.STATUS.EXPIRED,
+                    models: models
+                };
+            } else if (models.some(function(m) { return !m.isValid(); })) {
+                error = {
+                    error: that.STATUS.MODELS,
+                    models: models
+                };
             }
+
+            // Try handle error if any.
+            if (error && !ns.Update.handleError(error, that)) {
+                that.error(error);
+                return;
+            }
+
+            that._update(async);
+            // resolve main promise and return promises for async views
+            that.done({
+                async: asyncUpdaterPromises
+            });
         })
         .fail(function(models) {
-            //FIXME: ns.request.models can't reject promise this time, we should fix it
+            // NOTE here we do not even try to handle the error. Or we should do it?
             that.error({
                 error: that.STATUS.MODELS,
                 models: models
@@ -361,6 +365,24 @@ ns.Update.prototype.addToQueue = function(newUpdate) {
     currentUpdates.push(newUpdate);
 
     return true;
+};
+
+/**
+ * Whether this update is a global update (main update) or not.
+ * @returns Boolean.
+ */
+ns.Update.prototype.isGlobal = function() {
+    return this.EXEC_FLAG === ns.U.EXEC.GLOBAL;
+};
+
+/**
+ * Global error handler.
+ * @param {Object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
+ * @param {ns.Update} update Update instance so that we can abort it if we want to.
+ * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
+ */
+ns.Update.handleError = function(error, update) {
+    return false;
 };
 
 // ----------------------------------------------------------------------------------------------------------------- //

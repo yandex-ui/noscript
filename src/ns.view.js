@@ -1076,6 +1076,7 @@ ns.View.prototype._getViewTree = function(layout, params) {
         tree: {},
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
+        errors: this._getModelsError(),
         // есть view находится в режиме async, то модели проверять не надо
         is_models_valid: this.asyncState || this.isModelsValid(),
         //  добавляем собственные параметры блока
@@ -1162,6 +1163,20 @@ ns.View.prototype._getModelsData = function() {
             if (data) {
                 r[id] = data;
             }
+        }
+    }
+
+    return r;
+};
+
+ns.View.prototype._getModelsError = function() {
+    var r = {};
+
+    var models = this.models;
+    for (var id in models) {
+        var error = models[id].getError();
+        if (error) {
+            r[id] = error;
         }
     }
 

@@ -1,0 +1,24 @@
+module "main"
+
+include "../yate/noscript.yate"
+
+external scalar rand()
+
+match .* ns-view-add-attrs {
+    @data-random="{ rand() }"
+}
+
+match .* ns-view-desc {
+    @data-random="{ rand() }"
+    apply /.views.* ns-view
+}
+
+match .* ns-view-async-content {
+    @class += ' ns-async'
+    "async-view-content"
+}
+
+// Это шаблон для проверки того, что yate сбилжен для тестов.
+match / check-yate-is-ready {
+    "Ready"
+}

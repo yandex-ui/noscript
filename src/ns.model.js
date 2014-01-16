@@ -184,9 +184,7 @@ ns.Model.prototype.set = function(jpath, value, options) {
 };
 
 ns.Model.prototype.getData = function() {
-    var result = this.data;
-
-    return result;
+    return this.data;
 };
 
 /**

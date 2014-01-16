@@ -566,10 +566,8 @@ ns.Model.destroyWith = function(targetModel, withModels) {
 };
 
 ns.Model.isCollection = function(model) {
-    var info = model.info || ns.Model.infoLite(model.id);
-    return info.isCollection;
+    return (model.info || ns.Model.infoLite(model.id)).isCollection;
 };
-
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

@@ -63,12 +63,6 @@ ns.Model.prototype._reset = function(status) {
      * @protected
      */
     this._version = 0;
-
-    /**
-     * ModelCollection listeners
-     * @type {Object}
-     */
-    this.eventListeners = {};
 };
 
 /**

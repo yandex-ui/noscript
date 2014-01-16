@@ -45,6 +45,12 @@ ns.ModelCollection.prototype.getData = function() {
 
 ns.ModelCollection.prototype._reset = function() {
     ns.Model.prototype._reset.apply(this, arguments);
+
+    /**
+     * ModelCollection listeners
+     * @type {Object}
+     */
+    this.eventListeners = {};
     this.clear();
 };
 

@@ -300,7 +300,6 @@ ns.Model.prototype.prepareRequest = function(requestID) {
  * @returns {ns.Model}
  */
 ns.Model.get = function(id, params) {
-
     var model = this._find(id, params);
 
     if (!model) {
@@ -351,6 +350,7 @@ ns.Model._find = function(id, params) {
  * @param {ns.Model} model
  */
 ns.Model.destroy = function(model) {
+    // do-models are not cached
     if ( model.isDo() ) {
         return;
     }
@@ -368,12 +368,8 @@ ns.Model.destroy = function(model) {
     }
 };
 
-//  Проверяем, есть ли модель в кэше и валидна ли она.
 ns.Model.isValid = function(id, params) {
-    var model = ns.Model.get(id, params);
-    if (!model) { return; } // undefined означает, что кэша нет вообще, а false -- что он инвалидный.
-
-    return model.isValid();
+    return !!ns.Model.getValid(id, params);
 };
 
 /**

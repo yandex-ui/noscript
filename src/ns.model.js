@@ -264,10 +264,6 @@ ns.Model.prototype.isDo = function() {
     return this.info.isDo;
 };
 
-ns.Model.prototype.isCollection = function() {
-    return this.info.isCollection;
-};
-
 /**
  * Returns data version.
  * @returns {number}
@@ -492,7 +488,7 @@ ns.Model.infoLite = function(id) {
 };
 
 ns.Model.key = function(id, params, info) {
-    info = info || ns.Model.info(id);
+    info = info || ns.Model.infoLite(id);
 
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {
@@ -570,6 +566,12 @@ ns.Model.destroyWith = function(targetModel, withModels) {
         }
     }
 };
+
+ns.Model.isCollection = function(model) {
+    var info = model.info || ns.Model.infoLite(model.id);
+    return info.isCollection;
+};
+
 
 // ----------------------------------------------------------------------------------------------------------------- //
 

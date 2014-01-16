@@ -10,6 +10,7 @@ JS MVC framework
 
 ##### Next
 - `destroyWith` стал статическим методом `ns.Model.destroyWith`
+- статический метод `ns.Model.isCollection` вместо метода самой модели
 
 ##### 0.1.11 (12.11.2013)
 - Fix bug with bind/unbind global events

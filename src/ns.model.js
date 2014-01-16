@@ -235,24 +235,8 @@ ns.Model.prototype.preprocessData = function(data) {
     return data;
 };
 
-//  FIXME: Этот код сильно пересекается с вычислением ключа.
-//  Нельзя ли избавиться от копипаста?
 ns.Model.prototype.getRequestParams = function() {
-    var params = this.params;
-
-    var defaults = this.info.params;
-    var reqParams = {};
-
-    for (var pName in defaults) {
-        var pValue = params[pName];
-
-        pValue = (pValue === undefined) ? defaults[pName] : pValue;
-        if (pValue != null) {
-            reqParams[pName] = pValue;
-        }
-    }
-
-    return reqParams;
+    return ns.Model.getKeyParams(this.id, this.params, this.info);
 };
 
 /**
@@ -515,27 +499,36 @@ ns.Model.key = function(id, params, info) {
         return 'do-' + id + '-' + _keySuffix++;
     }
 
-    var defaults = info.params;
-    var pNames = info.pNames;
+    var key = 'model=' + id;
+    var keyParams = ns.Model.getKeyParams(id, params, info);
+    for (var pName in keyParams) {
+        key += '&' + pName + '=' + keyParams[keyName];
+    }
+    return key;
+};
 
+ns.Model.getKeyParams = function(id, params, info) {
+    info = info || ns.Model.info(id);
     params = params || {};
 
-    var key = 'model=' + id;
+    var defaults = info.params;
+    var pNames = info.pNames;
+    var result = {};
 
     for (var i = 0, l = pNames.length; i < l; i++) {
         var pName = pNames[i];
-
         var pValue = params[pName];
+
         //  Нельзя просто написать params[pName] || defaults[pName] --
         //  т.к. params[pName] может быть 0 или ''.
         pValue = (pValue === undefined) ? defaults[pName] : pValue;
 
         if (pValue != null) {
-            key += '&' + pName + '=' + pValue;
+            result[pName] = pValue;
         }
     }
 
-    return key;
+    return result;
 };
 
 /**

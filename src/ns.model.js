@@ -530,11 +530,13 @@ ns.Model.getKeyParams = function(id, params, info) {
  * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
  */
 ns.Model.invalidate = function(id, filter) {
+    filter = filter || function() { return true; };
+
     var models = _cache[id];
 
     for (var key in models) {
         var model = models[key];
-        if (!filter || filter(model)) {
+        if (filter(model)) {
             model.invalidate();
         }
     }

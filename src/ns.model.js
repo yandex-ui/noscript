@@ -549,7 +549,7 @@ ns.Model.invalidate = function(id, filter) {
  */
 ns.Model.destroyWith = function(targetModel, withModels) {
     if (!Array.isArray(withModels)) {
-        withModels = [withModels];
+        withModels = [ withModels ];
     }
 
     for (var i = 0, len = withModels.length; i < len; i++) {
@@ -560,7 +560,7 @@ ns.Model.destroyWith = function(targetModel, withModels) {
                 ns.Model.destroy(targetModel);
             });
         } else {
-            throw new Error("[ns.Model] " + targetModel.id + " destroyWith expected ns.Model or Array of ns.Model in argument");
+            throw new Error('[ns.Model] ' + targetModel.id + ' withModels must be instance of ns.Model or an array of models');
         }
     }
 };

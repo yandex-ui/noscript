@@ -208,8 +208,9 @@ ns.Model.prototype.setData = function(data, options) {
         //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
         //  Можно считать, что она в этом случае всегда меняется.
         //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
-        if (!options || !options.silent) {
-            this.trigger('ns-model-changed', '');
+        var silent = options && options.silent;
+        if (!silent) {
+            this.trigger('ns-model-changed', '', '');
         }
     }
 

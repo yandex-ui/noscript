@@ -185,8 +185,6 @@ ns.Model.prototype.set = function(jpath, value, options) {
     }
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 ns.Model.prototype.getData = function() {
     var result = this.data;
 
@@ -240,8 +238,6 @@ ns.Model.prototype.preprocessData = function(data) {
     return data;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 //  FIXME: Этот код сильно пересекается с вычислением ключа.
 //  Нельзя ли избавиться от копипаста?
 ns.Model.prototype.getRequestParams = function() {
@@ -262,9 +258,62 @@ ns.Model.prototype.getRequestParams = function() {
     return reqParams;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+/**
+ * Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
+ * @returns {boolean}
+ */
+ns.Model.prototype.canRetry = function() {
+    //  do-модели нельзя перезапрашивать.
+    return ( !this.isDo() && this.retries < 3 );
+};
 
-//  Работа с кэшем.
+ns.Model.prototype.extractData = function(result) {
+    if (result) {
+        return result.data;
+    }
+};
+
+ns.Model.prototype.extractError = function(result) {
+    if (result) {
+        return result.error;
+    }
+};
+
+ns.Model.prototype.isDo = function() {
+    return this.info.isDo;
+};
+
+ns.Model.prototype.isCollection = function() {
+    return this.info.isCollection;
+};
+
+/**
+ * Returns data version.
+ * @returns {number}
+ */
+ns.Model.prototype.getVersion = function() {
+    return this._version;
+};
+
+ns.Model.prototype.touch = function() {
+    this._version++;
+    this.trigger('ns-model-touched');
+};
+
+/**
+ * Подготавливает модель к запросу.
+ * @param {Number} requestID ID запроса.
+ * @return {ns.Model}
+ */
+ns.Model.prototype.prepareRequest = function(requestID) {
+    this.requestID = requestID;
+    this.retries++;
+    this.promise = new no.Promise();
+
+    return this;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
  * Models factory. Returns cached instance or creates new.
@@ -349,71 +398,6 @@ ns.Model.isValid = function(id, params) {
 
     return model.isValid();
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
- * Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
- * @returns {boolean}
- */
-ns.Model.prototype.canRetry = function() {
-    //  do-модели нельзя перезапрашивать.
-    return ( !this.isDo() && this.retries < 3 );
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-ns.Model.prototype.extractData = function(result) {
-    if (result) {
-        return result.data;
-    }
-};
-
-ns.Model.prototype.extractError = function(result) {
-    if (result) {
-        return result.error;
-    }
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-ns.Model.prototype.isDo = function() {
-    return this.info.isDo;
-};
-
-ns.Model.prototype.isCollection = function() {
-    return this.info.isCollection;
-};
-
-/**
- * Returns data version.
- * @returns {number}
- */
-ns.Model.prototype.getVersion = function() {
-    return this._version;
-};
-
-ns.Model.prototype.touch = function() {
-    this._version++;
-    this.trigger('ns-model-touched');
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
- * Подготавливает модель к запросу.
- * @param {Number} requestID ID запроса.
- * @return {ns.Model}
- */
-ns.Model.prototype.prepareRequest = function(requestID) {
-    this.requestID = requestID;
-    this.retries++;
-    this.promise = new no.Promise();
-
-    return this;
-};
-
-// ----------------------------------------------------------------------------------------------------------------- //
 
 /**
  * Определяет новую модель.
@@ -526,8 +510,6 @@ ns.Model.infoLite = function(id) {
     return info;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 ns.Model.key = function(id, params, info) {
     info = info || ns.Model.info(id);
 
@@ -558,8 +540,6 @@ ns.Model.key = function(id, params, info) {
 
     return key;
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
  * Инвалидирует все модели с заданным id, удовлетворяющие filter.
@@ -600,47 +580,6 @@ ns.Model.destroyWith = function(targetModel, withModels) {
         }
     }
 };
-
-// ----------------------------------------------------------------------------------------------------------------- //
-
-// @chestozo: куда-то хочется вынести это...
-if (window['mocha']) {
-    /**
-     * Удаляет определение модели.
-     * Используется только в юнит-тестах.
-     * @param {String} [id] ID модели.
-     */
-    ns.Model.undefine = function(id) {
-        if (id) {
-            delete _cache[id];
-            delete _ctors[id];
-            delete _infos[id];
-        } else {
-            _cache = {};
-            _ctors = {};
-            _infos = {};
-        }
-    };
-
-    ns.Model.privats = function() {
-        return {
-            _ctors: _ctors,
-            _infos: _infos,
-            _cache: _cache,
-            _keySuffix: _keySuffix
-        };
-    };
-
-    ns.Model.clearCaches = function(id) {
-        if (id) {
-            _cache[id] = {};
-        } else {
-            for (var key in _cache) {
-                _cache[key] = {};
-            }
-        }
-    };
-}
 
 // ----------------------------------------------------------------------------------------------------------------- //
 
@@ -815,5 +754,45 @@ ns.ModelUniq.prototype.getData = function(params) {
 
     return data;
 };
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+if (window['mocha']) {
+    /**
+     * Удаляет определение модели.
+     * Используется только в юнит-тестах.
+     * @param {String} [id] ID модели.
+     */
+    ns.Model.undefine = function(id) {
+        if (id) {
+            delete _cache[id];
+            delete _ctors[id];
+            delete _infos[id];
+        } else {
+            _cache = {};
+            _ctors = {};
+            _infos = {};
+        }
+    };
+
+    ns.Model.privats = function() {
+        return {
+            _ctors: _ctors,
+            _infos: _infos,
+            _cache: _cache,
+            _keySuffix: _keySuffix
+        };
+    };
+
+    ns.Model.clearCaches = function(id) {
+        if (id) {
+            _cache[id] = {};
+        } else {
+            for (var key in _cache) {
+                _cache[key] = {};
+            }
+        }
+    };
+}
 
 })();

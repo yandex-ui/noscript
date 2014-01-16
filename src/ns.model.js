@@ -111,6 +111,10 @@ ns.Model.prototype.isValid = function() {
     return (this.status === this.STATUS.OK);
 };
 
+ns.Model.prototype.getData = function() {
+    return this.data;
+};
+
 /**
  * Returns data matched by jpath.
  * @param {string} jpath
@@ -181,10 +185,6 @@ ns.Model.prototype.set = function(jpath, value, options) {
         this.trigger('ns-model-changed' + _jpath, _jpath, jpath);
         l--;
     }
-};
-
-ns.Model.prototype.getData = function() {
-    return this.data;
 };
 
 /**

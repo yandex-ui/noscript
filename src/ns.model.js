@@ -137,7 +137,6 @@ ns.Model.prototype.select = function(jpath) {
     if (data) {
         return no.jpath.raw(jpath, data).toArray();
     }
-
     return [];
 };
 
@@ -154,34 +153,33 @@ ns.Model.prototype.set = function(jpath, value, options) {
         return;
     }
 
-    no.jpath.set(jpath, data, value);
-
-    this.touch();
-
     //  FIXME: Непонятно, нужно ли сравнивать старое и новое значение.
     //  Как бы нужно, но это довольно дорого и сложно.
     //  Пока что будет версия без сравнения.
 
-    if ( !(options && options.silent) ) {
-        //  Сообщение о том, что вообще вся модель изменилась.
-        this.trigger('ns-model-changed', jpath);
+    no.jpath.set(jpath, data, value);
+    this.touch();
 
-        //  Кидаем сообщения о том, что изменились части модели.
-        //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'changed.foo.bar' и 'changed.foo'.
-        //  В качестве параметра (пока что) этот же самый jpath.
-        //
-        var parts = jpath.split('.');
-        var l = parts.length;
-        while (l > 1) {
-            var _jpath = parts.slice(0, l).join('.');
+    if (options && options.silent) {
+        return;
+    }
 
-            //  TODO @nop: Видимо, нужно в параметр передавать больше информации, например:
-            //  если изначально jpath был `.foo.bar`, то для события `changed.foo` передавать
-            //  старое значение и новое, полный jpath `.foo.bar`, текущий jpath `.foo`.
-            //
-            this.trigger('ns-model-changed' + _jpath, _jpath);
-            l--;
-        }
+    //  Сообщение о том, что вообще вся модель изменилась.
+    this.trigger('ns-model-changed', jpath);
+
+    //  Кидаем сообщения о том, что изменились части модели.
+    //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'ns-model-changed.foo.bar' и 'ns-model-changed.foo'.
+    //  В качестве параметра подjpath и полный jpath, по которому менялись данные.
+
+    var parts = jpath.split('.');
+    var l = parts.length;
+    while (l > 1) {
+        var _jpath = parts.slice(0, l).join('.');
+
+        //  TODO передавать старое значение и новое
+
+        this.trigger('ns-model-changed' + _jpath, _jpath, jpath);
+        l--;
     }
 };
 

@@ -103,171 +103,6 @@ ns.Model.prototype._prepareCallback = function(method) {
     return method;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
- * Определяет новую модель.
- * @param {String} id Название модели.
- * @param {Object} [info]
- * @param {Function} [info.ctor] Конструтор.
- * @param {Object} [info.methods] Методы прототипа.
- * @param {Object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
- * @param {ns.Model} [base=ns.Model] Базовый класс для наследования
- * @examples
- * //  Простая модель, без параметров.
- * ns.Model.define('profile');
- *
- * ns.Model.define('album', {
- *   params: {
- *     //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
- *     //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
- *     'author-login': null,
- *     'album-id': null,
- *
- *     //  Этим двум параметрам заданы дефолтные значения.
- *     'page': 0,
- *     'pageSize': 20
- *     }
- * });
- */
-ns.Model.define = function(id, info, base) {
-    if (id in _infos) {
-        throw new Error("[ns.Model] Can't redefine '" + id + "'");
-    }
-
-    info = info || {};
-
-    // Model becomes ModelCollection if it has "isCollection" or "split" property
-    if (typeof info.isCollection == 'undefined') {
-        info.isCollection = !!info.split;
-    }
-
-    if (!base) {
-        if (info.uniq) {
-            base = ns.ModelUniq;
-        } else if (info.isCollection) {
-            base = ns.ModelCollection;
-        } else {
-            base = ns.Model;
-        }
-    }
-
-    var ctor = info.ctor || function() {};
-    // Нужно унаследоваться от base и добавить в прототип info.methods.
-    ctor = no.inherit(ctor, base, info.methods);
-
-    // часть дополнительной обработки производится в ns.Model.info
-    // т.о. получаем lazy-определение
-
-    _infos[id] = info;
-    _ctors[id] = ctor;
-
-    //  Создаем пустой кэш для всех моделей с данным id.
-    _cache[id] = {};
-
-    return ctor;
-};
-
-/**
- * Returns model's info
- * @param {String} id Model ID.
- * @returns {Object}
- */
-ns.Model.info = function(id) {
-    var info = ns.Model.infoLite(id);
-
-    // если есть декларация, но еще нет pNames, то надо завершить определение Model
-    if (info && !info.pNames) {
-        /**
-         * Параметры моделей.
-         * @type {Object}
-         */
-        info.params = info.params || {};
-
-        /**
-         * Обработчики событий.
-         * @type {Object}
-         */
-        info.events = info.events || {};
-
-        info.pNames = Object.keys(info.params);
-
-        /**
-         * Флаг do-модели. Модель, которая изменяет данные.
-         * Для do-моделей отдельные правила кэширования и построения ключей.
-         * @type {Boolean}
-         */
-        info.isDo = /^do-/.test(id);
-    }
-    return info;
-};
-
-/**
- * Returns model's info without processing.
- * @param {String} id Model ID.
- * @returns {Object}
- */
-ns.Model.infoLite = function(id) {
-    var info = _infos[id];
-    if (!info) {
-        throw new Error('[ns.Model] "' + id + '" is not defined');
-    }
-
-    return info;
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-ns.Model.key = function(id, params, info) {
-    info = info || ns.Model.info(id);
-
-    //  Для do-моделей ключ строим особым образом.
-    if (info.isDo) {
-        return 'do-' + id + '-' + _keySuffix++;
-    }
-
-    var defaults = info.params;
-    var pNames = info.pNames;
-
-    params = params || {};
-
-    var key = 'model=' + id;
-
-    for (var i = 0, l = pNames.length; i < l; i++) {
-        var pName = pNames[i];
-
-        var pValue = params[pName];
-        //  Нельзя просто написать params[pName] || defaults[pName] --
-        //  т.к. params[pName] может быть 0 или ''.
-        pValue = (pValue === undefined) ? defaults[pName] : pValue;
-
-        if (pValue != null) {
-            key += '&' + pName + '=' + pValue;
-        }
-    }
-
-    return key;
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-/**
- * Инвалидирует все модели с заданным id, удовлетворяющие filter.
- * @static
- * @param {String} id ID модели.
- * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
- */
-ns.Model.invalidate = function(id, filter) {
-    var models = _cache[id];
-
-    for (var key in models) {
-        var model = models[key];
-        if (!filter || filter(model)) {
-            model.invalidate();
-        }
-    }
-};
-
 ns.Model.prototype.invalidate = function() {
     this._reset(this.STATUS.INVALID);
 };
@@ -578,6 +413,171 @@ ns.Model.prototype.prepareRequest = function(requestID) {
     return this;
 };
 
+// ----------------------------------------------------------------------------------------------------------------- //
+
+/**
+ * Определяет новую модель.
+ * @param {String} id Название модели.
+ * @param {Object} [info]
+ * @param {Function} [info.ctor] Конструтор.
+ * @param {Object} [info.methods] Методы прототипа.
+ * @param {Object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
+ * @param {ns.Model} [base=ns.Model] Базовый класс для наследования
+ * @examples
+ * //  Простая модель, без параметров.
+ * ns.Model.define('profile');
+ *
+ * ns.Model.define('album', {
+ *   params: {
+ *     //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
+ *     //  На самом деле, конечно, не любое -- смысл имеют только Number и String.
+ *     'author-login': null,
+ *     'album-id': null,
+ *
+ *     //  Этим двум параметрам заданы дефолтные значения.
+ *     'page': 0,
+ *     'pageSize': 20
+ *     }
+ * });
+ */
+ns.Model.define = function(id, info, base) {
+    if (id in _infos) {
+        throw new Error("[ns.Model] Can't redefine '" + id + "'");
+    }
+
+    info = info || {};
+
+    // Model becomes ModelCollection if it has "isCollection" or "split" property
+    if (typeof info.isCollection == 'undefined') {
+        info.isCollection = !!info.split;
+    }
+
+    if (!base) {
+        if (info.uniq) {
+            base = ns.ModelUniq;
+        } else if (info.isCollection) {
+            base = ns.ModelCollection;
+        } else {
+            base = ns.Model;
+        }
+    }
+
+    var ctor = info.ctor || function() {};
+    // Нужно унаследоваться от base и добавить в прототип info.methods.
+    ctor = no.inherit(ctor, base, info.methods);
+
+    // часть дополнительной обработки производится в ns.Model.info
+    // т.о. получаем lazy-определение
+
+    _infos[id] = info;
+    _ctors[id] = ctor;
+
+    //  Создаем пустой кэш для всех моделей с данным id.
+    _cache[id] = {};
+
+    return ctor;
+};
+
+/**
+ * Returns model's info
+ * @param {String} id Model ID.
+ * @returns {Object}
+ */
+ns.Model.info = function(id) {
+    var info = ns.Model.infoLite(id);
+
+    // если есть декларация, но еще нет pNames, то надо завершить определение Model
+    if (info && !info.pNames) {
+        /**
+         * Параметры моделей.
+         * @type {Object}
+         */
+        info.params = info.params || {};
+
+        /**
+         * Обработчики событий.
+         * @type {Object}
+         */
+        info.events = info.events || {};
+
+        info.pNames = Object.keys(info.params);
+
+        /**
+         * Флаг do-модели. Модель, которая изменяет данные.
+         * Для do-моделей отдельные правила кэширования и построения ключей.
+         * @type {Boolean}
+         */
+        info.isDo = /^do-/.test(id);
+    }
+    return info;
+};
+
+/**
+ * Returns model's info without processing.
+ * @param {String} id Model ID.
+ * @returns {Object}
+ */
+ns.Model.infoLite = function(id) {
+    var info = _infos[id];
+    if (!info) {
+        throw new Error('[ns.Model] "' + id + '" is not defined');
+    }
+
+    return info;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+ns.Model.key = function(id, params, info) {
+    info = info || ns.Model.info(id);
+
+    //  Для do-моделей ключ строим особым образом.
+    if (info.isDo) {
+        return 'do-' + id + '-' + _keySuffix++;
+    }
+
+    var defaults = info.params;
+    var pNames = info.pNames;
+
+    params = params || {};
+
+    var key = 'model=' + id;
+
+    for (var i = 0, l = pNames.length; i < l; i++) {
+        var pName = pNames[i];
+
+        var pValue = params[pName];
+        //  Нельзя просто написать params[pName] || defaults[pName] --
+        //  т.к. params[pName] может быть 0 или ''.
+        pValue = (pValue === undefined) ? defaults[pName] : pValue;
+
+        if (pValue != null) {
+            key += '&' + pName + '=' + pValue;
+        }
+    }
+
+    return key;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+/**
+ * Инвалидирует все модели с заданным id, удовлетворяющие filter.
+ * @static
+ * @param {String} id ID модели.
+ * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
+ */
+ns.Model.invalidate = function(id, filter) {
+    var models = _cache[id];
+
+    for (var key in models) {
+        var model = models[key];
+        if (!filter || filter(model)) {
+            model.invalidate();
+        }
+    }
+};
+
 /**
  * Модель должна удалиться вместе с переданными моделями.
  * @param { ns.Model } targetModel - модель, которую надо удалить при удалении связанных моделей
@@ -600,6 +600,8 @@ ns.Model.destroyWith = function(targetModel, withModels) {
         }
     }
 };
+
+// ----------------------------------------------------------------------------------------------------------------- //
 
 // @chestozo: куда-то хочется вынести это...
 if (window['mocha']) {

@@ -33,3 +33,16 @@ model.getVersion()
 model.touch()
 model.invalidate()
 ```
+
+
+### `ns.ModelCollection`
+```js
+// Instance API
+collection.insert(models, index)
+collection.remove(models)
+collection.getSelfVersion()
+collection.clear()
+collection.onItemChanged(evt, model, jpath)
+collection.onItemTouched(evt, model)
+collection.onItemDestroyed(evt, model)
+```

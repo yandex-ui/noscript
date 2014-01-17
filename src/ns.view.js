@@ -1190,10 +1190,9 @@ ns.View._initInfo = function(info) {
             var model_id = r[0];
             var jpath = r[1] || '';
 
-            //  FIXME: Придумать названия переменным!
-            var x = _subviews[model_id] || (( _subviews[model_id] = {} ));
-            var y = x[jpath] || (( x[jpath] = {} ));
-            y[subview] = true;
+            var subviewsByModel = _subviews[model_id] || (( _subviews[model_id] = {} ));
+            var subviewsByModelJpath = subviewsByModel[jpath] || (( subviewsByModel[jpath] = {} ));
+            subviewsByModelJpath[subview] = true;
         }
     }
     info.subviews = _subviews;

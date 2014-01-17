@@ -187,9 +187,8 @@ ns.ModelCollection.prototype.clear = function() {
 /**
  * Вставляет подмодели в коллекцию
  *
- * @param {Array <ns.Model> | ns.Model} models – одна или несколько подмоделей
- *                                                 для вставки
- * @param {Number} [index] – индекс позиции, на которую вставить подмодели
+ * @param {Array<ns.Model> | ns.Model} models – одна или несколько подмоделей для вставки
+ * @param {Number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
  *
  * @return {Boolean} – признак успешности вставки
  */
@@ -198,9 +197,8 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         index = this.models.length;
     }
 
-    // Для удобства, одиночная модель оборачивается в массив.
-    if (!(models instanceof Array)) {
-        models = [models];
+    if (!Array.isArray(models)) {
+        models = [ models ];
     }
 
     // Вставить можно только объявленную модель
@@ -211,8 +209,6 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     insertion.forEach(function(model, i) {
         this.models.splice(index + i, 0, model);
-
-        // не забудем подписаться на события
         this._subscribeSplit(model);
     }, this);
 
@@ -222,10 +218,11 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         this.status = this.STATUS.OK;
 
         this.trigger('ns-model-insert', insertion);
+
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 };
 
 /**

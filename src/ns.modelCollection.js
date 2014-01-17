@@ -79,17 +79,17 @@ ns.ModelCollection.prototype._beforeSetData = function(data) {
  * @return { Array<ns.Model> } – массив полученных подмоделей
  */
 ns.ModelCollection.prototype._splitModels = function(items) {
-    var info = this.info.split;
+    var splitInfo = this.info.split;
 
     return items.map(function(item) {
         var params = {};
-        for (var key in info.params) {
-            params[key] = no.jpath(info.params[key], item);
+        for (var key in splitInfo.params) {
+            params[key] = no.jpath(splitInfo.params[key], item);
         }
 
         // идентификатор подмодели берется из info.model_id
         // коллецкия может содержать модели только одного вида
-        return ns.Model.get(info.model_id, params).setData(item);
+        return ns.Model.get(splitInfo.model_id, params).setData(item);
     });
 };
 

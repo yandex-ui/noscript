@@ -211,14 +211,6 @@ ns.View.prototype._showNode = function() {
     this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
 };
 
-/**
- * Обработчик изменений моделей.
- * @private
- */
-ns.View.prototype._onModelChange = function() {
-    ns.page.go();
-};
-
 ns.View.prototype.invalidateSubview = function(subview) {
     //  FIXME: ns.SV.STATUS.INVALID?
     this._subviews[subview] = ns.V.STATUS.INVALID;

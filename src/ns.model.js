@@ -236,7 +236,7 @@ ns.Model.prototype.preprocessData = function(data) {
 };
 
 ns.Model.prototype.getRequestParams = function() {
-    return ns.Model.getKeyParams(this.id, this.params, this.info);
+    return ns.Model._getKeyParams(this.id, this.params, this.info);
 };
 
 /**
@@ -492,14 +492,14 @@ ns.Model.key = function(id, params, info) {
     }
 
     var key = 'model=' + id;
-    var keyParams = ns.Model.getKeyParams(id, params, info);
+    var keyParams = ns.Model._getKeyParams(id, params, info);
     for (var pName in keyParams) {
         key += '&' + pName + '=' + keyParams[keyName];
     }
     return key;
 };
 
-ns.Model.getKeyParams = function(id, params, info) {
+ns.Model._getKeyParams = function(id, params, info) {
     info = info || ns.Model.info(id);
     params = params || {};
 

@@ -49,8 +49,6 @@ ns.View.prototype._$window = $(window);
 ns.View.prototype._init = function(id, params, async) {
     this.id = id;
 
-    this._onModelChangeBinded = this._onModelChange.bind(this);
-
     /**
      * Флаг того, что view может быть асинхронным.
      * Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState
@@ -296,13 +294,6 @@ ns.View.prototype._bindModels = function() {
  */
 ns.View.prototype._unbindModels = function() {
     //  FIXME: Переписать все соответственно _bindModels.
-    /*
-    for (var id in this.models) {
-        var model = this.models[id];
-        //TODO: namespace бы пригодился!
-        model.off('changed', this._onModelChangeBinded);
-    }
-    */
 };
 
 /**

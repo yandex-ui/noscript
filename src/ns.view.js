@@ -1056,6 +1056,7 @@ ns.View.info = function(id) {
     if (info && !info.pGroups) {
         ns.View._initInfoParams(info);
         ns.View._initInfo(info);
+        ns.View._initInfoSubviews(info);
     }
     return info;
 };
@@ -1160,6 +1161,10 @@ ns.View._initInfo = function(info) {
     // больше не нужны
     delete info.events;
 
+    return info;
+};
+
+ns.View._initInfoSubviews = function(info) {
     //  Парсим информацию про subview.
     //
     //  В info.subviews приходит структура такого вида:
@@ -1223,8 +1228,6 @@ ns.View._initInfo = function(info) {
     //          ...
     //      }
     //
-
-    return info;
 };
 
 ns.View._initInfoParams = function(info) {

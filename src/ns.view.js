@@ -62,6 +62,13 @@ ns.View.prototype._init = function(id, params, async) {
 
     this._initModels();
 
+    /**
+     * Save models version to track changes.
+     * @type {object}
+     * @protected
+     */
+    this._modelsVersions = {};
+
     this.views = null;
     this._subviews = null;
     this.node = null;
@@ -73,13 +80,6 @@ ns.View.prototype._init = function(id, params, async) {
      * @private
      */
     this.status = this.STATUS.NONE;
-
-    /**
-     * Save models version to track changes.
-     * @type {object}
-     * @protected
-     */
-    this._modelsVersions = {};
 
     /**
      * Uniq View ID
@@ -104,9 +104,6 @@ ns.View.prototype._init = function(id, params, async) {
     this.trigger('ns-view-init');
 };
 
-/**
- * Инициализирует модели
- */
 ns.View.prototype._initModels = function() {
     if (!this.models) {
         this.models = {};

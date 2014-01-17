@@ -1071,75 +1071,6 @@ ns.View.info = function(id) {
     return info;
 };
 
-ns.View.getKey = function(id, params, info) {
-    return this.getKeyAndParams(id, params, info).key;
-};
-
-/**
- * Возвращает в объекта ключ и параметры с учётом rewriteParamsOnInit
- * В этом методе собрана вся логика рерайтов параметров при создании view
- * @return Object
- */
-ns.View.getKeyAndParams = function(id, params, info) {
-    //  Ключ можно вычислить даже для неопределенных view,
-    //  в частности, для боксов.
-    info = info || ns.View.info(id) || {};
-
-    if ('function' === typeof info.rewriteParamsOnInit) {
-        //  если для view определен метод rewriteParamsOnInit и он вернул объект,
-        //  то перепишем параметры
-        params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
-    }
-
-    var key;
-    var pGroups = info.pGroups || [];
-    for (var g = 0; g < pGroups.length; g++) {
-
-        key = 'view=' + id;
-
-        var group = pGroups[g];
-        var pNames = group.pNames || [];
-        var pFilters = group.pFilters || {};
-        var pOptional = group.pOptional || {};
-
-        for (var i = 0, l = pNames.length; i < l; i++) {
-            var pName = pNames[i];
-            var pValue = params[ pName ] || pOptional[ pName ];
-            var pFilter = pFilters[pName];
-            var isOptional = pName in pOptional;
-
-            if (pValue == null && isOptional) {
-                continue;
-            }
-
-            if ( pValue == null || (pFilter && pValue != pFilter) ) {
-                key = null;
-                break;
-            }
-
-            key += '&' + pName + '=' + pValue;
-        }
-
-        if (key) {
-            return {
-                params: params, // параметры с учётом rewrite
-                key: key        // ключ с учётом правильных параметров
-            };
-        }
-    }
-
-    //  Не по чему строить ключ.
-    if (!pGroups.length) {
-        return {
-            params: params,    // параметры с учётом rewrite
-            key: 'view=' + id  // ключ с учётом правильных параметров
-        };
-    }
-
-    //  Не удалось построить ключ view.
-    throw new Error("[ns.View] Could not generate key for view " + id);
-};
-
 ns.View._initInfo = function(info) {
     /**
      * События, которые надо повесить сразу при создании view
@@ -1374,6 +1305,75 @@ ns.View._initInfoParams = function(info) {
             info.pGroups = [];
         }
     }
+};
+
+ns.View.getKey = function(id, params, info) {
+    return this.getKeyAndParams(id, params, info).key;
+};
+
+/**
+ * Возвращает ключ объекта и параметры с учётом rewriteParamsOnInit
+ * В этом методе собрана вся логика рерайтов параметров при создании view
+ * @return Object
+ */
+ns.View.getKeyAndParams = function(id, params, info) {
+    //  Ключ можно вычислить даже для неопределенных view,
+    //  в частности, для боксов.
+    info = info || ns.View.info(id) || {};
+
+    if ('function' === typeof info.rewriteParamsOnInit) {
+        //  если для view определен метод rewriteParamsOnInit и он вернул объект,
+        //  то перепишем параметры
+        params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
+    }
+
+    var key;
+    var pGroups = info.pGroups || [];
+    for (var g = 0; g < pGroups.length; g++) {
+
+        key = 'view=' + id;
+
+        var group = pGroups[g];
+        var pNames = group.pNames || [];
+        var pFilters = group.pFilters || {};
+        var pOptional = group.pOptional || {};
+
+        for (var i = 0, l = pNames.length; i < l; i++) {
+            var pName = pNames[i];
+            var pValue = params[ pName ] || pOptional[ pName ];
+            var pFilter = pFilters[pName];
+            var isOptional = pName in pOptional;
+
+            if (pValue == null && isOptional) {
+                continue;
+            }
+
+            if ( pValue == null || (pFilter && pValue != pFilter) ) {
+                key = null;
+                break;
+            }
+
+            key += '&' + pName + '=' + pValue;
+        }
+
+        if (key) {
+            return {
+                params: params, // параметры с учётом rewrite
+                key: key        // ключ с учётом правильных параметров
+            };
+        }
+    }
+
+    //  Не по чему строить ключ.
+    if (!pGroups.length) {
+        return {
+            params: params,    // параметры с учётом rewrite
+            key: 'view=' + id  // ключ с учётом правильных параметров
+        };
+    }
+
+    //  Не удалось построить ключ view.
+    throw new Error("[ns.View] Could not generate key for view " + id);
 };
 
 /**

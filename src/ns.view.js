@@ -1160,29 +1160,52 @@ ns.View._initInfo = function(info) {
 
     // больше не нужны
     delete info.events;
-
-    return info;
 };
 
+/**
+    Парсим информацию про subview.
+
+    В info.subviews приходит структура такого вида:
+        {
+            //  Определяем subview 'labels':
+            'labels': [
+                //  зависящее от поля '.labels' модели 'message',
+                'message .labels',
+                //  и от модели 'labels' целиком.
+                'labels'
+            ],
+            //  Пустая строка в качестве имени subview означает все view целиком.
+            //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
+            '': 'folders'
+            ...
+        }
+
+    На выходе в info.subviews такая структура:
+        {
+                //  Название модели.
+                'message': {
+                //  jpath.
+                '.labels': {
+                    //  Список subview, которые зависят от этого jpath в данной модели.
+                    'labels': true
+                }
+            },
+            'labels': {
+                //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
+                '': {
+                    'labels': true
+                }
+            },
+            'folders': {
+                '': {
+                    //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
+                    '': true
+                }
+            },
+            ...
+        }
+*/
 ns.View._initInfoSubviews = function(info) {
-    //  Парсим информацию про subview.
-    //
-    //  В info.subviews приходит структура такого вида:
-    //
-    //      {
-    //          //  Определяем subview 'labels':
-    //          'labels': [
-    //              //  зависящее от поля '.labels' модели 'message',
-    //              'message .labels',
-    //              //  и от модели 'labels' целиком.
-    //              'labels'
-    //          ],
-    //          //  Пустая строка в качестве имени subview означает все view целиком.
-    //          //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
-    //          '': 'folders'
-    //          ...
-    //      }
-    //
     var subviewTree = {};
     for (var subview in info.subviews) {
         var deps = info.subviews[subview];
@@ -1201,33 +1224,6 @@ ns.View._initInfoSubviews = function(info) {
         }
     }
     info.subviews = subviewTree;
-    //
-    //  На выходе в info.subviews такая структура:
-    //
-    //      {
-    //          //  Название модели.
-    //          'message': {
-    //              //  jpath.
-    //              '.labels': {
-    //                  //  Список subview, которые зависят от этого jpath в данной модели.
-    //                  'labels': true
-    //              }
-    //          },
-    //          'labels': {
-    //              //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
-    //              '': {
-    //                  'labels': true
-    //              }
-    //          },
-    //          'folders': {
-    //              '': {
-    //                  //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
-    //                  '': true
-    //              }
-    //          },
-    //          ...
-    //      }
-    //
 };
 
 ns.View._initInfoParams = function(info) {

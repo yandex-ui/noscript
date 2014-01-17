@@ -1178,7 +1178,7 @@ ns.View._initInfo = function(info) {
     //          ...
     //      }
     //
-    var _subviews = {};
+    var subviewTree = {};
     for (var subview in info.subviews) {
         var deps = info.subviews[subview];
         if (typeof deps === 'string') {
@@ -1190,12 +1190,12 @@ ns.View._initInfo = function(info) {
             var model_id = r[0];
             var jpath = r[1] || '';
 
-            var subviewsByModel = _subviews[model_id] || (( _subviews[model_id] = {} ));
-            var subviewsByModelJpath = subviewsByModel[jpath] || (( subviewsByModel[jpath] = {} ));
-            subviewsByModelJpath[subview] = true;
+            var byModel = subviewTree[model_id] || (( subviewTree[model_id] = {} ));
+            var byModelJpath = byModel[jpath] || (( byModel[jpath] = {} ));
+            byModelJpath[subview] = true;
         }
     }
-    info.subviews = _subviews;
+    info.subviews = subviewTree;
     //
     //  На выходе в info.subviews такая структура:
     //

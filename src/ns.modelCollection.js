@@ -117,6 +117,9 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
 };
 
 ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
+    // Основной смысл этого метода в том, чтобы его можно было переопределить
+    // и триггерить изменение коллекции только для части изменений элементов коллекции.
+
     // TODO тут можно триггерить много чего, но мы пока этого не делаем:
     // this.trigger('ns-model-changed.items[3].some.inner.prop'); // (ЭТОГО СЕЙЧАС НЕТ).
 
@@ -129,7 +132,6 @@ ns.ModelCollection.prototype.onItemTouched = function() {
 };
 
 ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
-    // При уничтожении вложенной модели коллекция выносит останки.
     this.remove(model);
 };
 
@@ -169,8 +171,8 @@ ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
 };
 
 /**
- * Удаляет все подмодели из коллекции
- * С каждой модели происходит снятие подписки
+ * Очищает коллекцию от моделей.
+ * Не путать с remove.
  */
 ns.ModelCollection.prototype.clear = function() {
     if (this.models) {
@@ -227,17 +229,16 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 };
 
 /**
- * Удаляет подмодель из коллекции
+ * Удаляет подмодели из коллекции
  *
  * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления
  */
 ns.ModelCollection.prototype.remove = function(models) {
-
     var modelsRemoved = [];
 
-    if (!(models instanceof Array)) {
-        models = [models];
+    if (!Array.isArray(models)) {
+        models = [ models ];
     }
 
     models.forEach(function(modelOrIndex) {
@@ -252,7 +253,6 @@ ns.ModelCollection.prototype.remove = function(models) {
         if (index >= 0) {
             var model = this.models[index];
 
-            // не забудем отписаться от событий подмодели
             this._unsubscribeSplit(model);
             modelsRemoved.push(model);
             this.models.splice(index, 1);

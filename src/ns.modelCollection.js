@@ -61,12 +61,13 @@ ns.ModelCollection.prototype._beforeSetData = function(data) {
     this.clear();
 
     var info = this.info.split;
-    var models = data;
     if (info) {
         var items = no.jpath(info.items, data);
-        models = this._splitModels(items);
+        var models = this._splitModels(items);
         this.insert(models);
     }
+
+    // TODO может быть стоит удалять данные split-а?
 
     return data;
 };

@@ -498,7 +498,7 @@ ns.Model.key = function(id, params, info) {
     var key = 'model=' + id;
     var keyParams = ns.Model._getKeyParams(id, params, info);
     for (var pName in keyParams) {
-        key += '&' + pName + '=' + keyParams[keyName];
+        key += '&' + pName + '=' + keyParams[pName];
     }
     return key;
 };

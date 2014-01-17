@@ -74,29 +74,22 @@ ns.ModelCollection.prototype._setData = function(data) {
 /**
  * Создает модели из разбитых данных
  *
- * @param { Array <JSON>} items – массив данных для будущих подмоделей
- * @return { Array <ns.Model> } – массив полученных подмоделей
+ * @param { Array<Object>} items – массив данных для будущих подмоделей
+ * @return { Array<ns.Model> } – массив полученных подмоделей
  */
 ns.ModelCollection.prototype._splitModels = function(items) {
     var info = this.info.split;
-    var that = this;
 
-    var models = [];
-
-    items.forEach(function(item) {
-
+    return items.map(function(item) {
         var params = {};
         for (var key in info.params) {
             params[key] = no.jpath(info.params[key], item);
         }
 
         // идентификатор подмодели берется из info.model_id
-        // он коллецкия может содержать модели только одного вида
-        var model = ns.Model.get(info.model_id, params).setData(item);
-        models.push(model);
+        // коллецкия может содержать модели только одного вида
+        return ns.Model.get(info.model_id, params).setData(item);
     });
-
-    return models;
 };
 
 /**
@@ -108,8 +101,8 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
     var that = this;
 
     var onModelChanged = function(evt, jpath) { that.onItemChanged(evt, model, jpath); };
-    var onModelTouched = function(evt) { that.onItemTouched(evt, model); }
-    var onModelDestroyed = function(evt) { that.onItemDestroyed(evt, model); }
+    var onModelTouched = function(evt) { that.onItemTouched(evt, model); };
+    var onModelDestroyed = function(evt) { that.onItemDestroyed(evt, model); };
 
     model.on('ns-model-change', onModelChanged);
     model.on('ns-model-touched', onModelTouched);
@@ -129,7 +122,7 @@ ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
     this.trigger('ns-model-changed', { 'model': model, 'jpath': jpath });
 };
 
-ns.ModelCollection.prototype.onItemTouched = function(evt, model) {
+ns.ModelCollection.prototype.onItemTouched = function() {
     // TODO почему не this.touch() ?
     this._version++;
 };

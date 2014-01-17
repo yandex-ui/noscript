@@ -1,5 +1,7 @@
 (function() {
 
+var splitUnsubscribe = {};
+
 /**
  * Models collection
  * @namespace
@@ -11,6 +13,8 @@ ns.ModelCollection = function() {};
 no.inherit(ns.ModelCollection, ns.Model);
 
 ns.ModelCollection.prototype.getData = function() {
+    // TODO а точно это нужно? Можно ведь просто всегда взять элементы из collection.models.
+
     // это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
@@ -46,29 +50,7 @@ ns.ModelCollection.prototype.getData = function() {
 ns.ModelCollection.prototype._reset = function() {
     ns.Model.prototype._reset.apply(this, arguments);
 
-    /**
-     * ModelCollection listeners
-     * @type {Object}
-     */
-    this.eventListeners = {};
     this.clear();
-};
-
-/**
- * Регистрирует обработчики событий.
- * @private
- */
-ns.ModelCollection.prototype._bindEvents = function() {
-    ns.Model.prototype._bindEvents.apply(this, arguments);
-
-    // При уничтожении вложенной модели коллекция выносит останки.
-    this.on('ns-model-destroyed', function(e, data) {
-        // Убедимся, что удалился именно элемент коллекции, а не сама коллекция.
-        // Пока это возможно только по наличию data.model в аргументах
-        if (data && data.model) {
-            this.remove(data.model);
-        }
-    });
 };
 
 /**
@@ -111,12 +93,6 @@ ns.ModelCollection.prototype._splitModels = function(items) {
         // идентификатор подмодели берется из info.model_id
         // он коллецкия может содержать модели только одного вида
         var model = ns.Model.get(info.model_id, params).setData(item);
-
-        model.on('ns-model-touched', function() {
-            // increment modelCollection version on collection-item update
-            that._version++;
-        });
-
         models.push(model);
     });
 
@@ -129,29 +105,38 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
+    var that = this;
 
-    // добавим нашу коллекцию с список слушающих коллекций для подмодели
-    model.eventListeners[this.key] = this;
+    var onModelChanged = function(evt, jpath) { that.onItemChanged(evt, model, jpath); };
+    var onModelTouched = function(evt) { that.onItemTouched(evt, model); }
+    var onModelDestroyed = function(evt) { that.onItemDestroyed(evt, model); }
 
-    // если ранее мы не переопределяли прототипный тригер
-    // то переопеделим его
-    if (ns.Model.prototype.trigger === model.trigger) {
-        model.trigger = function(evt, data) {
-            ns.Model.prototype.trigger.call(this, evt, data);
+    model.on('ns-model-change', onModelChanged);
+    model.on('ns-model-touched', onModelTouched);
+    model.on('ns-model-destroyed', onModelDestroyed);
 
-            var collData = {
-                data: data,
-                model: this
-            };
+    splitUnsubscribe[model.key] = function() {
+        model.off('ns-model-change', onModelChanged);
+        model.off('ns-model-touched', onModelTouched);
+        model.off('ns-model-destroyed', onModelDestroyed);
+    };
+};
 
-            for (var key in this.eventListeners) {
-                var collection = this.eventListeners[key];
-                if (collection) {
-                    collection.trigger(evt, collData);
-                }
-            }
-        };
-    }
+ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
+    // TODO тут можно триггерить много чего, но мы пока этого не делаем:
+    // this.trigger('ns-model-changed.items[3].some.inner.prop'); // (ЭТОГО СЕЙЧАС НЕТ).
+
+    this.trigger('ns-model-changed', { 'model': model, 'jpath': jpath });
+};
+
+ns.ModelCollection.prototype.onItemTouched = function(evt, model) {
+    // TODO почему не this.touch() ?
+    this._version++;
+};
+
+ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
+    // При уничтожении вложенной модели коллекция выносит останки.
+    this.remove(model);
 };
 
 /**
@@ -184,7 +169,9 @@ ns.ModelCollection.prototype.touch = function() {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
-    delete model.eventListeners[this.key];
+    if (model && splitUnsubscribe[model.key]) {
+        splitUnsubscribe[model.key]();
+    }
 };
 
 /**

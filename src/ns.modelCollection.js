@@ -226,10 +226,10 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 };
 
 /**
- * Удаляет подмодели из коллекции
+ * Удаляет элементы коллекции.
  *
- * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмодели, которую надо удалить
- * @return {Boolean} – признак успешности удаления
+ * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмоделей, которые надо удалить.
+ * @return {Boolean} – признак успешности удаления.
  */
 ns.ModelCollection.prototype.remove = function(models) {
     var modelsRemoved = [];

@@ -1,6 +1,6 @@
 (function() {
 
-var splitUnsubscribe = {};
+var unsubscribe = {};
 
 /**
  * Models collection
@@ -108,7 +108,7 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
     model.on('ns-model-touched', onModelTouched);
     model.on('ns-model-destroyed', onModelDestroyed);
 
-    splitUnsubscribe[model.key] = function() {
+    unsubscribe[model.key] = function() {
         model.off('ns-model-change', onModelChanged);
         model.off('ns-model-touched', onModelTouched);
         model.off('ns-model-destroyed', onModelDestroyed);
@@ -162,8 +162,8 @@ ns.ModelCollection.prototype.touch = function() {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
-    if (model && splitUnsubscribe[model.key]) {
-        splitUnsubscribe[model.key]();
+    if (model && unsubscribe[model.key]) {
+        unsubscribe[model.key]();
     }
 };
 
@@ -172,14 +172,13 @@ ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
  * С каждой модели происходит снятие подписки
  */
 ns.ModelCollection.prototype.clear = function() {
-
-    this.models = this.models || [];
-
-    this.models.forEach(
-        this._unsubscribeSplit.bind(this)
-    );
-
-    this.models = [];
+    if (this.models) {
+        var that = this;
+        this.models.forEach(function(model) {
+            that._unsubscribeSplit(model);
+        });
+        this.models = [];
+    }
 };
 
 /**

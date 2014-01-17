@@ -60,9 +60,9 @@ ns.ModelCollection.prototype._reset = function() {
 ns.ModelCollection.prototype._beforeSetData = function(data) {
     this.clear();
 
-    var info = this.info.split;
-    if (info) {
-        var items = no.jpath(info.items, data);
+    var splitInfo = this.info.split;
+    if (splitInfo) {
+        var items = no.jpath(splitInfo.items, data);
         var models = this._splitModels(items);
         this.insert(models);
     }

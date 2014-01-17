@@ -68,10 +68,11 @@ ns.View.prototype._init = function(id, params, async) {
      * @protected
      */
     this._modelsVersions = {};
+    this._modelsEvents = {};
 
+    this.node = null;
     this.views = null;
     this._invalidSubviews = null;
-    this.node = null;
 
     /**
      * Статус View.
@@ -162,6 +163,7 @@ ns.View.prototype._htmlinit = function(events) {
  */
 ns.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
+        this._unbindModels();
         this._unbindEvents('show');
         this._hideNode();
         this._visible = false;
@@ -191,6 +193,8 @@ ns.View.prototype._show = function(events) {
     // При создании блока у него this._visible === undefined.
     if (!this.isLoading() && this._visible !== true) {
         //  FIXME: Почему это делается на show?
+        //  chestozo: думаю, потому что события от моделей вызывают перерисовку.
+        //  Если view скрыто - перерисоввывать ничего не надо.
         this._bindModels();
         this._bindEvents('show');
         this._showNode();
@@ -228,8 +232,9 @@ ns.View.prototype._bindModels = function() {
 
     for (var model_id in models) {
         var model = models[model_id];
+        var events = (this._modelsEvents[model.key] = {});
 
-        model.on('ns-model-destroyed', function() {
+        this._bindModel(model, 'ns-model-destroyed', events, function() {
             that.invalidate();
         });
 
@@ -251,13 +256,13 @@ ns.View.prototype._bindModels = function() {
                 if ('' in deps) {
                     //  При любом изменении модели нужно инвалидировать
                     //  весь view целиком.
-                    model.on('ns-model-changed' + jpath, function() {
+                    this._bindModel(model, 'ns-model-changed' + jpath, events, function() {
                         that.invalidate();
                     });
                 } else {
                     //  Инвалидируем только соответствующие subview:
                     (function(deps) {
-                        model.on('ns-model-changed' + jpath, function() {
+                        that._bindModel(model, 'ns-model-changed' + jpath, events, function() {
                             for (var subview_id in deps) {
                                 that.invalidateSubview(subview_id);
                             }
@@ -268,10 +273,33 @@ ns.View.prototype._bindModels = function() {
         } else {
             //  Для этой модели нет данных о том, какие subview она инвалидирует.
             //  Значит при изменении этой модели инвалидируем весь view целиком.
-            model.on('ns-model-changed', function() {
+            this._bindModel(model, 'ns-model-changed', events, function() {
                 that.invalidate();
             });
         }
+    }
+};
+
+ns.View.prototype._bindModel = function(model, eventName, events, callback) {
+    model.on(eventName, callback);
+    events[eventName] = callback;
+};
+
+/**
+ * Отписываемся от изменений моделей.
+ * @private
+ */
+ns.View.prototype._unbindModels = function() {
+    var models = this.models;
+    for (var model_id in models) {
+        var model = models[model_id];
+        var events = (this._modelsEvents[model.key] || {});
+
+        for (var eventName in events) {
+            model.off(eventName, events[eventName]);
+        }
+
+        delete this._modelsEvents[model.key];
     }
 };
 

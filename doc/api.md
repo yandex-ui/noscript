@@ -32,5 +32,4 @@ model.isDo()
 model.getVersion()
 model.touch()
 model.invalidate()
-//
 ```

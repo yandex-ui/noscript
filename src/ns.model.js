@@ -365,6 +365,10 @@ ns.Model.destroy = function(model) {
 
         // invalidate model to unsubsribe it from all listeners
         model.invalidate();
+
+        // NOTE удалять обработчики сейчас нельзя
+        // Даже, когда для модели вызывается destroy, обработчики событий не удаляются у instance-а.
+        // https://github.com/pasaran/nommon/pull/21
     }
 };
 

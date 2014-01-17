@@ -70,7 +70,7 @@ ns.View.prototype._init = function(id, params, async) {
     this._modelsVersions = {};
 
     this.views = null;
-    this._subviews = null;
+    this._invalidSubviews = null;
     this.node = null;
 
     /**
@@ -213,7 +213,7 @@ ns.View.prototype._showNode = function() {
 
 ns.View.prototype.invalidateSubview = function(subview) {
     //  FIXME: ns.SV.STATUS.INVALID?
-    this._subviews[subview] = ns.V.STATUS.INVALID;
+    this._invalidSubviews[subview] = ns.V.STATUS.INVALID;
 };
 
 /**
@@ -461,7 +461,7 @@ ns.View.prototype.isNone = function() {
 //  FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
 ns.View.prototype.isSubviewsOk = function() {
     //  Возвращаем, есть ли хоть один невалидный subview.
-    return ns.object.isEmpty(this._subviews);
+    return ns.object.isEmpty(this._invalidSubviews);
 };
 
 /**
@@ -894,7 +894,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
 
         if ( this.isOk() ) {
             //  Обновляем только subview.
-            for (var subview_id in this._subviews) {
+            for (var subview_id in this._invalidSubviews) {
                 var className = 'ns-subview-' + subview_id;
 
                 var new_subview_node = ns.byClass(className, viewNode)[0];
@@ -948,7 +948,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
         }
 
         //  Все subview теперь валидны.
-        this._subviews = {};
+        this._invalidSubviews = {};
 
         this._saveModelsVersions();
     }

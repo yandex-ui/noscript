@@ -57,7 +57,7 @@ ns.ModelCollection.prototype._reset = function() {
  * Разбивает данные через jpath описанный в info.split
  * на составные модели
  */
-ns.ModelCollection.prototype._setData = function(data) {
+ns.ModelCollection.prototype._beforeSetData = function(data) {
     this.clear();
 
     var info = this.info.split;

@@ -165,8 +165,6 @@ ns.View.prototype._htmlinit = function(events) {
  */
 ns.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
-        //  FIXME: Почему это делается на hide?
-        this._unbindModels();
         this._unbindEvents('show');
         this._hideNode();
         this._visible = false;
@@ -286,14 +284,6 @@ ns.View.prototype._bindModels = function() {
             });
         }
     }
-};
-
-/**
- * Анбиндится на изменение моделей.
- * @private
- */
-ns.View.prototype._unbindModels = function() {
-    //  FIXME: Переписать все соответственно _bindModels.
 };
 
 /**

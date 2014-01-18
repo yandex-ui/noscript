@@ -547,8 +547,6 @@ ns.View.prototype._apply = function(callback) {
     }
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 /**
  * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
  * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
@@ -567,6 +565,7 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     // Если views еще не определены (первая отрисовка)
     if (!this.views) {
         //  FIXME: Почему бы это в конструкторе не делать?
+        //  chestozo: lazy инициализация, всё такое.
         this.views = {};
         // Создаем подблоки
         for (var view_id in pageLayout) {
@@ -601,7 +600,7 @@ ns.View.prototype._tryPushToRequest = function(updated) {
 
         } else if (!hasValidModels) {
             this.asyncState = true;
-            // если асинхронный блок имеет невалидные модели, то его не надо рисовать
+            // если асинхронный блок имеет невалидные модели, то его не надо рисовать сразу
             updated.async.push(this);
             // прекращаем обработку
             return updated;

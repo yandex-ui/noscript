@@ -351,7 +351,6 @@ ns.View.prototype._bindEventHandlers = function(events, handlerPos) {
  * @private
  */
 ns.View.prototype._getEvents = function(type) {
-    // this._initEvents
     var eventProp = '_' + type + 'Events';
 
     if (!this[eventProp]) {
@@ -1083,13 +1082,13 @@ ns.View.info = function(id) {
     // если есть декларация, но еще нет pGroups, то надо завершить определение View
     if (info && !info.pGroups) {
         ns.View._initInfoParams(info);
-        ns.View._initInfo(info);
+        ns.View._initInfoEvents(info);
         ns.View._initInfoSubviews(info);
     }
     return info;
 };
 
-ns.View._initInfo = function(info) {
+ns.View._initInfoEvents = function(info) {
     /**
      * События, которые надо повесить сразу при создании view
      * @type {Array}

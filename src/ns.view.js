@@ -1117,9 +1117,8 @@ ns.View._initInfoParams = function(info) {
         var params = {};
         for (var model_id in info.models) {
             var modelInfo = ns.Model.info(model_id);
-            if (!modelInfo) {
-                throw new Error('[ns.View] Model "' + model_id + '" is not defined!');
-            }
+            ns.assert(modelInfo, ns.View, 'Model %s is not defined!', model_id);
+
             no.extend( params, modelInfo.params );
         }
 

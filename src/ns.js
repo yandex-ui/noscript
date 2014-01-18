@@ -151,7 +151,6 @@ ns.transaction = function(cb) {
  * @param {?} truthy Любое значение, которое проверяется на истинность.
  * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
  * @param {String} message Сообщение об ошибке.
- * @param {...String} messageArgs Параметры для генерации сообщения об ошибке.
  */
 ns.assert = function(truthy, contextName, message) {
     if (!truthy) {

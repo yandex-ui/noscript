@@ -673,7 +673,9 @@ ns.View.prototype._getViewTree = function(layout, params) {
         return tree;
     }
 
-    //  Это блок без подблоков и он не асинхронный.
+    //  Сюда попадают только синхронные блоки.
+
+    //  Это блок без подблоков.
     if (typeof layout !== 'object') {
         return true;
     }

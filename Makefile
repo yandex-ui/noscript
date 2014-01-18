@@ -4,7 +4,7 @@ export NPM_BIN
 yate: test/tests.yate.js
 
 test/tests.yate.js: test/tests.yate
-	node_modules/.bin/yate test/tests.yate > test/tests.yate.js
+	$(NPM_BIN)//yate test/tests.yate > test/tests.yate.js
 
 node_modules: package.json
 	npm install
@@ -16,4 +16,7 @@ clean-node_modules:
 grunt: node_modules yate
 	$(NPM_BIN)/grunt
 
-.PHONY: clean-node_modules grunt yate
+test: grunt
+	$(NPM_BIN)/jscs .
+
+.PHONY: clean-node_modules grunt yate test

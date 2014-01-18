@@ -1088,6 +1088,74 @@ ns.View.info = function(id) {
     return info;
 };
 
+ns.View._initInfoParams = function(info) {
+    if (info.params) {
+        if ( info['params+'] || info['params-'] ) {
+            throw new Error("[ns.View] you cannot specify params and params+/- at the same time");
+        }
+
+        var groups;
+        var pGroups = [];
+        if ( !Array.isArray(info.params) ) {
+            groups = [ info.params ];
+        } else {
+            groups = info.params;
+        }
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            // Если в params задано значение параметра -- это фильтр.
+            // Опциональные параметры это параметры моделей с дефолтным значением.
+            pGroups.push({
+                pNames: Object.keys(group),
+                pFilters: group,
+                pOptional: {}
+            });
+        }
+
+        info.pGroups = pGroups;
+    } else {
+        var params = {};
+        for (var model_id in info.models) {
+            var modelInfo = ns.Model.info(model_id);
+            if (!modelInfo) {
+                throw new Error('[ns.View] Model "' + model_id + '" is not defined!');
+            }
+            no.extend( params, modelInfo.params );
+        }
+
+        //  Массив с параметрами, которые надо исключить из ключа.
+        var exclude = info['params-'];
+        if (exclude) {
+            for (var i = 0; i < exclude.length; i++) {
+                delete params[ exclude[i] ];
+            }
+
+            delete info['params-'];
+        }
+
+        //  Дополнительные параметры (расширяют параметры от моделей или перекрывают их).
+        if (info['params+']) {
+            no.extend( params, info['params+'] );
+            delete info['params+'];
+        }
+
+        // Когда параметры строятся из параметров моделей нет фильтров параметров.
+        var pNames = Object.keys(params);
+        if (pNames.length) {
+            info.pGroups = [
+                {
+                    pNames: pNames,
+                    pFilters: {},
+                    pOptional: params
+                }
+            ];
+        } else {
+            info.pGroups = [];
+        }
+    }
+};
+
 ns.View._initInfoEvents = function(info) {
     /**
      * События, которые надо повесить сразу при создании view
@@ -1251,74 +1319,6 @@ ns.View._initInfoSubviews = function(info) {
         }
     }
     info.subviews = subviewTree;
-};
-
-ns.View._initInfoParams = function(info) {
-    if (info.params) {
-        if ( info['params+'] || info['params-'] ) {
-            throw new Error("[ns.View] you cannot specify params and params+/- at the same time");
-        }
-
-        var groups;
-        var pGroups = [];
-        if ( !Array.isArray(info.params) ) {
-            groups = [ info.params ];
-        } else {
-            groups = info.params;
-        }
-
-        for (var i = 0; i < groups.length; i++) {
-            var group = groups[i];
-            // Если в params задано значение параметра -- это фильтр.
-            // Опциональные параметры это параметры моделей с дефолтным значением.
-            pGroups.push({
-                pNames: Object.keys(group),
-                pFilters: group,
-                pOptional: {}
-            });
-        }
-
-        info.pGroups = pGroups;
-    } else {
-        var params = {};
-        for (var model_id in info.models) {
-            var modelInfo = ns.Model.info(model_id);
-            if (!modelInfo) {
-                throw new Error('[ns.View] Model "' + model_id + '" is not defined!');
-            }
-            no.extend( params, modelInfo.params );
-        }
-
-        //  Массив с параметрами, которые надо исключить из ключа.
-        var exclude = info['params-'];
-        if (exclude) {
-            for (var i = 0; i < exclude.length; i++) {
-                delete params[ exclude[i] ];
-            }
-
-            delete info['params-'];
-        }
-
-        //  Дополнительные параметры (расширяют параметры от моделей или перекрывают их).
-        if (info['params+']) {
-            no.extend( params, info['params+'] );
-            delete info['params+'];
-        }
-
-        // Когда параметры строятся из параметров моделей нет фильтров параметров.
-        var pNames = Object.keys(params);
-        if (pNames.length) {
-            info.pGroups = [
-                {
-                    pNames: pNames,
-                    pFilters: {},
-                    pOptional: params
-                }
-            ];
-        } else {
-            info.pGroups = [];
-        }
-    }
 };
 
 ns.View.getKey = function(id, params, info) {

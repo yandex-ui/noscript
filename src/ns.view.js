@@ -1090,9 +1090,8 @@ ns.View.info = function(id) {
 
 ns.View._initInfoParams = function(info) {
     if (info.params) {
-        if ( info['params+'] || info['params-'] ) {
-            throw new Error("[ns.View] you cannot specify params and params+/- at the same time");
-        }
+        ns.assert(!info['params+'], 'ns.View', 'you cannot specify params and params+ at the same time');
+        ns.assert(!info['params-'], 'ns.View', 'you cannot specify params and params- at the same time');
 
         var groups;
         var pGroups = [];

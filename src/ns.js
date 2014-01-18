@@ -145,6 +145,19 @@ ns.transaction = function(cb) {
     ns.page.go(ns.page._lastUrl);
 };
 
+/**
+ * Выполняет проверку, что первый аргумент истиннен.
+ * Если это не так - кидает ошибку.
+ * @param {?} truthy Любое значение, которое проверяется на истинность.
+ * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
+ * @param {String} message Сообщение об ошибке.
+ */
+ns.assert = function(truthy, contextName, message) {
+    if (!truthy) {
+        throw new Error('[' + contextName + '] ' + message);
+    }
+};
+
 if (window['mocha']) {
 
     /**

@@ -488,7 +488,7 @@ ns.Model.infoLite = function(id) {
 };
 
 ns.Model.key = function(id, params, info) {
-    info = info || ns.Model.infoLite(id);
+    info = info || ns.Model.info(id);
 
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {

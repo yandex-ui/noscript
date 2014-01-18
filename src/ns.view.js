@@ -530,6 +530,7 @@ ns.View.prototype.isModelsValid = function(modelsVersions) {
         ) {
             //  FIXME: А не нужно ли тут поменять статус блока?
             //  Раз уж мы заметили, что он невалидный.
+            //  chestozo: не нужно. Метод делает ровно то, что отражено в его названии: возвращает статус.
             return false;
         }
     }
@@ -537,14 +538,12 @@ ns.View.prototype.isModelsValid = function(modelsVersions) {
     return true;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 //  Вызываем callback для всех подблоков.
+//  Это плоский метод. Он работает только с подблоками и не уходит рекурсивно вглубь by design.
 ns.View.prototype._apply = function(callback) {
     var views = this.views;
     for (var id in views) {
         callback(views[id], id);
-        // @chestozo: а не надо тут вызвать: views[id]._apply(callback) ?
     }
 };
 

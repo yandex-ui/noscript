@@ -1031,20 +1031,15 @@ var _ctors = {};
  * @return {Function} Созданный View.
  */
 ns.View.define = function(id, info, base) {
-    if (id in _infos) {
-        throw new Error("[ns.View] Can't redefine '" + id + "'");
-    }
+    ns.assert(!(id in _infos), 'ns.View', "Can't redefine '%s'", id);
 
     info = info || {};
 
     var baseClass = ns.View;
     if (typeof base === 'string') {
         // если указана строка, то берем декларацию ns.View
-        if (_ctors[base]) {
-            baseClass = _ctors[base];
-        } else {
-            throw new Error("[ns.View] Can't find '" + base + "' to extend '" + id + "'");
-        }
+        baseClass = _ctors[base];
+        ns.assert(baseClass, 'ns.View', "Can't find '%s' to extend '%s'", base, id);
 
     } else if (typeof base === 'function') {
         baseClass = base;

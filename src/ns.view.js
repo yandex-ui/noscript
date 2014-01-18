@@ -97,10 +97,7 @@ ns.View.prototype._init = function(id, params, async) {
     this._eventNS = '.ns-view-' + this.id + '-' + this._uniqID;
 
     // события, которые надо забиндить сразу при создании блока
-    for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
-        var event = this.info.createEvents[i];
-        this.on(event[0], this._prepareCallback(event[1]));
-    }
+    this._bindCreateEvents();
 
     this.trigger('ns-view-init');
 };
@@ -416,6 +413,13 @@ ns.View.prototype._bindEvents = function(type) {
     for (i = 0, j = globalNoevents.length; i < j; i++) {
         event = globalNoevents[i];
         ns.events.on(event[0], event[1]);
+    }
+};
+
+ns.View.prototype._bindCreateEvents = function() {
+    for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
+        var event = this.info.createEvents[i];
+        this.on(event[0], this._prepareCallback(event[1]));
     }
 };
 

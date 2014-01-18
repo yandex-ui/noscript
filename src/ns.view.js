@@ -312,9 +312,7 @@ ns.View.prototype._unbindModels = function() {
 ns.View.prototype._prepareCallback = function(fn) {
     if (typeof fn === 'string') {
         var method = this[fn];
-        if (!method) {
-            throw new Error("[ns.View] Can't find method '" + fn + "' in '" + this.id + "'");
-        }
+        ns.assert(method, 'ns.View', "Can't find method '%s' in '%s'", fn, this.id);
         return method;
     }
 
@@ -903,14 +901,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
         viewNode = this._extractNode(node);
-
-        if (!viewNode) {
-            //  TODO @nop: Может сделать метод типа:
-            //
-            //      this.error("Can't find node for %id");
-            //
-            throw new Error("[ns.View] Can't find node for '" + this.id + "'");
-        }
+        ns.assert(viewNode, 'ns.View', "Can't find node for '%s'", this.id);
 
         //  Тут у нас может быть несколько вариантов, почему блок нужно как-то обновлять:
         //
@@ -927,9 +918,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
                 var new_subview_node = ns.byClass(className, viewNode)[0];
                 var old_subview_node = ns.byClass(className, this.node)[0];
 
-                if ( !(new_subview_node && old_subview_node) ) {
-                    throw "Can't find node for subview '" + subview_id + "' in view '" + this.id + "'";
-                }
+                ns.assert(new_subview_node && old_subview_node, 'ns.View', "Can't find node for subview '%s' in view '%s'", subview_id, this.id);
 
                 ns.replaceNode(old_subview_node, new_subview_node);
             }

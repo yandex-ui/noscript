@@ -1369,7 +1369,7 @@ ns.View.getKeyAndParams = function(id, params, info) {
     }
 
     //  Не удалось построить ключ view.
-    throw new Error("[ns.View] Could not generate key for view " + id);
+    ns.assert(false, 'ns.View', 'Could not generate key for view %s', id);
 };
 
 /**
@@ -1381,9 +1381,8 @@ ns.View.getKeyAndParams = function(id, params, info) {
  */
 ns.View.create = function(id, params, async) {
     var Ctor = _ctors[id];
-    if (!Ctor) {
-        throw new Error('[ns.View] "' + id + '" is not defined');
-    }
+    ns.assert(Ctor, 'ns.View', "'%s' is not defined", id);
+
     /**
      * @type {ns.View}
      */

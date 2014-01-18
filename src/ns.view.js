@@ -489,7 +489,6 @@ ns.View.prototype.isNone = function() {
 
 //  FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
 ns.View.prototype.isSubviewsOk = function() {
-    //  Возвращаем, есть ли хоть один невалидный subview.
     return ns.object.isEmpty(this._invalidSubviews);
 };
 

@@ -180,8 +180,10 @@ ns.ModelCollection.prototype.clear = function() {
         this.models.forEach(function(model) {
             that._unsubscribeSplit(model);
         });
-        this.models = [];
     }
+
+    // Это нужно и для начальной инициализации моделей.
+    this.models = [];
 };
 
 /**

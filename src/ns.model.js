@@ -96,9 +96,7 @@ ns.Model.prototype._prepareCallback = function(method) {
         method = this[method];
     }
 
-    if (typeof method !== 'function') {
-        throw new Error("[ns.View] Can't find method '" + method + "' in '" + this.id + "'");
-    }
+    ns.assert((typeof method === 'function'), 'ns.Model', "Can't find method '%s' in '%s'", method, this.id);
 
     return method;
 };
@@ -341,9 +339,7 @@ ns.Model.getValid = function(id, params) {
  * @returns {ns.Model|null}
  */
 ns.Model._find = function(id, params) {
-    if (!(id in _infos)) {
-        throw new Error('[ns.Model] "' + id + '" is not defined');
-    }
+    ns.assert((id in _infos), 'ns.Model', "'%s' is not defined", id);
 
     var key = ns.Model.key(id, params);
     return _cache[id][key] || null;
@@ -406,9 +402,7 @@ ns.Model.isValid = function(id, params) {
  * });
  */
 ns.Model.define = function(id, info, base) {
-    if (id in _infos) {
-        throw new Error("[ns.Model] Can't redefine '" + id + "'");
-    }
+    ns.assert(!(id in _infos), 'ns.Model', "Can't redefine '%s'", id);
 
     info = info || {};
 
@@ -484,9 +478,7 @@ ns.Model.info = function(id) {
  */
 ns.Model.infoLite = function(id) {
     var info = _infos[id];
-    if (!info) {
-        throw new Error('[ns.Model] "' + id + '" is not defined');
-    }
+    ns.assert(info, 'ns.Model', "'%s' is not defined", id);
 
     return info;
 };
@@ -562,14 +554,13 @@ ns.Model.destroyWith = function(targetModel, withModels) {
 
     for (var i = 0, len = withModels.length; i < len; i++) {
         var model = withModels[i];
-        if (model instanceof ns.Model) {
-            // при уничтожении модели, с которой связана текущая - она тоже должна быть уничтожена
-            model.on('ns-model-destroyed', function() {
-                ns.Model.destroy(targetModel);
-            });
-        } else {
-            throw new Error('[ns.Model] ' + targetModel.id + ' withModels must be instance of ns.Model or an array of models');
-        }
+
+        ns.assert((model instanceof ns.Model), 'ns.Model', "destroyWith called for '%s' while one of the withModels is not instance of ns.Model", targetModel.id);
+
+        // при уничтожении модели, с которой связана текущая - она тоже должна быть уничтожена
+        model.on('ns-model-destroyed', function() {
+            ns.Model.destroy(targetModel);
+        });
     }
 };
 

@@ -290,6 +290,10 @@ ns.Model.prototype.prepareRequest = function(requestID) {
     return this;
 };
 
+ns.Model.prototype.destroyWith = function(models) {
+    ns.Model.destroyWith(this, models);
+};
+
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**

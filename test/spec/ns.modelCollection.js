@@ -195,12 +195,6 @@ describe('ns.ModelCollection', function() {
                 expect(this.modelCollection.models[1].data).to.eql(this.data.item[1]);
                 expect(this.modelCollection.models[2].data).to.eql(this.data.item[2]);
             });
-
-            it('should trigger event on collection from other collection', function() {
-                this.modelCollection.insert(this.models);
-                this.modelCollection.models[0].trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(1);
-            });
         });
 
         describe('insert', function() {

@@ -650,7 +650,7 @@ ns.View.prototype._getViewTree = function(layout, params) {
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
         errors: this._getModelsError(),
-        // есть view находится в режиме async, то модели проверять не надо
+        // если view находится в режиме async, то модели проверять не надо
         is_models_valid: this.asyncState || this.isModelsValid(),
         //  добавляем собственные параметры блока
         params: this.params,
@@ -664,8 +664,8 @@ ns.View.prototype._getViewTree = function(layout, params) {
     // match .view-name ns-view-content
     tree.tree[this.id] = true;
 
-    //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
-    //  помечаем его как асинхронный (false).
+    //  Если это асинхронный блок и для него нет еще всех моделей,
+    //  помечаем его как асинхронный.
     //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
     //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
     if ( this.async && !this.isModelsValid() ) {

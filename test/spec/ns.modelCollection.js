@@ -140,25 +140,39 @@ describe('ns.ModelCollection', function() {
 
             it('should trigger events by methodName', function() {
                 this.models[0].trigger('event1');
+                expect(this.methodNameCallback.callCount).to.be(0);
+
+                this.model.trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
 
             it('should trigger events by func', function() {
                 this.models[0].trigger('event2');
+                expect(this.methodCallback.callCount).to.be(0);
+
+                this.model.trigger('event2');
                 expect(this.methodCallback.callCount).to.be(1);
             });
 
             it('should not duplicate trigger events by methodName', function() {
                 this.model.setData(this.data, { silent: true });
                 this.model.setData(this.data, { silent: true });
+
                 this.models[0].trigger('event1');
+                expect(this.methodNameCallback.callCount).to.be(0);
+
+                this.model.trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(1);
             });
 
             it('should not duplicate trigger events by func', function() {
                 this.model.setData(this.data, { silent: true });
                 this.model.setData(this.data, { silent: true });
+
                 this.models[0].trigger('event2');
+                expect(this.methodCallback.callCount).to.be(0);
+
+                this.model.trigger('event2');
                 expect(this.methodCallback.callCount).to.be(1);
             });
 

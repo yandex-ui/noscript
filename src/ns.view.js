@@ -1088,7 +1088,8 @@ ns.View._initInfoParams = function(info) {
         for (var i = 0; i < groups.length; i++) {
             var group = groups[i];
             // Если в params задано значение параметра -- это фильтр.
-            // Опциональные параметры это параметры моделей с дефолтным значением.
+            // Опциональные параметры view это параметры моделей с дефолтным значением.
+            // Опциональные параметры есть только когда параметры view формируются из параметров моделей (смотри ниже).
             pGroups.push({
                 pNames: Object.keys(group),
                 pFilters: group,
@@ -1097,6 +1098,7 @@ ns.View._initInfoParams = function(info) {
         }
 
         info.pGroups = pGroups;
+
     } else {
         var params = {};
         for (var model_id in info.models) {
@@ -1123,6 +1125,7 @@ ns.View._initInfoParams = function(info) {
         }
 
         // Когда параметры строятся из параметров моделей нет фильтров параметров.
+        // И групп параметров - всего одна.
         var pNames = Object.keys(params);
         if (pNames.length) {
             info.pGroups = [

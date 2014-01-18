@@ -331,20 +331,6 @@ describe('ns.ModelCollection', function() {
                 expect(this.changedCallback.callCount).to.be(2);
             });
 
-            it('should binding custom events for few models', function() {
-                this.model.insert(this.packItems);
-                this.models[0].trigger('event2');
-                this.models[3].trigger('event2');
-                expect(this.methodCallback.callCount).to.be(2);
-            });
-
-            it('should binding custom events for few models', function() {
-                this.model.insert(this.packItems);
-                this.models[0].trigger('event1');
-                this.models[3].trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(2);
-            });
-
             it('should trigger `ns-insert` event once', function() {
                 expect(this.insertCallback.callCount).to.be(1);
             });
@@ -423,13 +409,6 @@ describe('ns.ModelCollection', function() {
                 this.model.remove(this.item1);
                 this.item1.trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be(0);
-            });
-
-            it('should not duplicate trigger custom event', function() {
-                this.model.remove(this.item1);
-                this.model.insert(this.item1);
-                this.item1.trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(1);
             });
 
             it('should not trigger `ns-remove` event', function() {

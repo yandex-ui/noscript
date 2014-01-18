@@ -113,16 +113,16 @@ describe('ns.ModelCollection', function() {
                 expect(this.models[2].params).to.eql({id: 3, foo: 'baz'});
             });
 
-            it('should call _setData for split-models', function() {
+            it('should call _beforeSetData for split-models', function() {
 
-                sinon.spy(this.model, '_setData');
+                sinon.spy(this.model, '_beforeSetData');
 
                 this.model.setData(ns.Model.TESTDATA.split1);
 
-                expect(this.model._setData.calledOnce)
+                expect(this.model._beforeSetData.calledOnce)
                     .to.be.ok();
 
-                expect(this.model._setData.calledWith(ns.Model.TESTDATA.split1))
+                expect(this.model._beforeSetData.calledWith(ns.Model.TESTDATA.split1))
                     .to.be.ok();
             });
 

@@ -105,12 +105,12 @@ ns.ModelCollection.prototype._subscribeSplit = function(model) {
     var onModelTouched = function(evt) { that.onItemTouched(evt, model); };
     var onModelDestroyed = function(evt) { that.onItemDestroyed(evt, model); };
 
-    model.on('ns-model-change', onModelChanged);
+    model.on('ns-model-changed', onModelChanged);
     model.on('ns-model-touched', onModelTouched);
     model.on('ns-model-destroyed', onModelDestroyed);
 
     unsubscribe[model.key] = function() {
-        model.off('ns-model-change', onModelChanged);
+        model.off('ns-model-changed', onModelChanged);
         model.off('ns-model-touched', onModelTouched);
         model.off('ns-model-destroyed', onModelDestroyed);
     };

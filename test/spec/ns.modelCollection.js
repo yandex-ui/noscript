@@ -480,9 +480,7 @@ describe('ns.ModelCollection', function() {
         });
     });
 
-    // ----------------------------------------------------------------------------------------------------------------- //
-
-    describe.only('события от элементов коллекции', function() {
+    describe('события от элементов коллекции', function() {
 
         beforeEach(function() {
             this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
@@ -564,11 +562,53 @@ describe('ns.ModelCollection', function() {
         });
 
         describe('при удалении элемента коллекции - отписываем коллекцию от его событий', function() {
+            it('ns-model-changed', function() {
+                var removedModel = this.models[0];
+
+                // Before remove: events are heared
+                removedModel.setData({});
+                expect(this.onItemChangedSpy.callCount).to.be(1);
+
+                // After remove: no more
+                this.mc.remove(removedModel);
+                removedModel.setData({});
+                expect(this.onItemChangedSpy.callCount).to.be(1);
+            });
+        });
+
+        describe('одна и та же модель в нескольких коллекциях', function() {
+
+            beforeEach(function() {
+                // Дополнительно создаём вторую коллекцию.
+                this.mc2 = ns.Model.get('mc2', { id: Math.random() });
+                this.onItemChangedSpy2 = sinon.spy(this.mc2, 'onItemChanged');
+            });
+
+            afterEach(function() {
+                delete this.mc2;
+            });
+
+            it('события элемента слышат все коллекции (на примере ns-model-changed)', function() {
+                this.mc2.insert(this.mc.models[0]);
+
+                this.mc.models[0].setData({});
+                expect(this.onItemChangedSpy.callCount).to.be(1);
+                expect(this.onItemChangedSpy2.callCount).to.be(1);
+            });
+
+            it('когда удаляется из одной коллекции - другая продолжает слышать события (на примере ns-model-changed)', function() {
+                this.mc2.insert(this.mc.models[0]);
+
+                this.mc.models[0].setData({});
+                this.mc2.remove(this.mc.models[0]);
+                this.mc.models[0].setData({});
+
+                expect(this.onItemChangedSpy.callCount).to.be(2);
+                expect(this.onItemChangedSpy2.callCount).to.be(1);
+            });
 
         });
 
     });
-
-    // ----------------------------------------------------------------------------------------------------------------- //
 
 });

@@ -105,7 +105,7 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
     var that = this;
-    var events = (this._modelsEvents[model.key] = {});
+    var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
 
     this._bindModel(model, 'ns-model-changed', events, function(evt, jpath) {
         that.onItemChanged(evt, model, jpath);

@@ -500,7 +500,9 @@ describe('ns.ModelCollection', function() {
 
         afterEach(function() {
             this.mc.touch.restore();
+            this.mc.onItemChanged.restore();
             this.mc.onItemTouched.restore();
+            this.mc.onItemDestroyed.restore();
 
             delete this.data;
             delete this.mc;
@@ -544,7 +546,21 @@ describe('ns.ModelCollection', function() {
         });
 
         describe('события от элементов коллекции можно не проксировать', function() {
+            it('ns-model-changed', function() {
+                // Тут хитро восстанавливаем spy и создаём новый!
+                this.mc.onItemChanged.restore();
 
+                // Можно переопределить метод onItemChanged и не триггеирть в нём ns-model-changed на коллекции.
+                this.mc.onItemChanged = function() {};
+
+                this.onItemChangedSpy = sinon.spy(this.mc, 'onItemChanged');
+
+                var changedModel = this.models[0];
+                changedModel.setData({});
+
+                expect(this.onItemTouchedSpy.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be(0);
+            });
         });
 
         describe('при удалении элемента коллекции - отписываем коллекцию от его событий', function() {

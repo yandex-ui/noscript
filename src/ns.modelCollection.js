@@ -1,7 +1,5 @@
 (function() {
 
-var unsubscribe = {};
-
 /**
  * Models collection
  * @namespace
@@ -11,6 +9,13 @@ var unsubscribe = {};
 ns.ModelCollection = function() {};
 
 no.inherit(ns.ModelCollection, ns.Model);
+
+ns.ModelCollection.prototype._init = function() {
+    ns.Model.prototype._init.apply(this, arguments);
+
+    // Хэшик с событиями, навешанными на элементы коллекции.
+    this._modelsEvents = {};
+};
 
 ns.ModelCollection.prototype.getData = function() {
     // TODO а точно это нужно? Можно ведь просто всегда взять элементы из collection.models.
@@ -100,20 +105,24 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
     var that = this;
+    var events = (this._modelsEvents[model.key] = {});
 
-    var onModelChanged = function(evt, jpath) { that.onItemChanged(evt, model, jpath); };
-    var onModelTouched = function(evt) { that.onItemTouched(evt, model); };
-    var onModelDestroyed = function(evt) { that.onItemDestroyed(evt, model); };
+    this._bindModel(model, 'ns-model-changed', events, function(evt, jpath) {
+        that.onItemChanged(evt, model, jpath);
+    });
 
-    model.on('ns-model-changed', onModelChanged);
-    model.on('ns-model-touched', onModelTouched);
-    model.on('ns-model-destroyed', onModelDestroyed);
+    this._bindModel(model, 'ns-model-touched', events, function(evt) {
+        that.onItemTouched(evt, model);
+    });
 
-    unsubscribe[model.key] = function() {
-        model.off('ns-model-changed', onModelChanged);
-        model.off('ns-model-touched', onModelTouched);
-        model.off('ns-model-destroyed', onModelDestroyed);
-    };
+    this._bindModel(model, 'ns-model-destroyed', events, function(evt) {
+        that.onItemDestroyed(evt, model);
+    });
+};
+
+ns.ModelCollection.prototype._bindModel = function(model, eventName, events, callback) {
+    model.on(eventName, callback);
+    events[eventName] = callback;
 };
 
 ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
@@ -165,8 +174,14 @@ ns.ModelCollection.prototype.touch = function() {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
-    if (model && unsubscribe[model.key]) {
-        unsubscribe[model.key]();
+    if (model.key in this._modelsEvents) {
+        var events = this._modelsEvents[model.key];
+
+        for (var eventName in events) {
+            model.off(eventName, events[eventName]);
+        }
+
+        delete this._modelsEvents[model.key];
     }
 };
 

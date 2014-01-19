@@ -10,12 +10,7 @@ ns.ModelCollection = function() {};
 
 no.inherit(ns.ModelCollection, ns.Model);
 
-ns.ModelCollection.prototype._init = function() {
-    ns.Model.prototype._init.apply(this, arguments);
-
-    // Хэшик с событиями, навешанными на элементы коллекции.
-    this._modelsEvents = {};
-};
+no.extend(ns.ModelCollection.prototype, ns.mixins.BindModel);
 
 ns.ModelCollection.prototype.getData = function() {
     // TODO а точно это нужно? Можно ведь просто всегда взять элементы из collection.models.
@@ -105,24 +100,18 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
     var that = this;
-    var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
 
-    this._bindModel(model, 'ns-model-changed', events, function(evt, jpath) {
+    this._bindModel(model, 'ns-model-changed', function(evt, jpath) {
         that.onItemChanged(evt, model, jpath);
     });
 
-    this._bindModel(model, 'ns-model-touched', events, function(evt) {
+    this._bindModel(model, 'ns-model-touched', function(evt) {
         that.onItemTouched(evt, model);
     });
 
-    this._bindModel(model, 'ns-model-destroyed', events, function(evt) {
+    this._bindModel(model, 'ns-model-destroyed', function(evt) {
         that.onItemDestroyed(evt, model);
     });
-};
-
-ns.ModelCollection.prototype._bindModel = function(model, eventName, events, callback) {
-    model.on(eventName, callback);
-    events[eventName] = callback;
 };
 
 ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
@@ -175,15 +164,7 @@ ns.ModelCollection.prototype.touch = function() {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
-    if (model.key in this._modelsEvents) {
-        var events = this._modelsEvents[model.key];
-
-        for (var eventName in events) {
-            model.off(eventName, events[eventName]);
-        }
-
-        delete this._modelsEvents[model.key];
-    }
+    this._unbindModel(model);
 };
 
 /**

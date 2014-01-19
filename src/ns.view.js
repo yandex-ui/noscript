@@ -22,6 +22,7 @@ ns.View = function() {};
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 no.extend(ns.View.prototype, no.Events);
+no.extend(ns.View.prototype, ns.mixins.BindModel);
 
 //  ---------------------------------------------------------------------------------------------------------------  //
 
@@ -68,7 +69,6 @@ ns.View.prototype._init = function(id, params, async) {
      * @protected
      */
     this._modelsVersions = {};
-    this._modelsEvents = {};
 
     this.node = null;
     this.views = null;
@@ -229,9 +229,8 @@ ns.View.prototype._bindModels = function() {
 
     for (var model_id in models) {
         var model = models[model_id];
-        var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
 
-        this._bindModel(model, 'ns-model-destroyed', events, function() {
+        this._bindModel(model, 'ns-model-destroyed', function() {
             that.invalidate();
         });
 
@@ -253,13 +252,13 @@ ns.View.prototype._bindModels = function() {
                 if ('' in deps) {
                     //  При любом изменении модели нужно инвалидировать
                     //  весь view целиком.
-                    this._bindModel(model, 'ns-model-changed' + jpath, events, function() {
+                    this._bindModel(model, 'ns-model-changed' + jpath, function() {
                         that.invalidate();
                     });
                 } else {
                     //  Инвалидируем только соответствующие subview:
                     (function(deps) {
-                        that._bindModel(model, 'ns-model-changed' + jpath, events, function() {
+                        that._bindModel(model, 'ns-model-changed' + jpath, function() {
                             for (var subview_id in deps) {
                                 that.invalidateSubview(subview_id);
                             }
@@ -270,16 +269,11 @@ ns.View.prototype._bindModels = function() {
         } else {
             //  Для этой модели нет данных о том, какие subview она инвалидирует.
             //  Значит при изменении этой модели инвалидируем весь view целиком.
-            this._bindModel(model, 'ns-model-changed', events, function() {
+            this._bindModel(model, 'ns-model-changed', function() {
                 that.invalidate();
             });
         }
     }
-};
-
-ns.View.prototype._bindModel = function(model, eventName, events, callback) {
-    model.on(eventName, callback);
-    events[eventName] = callback;
 };
 
 /**
@@ -289,14 +283,7 @@ ns.View.prototype._bindModel = function(model, eventName, events, callback) {
 ns.View.prototype._unbindModels = function() {
     var models = this.models;
     for (var model_id in models) {
-        var model = models[model_id];
-        var events = (this._modelsEvents[model.key] || {});
-
-        for (var eventName in events) {
-            model.off(eventName, events[eventName]);
-        }
-
-        delete this._modelsEvents[model.key];
+        this._unbindModel(models[model_id]);
     }
 };
 

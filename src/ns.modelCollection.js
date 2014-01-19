@@ -136,7 +136,8 @@ ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
 };
 
 ns.ModelCollection.prototype.onItemTouched = function() {
-    // TODO почему не this.touch() ?
+    // У коллекции есть собственная версия (this._versionSelf) и версия элементов коллекции (this._version).
+    // Когда меняется элемент коллекции - версия самой коллекции не меняется.
     this._version++;
 };
 

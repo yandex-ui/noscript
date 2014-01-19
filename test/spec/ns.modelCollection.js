@@ -27,7 +27,7 @@ describe('ns.ModelCollection', function() {
                     methodCallback();
                 },
                 'ns-model-changed': function() {
-                    changedCallback();
+                    changedCallback.apply(this, arguments);
                 },
                 'ns-model-insert': function() {
                     insertCallback();
@@ -479,5 +479,80 @@ describe('ns.ModelCollection', function() {
 
         });
     });
+
+    // ----------------------------------------------------------------------------------------------------------------- //
+
+    describe.only('события от элементов коллекции', function() {
+
+        beforeEach(function() {
+            this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
+
+            this.mc = ns.Model.get('mc0', { id: Math.random() });
+            this.mc.setData(this.data, { silent: true });
+
+            this.models = this.mc.models;
+
+            this.touchSpy = sinon.spy(this.mc, 'touch');
+            this.onItemChangedSpy = sinon.spy(this.mc, 'onItemChanged');
+            this.onItemTouchedSpy = sinon.spy(this.mc, 'onItemTouched');
+            this.onItemDestroyedSpy = sinon.spy(this.mc, 'onItemDestroyed');
+        });
+
+        afterEach(function() {
+            this.mc.touch.restore();
+            this.mc.onItemTouched.restore();
+
+            delete this.data;
+            delete this.mc;
+            delete this.models;
+        });
+
+        describe('события от элементов коллекции проксируются в саму коллекцию', function() {
+            it('ns-model-changed', function() {
+                var changedModel = this.models[0];
+
+                changedModel.setData({});
+
+                expect(this.onItemTouchedSpy.callCount).to.be(1);
+                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', changedModel)).to.be.ok();
+
+                expect(this.onItemChangedSpy.callCount).to.be(1);
+                expect(this.onItemChangedSpy.calledWithExactly('ns-model-changed', changedModel, '')).to.be.ok();
+
+                expect(this.touchSpy.callCount).to.be(0);
+                expect(this.changedCallback.callCount).to.be(1);
+                expect(this.changedCallback.calledWithExactly('ns-model-changed', { 'model': changedModel, 'jpath': ''})).to.be.ok();
+            });
+
+            it('ns-model-touched', function() {
+                var touchedModel = this.models[0];
+
+                touchedModel.touch();
+                expect(this.touchSpy.callCount).to.be(0);
+                expect(this.onItemTouchedSpy.callCount).to.be(1);
+                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.ok();
+            });
+
+            it('ns-model-destroyed', function() {
+                var touchedModel = this.models[1];
+
+                touchedModel.touch();
+                expect(this.touchSpy.callCount).to.be(0);
+                expect(this.onItemTouchedSpy.callCount).to.be(1);
+                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.ok();
+            });
+        });
+
+        describe('события от элементов коллекции можно не проксировать', function() {
+
+        });
+
+        describe('при удалении элемента коллекции - отписываем коллекцию от его событий', function() {
+
+        });
+
+    });
+
+    // ----------------------------------------------------------------------------------------------------------------- //
 
 });

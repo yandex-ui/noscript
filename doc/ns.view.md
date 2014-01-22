@@ -56,7 +56,7 @@ ns.View.define('super-view', {
 ```
 
 
-## Про события
+### `events`
 
 Список событий:
 * ```ns-view-hide``` - view был скрыт и больше не виден на странице
@@ -85,6 +85,10 @@ ns-view-repaint
 * view был скрыт: ```ns-view-hide``` (без ```ns-view-repaint```)
 * view был показан: ```ns-view-show -> ns-view-repaint```
 * view был обновлене: ```ns-view-hide -> ns-view-htmldestroy -> ns-view-htmlinit -> ns-view-show -> ns-view-repaint``` (```ns-view-hide``` тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на ```ns-view-show/ns-view-hide``` и при обновлении ноды, они должны быть переинициализированы)
+
+#### `@show` и `@init`
+События с суффиксом `@show` вещаются во время показа view - `view.show()` - и снимаются во время `view.hide()`.
+Аналогично, `@init` суффикс означает, что событие будет активировано на `ns-view-htmlinit` и деактивировано на `ns-view-htmldestroy` (это поведение поумолчанию).
 
 ## Subview
 `Subview` - это часть `view`, которая отвечает за небольшой кусок интерфейса (флажок важное, метка прочитанности и т.п.).

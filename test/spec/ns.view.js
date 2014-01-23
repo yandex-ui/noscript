@@ -414,7 +414,7 @@ describe('ns.View', function() {
             });
 
             it('Нельзя указывать одновременно params и params+/-', function() {
-                expect(function() { ns.View.info('slider') }).to.throwError();
+                expect(function() { ns.View.info('slider'); }).to.throwError();
             });
         });
 
@@ -513,7 +513,7 @@ describe('ns.View', function() {
                                         done();
                                     })
                                     .fail(function() {
-                                        done('fail to init')
+                                        done('fail to init');
                                     });
                             });
                     });
@@ -526,13 +526,81 @@ describe('ns.View', function() {
             });
 
             it('"async-view" should have different nodes after redraw', function() {
-                expect(this.asyncViewNode2).not.to.be(this.asyncViewNode1)
+                expect(this.asyncViewNode2).not.to.be(this.asyncViewNode1);
             });
 
             it('"async-view" should have child view', function() {
                 expect($(this.asyncViewNode2).find('.ns-view-async-view-child')).to.have.length(1);
             });
 
+        });
+
+        describe.only('redraw old view when model was invalidated', function() {
+            // После починки _unbindModels перестало работать обновление view при изменении модели.
+            // Дело тут в том, что view подписана на своим модели. Модель поменялась - view перерисовалась (model ns-model-changed -> view invalidate).
+            // Когда мы починили отписку view от модели (во время _hide) изменения модели больше не будут услышаны view (что, как бы, хорошо и by design).
+            // Но тогда, во время update-а надо проверять, что все модели view валидны. И если нет - обновлять view.
+
+            var goToPage = function(app, params, callback) {
+                var layout = ns.layout.page('app', params);
+                return new ns.Update(app, layout, params).start().done(function() { callback(); });
+            };
+
+            beforeEach(function(done) {
+                this.spies = {};
+
+                ns.View.define('app');
+                ns.View.define('view', { models: [ 'model' ] });
+
+                // Модель и сразу два экземляра создаём заранее
+                ns.Model.define('model', { params: { id: null } });
+                this.model1 = ns.Model.get('model', { id: 1 }).setData({ data: 1 });
+                this.model2 = ns.Model.get('model', { id: 2 }).setData({ data: 2 });
+
+                ns.layout.define('app', {
+                    'app': {
+                        'box@': 'view'
+                    }
+                });
+
+                var app = this.appView = ns.View.create('app');
+                goToPage(app, { id: 1 }, done);
+            });
+
+            afterEach(function() {
+                for (var spyName in this.spies) {
+                    this.spies[spyName].restore();
+                }
+            });
+
+            it('redraw view after model invalidate while view was hidden', function(done) {
+                var model1 = this.model1;
+                var app = this.appView;
+                var view1 = this.appView.views.box.views['view=view&id=1'];
+
+                var spies = this.spies;
+                spies.view1Invalidate = sinon.spy(view1, 'invalidate');
+                spies.view1SetNode = sinon.spy(view1, '_setNode');
+                spies.view1Hide = sinon.spy(view1, '_hide');
+
+                // "Смена урла" - view1 прячется.
+                goToPage(app, { id: 2 }, function() {
+                    // view1 не видно.
+                    expect(view1._visible).to.be.eql(false);
+                    expect(spies.view1Hide.callCount).to.be.eql(1);
+                    expect(spies.view1SetNode.callCount).to.be.eql(0);
+
+                    // Меняется model1
+                    model1.setData({ id: 1, changed: true });
+                    expect(spies.view1Invalidate.callCount).to.be.eql(0);
+
+                    // Идёт назад - view должно перерисоваться
+                    goToPage(app, { id: 1 }, function() {
+                        expect(spies.view1SetNode.callCount).to.be.eql(1);
+                        done();
+                    });
+                });
+            });
         });
 
     });

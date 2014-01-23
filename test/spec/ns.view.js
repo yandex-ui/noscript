@@ -535,18 +535,21 @@ describe('ns.View', function() {
 
         });
 
-        describe.only('redraw old view when model was invalidated', function() {
+        describe('redraw old view when model was invalidated', function() {
+
+            // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
             // После починки _unbindModels перестало работать обновление view при изменении модели.
             // Дело тут в том, что view подписана на своим модели. Модель поменялась - view перерисовалась (model ns-model-changed -> view invalidate).
             // Когда мы починили отписку view от модели (во время _hide) изменения модели больше не будут услышаны view (что, как бы, хорошо и by design).
             // Но тогда, во время update-а надо проверять, что все модели view валидны. И если нет - обновлять view.
+            // Итог: не отписываем view от моделей
 
             var goToPage = function(app, params, callback) {
                 var layout = ns.layout.page('app', params);
                 return new ns.Update(app, layout, params).start().done(function() { callback(); });
             };
 
-            beforeEach(function(done) {
+            beforeEach(function() {
                 this.spies = {};
 
                 ns.View.define('app');
@@ -563,8 +566,7 @@ describe('ns.View', function() {
                     }
                 });
 
-                var app = this.appView = ns.View.create('app');
-                goToPage(app, { id: 1 }, done);
+                this.appView = ns.View.create('app');
             });
 
             afterEach(function() {
@@ -574,30 +576,60 @@ describe('ns.View', function() {
             });
 
             it('redraw view after model invalidate while view was hidden', function(done) {
+                var spies = this.spies;
                 var model1 = this.model1;
                 var app = this.appView;
-                var view1 = this.appView.views.box.views['view=view&id=1'];
+                var view1;
 
+                // Показываем страницы: 1 - 2 - 1
+                goToPage(app, { id: 1 }, function() {
+                    view1 = app.views.box.views['view=view&id=1'];
+
+                    spies.view1Invalidate = sinon.spy(view1, 'invalidate');
+                    spies.view1SetNode = sinon.spy(view1, '_setNode');
+                    spies.view1Hide = sinon.spy(view1, '_hide');
+
+                    goToPage(app, { id: 2 }, function() {
+                        // view1 не видно.
+                        expect(view1._visible).to.be.eql(false);
+                        expect(spies.view1Hide.callCount).to.be.eql(1);
+                        expect(spies.view1SetNode.callCount).to.be.eql(0);
+
+                        // Меняется model1
+                        model1.setData({ id: 1, changed: true });
+                        expect(spies.view1Invalidate.callCount).to.be.eql(1); // NOTE да да да, view даже спрятанная слышит изменения моделей.
+
+                        // Идёт назад - view должно перерисоваться
+                        goToPage(app, { id: 1 }, function() {
+                            expect(spies.view1SetNode.callCount).to.be.eql(1);
+                            done();
+                        });
+                    });
+                });
+            });
+
+            it('do not bind twice to model changed after show - hide - show cicle', function(done) {
                 var spies = this.spies;
-                spies.view1Invalidate = sinon.spy(view1, 'invalidate');
-                spies.view1SetNode = sinon.spy(view1, '_setNode');
-                spies.view1Hide = sinon.spy(view1, '_hide');
+                var model1 = this.model1;
+                var app = this.appView;
+                var view1;
 
-                // "Смена урла" - view1 прячется.
-                goToPage(app, { id: 2 }, function() {
-                    // view1 не видно.
-                    expect(view1._visible).to.be.eql(false);
-                    expect(spies.view1Hide.callCount).to.be.eql(1);
-                    expect(spies.view1SetNode.callCount).to.be.eql(0);
+                // Показываем страницы: 1 - 2 - 1 - 2
+                // view1 показывалось 2 раза.
+                // Надо проверить, что не будет двойного invalidate на ns-model-changed
+                goToPage(app, { id: 1 }, function() {
+                    view1 = app.views.box.views['view=view&id=1'];
 
-                    // Меняется model1
-                    model1.setData({ id: 1, changed: true });
-                    expect(spies.view1Invalidate.callCount).to.be.eql(0);
+                    spies.view1Invalidate = sinon.spy(view1, 'invalidate');
 
-                    // Идёт назад - view должно перерисоваться
-                    goToPage(app, { id: 1 }, function() {
-                        expect(spies.view1SetNode.callCount).to.be.eql(1);
-                        done();
+                    goToPage(app, { id: 2 }, function() {
+                        goToPage(app, { id: 1 }, function() {
+                            goToPage(app, { id: 2 }, function() {
+                                model1.setData({ id: 1, changed: true });
+                                expect(spies.view1Invalidate.callCount).to.be.eql(1);
+                                done();
+                            });
+                        });
                     });
                 });
             });

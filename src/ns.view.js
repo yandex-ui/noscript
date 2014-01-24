@@ -853,7 +853,13 @@ ns.View.prototype._setNode = function(node) {
          */
         this.$node = $(node);
 
-        this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
+        // Возможно, это несколько избыточно, что раз уж у view валидные модели, значит она и сама валидна.
+        if (this.isModelsValid()) {
+            this.status = STATUS.OK;
+        } else {
+            this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
+        }
+
     } else {
         this.status = STATUS.NONE;
     }

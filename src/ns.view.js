@@ -1387,7 +1387,7 @@ ns.View.getKeyAndParams = function(id, params, info) {
     }
 
     //  Не удалось построить ключ view.
-    ns.assert(false, 'ns.View', 'Could not generate key for view %s', id);
+    ns.assert.fail('ns.View', 'Could not generate key for view %s', id);
 };
 
 /**

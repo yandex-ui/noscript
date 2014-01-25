@@ -154,12 +154,21 @@ ns.transaction = function(cb) {
  */
 ns.assert = function(truthy, contextName, message) {
     if (!truthy) {
-        var messageArgs = Array.prototype.slice.call(arguments, 3);
-        for (var i = 0; i < messageArgs.length; i++) {
-            message = message.replace('%s', messageArgs[i]);
-        }
-        throw new Error('[' + contextName + '] ' + message);
+        ns.assert.fail(contextName, message);
     }
+};
+
+/**
+ * Кидает ошибку с понятным сообщением.
+ * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
+ * @param {String} message Сообщение об ошибке.
+ */
+ns.assert.fail = function(contextName, message) {
+    var messageArgs = Array.prototype.slice.call(arguments, 2);
+    for (var i = 0; i < messageArgs.length; i++) {
+        message = message.replace('%s', messageArgs[i]);
+    }
+    throw new Error('[' + contextName + '] ' + message);
 };
 
 if (window['mocha']) {

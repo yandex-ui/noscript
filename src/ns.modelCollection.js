@@ -217,8 +217,8 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     // Вставить можно только объявленную модель
     // и повторная вставка модели запрещена
-    var insertion = models.filter(function(model) {
-        return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id);
+    var insertion = models.filter(function(model, index) {
+        return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id) && index === models.indexOf(model);
     }, this);
 
     insertion.forEach(function(model, i) {

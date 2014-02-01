@@ -16,7 +16,7 @@ JS MVC framework
 - fix множественной подписки на ns-model-changed у view. Должно было стать пошустрее, но не очень заметно
 - поправил баг в ns.requestManager: иногда для модели в состоянии ошибки ставился статус, что она ок
 - добавил метод `ns.Model.prototype.needUpdateData(data)` чтобы можно было проверить, что пришли те же данные и не повышать версию модели (и не перерисоввывать view-хи)
-- у события `ns-page-before-load` добавился третий параметр `newPageUrl` (теперь обработчик должен выглядеть так `onPageBeforeLoad: function(evt, oldPage, newPage, newPageUrl) { .. }`)
+- у события `ns-page-before-load` добавился третий параметр `newPageUrl` (теперь обработчик должен выглядеть так `onPageBeforeLoad: function(evt, pairOfPages, newPageUrl) { .. }`)
 
 ##### 0.1.11 (12.11.2013)
 - Fix bug with bind/unbind global events

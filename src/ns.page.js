@@ -67,7 +67,7 @@ ns.page.go = function(url, action) {
 
     var layout = ns.layout.page(route.page, route.params);
 
-    ns.events.trigger('ns-page-before-load', [ns.page.current, route, url]);
+    ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
     ns.page.current = route;
     // save layout for async-view updates

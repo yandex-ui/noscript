@@ -15,6 +15,7 @@ JS MVC framework
 - вначале вернул `_unbindModels` у view, потом понял, что с ним не работает invalidate view. Отключил unbind
 - fix множественной подписки на ns-model-changed у view. Должно было стать пошустрее, но не очень заметно
 - поправил баг в ns.requestManager: иногда для модели в состоянии ошибки ставился статус, что она ок
+- добавил метод `ns.Model.prototype.needUpdateData(data)` чтобы можно было проверить, что пришли те же данные и не повышать версию модели (и не перерисоввывать view-хи)
 
 ##### 0.1.11 (12.11.2013)
 - Fix bug with bind/unbind global events

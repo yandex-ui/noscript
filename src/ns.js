@@ -154,7 +154,7 @@ ns.transaction = function(cb) {
  */
 ns.assert = function(truthy, contextName, message) {
     if (!truthy) {
-        ns.assert.fail(contextName, message);
+        ns.assert.fail.apply(this, Array.prototype.slice.call(arguments, 1));
     }
 };
 

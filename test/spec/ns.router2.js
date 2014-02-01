@@ -5,7 +5,7 @@ function extractRegExp(r) {
         multiline: r.multiline,
         ignoreCase: r.ignoreCase
     };
-};
+}
 
 function compareRegExp(a, b) {
     expect(extractRegExp(a)).to.be.eql(extractRegExp(b));
@@ -47,6 +47,10 @@ describe('router: new route parsing method', function() {
                 expect( ns.router._generateParamRegexp( ns.router._parseParam(test) )).to.be(_tests[test] );
             });
         }
+
+        it('should throw error for unknown parameter type', function() {
+            expect(function() { ns.router._generateParamRegexp(ns.router._parseParam('param:new-type')); }).to.throwError(/\[ns\.router\] Could not find regexp for 'new\-type'!/);
+        });
     });
 
     describe('parse section', function() {
@@ -113,5 +117,35 @@ describe('router: new route parsing method', function() {
             compareRegExp( regexp, new RegExp('^/message(?:/(?!/)(?:([0-9]+))?)?/?(?:\\?(.*))?$') ); // TODO проверить, что не получится 2 слеша на конце
         });
     });
+
+    describe('ns.router.generateUrl()', function() {
+        beforeEach(function() {
+            ns.router.routes = {
+                route: {
+                    '/test/{id}': 'test'
+                }
+            };
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            ns.router.baseDir = '';
+            ns.router.undefine();
+        });
+
+        it('should throw error for unknown route', function() {
+            expect(function() { ns.router.generateUrl('test-no-such-route', {});  }).to.throwError(/\[ns\.router\] Could not find route with id 'test-no-such-route'!/);
+        });
+
+        it('should throw error when not enough params', function() {
+            expect(function() { ns.router.generateUrl('test', {});  }).to.throwError(/\[ns\.router\] Could not generate url for layout id 'test'!/);
+        });
+    });
+
+    // describe('ns.router.compare()', function() {
+    //     // does not throw exceptoin when cannot generate url
+    //     // ignore query
+
+    // })
 
 });

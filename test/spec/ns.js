@@ -19,7 +19,7 @@ describe('ns.js', function() {
 
                 it('should parse "' + testString + '" as ' + JSON.stringify(expectedResult), function() {
                     var actualResult = ns.parseQuery(testString);
-                    expect(actualResult).to.be.eql(expectedResult)
+                    expect(actualResult).to.be.eql(expectedResult);
                 });
 
             })(testString, expectedResult);

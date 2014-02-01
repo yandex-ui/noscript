@@ -27,7 +27,6 @@ describe('ns.router', function() {
                     '/message/{mid:int}': 'message',
                     '/page/prefix{page:int}': 'url-with-prefix',
                     '/search/{request:any}': 'search'
-
                 }
             };
 
@@ -242,7 +241,7 @@ describe('ns.router', function() {
 
         beforeEach(function() {
             ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
-            ns.router.regexps.dialog = 'copy|move'
+            ns.router.regexps.dialog = 'copy|move';
             ns.router.regexps.divider = '\\|';
 
             ns.router.routes = {

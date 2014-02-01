@@ -159,20 +159,16 @@ ns.router.generateUrl = function(id, params) {
     var routes = ns.router._routes.routeHash[id];
     params = params || {};
 
-    if (!routes || !routes.length) {
-        throw new Error("[ns.router] Could not find route with id '" + id + "'!");
-    }
+    ns.assert(routes && routes.length, 'ns.router', "Could not find route with id '%s'!", id);
 
     for (var i = 0; i < routes.length; i++) {
         url = ns.router._generateUrl(routes[i], params);
-        if (url) {
+        if (url !== null) {
             break;
         }
     }
 
-    if (url === null) {
-        throw new Error("[ns.router] Could not generate url for layout id '" + id + "'!");
-    }
+    ns.assert(url !== null, 'ns.router', "Could not generate url for layout id '%s'!", id);
 
     return ns.router.url(url);
 };
@@ -384,8 +380,8 @@ ns.router._generateParamRegexp = function(p) {
     }
 
     // validate parameter type is known (if specified)
-    if (p.type && !(p.type in regexps)) {
-        throw new Error("[ns.router] Could not find regexp for '" + p.type + "'!");
+    if (p.type) {
+        ns.assert((p.type in regexps), 'ns.router', "Could not find regexp for '%s'!", p.type);
     }
 
     re = regexps[p.type];

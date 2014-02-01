@@ -78,6 +78,10 @@ describe('router: new route parsing method', function() {
                 expect(ns.router._parseSection(test)).to.be.eql(_tests[test]);
             });
         }
+
+        it('should throw error if there is not closing braket', function() {
+            expect(function() { ns.router._parseSection('some{thing'); }).to.throwError(/\[ns\.router\] could not parse parameter in url section: some{thing/);
+        });
     });
 
     describe('generate section regexp', function() {

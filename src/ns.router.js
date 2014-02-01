@@ -291,9 +291,8 @@ ns.router._parseSection = function(rawSection) {
         }
 
         closeBraketIndex = rawSection.indexOf('}', openBraketIndex);
-        if (closeBraketIndex < 0) {
-            throw '[ns.router] could not parse parameter in url section: ' + rawSection;
-        }
+
+        ns.assert(closeBraketIndex > 0, 'ns.router', 'could not parse parameter in url section: %s', rawSection);
 
         // Добавляем всё, что до { как константу.
         if (openBraketIndex > curIndex) {

@@ -1,3 +1,5 @@
+/*jshint unused: vars */
+
 /**
  * noscript MVC framework
  * @namespace

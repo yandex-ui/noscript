@@ -596,6 +596,16 @@ ns.View.prototype._hide = function(events) {
             events.push(this);
         }
         return true;
+
+    // Случай для асинхронных видов, которые отрендерили в состоянии async,
+    // но `_show` для них не выполнялся. Это происходит, например, при
+    // быстрой навигации по интерфейсу.
+    } else if (this.isLoading() && this._visible !== false) {
+        this._hideNode();
+        this._visible = false;
+
+        // Чтобы не триггерились события (см ns.box).
+        return false;
     }
 
     return false;

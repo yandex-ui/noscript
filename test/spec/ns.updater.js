@@ -698,7 +698,69 @@ describe('no.Updater', function() {
                 finish();
             });
         });
+    });
 
+    describe('interrupting updates of async views inside a box', function() {
+        beforeEach(function(finish) {
+
+            ns.layout.define('app', {
+                'app': {
+                    'box@': 'todos&'
+                }
+            });
+
+            /// Model
+            ns.Model.define('todos', { params: { category: null } });
+
+            /// Views
+            ns.View.define('app');
+            ns.View.define('todos', { models: [ 'todos' ] });
+
+            ns.router.routes = {
+                route: {
+                    '/{category:int}': 'app'
+                }
+            };
+            ns.router.init();
+
+            var server = this.server = sinon.fakeServer.create();
+            server.autoRespond = true;
+            server.autoRespondAfter = 400;
+            server.respondWith('{ "models": [ { "data": {} } ] }');
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            ns.page.go('/1');
+            ns.page.go('/2');
+            ns.page.go('/3')
+                .done(function(result) {
+                    console.log(ns.MAIN_VIEW.node.cloneNode(true));
+                    no.Promise.wait(result.async)
+                        .done(function() {
+                            ns.page.go().done(function() {
+                                console.log(ns.MAIN_VIEW.node);
+                                finish();
+                            }.bind(this));
+                        }.bind(this));
+                }.bind(this));
+        });
+
+        // Restore XHR.
+        afterEach(function() {
+            this.server.restore();
+        });
+
+        it.only('should hide async views', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async')).to.have.length(0);
+        });
+
+        it('should show only one view', function() {
+            expect(this.APP.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
+        });
+
+        it('should hide other fetching views', function() {
+            expect(this.APP.node.querySelectorAll('.ns-view-todosFetch.ns-view-hidden')).to.have.length(3);
+        });
     });
 
 });

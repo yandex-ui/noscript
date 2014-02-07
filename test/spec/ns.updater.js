@@ -731,14 +731,11 @@ describe('no.Updater', function() {
             ns.MAIN_VIEW = ns.View.create('app');
 
             ns.page.go('/1');
-            ns.page.go('/2');
-            ns.page.go('/3')
+            ns.page.go('/2')
                 .done(function(result) {
-                    console.log(ns.MAIN_VIEW.node.cloneNode(true));
                     no.Promise.wait(result.async)
                         .done(function() {
                             ns.page.go().done(function() {
-                                console.log(ns.MAIN_VIEW.node);
                                 finish();
                             }.bind(this));
                         }.bind(this));
@@ -750,16 +747,16 @@ describe('no.Updater', function() {
             this.server.restore();
         });
 
-        it.only('should hide async views', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async')).to.have.length(0);
+        it('should hide async views', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async:not(.ns-view-hidden)')).to.have.length(0);
         });
 
         it('should show only one view', function() {
-            expect(this.APP.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
         });
 
         it('should hide other fetching views', function() {
-            expect(this.APP.node.querySelectorAll('.ns-view-todosFetch.ns-view-hidden')).to.have.length(3);
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-hidden')).to.have.length(1);
         });
     });
 

@@ -173,6 +173,14 @@ ns.View.prototype._hide = function(events) {
             events.push(this);
         }
         return true;
+
+    } else if (this.isLoading() && this._visible !== false) {
+        // Случай для асинхронных view, которые отрендерили в состоянии async, но _show для них не выполнялся.
+        this._hideNode();
+        this._visible = false;
+
+        // Чтобы не триггерились события (см ns.box).
+        return false;
     }
 
     return false;

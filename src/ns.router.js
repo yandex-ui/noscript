@@ -29,7 +29,7 @@ ns.router = function(url) {
     var urlWithoutQuery = urlChunks.shift();
 
     var pathRedirect;
-    routesDef.redirect.forEach(function(redirect, i) {
+    routesDef.redirect.forEach(function(redirect) {
         if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
             pathRedirect = redirect.path;
         }

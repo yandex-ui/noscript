@@ -139,15 +139,15 @@ ns.router.init = function() {
     _routes.routeHash = compiledRoutesHash;
 
     var rawRedirects = routes.redirect || {};
-    var rawRedirectsNew = [];
+    var compiledRedirects = [];
     for (var redirect in rawRedirects) {
         var compiled = ns.router.compile(redirect);
-        rawRedirectsNew.push({
+        compiledRedirects.push({
             regexp: compiled.regexp,
             path: rawRedirects[redirect]
         });
     }
-    _routes.redirect = rawRedirectsNew;
+    _routes.redirect = compiledRedirects;
 
     ns.router._routes = _routes;
 

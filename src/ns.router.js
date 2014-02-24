@@ -28,14 +28,21 @@ ns.router = function(url) {
     // /path/?foo=bar -> /path/
     var urlWithoutQuery = urlChunks.shift();
 
+    var pathRedirect;
+    routesDef.redirect.forEach(function(redirect) {
+        if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
+            pathRedirect = redirect.path;
+        }
+    });
+
     // we should check redirect without query
-    if (urlWithoutQuery in routesDef.redirect) {
+    if (pathRedirect) {
         return {
             page: ns.R.REDIRECT,
             params: {},
             // add baseDir for redirect url
             // so I define redirect "/" -> "/main", but real url is "/basepath/" -> "/basepath/main"
-            redirect: baseDir + routesDef.redirect[urlWithoutQuery]
+            redirect: baseDir + pathRedirect
         };
     }
 
@@ -130,6 +137,17 @@ ns.router.init = function() {
     }
     _routes.route = compiledRoutes;
     _routes.routeHash = compiledRoutesHash;
+
+    var rawRedirects = routes.redirect || {};
+    var compiledRedirects = [];
+    for (var redirect in rawRedirects) {
+        var compiled = ns.router.compile(redirect);
+        compiledRedirects.push({
+            regexp: compiled.regexp,
+            path: rawRedirects[redirect]
+        });
+    }
+    _routes.redirect = compiledRedirects;
 
     ns.router._routes = _routes;
 

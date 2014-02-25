@@ -21,7 +21,13 @@ describe('ns.router', function() {
             ns.router.routes = {
                 redirect: {
                     '/': '/inbox',
-                    '/inbox/old/{int:int}': '/inbox'
+                    '/inbox/old/{int:int}': '/inbox',
+                    '/inbox/my': function() {
+                        return '/inbox';
+                    },
+                    '/inbox/my/{int:int}': function() {
+                        return '/inbox';
+                    }
                 },
                 route: {
                     '/inbox': 'messages',
@@ -51,6 +57,8 @@ describe('ns.router', function() {
         test_route('', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/inbox/old/123', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
+        test_route('/inbox/my', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
+        test_route('/inbox/my/123', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/?foo=bar', {page: ns.R.REDIRECT, params: {}, redirect: '/inbox'});
         test_route('/inbox', {page: 'messages', params: {}});
         test_route('/inbox/', {page: 'messages', params: {}});

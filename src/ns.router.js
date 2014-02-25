@@ -31,7 +31,11 @@ ns.router = function(url) {
     var pathRedirect;
     routesDef.redirect.forEach(function(redirect) {
         if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
-            pathRedirect = typeof redirect.path === 'function' ? redirect.path() : redirect.path;
+            if (typeof redirect.path === 'function') {
+                pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
+            } else {
+                pathRedirect = redirect.path;
+            }
         }
     });
 
@@ -58,35 +62,10 @@ ns.router = function(url) {
 
         var r = route.regexp.exec(url);
         if (r) {
-            var rparams = route.params;
-            var params = {};
-
-            // Вытаскиваем параметры из основной части урла.
-            var l = rparams.length;
-            var rparam;
-            for (var k = 0; k < l; k++) {
-                rparam = rparams[k];
-
-                var paramValueFromURL = r[k + 1];
-                if (paramValueFromURL) {
-                    // try to decode
-                    try {
-                        paramValueFromURL = decodeURIComponent(paramValueFromURL);
-                    } catch(e) {
-                        // fallback to default value
-                        paramValueFromURL = '';
-                    }
-                }
-
-                if (!paramValueFromURL) {
-                    paramValueFromURL = rparam.default_value;
-                }
-
-                params[rparam.name] = paramValueFromURL;
-            }
+            var params = ns.router._getParamsRouteFromUrl(url, route);
 
             // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
-            var query = r[l + 1];
+            var query = r[route.params.length + 1];
             if (query) {
                 no.extend( params, ns.parseQuery(query) );
             }
@@ -109,6 +88,48 @@ ns.router = function(url) {
         params: {}
     };
 
+};
+
+/**
+ * Get params for router from url
+ * @param {string} url - current url
+ * @param {Object} route - compiled route or redirect
+ * @returns {{}}
+ * @private
+ */
+ns.router._getParamsRouteFromUrl = function(url, route) {
+    var r = route.regexp.exec(url);
+    if (!r) {
+        return {};
+    }
+
+    var rparams = route.params;
+
+    var params = {};
+    // Вытаскиваем параметры из основной части урла.
+    var l = rparams.length;
+    var rparam;
+    for (var k = 0; k < l; k++) {
+        rparam = rparams[k];
+
+        var paramValueFromURL = r[k + 1];
+        if (paramValueFromURL) {
+            // try to decode
+            try {
+                paramValueFromURL = decodeURIComponent(paramValueFromURL);
+            } catch(e) {
+                // fallback to default value
+                paramValueFromURL = '';
+            }
+        }
+
+        if (!paramValueFromURL) {
+            paramValueFromURL = rparam.default_value;
+        }
+
+        params[rparam.name] = paramValueFromURL;
+    }
+    return params;
 };
 
 /**
@@ -144,7 +165,8 @@ ns.router.init = function() {
         var compiled = ns.router.compile(redirect);
         compiledRedirects.push({
             regexp: compiled.regexp,
-            path: rawRedirects[redirect]
+            path: rawRedirects[redirect],
+            params: compiled.params
         });
     }
     _routes.redirect = compiledRedirects;

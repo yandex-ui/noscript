@@ -2,4 +2,5 @@
 dist
 node_modules
 *.yate.obj
+*.yate.ast
 test/tests.yate.js

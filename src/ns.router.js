@@ -31,7 +31,7 @@ ns.router = function(url) {
     var pathRedirect;
     routesDef.redirect.forEach(function(redirect) {
         if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
-            pathRedirect = redirect.path;
+            pathRedirect = typeof redirect.path === 'function' ? redirect.path() : redirect.path;
         }
     });
 

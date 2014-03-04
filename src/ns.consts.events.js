@@ -22,6 +22,7 @@ ns.V.EVENTS = {
 ns.V.DOM_EVENTS = [
     'blur',
     'change',
+    'input',
     'click',
     'dblclick',
     'dragstart',

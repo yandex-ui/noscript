@@ -8,6 +8,12 @@ JS MVC framework
 
 #### Changelog
 
+##### 0.1.12 (12.13.2014)
+- New ns.page.go API [#187](https://github.com/yandex-ui/noscript/pull/187)
+- Error handling in ns.View [#186](https://github.com/yandex-ui/noscript/pull/186)
+- Fix for async view [#196](https://github.com/yandex-ui/noscript/pull/186)
+- ns.router.redirect can be function now [#201](https://github.com/yandex-ui/noscript/pull/201)
+
 ##### 0.1.11 (12.11.2013)
 - Fix bug with bind/unbind global events
 

@@ -18,34 +18,41 @@ describe('router: new route parsing method', function() {
     describe('parse parameter', function() {
         var _tests = {
             'param': { name: 'param', type: 'id', default_value: undefined, is_optional: false },
-            'param=': { name: 'param', type: undefined, default_value: undefined, is_optional: true },
+            'param=': { name: 'param', type: 'id', default_value: '', is_optional: true },
             'param:int': { name: 'param', type: 'int', default_value: undefined, is_optional: false },
-            'param=:int': { name: 'param', type: 'int', default_value: undefined, is_optional: true },
-            'param=value': { name: 'param', type: undefined, default_value: 'value', is_optional: true },
+            'param=:int': { name: 'param', type: 'int', default_value: '', is_optional: true },
+            'param=value': { name: 'param', type: 'id', default_value: 'value', is_optional: true },
             'param=value:int': { name: 'param', type: 'int', default_value: 'value', is_optional: true }
         };
 
         for (var test in _tests) {
-            it(test, function() {
-                expect(ns.router._parseParam(test)).to.be.eql(_tests[test]);
-            });
+            (function(test) {
+                it(test, function() {
+                    expect(ns.router._parseParam(test)).to.be.eql(_tests[test]);
+                });
+            })(test);
         }
     });
 
     describe('generate parameter regexp', function() {
+        // 'id': '[A-Za-z_][A-Za-z0-9_-]*',
+        // 'int': '[0-9]+'
+
         var _tests = {
-            'param': '(.+)',
-            'param=': '(?:(.+))?',
+            'param': '([A-Za-z_][A-Za-z0-9_-]*)',
+            'param=': '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
             'param:int': '([0-9]+)',
             'param=:int': '(?:([0-9]+))?',
-            'param=value': '([0-9]+)',
+            'param=value': '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
             'param=value:int': '(?:([0-9]+))?'
         };
 
         for (var test in _tests) {
-            it(test, function() {
-                expect( ns.router._generateParamRegexp( ns.router._parseParam(test) )).to.be(_tests[test] );
-            });
+            (function(test) {
+                it(test, function() {
+                    expect( ns.router._generateParamRegexp( ns.router._parseParam(test) )).to.be(_tests[test] );
+                });
+            })(test);
         }
 
         it('should throw error for unknown parameter type', function() {
@@ -74,9 +81,11 @@ describe('router: new route parsing method', function() {
         };
 
         for (var test in _tests) {
-            it(test, function() {
-                expect(ns.router._parseSection(test)).to.be.eql(_tests[test]);
-            });
+            (function(test) {
+                it(test, function() {
+                    expect(ns.router._parseSection(test)).to.be.eql(_tests[test]);
+                });
+            })(test);
         }
 
         it('should throw error if there is not closing braket', function() {
@@ -86,15 +95,17 @@ describe('router: new route parsing method', function() {
 
     describe('generate section regexp', function() {
         var _tests = {
-            '{param}': '/(.+)',
+            '{param}': '/([A-Za-z_][A-Za-z0-9_-]*)',
             '{param:int}': '/([0-9]+)',
             '{param=value:int}': '(?:/(?!/)(?:([0-9]+))?)?'
         };
 
         for (var test in _tests) {
-            it(test, function() {
-                expect( ns.router._generateSectionRegexp( ns.router._parseSection(test) )).to.be(_tests[test] );
-            });
+            (function(test) {
+                it(test, function() {
+                    expect( ns.router._generateSectionRegexp( ns.router._parseSection(test) )).to.be(_tests[test] );
+                });
+            })(test);
         }
     });
 

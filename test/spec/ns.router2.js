@@ -15,20 +15,39 @@ function compareRegExp(a, b) {
 
 describe('router: new route parsing method', function() {
 
+    beforeEach(function() {
+        ns.router.init();
+    });
+
+    afterEach(function() {
+        delete ns.router._routes;
+        delete ns.router.routes;
+    });
+
     describe('parse parameter', function() {
         var _tests = {
-            'param': { name: 'param', type: 'id', default_value: undefined, is_optional: false },
-            'param=': { name: 'param', type: 'id', default_value: '', is_optional: true },
-            'param:int': { name: 'param', type: 'int', default_value: undefined, is_optional: false },
-            'param=:int': { name: 'param', type: 'int', default_value: '', is_optional: true },
-            'param=value': { name: 'param', type: 'id', default_value: 'value', is_optional: true },
-            'param=value:int': { name: 'param', type: 'int', default_value: 'value', is_optional: true }
+            'param':            { name: 'param', type: 'id', default_value: undefined, is_optional: false },
+            'param=':           { name: 'param', type: 'id', default_value: '', is_optional: true },
+            'param:int':        { name: 'param', type: 'int', default_value: undefined, is_optional: false },
+            'param=:int':       { name: 'param', type: 'int', default_value: '', is_optional: true },
+            'param=value':      { name: 'param', type: 'id', default_value: 'value', is_optional: true },
+            'param=value:int':  { name: 'param', type: 'int', default_value: 'value', is_optional: true },
+            'param==':          { throw: /^\[ns\.router\] Parameter 'param' value must be specified$/ },
+            'param==:int':      { throw: /^\[ns\.router\] Parameter 'param' value must be specified$/ },
+            'param==value':     { name: 'param', type: 'id', default_value: 'value', is_optional: false },
+            'param==value:int': { throw: /^\[ns\.router\] Wrong value for 'param' parameter$/ },
+            'param==123:int':   { name: 'param', type: 'int', default_value: '123', is_optional: false }
         };
 
         for (var test in _tests) {
             (function(test) {
                 it(test, function() {
-                    expect(ns.router._parseParam(test)).to.be.eql(_tests[test]);
+                    var result = _tests[test];
+                    if (result.throw) {
+                        expect(function() { ns.router._parseParam(test); }).to.throwError(result.throw);
+                    } else {
+                        expect(ns.router._parseParam(test)).to.be.eql(result);
+                    }
                 });
             })(test);
         }
@@ -39,37 +58,45 @@ describe('router: new route parsing method', function() {
         // 'int': '[0-9]+'
 
         var _tests = {
-            'param': '([A-Za-z_][A-Za-z0-9_-]*)',
-            'param=': '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
-            'param:int': '([0-9]+)',
-            'param=:int': '(?:([0-9]+))?',
-            'param=value': '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
-            'param=value:int': '(?:([0-9]+))?'
+            'param':                 '([A-Za-z_][A-Za-z0-9_-]*)',
+            'param=':                '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
+            'param:int':             '([0-9]+)',
+            'param=:int':            '(?:([0-9]+))?',
+            'param=value':           '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
+            'param=value:int':       '(?:([0-9]+))?',
+            'param:new-type':        { throw: /^\[ns\.router\] Could not find regexp for type 'new\-type'!$/ },
+            'param==value':          '(value)',
+            'param==123:int':        '(123)',
+            'param==value:int':      { throw: /^\[ns\.router\] Wrong value for 'param' parameter$/ },
+            'param==value:new-type': { throw: /^\[ns\.router\] Could not find regexp for type 'new\-type'!$/ },
         };
 
         for (var test in _tests) {
             (function(test) {
                 it(test, function() {
-                    expect( ns.router._generateParamRegexp( ns.router._parseParam(test) )).to.be(_tests[test] );
+                    var result = _tests[test];
+                    if (result.throw) {
+                        expect(function() { ns.router._generateParamRegexp(ns.router._parseParam(test)); }).to.throwError(result.throw);
+                    } else {
+                        expect(ns.router._generateParamRegexp(ns.router._parseParam(test))).to.be.eql(result);
+                    }
                 });
             })(test);
         }
-
-        it('should throw error for unknown parameter type', function() {
-            expect(function() { ns.router._generateParamRegexp(ns.router._parseParam('param:new-type')); }).to.throwError(/\[ns\.router\] Could not find regexp for 'new\-type'!/);
-        });
     });
 
     describe('parse section', function() {
         var _tests = {
-            'static': { is_optional: false, items: [ { default_value: 'static' } ]  },
-            '{param}': { is_optional: false, items: [ { name: 'param', type: 'id', default_value: undefined, is_optional: false } ] },
-            '{param=}': { is_optional: true, items: [ { name: 'param', type: 'id', default_value: '', is_optional: true } ] },
-            '{param:int}': { is_optional: false, items: [ { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
-            '{param=:int}': { is_optional: true, items: [ { name: 'param', type: 'int', default_value: '', is_optional: true } ] },
-            '{param=value}': { is_optional: true, items: [ { name: 'param', type: 'id', default_value: 'value', is_optional: true } ] },
-            '{param=value:int}': { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true } ] },
-            'prefix-{param:int}': { is_optional: false, items: [ { default_value: 'prefix-' }, { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
+            'static':                     { is_optional: false, items: [ { default_value: 'static' } ]  },
+            '{param}':                    { is_optional: false, items: [ { name: 'param', type: 'id', default_value: undefined, is_optional: false } ] },
+            '{param=}':                   { is_optional: true, items: [ { name: 'param', type: 'id', default_value: '', is_optional: true } ] },
+            '{param:int}':                { is_optional: false, items: [ { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
+            '{param=:int}':               { is_optional: true, items: [ { name: 'param', type: 'int', default_value: '', is_optional: true } ] },
+            '{param=value}':              { is_optional: true, items: [ { name: 'param', type: 'id', default_value: 'value', is_optional: true } ] },
+            '{param=value:int}':          { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true } ] },
+            '{param==value:int}':         { throw: /^\[ns\.router\] Wrong value for 'param' parameter$/ },
+            '{param==123:int}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: '123', is_optional: false } ] },
+            'prefix-{param:int}':         { is_optional: false, items: [ { default_value: 'prefix-' }, { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
             'prefix-{part1:int}{part2=}': {
                 is_optional: false,
                 items: [
@@ -78,26 +105,30 @@ describe('router: new route parsing method', function() {
                     { name: 'part2', type: 'id', default_value: '', is_optional: true },
                 ]
             },
+            'some{thing': { throw: /^\[ns\.router\] could not parse parameter in url section: some{thing$/ }
         };
 
         for (var test in _tests) {
             (function(test) {
                 it(test, function() {
-                    expect(ns.router._parseSection(test)).to.be.eql(_tests[test]);
+                    var result = _tests[test];
+                    if (result.throw) {
+                        expect(function() { ns.router._parseSection(test); }).to.throwError(result);
+                    } else {
+                        expect(ns.router._parseSection(test)).to.be.eql(result);
+                    }
                 });
             })(test);
         }
-
-        it('should throw error if there is not closing braket', function() {
-            expect(function() { ns.router._parseSection('some{thing'); }).to.throwError(/\[ns\.router\] could not parse parameter in url section: some{thing/);
-        });
     });
 
     describe('generate section regexp', function() {
         var _tests = {
-            '{param}': '/([A-Za-z_][A-Za-z0-9_-]*)',
-            '{param:int}': '/([0-9]+)',
-            '{param=value:int}': '(?:/(?!/)(?:([0-9]+))?)?'
+            '{param}':            '/([A-Za-z_][A-Za-z0-9_-]*)',
+            '{param:int}':        '/([0-9]+)',
+            '{param=value:int}':  '(?:/(?!/)(?:([0-9]+))?)?',
+            '{param==value}':     '/(value)',
+            '{param==123:int}':   '/(123)'
         };
 
         for (var test in _tests) {
@@ -137,6 +168,9 @@ describe('router: new route parsing method', function() {
         beforeEach(function() {
             ns.router.routes = {
                 route: {
+                    '/{context==search}/{query}/image/{id:int}': 'view',
+                    '/{context==tag}/{tag}/image/{id:int}': 'view',
+                    '/{context==top}/image/{id:int}': 'view',
                     '/test/{id}': 'test'
                 }
             };
@@ -144,17 +178,53 @@ describe('router: new route parsing method', function() {
         });
 
         afterEach(function() {
-            ns.router.baseDir = '';
             ns.router.undefine();
         });
 
-        it('should throw error for unknown route', function() {
-            expect(function() { ns.router.generateUrl('test-no-such-route', {});  }).to.throwError(/\[ns\.router\] Could not find route with id 'test-no-such-route'!/);
-        });
+        var _tests = [
+            {
+                name: 'should throw error for unknown route',
+                id: 'test-no-such-route',
+                params: {},
+                result: { throw: /^\[ns\.router\] Could not find route with id 'test-no-such-route'!$/ }
+            },
+            {
+                name: 'should throw error when not enough params',
+                id: 'test',
+                params: {},
+                result: { throw: /^\[ns\.router\] Could not generate url for layout id 'test'!$/ }
+            },
+            {
+                name: 'generate route for parameter with filter 1',
+                id: 'view',
+                params: { context: 'top', id: 1 },
+                result: '/top/image/1'
+            },
+            {
+                name: 'generate route for parameter with filter 2',
+                id: 'view',
+                params: { context: 'search', query: 'airport', id: 2 },
+                result: '/search/airport/image/2'
+            },
+            {
+                name: 'generate route for parameter with filter 3',
+                id: 'view',
+                params: { context: 'tag', tag: 'summer', id: 3 },
+                result: '/tag/summer/image/3'
+            }
+        ];
 
-        it('should throw error when not enough params', function() {
-            expect(function() { ns.router.generateUrl('test', {});  }).to.throwError(/\[ns\.router\] Could not generate url for layout id 'test'!/);
-        });
+        for (var i = 0; i < _tests.length; i++) {
+            (function(test) {
+                it(test.name, function() {
+                    if (test.result.throw) {
+                        expect(function() { ns.router.generateUrl(test.id, test.params); }).to.throwError(test.result.throw);
+                    } else {
+                        expect(ns.router.generateUrl(test.id, test.params)).to.be.eql(test.result);
+                    }
+                });
+            })(_tests[i]);
+        }
     });
 
     // describe('ns.router.compare()', function() {

@@ -171,6 +171,7 @@ describe('router: new route parsing method', function() {
                     '/{context==search}/{query}/image/{id:int}': 'view',
                     '/{context==tag}/{tag}/image/{id:int}': 'view',
                     '/{context==top}/image/{id:int}': 'view',
+                    '/{context}/image/{id:int}': 'view',
                     '/test/{id}': 'test'
                 }
             };
@@ -211,6 +212,12 @@ describe('router: new route parsing method', function() {
                 id: 'view',
                 params: { context: 'tag', tag: 'summer', id: 3 },
                 result: '/tag/summer/image/3'
+            },
+            {
+                name: 'generate route for parameter with filter 4',
+                id: 'view',
+                params: { context: 'new-context', id: 4 },
+                result: '/new-context/image/4'
             }
         ];
 

@@ -53,6 +53,24 @@ describe('router: new route parsing method', function() {
         }
     });
 
+    describe('parameter validation', function() {
+        var _tests = [
+            { value: 123, type: 'int', result: true },
+            { value: '123', type: 'int', result: true },
+            { value: 'a123', type: 'int', result: false },
+            { value: '123a', type: 'int', result: false }
+        ];
+
+        for (var i = 0; i < _tests.length; i++) {
+            (function(test) {
+                var name = '' + test.value + ' (' + typeof (test.value) + ') ' + (test.result ? 'is' : 'is not') + ' ' + test.type;
+                it(name, function() {
+                    expect(ns.router._isParamValid(test.value, test.type)).to.be(test.result);
+                });
+            })(_tests[i]);
+        }
+    });
+
     describe('generate parameter regexp', function() {
         // 'id': '[A-Za-z_][A-Za-z0-9_-]*',
         // 'int': '[0-9]+'

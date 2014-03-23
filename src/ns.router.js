@@ -113,7 +113,7 @@ ns.router.init = function() {
     // Типы параметров (нужны при валидации и при генерации урлов).
     ns.router._regexps = {};
     for (var id in ns.router.regexps) {
-        ns.router._regexps[id] = new RegExp( ns.router.regexps[id] );
+        ns.router._regexps[id] = new RegExp('^' + ns.router.regexps[id] + '$');
     }
 
     var _routes = {};

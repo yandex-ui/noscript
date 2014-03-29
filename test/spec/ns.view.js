@@ -402,6 +402,31 @@ describe('ns.View', function() {
             });
         });
 
+        describe('typeof view.info.params == "function"', function() {
+            beforeEach(function() {
+                ns.View.define('slider', {
+                    params: function(params) {
+                        if (params.mode === 'custom') {
+                            return { id: params['id'] };
+                        }
+                        return {};
+                    }
+                });
+            });
+
+            it('view=slider&id=1', function() {
+                expect(ns.View.getKey('slider', { mode: 'custom', id: 1 })).to.be.eql('view=slider&id=1');
+            });
+
+            it('view=slider&id=', function() {
+                expect(ns.View.getKey('slider', { mode: 'custom', id: '' })).to.be.eql('view=slider&id=');
+            });
+
+            it('view=slider', function() {
+                expect(ns.View.getKey('slider', { mode: 'new' })).to.be.eql('view=slider');
+            });
+        });
+
         describe('ns.View: params+ / params-', function() {
             beforeEach(function() {
                 ns.View.define('slider', {

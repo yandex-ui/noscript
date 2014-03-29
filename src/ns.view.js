@@ -1116,7 +1116,7 @@ ns.View._initInfoParams = function(info) {
             pGroups.push({
                 pNames: Object.keys(group),
                 pFilters: group,
-                pOptional: {}
+                pDefaults: {}
             });
         }
 
@@ -1155,7 +1155,7 @@ ns.View._initInfoParams = function(info) {
                 {
                     pNames: pNames,
                     pFilters: {},
-                    pOptional: params
+                    pDefaults: params
                 }
             ];
         } else {
@@ -1375,14 +1375,16 @@ ns.View._getKeyParams = function(id, params, info) {
         var group = pGroups[g];
         var pNames = group.pNames || [];
         var pFilters = group.pFilters || {};
-        var pOptional = group.pOptional || {};
+        var pDefaults = group.pDefaults || {};
         var result = {};
 
         for (var i = 0, l = pNames.length; i < l; i++) {
             var pName = pNames[i];
-            var pValue = params[ pName ] || pOptional[ pName ];
+            var pValue = params[pName];
             var pFilter = pFilters[pName];
-            var isOptional = pName in pOptional;
+            var isOptional = pName in pDefaults;
+
+            pValue = (pValue === undefined) ? pDefaults[pName] : pValue;
 
             if (pValue == null && isOptional) {
                 continue;

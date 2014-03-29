@@ -507,7 +507,7 @@ ns.Model._getKeyParams = function(id, params, info) {
     params = params || {};
 
     if (typeof info.params === 'function') {
-        return info.params(id, params);
+        return info.params(params);
     }
 
     var defaults = info.params;

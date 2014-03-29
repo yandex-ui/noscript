@@ -13,7 +13,7 @@ describe('ns.Model', function() {
         });
 
         ns.Model.define('m2', {
-            params: function(id, params) {
+            params: function(params) {
                 if (params.mode === 'custom') {
                     return { id: params.id, more: 'added' };
                 }

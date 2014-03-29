@@ -479,6 +479,20 @@ describe('ns.View', function() {
             });
         });
 
+        describe('Когда ключ view строится по части параметров - this.params у view должны хранить исходный набор (а не тот, что используется в ключе)', function() {
+
+            beforeEach(function() {
+                ns.View.define('photo', { params: { login: null, id: null } });
+            });
+
+            it('preserve full params object', function() {
+                var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
+                var view = ns.View.create('photo', params);
+                expect(view.params).to.eql(params);
+            });
+
+        });
+
     });
 
     describe('updateHTML', function() {

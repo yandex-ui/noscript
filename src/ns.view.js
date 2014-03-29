@@ -1349,17 +1349,18 @@ ns.View.getKeyAndParams = function(id, params, info) {
         params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
     }
 
+    var keyParams;
     if ('function' === typeof info.params) {
-        params = info.params(params);
+        keyParams = info.params(params);
     } else {
-        params = ns.View._getKeyParams(id, params, info);
+        keyParams = ns.View._getKeyParams(id, params, info);
     }
 
-    ns.assert(params, 'ns.View', 'Could not generate key for view %s', id);
+    ns.assert(keyParams, 'ns.View', 'Could not generate key for view %s', id);
 
     return {
-        params: params,                   // параметры с учётом rewrite
-        key: ns.key('view=' + id, params) // ключ с учётом правильных параметров
+        params: params,                      // параметры с учётом rewrite (полный набор параметров, а не только то, что нужно в ключе)
+        key: ns.key('view=' + id, keyParams) // ключ с учётом правильных параметров для ключа
     };
 };
 

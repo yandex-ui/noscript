@@ -173,6 +173,21 @@ ns.assert.fail = function(contextName, message) {
     throw new Error('[' + contextName + '] ' + message);
 };
 
+/**
+ * Строит ключ по готовому объекту параметров.
+ * @param {string} prefix Префикс ключа.
+ * @param {Object} params Объект с параметрами составляющими ключ.
+ * @return {string} Строка ключа.
+ */
+ns.key = function(prefix, params) {
+    var key = prefix;
+    params = params || {};
+    for (var pName in params) {
+        key += '&' + pName + '=' + params[pName];
+    }
+    return key;
+};
+
 if (window['mocha']) {
 
     /**

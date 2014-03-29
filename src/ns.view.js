@@ -1349,16 +1349,34 @@ ns.View.getKeyAndParams = function(id, params, info) {
         params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
     }
 
-    var key;
+    if ('function' === typeof info.params) {
+        params = info.params(params);
+    } else {
+        params = ns.View._getKeyParams(id, params, info);
+    }
+
+    ns.assert(params, 'ns.View', 'Could not generate key for view %s', id);
+
+    return {
+        params: params,                   // параметры с учётом rewrite
+        key: ns.key('view=' + id, params) // ключ с учётом правильных параметров
+    };
+};
+
+ns.View._getKeyParams = function(id, params, info) {
     var pGroups = info.pGroups || [];
+
+    // Группы параметров могут быть не заданы (это ок).
+    if (!pGroups.length) {
+        return {};
+    }
+
     for (var g = 0; g < pGroups.length; g++) {
-
-        key = 'view=' + id;
-
         var group = pGroups[g];
         var pNames = group.pNames || [];
         var pFilters = group.pFilters || {};
         var pOptional = group.pOptional || {};
+        var result = {};
 
         for (var i = 0, l = pNames.length; i < l; i++) {
             var pName = pNames[i];
@@ -1370,32 +1388,20 @@ ns.View.getKeyAndParams = function(id, params, info) {
                 continue;
             }
 
-            if ( pValue == null || (pFilter && pValue != pFilter) ) {
-                key = null;
+            if (pValue == null || (pFilter && pValue != pFilter)) {
+                result = null;
                 break;
             }
 
-            key += '&' + pName + '=' + pValue;
+            result[pName] = pValue;
         }
 
-        if (key) {
-            return {
-                params: params, // параметры с учётом rewrite
-                key: key        // ключ с учётом правильных параметров
-            };
+        if (result) {
+            return result;
         }
     }
 
-    //  Не по чему строить ключ.
-    if (!pGroups.length) {
-        return {
-            params: params,    // параметры с учётом rewrite
-            key: 'view=' + id  // ключ с учётом правильных параметров
-        };
-    }
-
-    //  Не удалось построить ключ view.
-    ns.assert.fail('ns.View', 'Could not generate key for view %s', id);
+    return null;
 };
 
 /**

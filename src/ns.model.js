@@ -489,22 +489,23 @@ ns.Model.infoLite = function(id) {
 ns.Model.key = function(id, params, info) {
     info = info || ns.Model.info(id);
 
+    ns.assert(info, 'ns.Model', 'Unknown model type "%s"', id);
+
     //  Для do-моделей ключ строим особым образом.
     if (info.isDo) {
         return 'do-' + id + '-' + _keySuffix++;
     }
 
-    var key = 'model=' + id;
+    var keyPrefix = 'model=' + id;
     var keyParams = ns.Model._getKeyParams(id, params, info);
-    for (var pName in keyParams) {
-        key += '&' + pName + '=' + keyParams[pName];
-    }
-    return key;
+    return ns.key(keyPrefix, keyParams);
 };
 
 ns.Model._getKeyParams = function(id, params, info) {
-    info = info || ns.Model.info(id);
     params = params || {};
+    info = info || ns.Model.info(id);
+
+    ns.assert(info, 'ns.Model', 'Unknown model type "%s"', id);
 
     if (typeof info.params === 'function') {
         return info.params(params);

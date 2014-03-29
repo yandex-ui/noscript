@@ -12,6 +12,14 @@ describe('ns.Model', function() {
             }
         });
 
+        ns.Model.define('m2', {
+            params: function(id, params) {
+                if (params.mode === 'custom') {
+                    return { id: params.id, more: 'added' };
+                }
+            }
+        });
+
         ns.Model.define('do-m1', {
             params: {
                 p1: null,
@@ -200,7 +208,13 @@ describe('ns.Model', function() {
 
         describe('info', function() {
 
+            it('should set ready after first call', function() {
+                expect( ns.Model.info('m1').ready )
+                    .to.eql(true);
+            });
+
             it('should return pNames property', function() {
+                var key = ns.Model.key('m1', { p1: 1, p3: 2 });
                 expect( ns.Model.info('m1').pNames )
                     .to.eql(['p1', 'p2', 'p3', 'p4']);
             });
@@ -280,6 +294,20 @@ describe('ns.Model', function() {
                 var k2 = ns.Model.key('do-m1');
 
                 expect(k1).not.to.be(k2);
+            });
+
+        });
+
+        describe('info.params as a function', function() {
+
+            it('function can return any object', function() {
+                expect( ns.Model.key('m2', { mode: 'custom', id: 1 }) )
+                    .to.be('model=m2&id=1&more=added');
+            });
+
+            it('function can return nothing', function() {
+                expect( ns.Model.key('m2', {}) )
+                    .to.be('model=m2');
             });
 
         });

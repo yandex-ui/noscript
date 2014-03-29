@@ -449,8 +449,7 @@ ns.Model.define = function(id, info, base) {
 ns.Model.info = function(id) {
     var info = ns.Model.infoLite(id);
 
-    // если есть декларация, но еще нет pNames, то надо завершить определение Model
-    if (info && !info.pNames) {
+    if (info && !info.ready) {
         /**
          * Параметры моделей.
          * @type {Object}
@@ -463,14 +462,14 @@ ns.Model.info = function(id) {
          */
         info.events = info.events || {};
 
-        info.pNames = Object.keys(info.params);
-
         /**
          * Флаг do-модели. Модель, которая изменяет данные.
          * Для do-моделей отдельные правила кэширования и построения ключей.
          * @type {Boolean}
          */
         info.isDo = /^do-/.test(id);
+
+        info.ready = true;
     }
     return info;
 };
@@ -507,8 +506,12 @@ ns.Model._getKeyParams = function(id, params, info) {
     info = info || ns.Model.info(id);
     params = params || {};
 
+    if (typeof info.params === 'function') {
+        return info.params(id, params);
+    }
+
     var defaults = info.params;
-    var pNames = info.pNames;
+    var pNames = info.pNames || (info.pNames = Object.keys(info.params));
     var result = {};
 
     for (var i = 0, l = pNames.length; i < l; i++) {

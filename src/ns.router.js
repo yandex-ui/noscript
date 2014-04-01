@@ -222,7 +222,7 @@ ns.router._generateUrl = function(def, params) {
             continue;
         }
 
-        result.push(svalue);
+        result.push(encodeURIComponent(svalue));
     }
 
     url = result.join('/');

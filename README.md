@@ -22,6 +22,7 @@ JS MVC framework
 - пофиксил валидацию значения параметра (раньше `a123` тоже подходило под тип `int`, что не есть верно)
 - поддержка функции на месте `info.params` для `ns.Model`
 - поддержка функции на месте `info.params` для `ns.View`
+- fix ns.router.generateUrl(): не urlencode-ились параметры при генерации урла
 
 ##### 0.1.11 (12.11.2013)
 - Fix bug with bind/unbind global events

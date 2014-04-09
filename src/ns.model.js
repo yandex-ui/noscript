@@ -38,7 +38,7 @@ ns.Model.prototype.STATUS = ns.M.STATUS;
 
 ns.Model.prototype._init = function(id, params, data) {
     this.id = id;
-    this.params = params;
+    this.params = params || {};
 
     this._reset();
 
@@ -125,7 +125,7 @@ ns.Model.prototype._prepareCallback = function(method) {
     }
 
     if (typeof method !== 'function') {
-        throw new Error("[ns.View] Can't find method '" + method + "' in '" + this.id + "'");
+        throw new Error("[ns.Model] Can't find method '" + method + "' in '" + this.id + "' to bind event");
     }
 
     return method;

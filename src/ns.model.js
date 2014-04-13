@@ -5,10 +5,9 @@
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * @class Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
+ * @classdesc Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
  * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.get().
  * @constructor
- * @namespace
  * @mixes no.Events
  */
 ns.Model = function() {};
@@ -200,6 +199,7 @@ ns.Model.define = function(id, info, base) {
  * Returns model's info
  * @param {String} id Model ID.
  * @returns {Object}
+ * @throws Throws exception if model is not defined.
  */
 ns.Model.info = function(id) {
     var info = ns.Model.infoLite(id);
@@ -234,6 +234,7 @@ ns.Model.info = function(id) {
  * Returns model's info without processing.
  * @param {String} id Model ID.
  * @returns {Object}
+ * @throws Throws exception if model is not defined.
  */
 ns.Model.infoLite = function(id) {
     var info = _infos[id];

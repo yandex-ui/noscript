@@ -257,6 +257,12 @@ ns.View.define = function(id, info, base) {
     return ctor;
 };
 
+/**
+ * Возвращает информацию о View.
+ * @param {String} id Название модели.
+ * @returns {Object}
+ * @throws Бросает исключения, если нет
+ */
 ns.View.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pGroups, то надо завершить определение View
@@ -465,9 +471,6 @@ ns.View._initInfoParams = function(info) {
         var params = {};
         for (var model_id in info.models) {
             var modelInfo = ns.Model.info(model_id);
-            if (!modelInfo) {
-                throw new Error('[ns.View] Model "' + model_id + '" is not defined!');
-            }
             no.extend( params, modelInfo.params );
         }
 

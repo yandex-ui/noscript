@@ -595,6 +595,79 @@ describe('ns.request.js', function() {
         });
     });
 
+    describe('custom request', function() {
+        beforeEach(function() {
+            ns.Model.define('simple-model');
+            ns.Model.define('custom-request-model', {
+                request: {
+                    method: 'GET',
+                    url: '/my/model'
+                }
+            });
+
+            this.xhr = sinon.useFakeXMLHttpRequest();
+            var requests = this.requests = [];
+
+            this.xhr.onCreate = function (xhr) {
+                requests.push(xhr);
+            };
+        });
+
+        afterEach(function() {
+            this.xhr.restore();
+        });
+
+        it('should load model with custom options', function() {
+            ns.Model.get('custom-request-model');
+            ns.request('custom-request-model');
+            expect(this.requests.length).to.be(1);
+            expect(this.requests[0].method).to.be('GET');
+            expect(this.requests[0].url).to.be('/my/model');
+        });
+
+        it('should load models from custom and common url simultaneously', function() {
+            ns.Model.get('simple-model');
+            ns.Model.get('custom-request-model');
+            ns.request(['simple-model', 'custom-request-model']);
+            expect(this.requests.length).to.be(2);
+            expect(this.requests[0].method).to.be('GET');
+            expect(this.requests[0].url).to.be('/my/model');
+
+            expect(this.requests[1].method).to.be('POST');
+            expect(this.requests[1].url).to.be('/models/?_m=simple-model');
+        });
+
+        describe('response handling', function() {
+            beforeEach(function() {
+                ns.Model.get('simple-model');
+                ns.Model.get('custom-request-model');
+                ns.request(['simple-model', 'custom-request-model']);
+            });
+
+            it('should update custom model', function() {
+                this.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        data: {content: 'i came from custom url'}
+                    })
+                );
+                expect(ns.Model.get('custom-request-model').getData()).to.eql({content: 'i came from custom url'});
+            });
+
+            it('should update simple model after batch response', function() {
+                this.requests[1].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [{data: {content: 'i am simple'}}]
+                    })
+                );
+                expect(ns.Model.get('simple-model').getData()).to.eql({content: 'i am simple'});
+            });
+        });
+    });
+
     //TODO: STATUS.INVALID
     //TODO: xhr response parsing
 

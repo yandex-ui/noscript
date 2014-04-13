@@ -277,21 +277,42 @@ Request.prototype.start = function() {
 };
 
 Request.prototype.request = function(loading, requesting) {
-    var all = [];
-    // promise от http-запроса
-    var httpRequest;
+    var that = this;
+    var modelPromises = [];
 
     if (requesting.length) {
-        //  Запрашиваем модели, которые нужно запросить.
-        var params = models2params(requesting);
-        var modelsNames = requesting.map(models2name);
-        ns.request.addRequestParams(params);
-        // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
-        // мог зарезолвится без завершения http-запроса
-        httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params, {type: 'POST'});
+        //  Запрашиваем модели с определенным request
+        requesting = requesting.filter(function(model) {
+            if (model.info.request) {
+                modelPromises.push(that.requestModel(model));
+            }
+            return !model.info.request;
+        });
+        //  Запрашиваем остальные модели, которые нужно запросить.
+        if (requesting.length) {
+            var params = models2params(requesting);
+            var modelsNames = requesting.map(models2name);
+            ns.request.addRequestParams(params);
+            //TODO: что будет если fail?
+            ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params, {type: 'POST'}).then(function(r) {
+                /*
+                 if (ns.request.canProcessResponse(r) === false) {
+                 //TODO: clear keys, promise.reject()
 
-        all = all.concat( requesting.map(model2Promise) );
-
+                 } else {
+                 */
+                if (ns.request.canProcessResponse(r) !== false) {
+                    //  В r должен быть массив из одного или двух элементов.
+                    if (requesting.length) {
+                        that.extract(requesting, r);
+                    }/* else {
+                     //TODO: clear keys, promise.reject()
+                     }
+                     */
+                }
+            });
+            modelPromises = modelPromises.concat( requesting.map(model2Promise) );
+        }
     }/* else {
         //TODO: надо перепроверить поведение, если нет запросов
         // создаем фейковый зарезолвленный promise
@@ -301,39 +322,16 @@ Request.prototype.request = function(loading, requesting) {
 
     if (loading.length) {
         //  Ждем все остальные модели, которые должны загрузиться (уже были запрошены).
-        all = all.concat( loading.map(model2Promise) );
+        modelPromises = modelPromises.concat( loading.map(model2Promise) );
     }
 
     //  Мы ждём какие-то данные:
     //    * либо мы запросили какие-то новые модели;
     //    * либо мы ждем ранее запрошенные модели.
-    if (all.length) {
-        var that = this;
-
-        if (httpRequest) {
-            //TODO: что будет если fail?
-            httpRequest.then(function(r) {
-                /*
-                if (ns.request.canProcessResponse(r) === false) {
-                    //TODO: clear keys, promise.reject()
-
-                } else {
-                */
-                if (ns.request.canProcessResponse(r) !== false) {
-                    //  В r должен быть массив из одного или двух элементов.
-                    if (requesting.length) {
-                        that.extract(requesting, r);
-                    }/* else {
-                        //TODO: clear keys, promise.reject()
-                    }
-                    */
-                }
-            });
-        }
-
+    if (modelPromises.length) {
         // Ждем резолва всех моделей и "повторяем" запрос
         // Если какие-то ключи не пришли, они будут перезапрошены.
-        no.Promise.wait(all).then(this.start.bind(this));
+        no.Promise.wait(modelPromises).then(this.start.bind(this));
 
     } else {
         // у всех моделей есть какой-то статус (ERROR или OK)
@@ -345,6 +343,17 @@ Request.prototype.request = function(loading, requesting) {
     }
 };
 
+Request.prototype.requestModel = function(model) {
+    var that = this;
+    var url = model.info.request.url;
+    var params = ns.request.addRequestParams(model.getRequestParams());
+    var promise = ns.http(url, params, {type: model.info.request.type});
+    promise.then(function(response) {
+        that.extractModel(model, response);
+    });
+    return promise;
+};
+
 Request.prototype.extract = function(models, response) {
     // response - это объект, чтобы дать возможность напихать туда сервисных данных
     // ответы хендлеров приходят в массиве response.models
@@ -354,42 +363,44 @@ Request.prototype.extract = function(models, response) {
         var result = results[i];
 
         // если модель запрашиваем кто-то другой, то этот ответ игнорируем
-        if (model.requestID > this.id) {
-            continue;
+        if (model.requestID <= this.id) {
+            this.extractModel(model, result);
         }
+    }
+};
 
-        var data;
-        var error;
-        if (!result) {
-            error = {
-                id: 'NO_DATA',
-                reason: 'Server returned no data'
-            };
-        } else {
-            data = model.extractData(result);
-            if (!data) {
-                error = model.extractError(result);
-                if (!error) {
-                    error = {
-                        id: 'INVALID_FORMAT',
-                        reason: 'response should contain result or error'
-                    };
-                }
+Request.prototype.extractModel = function(model, result) {
+    var data;
+    var error;
+    if (!result) {
+        error = {
+            id: 'NO_DATA',
+            reason: 'Server returned no data'
+        };
+    } else {
+        data = model.extractData(result);
+        if (!data) {
+            error = model.extractError(result);
+            if (!error) {
+                error = {
+                    id: 'INVALID_FORMAT',
+                    reason: 'response should contain result or error'
+                };
             }
         }
-
-        if (data) {
-            model.setData(data);
-        } else {
-            model.setError(error);
-        }
-
-        // сообщаем менеджеру о завершении запроса этой модели
-        // это не означает, что завершится весь ns.request
-        ns.request.Manager.done(model);
-
-        model.promise.resolve();
     }
+
+    if (data) {
+        model.setData(data);
+    } else {
+        model.setError(error);
+    }
+
+    // сообщаем менеджеру о завершении запроса этой модели
+    // это не означает, что завершится весь ns.request
+    ns.request.Manager.done(model);
+
+    model.promise.resolve();
 };
 
 function models2params(models) {

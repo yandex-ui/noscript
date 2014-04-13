@@ -139,6 +139,7 @@ ns.Model.prototype._prepareCallback = function(method) {
  * @param {Function} [info.ctor] Конструтор.
  * @param {Object} [info.methods] Методы прототипа.
  * @param {Object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
+ * @param {Object} [info.request] Декларация способа загрузки модели для request.
  * @param {ns.Model} [base=ns.Model] Базовый класс для наследования
  * @examples
  * //  Простая модель, без параметров.
@@ -217,6 +218,13 @@ ns.Model.info = function(id) {
          * @type {Object}
          */
         info.events = info.events || {};
+
+        /**
+         * Определение url и type запроса. Если null,
+         * то Request соберет url сам
+         * @type {Object|null}
+         */
+        info.request = info.request || null;
 
         info.pNames = Object.keys(info.params);
 

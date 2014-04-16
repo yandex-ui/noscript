@@ -362,44 +362,42 @@ ns.router._parseSection = function(rawSection) {
 };
 
 /**
- * Парсит декларацию параметра (то, что внутри фигурных скобок.
- * Пример:
- *      name=default:type
- *      name==filter:type
+ * Парсит декларацию параметра (то, что внутри фигурных скобок).
+ * @returns {Object}
+ * @private
  */
 ns.router._parseParam = function(param) {
-    var type_parts;
+    var chunks;
     var default_parts;
     var param_type;
     var param_default;
     var param_is_optional;
+    var paramName;
 
-    // parameter type (defaults to id).
-    type_parts = param.split(':');
-    param_type = type_parts[1] || 'id';
+    chunks = param.split('=');
+    // название и тип всегда идут вместе "paramName:paramType"
+    var paramNameAndType = chunks[0].split(':')
 
-    // parameter default value and param_is_optional flag.
-    param = type_parts[0];
+    paramName = paramNameAndType[0];
+    // если тип не указан, то id
+    param_type = paramNameAndType[1] || 'id';
 
-    if (param.indexOf('==') >= 0) {
-        default_parts = param.split('==');
+    // фильтр "=="
+    if (chunks.length == 3) {
         param_is_optional = false;
-        param = default_parts[0];
-        param_default = default_parts[1];
-
+        param_default = chunks[2];
         ns.assert(param_default, 'ns.router', "Parameter '%s' value must be specified", param);
         ns.assert(ns.router._isParamValid(param_default, param_type), 'ns.router', "Wrong value for '%s' parameter", param);
 
     } else {
-        default_parts = param.split('=');
-        param_is_optional = (default_parts.length > 1);
-        param = default_parts[0];
-        param_default = default_parts[1];
+        // если в декларации одно "=", то параметр опциональный
+        param_is_optional = chunks.length == 2;
+        param_default = chunks[1]
     }
 
     // section parsed
     return {
-        name: param,
+        name: paramName,
         type: param_type,
         default_value: param_default,
         is_optional: param_is_optional

@@ -29,14 +29,14 @@ describe('router: new route parsing method', function() {
             'param':            { name: 'param', type: 'id', default_value: undefined, is_optional: false },
             'param=':           { name: 'param', type: 'id', default_value: '', is_optional: true },
             'param:int':        { name: 'param', type: 'int', default_value: undefined, is_optional: false },
-            'param=:int':       { name: 'param', type: 'int', default_value: '', is_optional: true },
+            'param:int=':       { name: 'param', type: 'int', default_value: '', is_optional: true },
             'param=value':      { name: 'param', type: 'id', default_value: 'value', is_optional: true },
-            'param=value:int':  { name: 'param', type: 'int', default_value: 'value', is_optional: true },
-            'param==':          { throw: /^\[ns\.router\] Parameter 'param' value must be specified$/ },
-            'param==:int':      { throw: /^\[ns\.router\] Parameter 'param' value must be specified$/ },
+            'param:int=value':  { name: 'param', type: 'int', default_value: 'value', is_optional: true },
+            'param==':          { throw: "[ns.router] Parameter 'param' value must be specified" },
+            'param:int==':      { throw: "[ns.router] Parameter 'param' value must be specified" },
             'param==value':     { name: 'param', type: 'id', default_value: 'value', is_optional: false },
-            'param==value:int': { throw: /^\[ns\.router\] Wrong value for 'param' parameter$/ },
-            'param==123:int':   { name: 'param', type: 'int', default_value: '123', is_optional: false }
+            'param:int==value': { throw: "[ns\.router\] Wrong value for 'param' parameter" },
+            'param:int==123':   { name: 'param', type: 'int', default_value: '123', is_optional: false }
         };
 
         for (var test in _tests) {
@@ -79,14 +79,14 @@ describe('router: new route parsing method', function() {
             'param':                 '([A-Za-z_][A-Za-z0-9_-]*)',
             'param=':                '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
             'param:int':             '([0-9]+)',
-            'param=:int':            '(?:([0-9]+))?',
+            'param:int=':            '(?:([0-9]+))?',
             'param=value':           '(?:([A-Za-z_][A-Za-z0-9_-]*))?',
-            'param=value:int':       '(?:([0-9]+))?',
-            'param:new-type':        { throw: /^\[ns\.router\] Could not find regexp for type 'new\-type'!$/ },
+            'param:int=value':       '(?:([0-9]+))?',
+            'param:new-type':        { throw: "[ns.router] Could not find regexp for type 'new-type'!" },
             'param==value':          '(value)',
-            'param==123:int':        '(123)',
-            'param==value:int':      { throw: /^\[ns\.router\] Wrong value for 'param' parameter$/ },
-            'param==value:new-type': { throw: /^\[ns\.router\] Could not find regexp for type 'new\-type'!$/ },
+            'param:int==123':        '(123)',
+            'param:int==value':      { throw: "[ns.router] Wrong value for 'param' parameter" },
+            'param:new-type==value': { throw: "[ns.router] Could not find regexp for type 'new-type'!" }
         };
 
         for (var test in _tests) {
@@ -109,18 +109,18 @@ describe('router: new route parsing method', function() {
             '{param}':                    { is_optional: false, items: [ { name: 'param', type: 'id', default_value: undefined, is_optional: false } ] },
             '{param=}':                   { is_optional: true, items: [ { name: 'param', type: 'id', default_value: '', is_optional: true } ] },
             '{param:int}':                { is_optional: false, items: [ { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
-            '{param=:int}':               { is_optional: true, items: [ { name: 'param', type: 'int', default_value: '', is_optional: true } ] },
+            '{param:int=}':               { is_optional: true, items: [ { name: 'param', type: 'int', default_value: '', is_optional: true } ] },
             '{param=value}':              { is_optional: true, items: [ { name: 'param', type: 'id', default_value: 'value', is_optional: true } ] },
-            '{param=value:int}':          { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true } ] },
-            '{param==value:int}':         { throw: /^\[ns\.router\] Wrong value for 'param' parameter$/ },
-            '{param==123:int}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: '123', is_optional: false } ] },
+            '{param:int=value}':          { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true } ] },
+            '{param:int==value}':         { throw: "[ns.router] Wrong value for 'param' parameter" },
+            '{param:int==123}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: '123', is_optional: false } ] },
             'prefix-{param:int}':         { is_optional: false, items: [ { default_value: 'prefix-' }, { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
             'prefix-{part1:int}{part2=}': {
                 is_optional: false,
                 items: [
                     { default_value: 'prefix-' },
                     { name: 'part1', type: 'int', default_value: undefined, is_optional: false },
-                    { name: 'part2', type: 'id', default_value: '', is_optional: true },
+                    { name: 'part2', type: 'id', default_value: '', is_optional: true }
                 ]
             },
             'some{thing': { throw: /^\[ns\.router\] could not parse parameter in url section: some{thing$/ }
@@ -144,9 +144,9 @@ describe('router: new route parsing method', function() {
         var _tests = {
             '{param}':            '/([A-Za-z_][A-Za-z0-9_-]*)',
             '{param:int}':        '/([0-9]+)',
-            '{param=value:int}':  '(?:/(?!/)(?:([0-9]+))?)?',
+            '{param:int=value}':  '(?:/(?!/)(?:([0-9]+))?)?',
             '{param==value}':     '/(value)',
-            '{param==123:int}':   '/(123)'
+            '{param:int==123}':   '/(123)'
         };
 
         for (var test in _tests) {
@@ -175,8 +175,8 @@ describe('router: new route parsing method', function() {
     });
 
     describe('complex url 3', function() {
-        it('/message/{id=:int}', function() {
-            var route = '/message/{id=:int}';
+        it('/message/{id:int=}', function() {
+            var route = '/message/{id:int=}';
             var regexp = ns.router.compile(route).regexp;
             compareRegExp( regexp, new RegExp('^/message(?:/(?!/)(?:([0-9]+))?)?/?(?:\\?(.*))?$') ); // TODO проверить, что не получится 2 слеша на конце
         });

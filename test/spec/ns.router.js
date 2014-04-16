@@ -82,9 +82,9 @@ describe('ns.router', function() {
             ns.router.regexps[ 'page' ] = 'folder|home';
             ns.router.routes = {
                 route: {
-                    '/messages/{folder=inbox:id}/{message_id:int}': 'message',
-                    '/folder/{folder=inbox:id}': 'folder',
-                    '/{page=home:page}': 'page'
+                    '/messages/{folder:id=inbox}/{message_id:int}': 'message',
+                    '/folder/{folder:id=inbox}': 'folder',
+                    '/{page:page=home}': 'page'
                 }
             };
             ns.router.init();
@@ -132,9 +132,9 @@ describe('ns.router', function() {
             ns.router.regexps['context'] = 'search|tag|top';
             ns.router.routes = {
                 route: {
-                    '/{context==search:context}/{query}/image/{id:int}': 'view',
-                    '/{context==tag:context}/{tag}/image/{id:int}': 'view',
-                    '/{context=:context}/image/{id:int}': 'view'
+                    '/{context:context==search}/{query}/image/{id:int}': 'view',
+                    '/{context:context==tag}/{tag}/image/{id:int}': 'view',
+                    '/{context:context=}/image/{id:int}': 'view'
                 }
             };
             ns.router.init();
@@ -284,7 +284,7 @@ describe('ns.router', function() {
                     '/from{from-path:path}/{dialog:dialog}{div:divider}{to-path:path}': 'page',
                     '/from{from-path:path}/{dialog:dialog}{div:divider}': 'page',
                     '/from{from-path:path}/{dialog:dialog}': 'page',
-                    '/from{from-path:path}': 'page',
+                    '/from{from-path:path}': 'page'
                 }
             };
             ns.router.init();

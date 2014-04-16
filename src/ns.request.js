@@ -146,7 +146,9 @@ ns.request.Manager = {
                 }
 
             } else {
-                model.status = model.STATUS.OK;
+
+                // FIXME chestozo: тут бывает так, что модель в статусе ошибка, а мы ей затираем статус и делаем её ок.
+                // model.status = model.STATUS.OK;
                 model.retries = 0;
                 return false;
             }

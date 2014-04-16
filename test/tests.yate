@@ -22,3 +22,12 @@ match .* ns-view-async-content {
 match / check-yate-is-ready {
     "Ready"
 }
+
+match .app-subview-01 ns-view-content {
+    <div class="ns-subview-version">
+        /.models.data.version
+    </div>
+    <div class="js-test-data">
+        /.models.data.data
+    </div>
+}

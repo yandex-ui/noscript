@@ -154,7 +154,7 @@ describe('no.Updater', function() {
                             ]
                         })
                     );
-                }.bind(this))
+                }.bind(this));
             });
 
             it('should resolve second async promise', function(finish) {
@@ -185,7 +185,7 @@ describe('no.Updater', function() {
                             ]
                         })
                     );
-                }.bind(this))
+                }.bind(this));
             });
 
         });
@@ -257,7 +257,7 @@ describe('no.Updater', function() {
 
                                 window.setTimeout(function() {
                                     finish();
-                                }, 100)
+                                }, 100);
 
                             })
                             .fail(function() {
@@ -607,8 +607,157 @@ describe('no.Updater', function() {
                 .fail(function() {
                     finish('main ns.Update was rejected');
                 });
-        })
+        });
+    });
 
+    describe('subviews', function() {
+
+        beforeEach(function(done) {
+            ns.layout.define('app', {
+                'app': {
+                    'content@': 'app-subview-01'
+                }
+            });
+
+            ns.Model.define('data');
+
+            ns.View.define('app');
+            ns.View.define('app-subview-01', {
+                models: [ 'data' ],
+                subviews: {
+                    'version': 'data .version'
+                }
+            });
+
+            var server = this.server = sinon.fakeServer.create();
+            server.autoRespond = true;
+            server.respondWith(function(xhr) {
+                if (xhr.url === '/models/?_m=data') {
+                    xhr.respond(200, { "Content-Type": "application/json" }, JSON.stringify({
+                        models: [
+                            { data: { version: 1, data: 'Data first version' } }
+                        ]
+                    }));
+                } else {
+                    xhr.respond(400);
+                }
+            });
+
+            var view = this.view = ns.View.create('app');
+
+            this.runUpdate = function() {
+                var layout = this.layout = ns.layout.page('app', {});
+                var update = new ns.Update(view, layout, {});
+                return update.start();
+            };
+
+            // Run first update.
+            this.runUpdate().done(function() { done(); });
+        });
+
+        afterEach(function() {
+            this.server.restore();
+            ns.clean();
+            delete this.promise;
+        });
+
+        it('should update subview', function(finish) {
+            var appView = this.view;
+            expect($('.ns-subview-version', appView.node).html()).to.be('1');
+
+            ns.Model.get('data').set('.version', 2);
+
+            this.runUpdate().done(function() {
+                expect($('.ns-subview-version', appView.node).html()).to.be('2');
+                finish();
+            });
+        });
+
+        it('should do nothing when model changes but subview is not binded to that change', function(finish) {
+            var appView = this.view;
+            expect($('.ns-subview-version', appView.node).html()).to.be('1');
+
+            ns.Model.get('data').set('.data', 'nothing will be redrawn');
+
+            this.runUpdate().done(function() {
+                expect($('.ns-subview-version', appView.node).html()).to.be('1');
+                finish();
+            });
+        });
+
+        it('should not trigger ns-view-htmldestroy when subview changes', function(finish) {
+            var appView = this.view;
+            var htmlDestroySpy = sinon.spy();
+            appView.on('ns-view-htmldestroy', htmlDestroySpy);
+
+            var dataModel = ns.Model.get('data');
+            dataModel.set('.version', 2);
+
+            this.runUpdate().done(function() {
+                expect(htmlDestroySpy.callCount).to.be(0);
+                finish();
+            });
+        });
+    });
+
+    describe('interrupting updates of async views inside a box', function() {
+        beforeEach(function(finish) {
+
+            ns.layout.define('app', {
+                'app': {
+                    'box@': 'todos&'
+                }
+            });
+
+            /// Model
+            ns.Model.define('todos', { params: { category: null } });
+
+            /// Views
+            ns.View.define('app');
+            ns.View.define('todos', { models: [ 'todos' ] });
+
+            ns.router.routes = {
+                route: {
+                    '/{category:int}': 'app'
+                }
+            };
+            ns.router.init();
+
+            var server = this.server = sinon.fakeServer.create();
+            server.autoRespond = true;
+            server.autoRespondAfter = 400;
+            server.respondWith('{ "models": [ { "data": {} } ] }');
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            ns.page.go('/1');
+            ns.page.go('/2')
+                .done(function(result) {
+                    no.Promise.wait(result.async)
+                        .done(function() {
+                            ns.page.go().done(function() {
+                                finish();
+                            }.bind(this));
+                        }.bind(this));
+                }.bind(this));
+        });
+
+        // Restore XHR.
+        afterEach(function() {
+            this.server.restore();
+        });
+
+        it('should hide async views', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async:not(.ns-view-hidden)')).to.have.length(0);
+        });
+
+        it('should show only one view', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
+        });
+
+        it('should hide other fetching views', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-hidden')).to.have.length(1);
+        });
     });
 
     describe('interrupting updates of async views inside a box', function() {

@@ -13,7 +13,8 @@
         "it": false,
         "beforeEach": false,
         "afterEach": false,
-        "expect": false
+        "expect": false,
+        "sinon": false
     },
 
     "bitwise": true,

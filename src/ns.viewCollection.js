@@ -99,7 +99,7 @@ ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
         var modelVersion = model.getVersion();
         // при сравнении с версией модели-коллекции используем versionSelf,
         // не зависящий от внутренних моделей
-        if (model.isCollection()) {
+        if (ns.Model.isCollection(model)) {
             modelVersion = model.getSelfVersion();
         }
 

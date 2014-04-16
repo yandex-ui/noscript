@@ -16,7 +16,7 @@ describe('generate url', function() {
         });
 
         it('if page name is unknown', function() {
-            expect(function() { ns.router.generateUrl('new-page'); }).to.throwError()
+            expect(function() { ns.router.generateUrl('new-page'); }).to.throwError();
         });
     });
 
@@ -42,7 +42,7 @@ describe('generate url', function() {
         });
 
         it('baseDir specified', function() {
-            ns.router.baseDir = '/the-base'
+            ns.router.baseDir = '/the-base';
             expect( ns.router.generateUrl('root') ).to.be('/the-base');
             expect( ns.router.generateUrl('index') ).to.be('/the-base/index');
         });
@@ -105,8 +105,8 @@ describe('generate url', function() {
         });
 
         it('not specified', function() {
-            expect(function() { ns.router.generateUrl('folder') }).to.throwError();
-            expect(function() { ns.router.generateUrl('file', { name: 'inbox' }) }).to.throwError();
+            expect(function() { ns.router.generateUrl('folder'); }).to.throwError();
+            expect(function() { ns.router.generateUrl('file', { name: 'inbox' }); }).to.throwError();
         });
     });
 
@@ -173,7 +173,7 @@ describe('generate url', function() {
             it('should generate "' + test.url +'" for "' + test.layout + '" ' + JSON.stringify(test.params), function() {
                 expect(
                     ns.router.generateUrl(test.layout, test.params)
-                ).to.be(test.url)
+                ).to.be(test.url);
             });
 
         });
@@ -247,6 +247,35 @@ describe('generate url', function() {
         it('reverse rewrite and query', function() {
             expect(ns.router.generateUrl('page', { id: 1, page: 7, nc: '0123' })).to.be.eql('/shortcut?page=7&nc=0123');
         });
+    });
+
+    describe('special chars in url', function() {
+        beforeEach(function() {
+            ns.router.regexps['any'] = '.+';
+            ns.router.routes = {
+                route: {
+                    '/tag/{tag:any}': 'tag'
+                }
+            };
+            ns.router.init();
+        });
+
+        afterEach(function() {
+            ns.router.baseDir = '';
+            ns.router.undefine();
+            delete ns.router.regexps['any'];
+        });
+
+        it('#', function() {
+            expect(ns.router('/tag/%23cool')).to.be.eql({ page: 'tag', params: { tag: '#cool' } });
+            expect(ns.router.generateUrl('tag', { tag: '#cool' })).to.be.eql('/tag/%23cool');
+        });
+
+        it('%%%', function() {
+            expect(ns.router('/tag/%25%25%25')).to.be.eql({ page: 'tag', params: { tag: '%%%' } });
+            expect(ns.router.generateUrl('tag', { tag: '%%%' })).to.be.eql('/tag/%25%25%25');
+        });
+
     });
 
 });

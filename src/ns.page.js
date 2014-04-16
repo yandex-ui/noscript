@@ -74,14 +74,16 @@ ns.page.go = function(url, action) {
     ns.page.current.layout = layout;
     ns.page.currentUrl = url;
 
+    /*
     if (action === 'push') {
         // записываем в историю все переходы
         ns.history.pushState(url);
     } else if (action === 'replace') {
         ns.history.replaceState(url);
     }
+    */
 
-    ns.page.history.push(url);
+    //ns.page.history.push(url);
     document.title = ns.page.title(url);
 
     var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);

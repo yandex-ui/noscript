@@ -18,9 +18,17 @@ ns.Box = function(id, params) {
     this.active = {};
 
     this._visible = false;
+
+    Jane.Block._blocks[id] = this;
 };
 
 //  ---------------------------------------------------------------------------------------------------------------  //
+
+ns.Box.prototype.getActive = function() {
+    for (var key in this.views) {
+        return this.views[key];
+    }
+};
 
 ns.Box.prototype._getView = function(id, params) {
     var key = ns.View.getKey(id, params);

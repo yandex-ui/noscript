@@ -12,6 +12,8 @@ models = /.models
 //  Ключ для получения моделей по имени.
 //
 key model( models.*, name() ) { . }
+key data( models.*, name() ) { . }
+key dataInBlock( models.*, name() ) { . }
 
 // @private
 match / {

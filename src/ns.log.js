@@ -1,4 +1,4 @@
-(function(/** @type ns */ns) {
+(function(ns) {
 
     /* jshint unused: false */
 
@@ -12,7 +12,7 @@
      * @param {...*} str
      */
     ns.log.debug = function(str) {
-//        console.log.apply(console, arguments);
+        console.log.apply(console, arguments);
     };
 
     /**

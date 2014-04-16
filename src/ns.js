@@ -121,7 +121,7 @@ ns.init = function() {
  */
 ns.initMainView = function() {
     var mainView = ns.View.create('app');
-    mainView._setNode(document.getElementById('app'));
+    mainView._setNode(document.getElementById('block-app'));
     mainView.invalidate();
 
     /**

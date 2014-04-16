@@ -192,7 +192,7 @@ ns.Model.prototype.set = function(jpath, value, options) {
  * @returns {ns.Model}
  */
 ns.Model.prototype.setData = function(data, options) {
-    if (data && this.needUpdateData(data)) {
+    if (data && this.hasDataChanged(data)) {
 
         this.data = this._beforeSetData(this.preprocessData(data));
 
@@ -214,7 +214,7 @@ ns.Model.prototype.setData = function(data, options) {
     return this;
 };
 
-ns.Model.prototype.needUpdateData = function(data) {
+ns.Model.prototype.hasDataChanged = function(data) {
     return !!data;
 };
 

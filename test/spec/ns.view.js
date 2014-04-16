@@ -402,6 +402,31 @@ describe('ns.View', function() {
             });
         });
 
+        describe('typeof view.info.params == "function"', function() {
+            beforeEach(function() {
+                ns.View.define('slider', {
+                    params: function(params) {
+                        if (params.mode === 'custom') {
+                            return { id: params['id'] };
+                        }
+                        return {};
+                    }
+                });
+            });
+
+            it('view=slider&id=1', function() {
+                expect(ns.View.getKey('slider', { mode: 'custom', id: 1 })).to.be.eql('view=slider&id=1');
+            });
+
+            it('view=slider&id=', function() {
+                expect(ns.View.getKey('slider', { mode: 'custom', id: '' })).to.be.eql('view=slider&id=');
+            });
+
+            it('view=slider', function() {
+                expect(ns.View.getKey('slider', { mode: 'new' })).to.be.eql('view=slider');
+            });
+        });
+
         describe('ns.View: params+ / params-', function() {
             beforeEach(function() {
                 ns.View.define('slider', {
@@ -414,7 +439,7 @@ describe('ns.View', function() {
             });
 
             it('Нельзя указывать одновременно params и params+/-', function() {
-                expect(function() { ns.View.info('slider') }).to.throwError();
+                expect(function() { ns.View.info('slider'); }).to.throwError();
             });
         });
 
@@ -452,6 +477,20 @@ describe('ns.View', function() {
                 var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
                 expect( ns.View.getKey('photo', params) ).to.be.eql('view=photo&login=a&id=4&per_page=10');
             });
+        });
+
+        describe('Когда ключ view строится по части параметров - this.params у view должны хранить исходный набор (а не тот, что используется в ключе)', function() {
+
+            beforeEach(function() {
+                ns.View.define('photo', { params: { login: null, id: null } });
+            });
+
+            it('preserve full params object', function() {
+                var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
+                var view = ns.View.create('photo', params);
+                expect(view.params).to.eql(params);
+            });
+
         });
 
     });
@@ -513,7 +552,7 @@ describe('ns.View', function() {
                                         done();
                                     })
                                     .fail(function() {
-                                        done('fail to init')
+                                        done('fail to init');
                                     });
                             });
                     });
@@ -526,13 +565,113 @@ describe('ns.View', function() {
             });
 
             it('"async-view" should have different nodes after redraw', function() {
-                expect(this.asyncViewNode2).not.to.be(this.asyncViewNode1)
+                expect(this.asyncViewNode2).not.to.be(this.asyncViewNode1);
             });
 
             it('"async-view" should have child view', function() {
                 expect($(this.asyncViewNode2).find('.ns-view-async-view-child')).to.have.length(1);
             });
 
+        });
+
+        describe('redraw old view when model was invalidated', function() {
+
+            // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
+            // После починки _unbindModels перестало работать обновление view при изменении модели.
+            // Дело тут в том, что view подписана на своим модели. Модель поменялась - view перерисовалась (model ns-model-changed -> view invalidate).
+            // Когда мы починили отписку view от модели (во время _hide) изменения модели больше не будут услышаны view (что, как бы, хорошо и by design).
+            // Но тогда, во время update-а надо проверять, что все модели view валидны. И если нет - обновлять view.
+            // Итог: не отписываем view от моделей
+
+            var goToPage = function(app, params, callback) {
+                var layout = ns.layout.page('app', params);
+                return new ns.Update(app, layout, params).start().done(function() { callback(); });
+            };
+
+            beforeEach(function() {
+                this.spies = {};
+
+                ns.View.define('app');
+                ns.View.define('view', { models: [ 'model' ] });
+
+                // Модель и сразу два экземляра создаём заранее
+                ns.Model.define('model', { params: { id: null } });
+                this.model1 = ns.Model.get('model', { id: 1 }).setData({ data: 1 });
+                this.model2 = ns.Model.get('model', { id: 2 }).setData({ data: 2 });
+
+                ns.layout.define('app', {
+                    'app': {
+                        'box@': 'view'
+                    }
+                });
+
+                this.appView = ns.View.create('app');
+            });
+
+            afterEach(function() {
+                for (var spyName in this.spies) {
+                    this.spies[spyName].restore();
+                }
+            });
+
+            it('redraw view after model invalidate while view was hidden', function(done) {
+                var spies = this.spies;
+                var model1 = this.model1;
+                var app = this.appView;
+                var view1;
+
+                // Показываем страницы: 1 - 2 - 1
+                goToPage(app, { id: 1 }, function() {
+                    view1 = app.views.box.views['view=view&id=1'];
+
+                    spies.view1Invalidate = sinon.spy(view1, 'invalidate');
+                    spies.view1SetNode = sinon.spy(view1, '_setNode');
+                    spies.view1Hide = sinon.spy(view1, '_hide');
+
+                    goToPage(app, { id: 2 }, function() {
+                        // view1 не видно.
+                        expect(view1._visible).to.be.eql(false);
+                        expect(spies.view1Hide.callCount).to.be.eql(1);
+                        expect(spies.view1SetNode.callCount).to.be.eql(0);
+
+                        // Меняется model1
+                        model1.setData({ id: 1, changed: true });
+                        expect(spies.view1Invalidate.callCount).to.be.eql(1); // NOTE да да да, view даже спрятанная слышит изменения моделей.
+
+                        // Идёт назад - view должно перерисоваться
+                        goToPage(app, { id: 1 }, function() {
+                            expect(spies.view1SetNode.callCount).to.be.eql(1);
+                            done();
+                        });
+                    });
+                });
+            });
+
+            it('do not bind twice to model changed after show - hide - show cicle', function(done) {
+                var spies = this.spies;
+                var model1 = this.model1;
+                var app = this.appView;
+                var view1;
+
+                // Показываем страницы: 1 - 2 - 1 - 2
+                // view1 показывалось 2 раза.
+                // Надо проверить, что не будет двойного invalidate на ns-model-changed
+                goToPage(app, { id: 1 }, function() {
+                    view1 = app.views.box.views['view=view&id=1'];
+
+                    spies.view1Invalidate = sinon.spy(view1, 'invalidate');
+
+                    goToPage(app, { id: 2 }, function() {
+                        goToPage(app, { id: 1 }, function() {
+                            goToPage(app, { id: 2 }, function() {
+                                model1.setData({ id: 1, changed: true });
+                                expect(spies.view1Invalidate.callCount).to.be.eql(1);
+                                done();
+                            });
+                        });
+                    });
+                });
+            });
         });
 
     });

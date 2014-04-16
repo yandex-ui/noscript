@@ -34,7 +34,6 @@ describe('ns.router', function() {
                     '/message/{mid:int}': 'message',
                     '/page/prefix{page:int}': 'url-with-prefix',
                     '/search/{request:any}': 'search'
-
                 }
             };
 
@@ -125,6 +124,31 @@ describe('ns.router', function() {
         test_route('/messages//45?val1',                'not-found', {}, '/messages//45?val1: MUST FAIL');
         test_route('/messages//45?',                    'not-found', {}, '/messages//45?: MUST FAIL');
         test_route('/messages//45',                     'not-found', {}, '/messages//45: MUST FAIL');
+    });
+
+    describe('filter value', function() {
+
+        beforeEach(function() {
+            ns.router.regexps['context'] = 'search|tag|top';
+            ns.router.routes = {
+                route: {
+                    '/{context==search:context}/{query}/image/{id:int}': 'view',
+                    '/{context==tag:context}/{tag}/image/{id:int}': 'view',
+                    '/{context=:context}/image/{id:int}': 'view'
+                }
+            };
+            ns.router.init();
+        });
+
+        var test_route = function(url, page, params, test_name) {
+            it(test_name || url, function() {
+                expect(ns.router(url)).to.be.eql({ page: page, params: params });
+            });
+        };
+
+        test_route('/search/airport/image/1', 'view', { context: 'search', query: 'airport', id: 1 });
+        test_route('/tag/airport/image/2',    'view', { context: 'tag', tag: 'airport', id: 2 });
+        test_route('/top/image/3',            'view', { context: 'top', id: 3 });
     });
 
     describe('baseDir: routing', function() {
@@ -252,7 +276,7 @@ describe('ns.router', function() {
 
         beforeEach(function() {
             ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
-            ns.router.regexps.dialog = 'copy|move'
+            ns.router.regexps.dialog = 'copy|move';
             ns.router.regexps.divider = '\\|';
 
             ns.router.routes = {

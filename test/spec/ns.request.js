@@ -146,7 +146,7 @@ describe('ns.request.js', function() {
         });
     });
 
-    describe('no.reques.models()', function(){
+    describe('no.request.models()', function(){
 
         beforeEach(function() {
             ns.Model.define('test-model');
@@ -550,7 +550,7 @@ describe('ns.request.js', function() {
             });
 
             it('should create two requests', function() {
-                expect(this.promises.length).to.be(2)
+                expect(this.promises.length).to.be(2);
             });
 
             it('should not resolve first promise after first response', function() {
@@ -593,6 +593,59 @@ describe('ns.request.js', function() {
                 expect(promiseIsResolved(this.request2)).to.be(true);
             });
         });
+    });
+
+    describe('do not reset model status to ok if it was in error status', function() {
+
+        beforeEach(function() {
+            ns.Model.define('model1');
+            ns.Model.define('model2');
+
+            this.xhr = sinon.useFakeXMLHttpRequest();
+            this.xhr.onCreate = function(xhr) {
+                window.setTimeout(function() {
+                    xhr.respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                { error: 'unknown error' }
+                            ]
+                        })
+                    );
+                }, 1);
+            };
+        });
+
+        afterEach(function() {
+            this.xhr.restore();
+        });
+
+        it('if model was requested and request was done it does not mean that we model is ok', function(done) {
+            var wait = 2;
+            var handleModels = function(models) {
+                var model1 = models[0];
+                var model2 = models[1];
+
+                expect(model1.status).to.be.eql(ns.M.STATUS.ERROR);
+
+                if (model2) {
+                    expect(model2.status).to.be.eql(ns.M.STATUS.ERROR);
+                }
+
+                wait--;
+                if (!wait) {
+                    done();
+                }
+            };
+
+            // Тут какая-то хитрая комбинация запросов должна была быть, чтобы в какой-то момент при запросе модели она бы оказалась
+            // уже запрошена и мы бы просто проставили ей руками статус ok.
+
+            ns.request([ 'model1', 'model2' ]).done(handleModels);
+            ns.request('model1').done(handleModels);
+        });
+
     });
 
     //TODO: STATUS.INVALID

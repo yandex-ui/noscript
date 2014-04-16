@@ -1,3 +1,5 @@
+/*jshint unused: vars */
+
 /**
  * noscript MVC framework
  * @namespace
@@ -143,6 +145,47 @@ ns.transaction = function(cb) {
     // запускаем ns.page.go
     ns.page._stop = false;
     ns.page.go(ns.page._lastUrl);
+};
+
+/**
+ * Выполняет проверку, что первый аргумент истиннен.
+ * Если это не так - кидает ошибку.
+ * @param {?} truthy Любое значение, которое проверяется на истинность.
+ * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
+ * @param {String} message Сообщение об ошибке.
+ */
+ns.assert = function(truthy, contextName, message) {
+    if (!truthy) {
+        ns.assert.fail.apply(this, Array.prototype.slice.call(arguments, 1));
+    }
+};
+
+/**
+ * Кидает ошибку с понятным сообщением.
+ * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
+ * @param {String} message Сообщение об ошибке.
+ */
+ns.assert.fail = function(contextName, message) {
+    var messageArgs = Array.prototype.slice.call(arguments, 2);
+    for (var i = 0; i < messageArgs.length; i++) {
+        message = message.replace('%s', messageArgs[i]);
+    }
+    throw new Error('[' + contextName + '] ' + message);
+};
+
+/**
+ * Строит ключ по готовому объекту параметров.
+ * @param {string} prefix Префикс ключа.
+ * @param {Object} params Объект с параметрами составляющими ключ.
+ * @return {string} Строка ключа.
+ */
+ns.key = function(prefix, params) {
+    var key = prefix;
+    params = params || {};
+    for (var pName in params) {
+        key += '&' + pName + '=' + params[pName];
+    }
+    return key;
 };
 
 if (window['mocha']) {

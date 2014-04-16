@@ -49,8 +49,6 @@ ns.View.prototype._$window = $(window);
 ns.View.prototype._init = function(id, params, async) {
     this.id = id;
 
-    this._onModelChangeBinded = this._onModelChange.bind(this);
-
     /**
      * Флаг того, что view может быть асинхронным.
      * Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState
@@ -64,9 +62,17 @@ ns.View.prototype._init = function(id, params, async) {
 
     this._initModels();
 
-    this.views = null;
-    this._subviews = null;
+    /**
+     * Save models version to track changes.
+     * @type {object}
+     * @protected
+     */
+    this._modelsVersions = {};
+    this._modelsEvents = {};
+
     this.node = null;
+    this.views = null;
+    this._invalidSubviews = null;
 
     /**
      * Статус View.
@@ -75,13 +81,6 @@ ns.View.prototype._init = function(id, params, async) {
      * @private
      */
     this.status = this.STATUS.NONE;
-
-    /**
-     * Save models version to track changes.
-     * @type {object}
-     * @protected
-     */
-    this._modelsVersions = {};
 
     /**
      * Uniq View ID
@@ -98,17 +97,11 @@ ns.View.prototype._init = function(id, params, async) {
     this._eventNS = '.ns-view-' + this.id + '-' + this._uniqID;
 
     // события, которые надо забиндить сразу при создании блока
-    for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
-        var event = this.info.createEvents[i];
-        this.on(event[0], this._prepareCallback(event[1]));
-    }
+    this._bindCreateEvents();
 
     this.trigger('ns-view-init');
 };
 
-/**
- * Инициализирует модели
- */
 ns.View.prototype._initModels = function() {
     if (!this.models) {
         this.models = {};
@@ -120,429 +113,6 @@ ns.View.prototype._initModels = function() {
             this.models[id] = ns.Model.get(id, this.params);
         }
     }
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-ns.View.getKey = function(id, params, info) {
-    return this.getKeyAndParams(id, params, info).key;
-};
-
-/**
- * Возвращает в объекта ключ и параметры с учётом rewriteParamsOnInit
- * В этом методе собрана вся логика рерайтов параметров при создании view
- * @return Object
- */
-ns.View.getKeyAndParams = function(id, params, info) {
-    //  Ключ можно вычислить даже для неопределенных view,
-    //  в частности, для боксов.
-    info = info || ns.View.info(id) || {};
-
-    if ('function' === typeof info.rewriteParamsOnInit) {
-        //  если для view определен метод rewriteParamsOnInit и он вернул объект,
-        //  то перепишем параметры
-        params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
-    }
-
-    var key;
-    var pGroups = info.pGroups || [];
-    for (var g = 0; g < pGroups.length; g++) {
-
-        key = 'view=' + id;
-
-        var group = pGroups[g];
-        var pNames = group.pNames || [];
-        var pFilters = group.pFilters || {};
-        var pOptional = group.pOptional || {};
-
-        for (var i = 0, l = pNames.length; i < l; i++) {
-            var pName = pNames[i];
-            var pValue = params[ pName ] || pOptional[ pName ];
-            var pFilter = pFilters[pName];
-            var isOptional = pName in pOptional;
-
-            if (pValue == null && isOptional) {
-                continue;
-            }
-
-            if ( pValue == null || (pFilter && pValue != pFilter) ) {
-                key = null;
-                break;
-            }
-
-            key += '&' + pName + '=' + pValue;
-        }
-
-        if (key) {
-            return {
-                params: params, // параметры с учётом rewrite
-                key: key        // ключ с учётом правильных параметров
-            };
-        }
-    }
-
-    //  Не по чему строить ключ.
-    if (!pGroups.length) {
-        return {
-            params: params,    // параметры с учётом rewrite
-            key: 'view=' + id  // ключ с учётом правильных параметров
-        };
-    }
-
-    //  Не удалось построить ключ view.
-    throw new Error("[ns.View] Could not generate key for view " + id);
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-var _infos = {};
-var _ctors = {};
-
-/**
- * Определяет новый View.
- * @description
- * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
- * "eventDecl" записывается в виде "eventName [ selector ]".
- * "selector" опционален, если его нет, то события регистрируется на ноду View.
- * "handler" может быть строка (тогда она заменится на метод прототипа) или функция.
- * Все хендлеры биндятся на экземпляр View.
- * Разделение на типы событий происходит автоматически по следующим правилам (в порядке приоритета):
- *   - если selector === "window" || selector == "document", то обработчик регистрируется по событию show
- *   - если eventName === "resize", то обработчик регистрируется по событию show
- *   - если eventName === "scroll", то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)
- *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
- * @param {String} id Название View.
- * @param {Object} [info={}] Декларация View.
- * @param {Function} [info.ctor] Конструтор.
- * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
- * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
- * @param {Object} [info.events] DOM-события, на которые подписывается View.
- * @param {Object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
- * @param {Function|String} [base=ns.View] Базовый View для наследования
- * @return {Function} Созданный View.
- */
-ns.View.define = function(id, info, base) {
-    if (id in _infos) {
-        throw new Error("[ns.View] Can't redefine '" + id + "'");
-    }
-
-    info = info || {};
-
-    var baseClass = ns.View;
-    if (typeof base === 'string') {
-        // если указана строка, то берем декларацию ns.View
-        if (_ctors[base]) {
-            baseClass = _ctors[base];
-        } else {
-            throw new Error("[ns.View] Can't find '" + base + "' to extend '" + id + "'");
-        }
-
-    } else if (typeof base === 'function') {
-        baseClass = base;
-    }
-
-    var ctor = info.ctor || function() {};
-    // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
-    ctor = no.inherit(ctor, baseClass, info.methods);
-
-    info.models = ns.View._prepareModels( info.models || {} );
-    info.events = info.events || {};
-
-    // часть дополнительной обработки производится в ns.View.info
-    // т.о. получаем lazy-определение
-
-    _infos[id] = info;
-    _ctors[id] = ctor;
-
-    return ctor;
-};
-
-/**
- * Возвращает информацию о View.
- * @param {String} id Название модели.
- * @returns {Object}
- * @throws Бросает исключения, если нет
- */
-ns.View.info = function(id) {
-    var info = _infos[id];
-    // если есть декларация, но еще нет pGroups, то надо завершить определение View
-    if (info && !info.pGroups) {
-        ns.View._initInfoParams(info);
-        ns.View._initInfo(info);
-    }
-    return info;
-};
-
-ns.View._initInfo = function(info) {
-    /**
-     * События, которые надо повесить сразу при создании view
-     * @type {Array}
-     */
-    info.createEvents = [];
-
-    /**
-     * События, которые вешаются на htmlinit, снимаются на htmldestroy
-     * @type {Object}
-     */
-    info.initEvents = {
-        'bind': [],
-        'delegate': []
-    };
-
-    /**
-     * События, которые вешаются на show, снимаются на hide
-     * @type {Object}
-     */
-    info.showEvents = {
-        'bind': [],
-        'delegate': []
-    };
-
-    /**
-     * Декларации подписок на кастомные события при создании View.
-     * @type {Object}
-     */
-    info.initNoevents = {
-        'global': [],
-        'local': []
-    };
-
-    /**
-     * Декларации подписок на кастомные события при показе View.
-     * @type {Object}
-     */
-    info.showNoevents = {
-        'global': [],
-        'local': []
-    };
-
-    // парсим события View
-    for (var eventDecl in info.events) {
-        var declParts = eventDecl.split(' ');
-
-        // первый элемент - событие
-        var eventParts = declParts.shift().split('@');
-        var when = eventParts.length > 1 ? eventParts.pop() : '';
-        // нормализуем when
-        when = when && (when === 'init' || when === 'show') ? when : '';
-
-        var eventName = eventParts.join('@');
-
-        // остальное - селектор
-        var eventSelector = declParts.join(' ');
-
-        if (eventName) {
-            var handler = info.events[eventDecl];
-            var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
-
-            if (nativeEvent) {
-                var arr = [eventName, eventSelector, info.events[eventDecl]];
-
-                // глобальные селекторы всегда delegate
-                var globalSelector = eventSelector === 'window' || eventSelector === 'document';
-                // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
-                var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
-
-                if (!when) {
-                    when = globalSelector ? 'show' : 'init';
-                }
-
-                // info.initEvents.delegate.push(arr)
-                info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
-
-            } else {
-                when = when || 'init';
-
-                // событие init тригерится при создании блока, поэтому вешать его надо сразу
-                // событие async тригерится до всего, его тоже надо вешать
-                if (eventName == 'ns-view-init' || eventName == 'ns-view-async') {
-                    info.createEvents.push([eventName, handler]);
-
-                } else {
-                    // к View нельзя получить доступ, поэтому локальными могут быть только встроенные ns-* события
-                    if (ns.V.NS_EVENTS.indexOf(eventName) > -1) {
-                        info[when + 'Noevents'].local.push([eventName, handler]);
-                    } else {
-                        info[when + 'Noevents'].global.push([eventName, handler]);
-                    }
-                }
-            }
-        }
-    }
-
-    // больше не нужны
-    delete info.events;
-
-    //  Парсим информацию про subview.
-    //
-    //  В info.subviews приходит структура такого вида:
-    //
-    //      {
-    //          //  Определяем subview 'labels':
-    //          'labels': [
-    //              //  зависящее от поля '.labels' модели 'message',
-    //              'message .labels',
-    //              //  и от модели 'labels' целиком.
-    //              'labels'
-    //          ],
-    //          //  Пустая строка в качестве имени subview означает все view целиком.
-    //          //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
-    //          '': 'folders'
-    //          ...
-    //      }
-    //
-    var _subviews = {};
-    for (var subview in info.subviews) {
-        var deps = info.subviews[subview];
-        if (typeof deps === 'string') {
-            deps = [ deps ];
-        }
-
-        for (var i = 0; i < deps.length; i++) {
-            var r = deps[i].split(' ');
-            var model_id = r[0];
-            var jpath = r[1] || '';
-
-            //  FIXME: Придумать названия переменным!
-            var x = _subviews[model_id] || (( _subviews[model_id] = {} ));
-            var y = x[jpath] || (( x[jpath] = {} ));
-            y[subview] = true;
-        }
-    }
-    info.subviews = _subviews;
-    //
-    //  На выходе в info.subviews такая структура:
-    //
-    //      {
-    //          //  Название модели.
-    //          'message': {
-    //              //  jpath.
-    //              '.labels': {
-    //                  //  Список subview, которые зависят от этого jpath в данной модели.
-    //                  'labels': true
-    //              }
-    //          },
-    //          'labels': {
-    //              //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
-    //              '': {
-    //                  'labels': true
-    //              }
-    //          },
-    //          'folders': {
-    //              '': {
-    //                  //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
-    //                  '': true
-    //              }
-    //          },
-    //          ...
-    //      }
-    //
-
-    return info;
-};
-
-ns.View._initInfoParams = function(info) {
-    if (info.params) {
-        if ( info['params+'] || info['params-'] ) {
-            throw new Error("[ns.View] you cannot specify params and params+/- at the same time");
-        }
-
-        var groups;
-        var pGroups = [];
-        if ( !Array.isArray(info.params) ) {
-            groups = [ info.params ];
-        } else {
-            groups = info.params;
-        }
-
-        for (var i = 0; i < groups.length; i++) {
-            var group = groups[i];
-            // Если в params задано значение параметра -- это фильтр.
-            // Опциональные параметры это параметры моделей с дефолтным значением.
-            pGroups.push({
-                pNames: Object.keys(group),
-                pFilters: group,
-                pOptional: {}
-            });
-        }
-
-        info.pGroups = pGroups;
-    } else {
-        var params = {};
-        for (var model_id in info.models) {
-            var modelInfo = ns.Model.info(model_id);
-            no.extend( params, modelInfo.params );
-        }
-
-        //  Массив с параметрами, которые надо исключить из ключа.
-        var exclude = info['params-'];
-        if (exclude) {
-            for (var i = 0; i < exclude.length; i++) {
-                delete params[ exclude[i] ];
-            }
-
-            delete info['params-'];
-        }
-
-        //  Дополнительные параметры (расширяют параметры от моделей или перекрывают их).
-        if (info['params+']) {
-            no.extend( params, info['params+'] );
-            delete info['params+'];
-        }
-
-        // Когда параметры строятся из параметров моделей нет фильтров параметров.
-        var pNames = Object.keys(params);
-        if (pNames.length) {
-            info.pGroups = [
-                {
-                    pNames: pNames,
-                    pFilters: {},
-                    pOptional: params
-                }
-            ];
-        } else {
-            info.pGroups = [];
-        }
-    }
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-/**
- * Фабрика ns.View
- * @param {String} id ID view.
- * @param {Object} [params] Параметры view.
- * @param {Boolean} [async=false] Может ли view бы асинхронным.
- * @return {ns.View}
- */
-ns.View.create = function(id, params, async) {
-    var Ctor = _ctors[id];
-    if (!Ctor) {
-        throw new Error('[ns.View] "' + id + '" is not defined');
-    }
-    /**
-     * @type {ns.View}
-     */
-    var view = new Ctor();
-    view._init(id, params, async);
-
-    return view;
-};
-
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-ns.View._prepareModels = function(models) {
-    var _models = {};
-
-    if ( Array.isArray(models) ) {
-        //  Если указан массив -- все модели обязательны.
-        for (var i = 0; i < models.length; i++) {
-            _models[ models[i] ] = true;
-        }
-    } else {
-        _models = models;
-    }
-
-    return _models;
 };
 
 ns.View.prototype._getView = function(id) {
@@ -590,8 +160,12 @@ ns.View.prototype._htmlinit = function(events) {
  */
 ns.View.prototype._hide = function(events) {
     if (!this.isLoading() && this._visible === true) {
-        //  FIXME: Почему это делается на hide?
-        this._unbindModels();
+
+        // FIXME если unbind-ить view от моделей - view не invalidate-ится и не будет перерисовано.
+        // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
+        // Написал тест кейс, чтобы это опять не сломать.
+        // this._unbindModels();
+
         this._unbindEvents('show');
         this._hideNode();
         this._visible = false;
@@ -600,10 +174,10 @@ ns.View.prototype._hide = function(events) {
         }
         return true;
 
-    // Случай для асинхронных видов, которые отрендерили в состоянии async,
-    // но `_show` для них не выполнялся. Это происходит, например, при
-    // быстрой навигации по интерфейсу.
     } else if (this.isLoading() && this._visible !== false) {
+        // Случай для асинхронных видов, которые отрендерили в состоянии async,
+        // но `_show` для них не выполнялся. Это происходит, например, при
+        // быстрой навигации по интерфейсу.
         this._hideNode();
         this._visible = false;
 
@@ -631,6 +205,10 @@ ns.View.prototype._show = function(events) {
     // При создании блока у него this._visible === undefined.
     if (!this.isLoading() && this._visible !== true) {
         //  FIXME: Почему это делается на show?
+        //  chestozo: думаю, потому что события от моделей вызывают перерисовку.
+        //  Если view скрыто - перерисоввывать ничего не надо.
+        //  NOTE: вначале делаем _unbindModels, чтобы не подписываться дважды.
+        this._unbindModels();
         this._bindModels();
         this._bindEvents('show');
         this._showNode();
@@ -651,17 +229,9 @@ ns.View.prototype._showNode = function() {
     this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
 };
 
-/**
- * Обработчик изменений моделей.
- * @private
- */
-ns.View.prototype._onModelChange = function() {
-    ns.page.go();
-};
-
-ns.View.prototype.invalidateSubview = function(subview) {
+ns.View.prototype.invalidateSubview = function(subviewId) {
     //  FIXME: ns.SV.STATUS.INVALID?
-    this._subviews[subview] = ns.V.STATUS.INVALID;
+    this._invalidSubviews[subviewId] = ns.V.STATUS.INVALID;
 };
 
 /**
@@ -676,8 +246,9 @@ ns.View.prototype._bindModels = function() {
 
     for (var model_id in models) {
         var model = models[model_id];
+        var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
 
-        model.on('ns-model-destroyed', function() {
+        this._bindModel(model, 'ns-model-destroyed', events, function() {
             that.invalidate();
         });
 
@@ -699,13 +270,13 @@ ns.View.prototype._bindModels = function() {
                 if ('' in deps) {
                     //  При любом изменении модели нужно инвалидировать
                     //  весь view целиком.
-                    model.on('ns-model-changed' + jpath, function() {
+                    this._bindModel(model, 'ns-model-changed' + jpath, events, function() {
                         that.invalidate();
                     });
                 } else {
                     //  Инвалидируем только соответствующие subview:
                     (function(deps) {
-                        model.on('ns-model-changed' + jpath, function() {
+                        that._bindModel(model, 'ns-model-changed' + jpath, events, function() {
                             for (var subview_id in deps) {
                                 that.invalidateSubview(subview_id);
                             }
@@ -716,26 +287,34 @@ ns.View.prototype._bindModels = function() {
         } else {
             //  Для этой модели нет данных о том, какие subview она инвалидирует.
             //  Значит при изменении этой модели инвалидируем весь view целиком.
-            model.on('ns-model-changed', function() {
+            this._bindModel(model, 'ns-model-changed', events, function() {
                 that.invalidate();
             });
         }
     }
 };
 
+ns.View.prototype._bindModel = function(model, eventName, events, callback) {
+    model.on(eventName, callback);
+    events[eventName] = callback;
+};
+
 /**
- * Анбиндится на изменение моделей.
+ * Отписываемся от изменений моделей.
  * @private
  */
 ns.View.prototype._unbindModels = function() {
-    //  FIXME: Переписать все соответственно _bindModels.
-    /*
-    for (var id in this.models) {
-        var model = this.models[id];
-        //TODO: namespace бы пригодился!
-        model.off('changed', this._onModelChangeBinded);
+    var models = this.models;
+    for (var model_id in models) {
+        var model = models[model_id];
+        var events = (this._modelsEvents[model.key] || {});
+
+        for (var eventName in events) {
+            model.off(eventName, events[eventName]);
+        }
+
+        delete this._modelsEvents[model.key];
     }
-    */
 };
 
 /**
@@ -747,9 +326,7 @@ ns.View.prototype._unbindModels = function() {
 ns.View.prototype._prepareCallback = function(fn) {
     if (typeof fn === 'string') {
         var method = this[fn];
-        if (!method) {
-            throw new Error("[ns.View] Can't find method '" + fn + "' in '" + this.id + "'");
-        }
+        ns.assert(method, 'ns.View', "Can't find method '%s' in '%s'", fn, this.id);
         return method;
     }
 
@@ -786,7 +363,6 @@ ns.View.prototype._bindEventHandlers = function(events, handlerPos) {
  * @private
  */
 ns.View.prototype._getEvents = function(type) {
-    // this._initEvents
     var eventProp = '_' + type + 'Events';
 
     if (!this[eventProp]) {
@@ -857,6 +433,13 @@ ns.View.prototype._bindEvents = function(type) {
     }
 };
 
+ns.View.prototype._bindCreateEvents = function() {
+    for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
+        var event = this.info.createEvents[i];
+        this.on(event[0], this._prepareCallback(event[1]));
+    }
+};
+
 /**
  * Удаляет обработчики событий перед удалением ноды.
  * @private
@@ -905,8 +488,6 @@ ns.View.prototype.invalidate = function() {
     }
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 ns.View.prototype.isOk = function() {
     return (this.status === this.STATUS.OK);
 };
@@ -925,8 +506,7 @@ ns.View.prototype.isNone = function() {
 
 //  FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
 ns.View.prototype.isSubviewsOk = function() {
-    //  Возвращаем, есть ли хоть один невалидный subview.
-    return ns.object.isEmpty(this._subviews);
+    return ns.object.isEmpty(this._invalidSubviews);
 };
 
 /**
@@ -967,6 +547,7 @@ ns.View.prototype.isModelsValid = function(modelsVersions) {
         ) {
             //  FIXME: А не нужно ли тут поменять статус блока?
             //  Раз уж мы заметили, что он невалидный.
+            //  chestozo: не нужно. Метод делает ровно то, что отражено в его названии: возвращает статус.
             return false;
         }
     }
@@ -974,18 +555,14 @@ ns.View.prototype.isModelsValid = function(modelsVersions) {
     return true;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 //  Вызываем callback для всех подблоков.
+//  Это плоский метод. Он работает только с подблоками и не уходит рекурсивно вглубь by design.
 ns.View.prototype._apply = function(callback) {
     var views = this.views;
     for (var id in views) {
         callback(views[id], id);
-        // @chestozo: а не надо тут вызвать: views[id]._apply(callback) ?
     }
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
  * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
@@ -1005,6 +582,7 @@ ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
     // Если views еще не определены (первая отрисовка)
     if (!this.views) {
         //  FIXME: Почему бы это в конструкторе не делать?
+        //  chestozo: lazy инициализация, всё такое.
         this.views = {};
         // Создаем подблоки
         for (var view_id in pageLayout) {
@@ -1039,7 +617,7 @@ ns.View.prototype._tryPushToRequest = function(updated) {
 
         } else if (!hasValidModels) {
             this.asyncState = true;
-            // если асинхронный блок имеет невалидные модели, то его не надо рисовать
+            // если асинхронный блок имеет невалидные модели, то его не надо рисовать сразу
             updated.async.push(this);
             // прекращаем обработку
             return updated;
@@ -1052,18 +630,17 @@ ns.View.prototype._tryPushToRequest = function(updated) {
     return updated;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
-//  Строим дерево для шаблонизатора.
-//
-//  В tree.views будет дерево блоков, которые нужно сгенерить,
-//  причем на верхнем уровне будут т.н. toplevel-блоки --
-//  это невалидные блоки и выше их все блоки валидны.
-//  В частности, это значит, что если блок невалидный, то он будет перерисован
-//  со всеми своими подблоками.
-//
-//  В tree.models будут все модели, требуемые для этих блоков.
-//
+/**
+ *  Строим дерево для шаблонизатора.
+ *
+ *  В tree.views будет дерево блоков, которые нужно сгенерить,
+ *  причем на верхнем уровне будут т.н. toplevel-блоки --
+ *  это невалидные блоки и выше их все блоки валидны.
+ *  В частности, это значит, что если блок невалидный, то он будет перерисован
+ *  со всеми своими подблоками.
+ *
+ *  В tree.models будут все модели, требуемые для этих блоков.
+ */
 ns.View.prototype._getUpdateTree = function(tree, layout, params) {
     if ( !this.isValid() ) {
         tree.views[this.id] = this._getViewTree(layout, params);
@@ -1090,7 +667,7 @@ ns.View.prototype._getViewTree = function(layout, params) {
         // всегда собираем данные, в том числе закешированные модели для async-view
         models: this._getModelsData(),
         errors: this._getModelsError(),
-        // есть view находится в режиме async, то модели проверять не надо
+        // если view находится в режиме async, то модели проверять не надо
         is_models_valid: this.asyncState || this.isModelsValid(),
         //  добавляем собственные параметры блока
         params: this.params,
@@ -1104,8 +681,8 @@ ns.View.prototype._getViewTree = function(layout, params) {
     // match .view-name ns-view-content
     tree.tree[this.id] = true;
 
-    //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
-    //  помечаем его как асинхронный (false).
+    //  Если это асинхронный блок и для него нет еще всех моделей,
+    //  помечаем его как асинхронный.
     //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
     //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
     if ( this.async && !this.isModelsValid() ) {
@@ -1113,7 +690,9 @@ ns.View.prototype._getViewTree = function(layout, params) {
         return tree;
     }
 
-    //  Это блок без подблоков и он не асинхронный.
+    //  Сюда попадают только синхронные блоки.
+
+    //  Это блок без подблоков.
     if (typeof layout !== 'object') {
         return true;
     }
@@ -1284,7 +863,13 @@ ns.View.prototype._setNode = function(node) {
          */
         this.$node = $(node);
 
-        this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
+        // Возможно, это несколько избыточно, что раз уж у view валидные модели, значит она и сама валидна.
+        if (this.isModelsValid()) {
+            this.status = STATUS.OK;
+        } else {
+            this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
+        }
+
     } else {
         this.status = STATUS.NONE;
     }
@@ -1341,14 +926,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
     if ( !this.isValid() ) {
         //  Ищем новую ноду блока.
         viewNode = this._extractNode(node);
-
-        if (!viewNode) {
-            //  TODO @nop: Может сделать метод типа:
-            //
-            //      this.error("Can't find node for %id");
-            //
-            throw new Error("[ns.View] Can't find node for '" + this.id + "'");
-        }
+        ns.assert(viewNode, 'ns.View', "Can't find node for '%s'", this.id);
 
         //  Тут у нас может быть несколько вариантов, почему блок нужно как-то обновлять:
         //
@@ -1359,15 +937,13 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
 
         if ( this.isOk() ) {
             //  Обновляем только subview.
-            for (var subview_id in this._subviews) {
+            for (var subview_id in this._invalidSubviews) {
                 var className = 'ns-subview-' + subview_id;
 
                 var new_subview_node = ns.byClass(className, viewNode)[0];
                 var old_subview_node = ns.byClass(className, this.node)[0];
 
-                if ( !(new_subview_node && old_subview_node) ) {
-                    throw "Can't find node for subview '" + subview_id + "' in view '" + this.id + "'";
-                }
+                ns.assert(new_subview_node && old_subview_node, 'ns.View', "Can't find node for subview '%s' in view '%s'", subview_id, this.id);
 
                 ns.replaceNode(old_subview_node, new_subview_node);
             }
@@ -1413,7 +989,7 @@ ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, ev
         }
 
         //  Все subview теперь валидны.
-        this._subviews = {};
+        this._invalidSubviews = {};
 
         this._saveModelsVersions();
     }
@@ -1450,6 +1026,431 @@ ns.View.prototype._saveModelsVersions = function() {
         this._modelsVersions[modelId] = this.models[modelId].getVersion();
     }
 };
+
+//  ---------------------------------------------------------------------------------------------------------------  //
+
+var _infos = {};
+var _ctors = {};
+
+/**
+ * Определяет новый View.
+ * @description
+ * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
+ * "eventDecl" записывается в виде "eventName [ selector ]".
+ * "selector" опционален, если его нет, то события регистрируется на ноду View.
+ * "handler" может быть строка (тогда она заменится на метод прототипа) или функция.
+ * Все хендлеры биндятся на экземпляр View.
+ * Разделение на типы событий происходит автоматически по следующим правилам (в порядке приоритета):
+ *   - если selector === "window" || selector == "document", то обработчик регистрируется по событию show
+ *   - если eventName === "resize", то обработчик регистрируется по событию show
+ *   - если eventName === "scroll", то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)
+ *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
+ * @param {String} id Название View.
+ * @param {Object} [info={}] Декларация View.
+ * @param {Function} [info.ctor] Конструтор.
+ * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
+ * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
+ * @param {Object} [info.events] DOM-события, на которые подписывается View.
+ * @param {Object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
+ * @param {Function|String} [base=ns.View] Базовый View для наследования
+ * @return {Function} Созданный View.
+ */
+ns.View.define = function(id, info, base) {
+    ns.assert(!(id in _infos), 'ns.View', "Can't redefine '%s'", id);
+
+    info = info || {};
+
+    var baseClass = ns.View;
+    if (typeof base === 'string') {
+        // если указана строка, то берем декларацию ns.View
+        baseClass = _ctors[base];
+        ns.assert(baseClass, 'ns.View', "Can't find '%s' to extend '%s'", base, id);
+
+    } else if (typeof base === 'function') {
+        baseClass = base;
+    }
+
+    var ctor = info.ctor || function() {};
+    // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
+    ctor = no.inherit(ctor, baseClass, info.methods);
+
+    info.models = ns.View._prepareModels( info.models || {} );
+    info.events = info.events || {};
+
+    // часть дополнительной обработки производится в ns.View.info
+    // т.о. получаем lazy-определение
+
+    _infos[id] = info;
+    _ctors[id] = ctor;
+
+    return ctor;
+};
+
+/**
+ * Возвращает информацию о View.
+ * @param {String} id Название модели.
+ * @returns {Object}
+ * @throws Бросает исключения, если нет
+ */
+ns.View.info = function(id) {
+    var info = _infos[id];
+    // если есть декларация, но еще нет pGroups, то надо завершить определение View
+    if (info && !info.pGroups) {
+        ns.View._initInfoParams(info);
+        ns.View._initInfoEvents(info);
+        ns.View._initInfoSubviews(info);
+    }
+    return info;
+};
+
+ns.View._initInfoParams = function(info) {
+    if (info.params) {
+        ns.assert(!info['params+'], 'ns.View', 'you cannot specify params and params+ at the same time');
+        ns.assert(!info['params-'], 'ns.View', 'you cannot specify params and params- at the same time');
+
+        var groups;
+        var pGroups = [];
+        if ( !Array.isArray(info.params) ) {
+            groups = [ info.params ];
+        } else {
+            groups = info.params;
+        }
+
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            // Если в params задано значение параметра -- это фильтр.
+            // Опциональные параметры view это параметры моделей с дефолтным значением.
+            // Опциональные параметры есть только когда параметры view формируются из параметров моделей (смотри ниже).
+            pGroups.push({
+                pNames: Object.keys(group),
+                pFilters: group,
+                pDefaults: {}
+            });
+        }
+
+        info.pGroups = pGroups;
+
+    } else {
+        var params = {};
+        for (var model_id in info.models) {
+            var modelInfo = ns.Model.info(model_id);
+            ns.assert(modelInfo, ns.View, 'Model %s is not defined!', model_id);
+
+            no.extend( params, modelInfo.params );
+        }
+
+        //  Массив с параметрами, которые надо исключить из ключа.
+        var exclude = info['params-'];
+        if (exclude) {
+            for (var i = 0; i < exclude.length; i++) {
+                delete params[ exclude[i] ];
+            }
+
+            delete info['params-'];
+        }
+
+        //  Дополнительные параметры (расширяют параметры от моделей или перекрывают их).
+        if (info['params+']) {
+            no.extend( params, info['params+'] );
+            delete info['params+'];
+        }
+
+        // Когда параметры строятся из параметров моделей нет фильтров параметров.
+        // И групп параметров - всего одна.
+        var pNames = Object.keys(params);
+        if (pNames.length) {
+            info.pGroups = [
+                {
+                    pNames: pNames,
+                    pFilters: {},
+                    pDefaults: params
+                }
+            ];
+        } else {
+            info.pGroups = [];
+        }
+    }
+};
+
+ns.View._initInfoEvents = function(info) {
+    /**
+     * События, которые надо повесить сразу при создании view
+     * @type {Array}
+     */
+    info.createEvents = [];
+
+    /**
+     * События, которые вешаются на htmlinit, снимаются на htmldestroy
+     * @type {Object}
+     */
+    info.initEvents = {
+        'bind': [],
+        'delegate': []
+    };
+
+    /**
+     * События, которые вешаются на show, снимаются на hide
+     * @type {Object}
+     */
+    info.showEvents = {
+        'bind': [],
+        'delegate': []
+    };
+
+    /**
+     * Декларации подписок на кастомные события при создании View.
+     * @type {Object}
+     */
+    info.initNoevents = {
+        'global': [],
+        'local': []
+    };
+
+    /**
+     * Декларации подписок на кастомные события при показе View.
+     * @type {Object}
+     */
+    info.showNoevents = {
+        'global': [],
+        'local': []
+    };
+
+    // парсим события View
+    for (var eventDecl in info.events) {
+        var declParts = eventDecl.split(' ');
+
+        // первый элемент - событие
+        var eventParts = declParts.shift().split('@');
+        var when = eventParts.length > 1 ? eventParts.pop() : '';
+        // нормализуем when
+        when = when && (when === 'init' || when === 'show') ? when : '';
+
+        var eventName = eventParts.join('@');
+
+        // остальное - селектор
+        var eventSelector = declParts.join(' ');
+
+        if (eventName) {
+            var handler = info.events[eventDecl];
+            var nativeEvent = ns.V.DOM_EVENTS.indexOf(eventName) > -1;
+
+            if (nativeEvent) {
+                var arr = [eventName, eventSelector, info.events[eventDecl]];
+
+                // глобальные селекторы всегда delegate
+                var globalSelector = eventSelector === 'window' || eventSelector === 'document';
+                // все события вешаем через .on(event, selector), кроме scroll, который .find(selector).on(scroll, handler)
+                var delegatedEvent = globalSelector || !(eventName === 'scroll' && eventSelector);
+
+                if (!when) {
+                    when = globalSelector ? 'show' : 'init';
+                }
+
+                // info.initEvents.delegate.push(arr)
+                info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
+
+            } else {
+                when = when || 'init';
+
+                // событие init тригерится при создании блока, поэтому вешать его надо сразу
+                // событие async тригерится до всего, его тоже надо вешать
+                if (eventName == 'ns-view-init' || eventName == 'ns-view-async') {
+                    info.createEvents.push([eventName, handler]);
+
+                } else {
+                    // к View нельзя получить доступ, поэтому локальными могут быть только встроенные ns-* события
+                    if (ns.V.NS_EVENTS.indexOf(eventName) > -1) {
+                        info[when + 'Noevents'].local.push([eventName, handler]);
+                    } else {
+                        info[when + 'Noevents'].global.push([eventName, handler]);
+                    }
+                }
+            }
+        }
+    }
+
+    // больше не нужны
+    delete info.events;
+};
+
+/**
+    Парсим информацию про subview.
+
+    В info.subviews приходит структура такого вида:
+        {
+            //  Определяем subview 'labels':
+            'labels': [
+                //  зависящее от поля '.labels' модели 'message',
+                'message .labels',
+                //  и от модели 'labels' целиком.
+                'labels'
+            ],
+            //  Пустая строка в качестве имени subview означает все view целиком.
+            //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
+            '': 'folders'
+            ...
+        }
+
+    На выходе в info.subviews такая структура:
+        {
+                //  Название модели.
+                'message': {
+                //  jpath.
+                '.labels': {
+                    //  Список subview, которые зависят от этого jpath в данной модели.
+                    'labels': true
+                }
+            },
+            'labels': {
+                //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
+                '': {
+                    'labels': true
+                }
+            },
+            'folders': {
+                '': {
+                    //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
+                    '': true
+                }
+            },
+            ...
+        }
+*/
+ns.View._initInfoSubviews = function(info) {
+    var subviewTree = {};
+    for (var subview in info.subviews) {
+        var deps = info.subviews[subview];
+        if (typeof deps === 'string') {
+            deps = [ deps ];
+        }
+
+        for (var i = 0; i < deps.length; i++) {
+            var r = deps[i].split(' ');
+            var model_id = r[0];
+            var jpath = r[1] || '';
+
+            var byModel = subviewTree[model_id] || (( subviewTree[model_id] = {} ));
+            var byModelJpath = byModel[jpath] || (( byModel[jpath] = {} ));
+            byModelJpath[subview] = true;
+        }
+    }
+    info.subviews = subviewTree;
+};
+
+ns.View.getKey = function(id, params, info) {
+    return this.getKeyAndParams(id, params, info).key;
+};
+
+/**
+ * Возвращает ключ объекта и параметры с учётом rewriteParamsOnInit
+ * В этом методе собрана вся логика рерайтов параметров при создании view
+ * @return Object
+ */
+ns.View.getKeyAndParams = function(id, params, info) {
+    //  Ключ можно вычислить даже для неопределенных view,
+    //  в частности, для боксов.
+    info = info || ns.View.info(id) || {};
+
+    if ('function' === typeof info.rewriteParamsOnInit) {
+        //  если для view определен метод rewriteParamsOnInit и он вернул объект,
+        //  то перепишем параметры
+        params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
+    }
+
+    var keyParams;
+    if ('function' === typeof info.params) {
+        keyParams = info.params(params);
+    } else {
+        keyParams = ns.View._getKeyParams(id, params, info);
+    }
+
+    ns.assert(keyParams, 'ns.View', 'Could not generate key for view %s', id);
+
+    return {
+        params: params,                      // параметры с учётом rewrite (полный набор параметров, а не только то, что нужно в ключе)
+        key: ns.key('view=' + id, keyParams) // ключ с учётом правильных параметров для ключа
+    };
+};
+
+ns.View._getKeyParams = function(id, params, info) {
+    var pGroups = info.pGroups || [];
+
+    // Группы параметров могут быть не заданы (это ок).
+    if (!pGroups.length) {
+        return {};
+    }
+
+    for (var g = 0; g < pGroups.length; g++) {
+        var group = pGroups[g];
+        var pNames = group.pNames || [];
+        var pFilters = group.pFilters || {};
+        var pDefaults = group.pDefaults || {};
+        var result = {};
+
+        for (var i = 0, l = pNames.length; i < l; i++) {
+            var pName = pNames[i];
+            var pValue = params[pName];
+            var pFilter = pFilters[pName];
+            var isOptional = pName in pDefaults;
+
+            pValue = (pValue === undefined) ? pDefaults[pName] : pValue;
+
+            if (pValue == null && isOptional) {
+                continue;
+            }
+
+            if (pValue == null || (pFilter && pValue != pFilter)) {
+                result = null;
+                break;
+            }
+
+            result[pName] = pValue;
+        }
+
+        if (result) {
+            return result;
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Фабрика ns.View
+ * @param {String} id ID view.
+ * @param {Object} [params] Параметры view.
+ * @param {Boolean} [async=false] Может ли view бы асинхронным.
+ * @return {ns.View}
+ */
+ns.View.create = function(id, params, async) {
+    var Ctor = _ctors[id];
+    ns.assert(Ctor, 'ns.View', "'%s' is not defined", id);
+
+    /**
+     * @type {ns.View}
+     */
+    var view = new Ctor();
+    view._init(id, params, async);
+
+    return view;
+};
+
+ns.View._prepareModels = function(models) {
+    var _models = {};
+
+    if ( Array.isArray(models) ) {
+        //  Если указан массив -- все модели обязательны.
+        for (var i = 0; i < models.length; i++) {
+            _models[ models[i] ] = true;
+        }
+    } else {
+        _models = models;
+    }
+
+    return _models;
+};
+
+//  ---------------------------------------------------------------------------------------------------------------  //
 
 if (window['mocha']) {
     /**

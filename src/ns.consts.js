@@ -102,7 +102,7 @@ ns.R = {
      * Тут специально выбрано длинное название,
      * чтобы не пересечься с нормальными страницами.
      */
-     REDIRECT: 'ns-router-redirect'
+    REDIRECT: 'ns-router-redirect'
 };
 
 /**

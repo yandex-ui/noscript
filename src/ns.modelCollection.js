@@ -10,7 +10,16 @@ ns.ModelCollection = function() {};
 
 no.inherit(ns.ModelCollection, ns.Model);
 
+ns.ModelCollection.prototype._init = function() {
+    ns.Model.prototype._init.apply(this, arguments);
+
+    // Хэшик с событиями, навешанными на элементы коллекции.
+    this._modelsEvents = {};
+};
+
 ns.ModelCollection.prototype.getData = function() {
+    // TODO а точно это нужно? Можно ведь просто всегда взять элементы из collection.models.
+
     // это составная модель —
     // нужно склеить все данные
     // из моделей её состовляющих
@@ -45,40 +54,25 @@ ns.ModelCollection.prototype.getData = function() {
 
 ns.ModelCollection.prototype._reset = function() {
     ns.Model.prototype._reset.apply(this, arguments);
+
     this.clear();
-};
-
-/**
- * Регистрирует обработчики событий.
- * @private
- */
-ns.ModelCollection.prototype._bindEvents = function() {
-    ns.Model.prototype._bindEvents.apply(this, arguments);
-
-    // При уничтожении вложенной модели коллекция выносит останки.
-    this.on('ns-model-destroyed', function(e, data) {
-        // Убедимся, что удалился именно элемент коллекции, а не сама коллекция.
-        // Пока это возможно только по наличию data.model в аргументах
-        if (data && data.model) {
-            this.remove(data.model);
-        }
-    });
 };
 
 /**
  * Разбивает данные через jpath описанный в info.split
  * на составные модели
  */
-ns.ModelCollection.prototype._setData = function(data) {
+ns.ModelCollection.prototype._beforeSetData = function(data) {
     this.clear();
 
-    var info = this.info.split;
-    var models = data;
-    if (info) {
-        var items = no.jpath(info.items, data);
-        models = this._splitModels(items);
+    var splitInfo = this.info.split;
+    if (splitInfo) {
+        var items = no.jpath(splitInfo.items, data);
+        var models = this._splitModels(items);
         this.insert(models);
     }
+
+    // TODO может быть стоит удалять данные split-а?
 
     return data;
 };
@@ -86,35 +80,22 @@ ns.ModelCollection.prototype._setData = function(data) {
 /**
  * Создает модели из разбитых данных
  *
- * @param {Array} items – массив данных для будущих подмоделей
- * @returns {ns.Model[]} – массив полученных подмоделей
+ * @param { Array } items – массив данных для будущих подмоделей
+ * @return { ns.Model[] } – массив полученных подмоделей
  */
 ns.ModelCollection.prototype._splitModels = function(items) {
-    var info = this.info.split;
-    var that = this;
+    var splitInfo = this.info.split;
 
-    var models = [];
-
-    items.forEach(function(item) {
-
+    return items.map(function(item) {
         var params = {};
-        for (var key in info.params) {
-            params[key] = no.jpath(info.params[key], item);
+        for (var key in splitInfo.params) {
+            params[key] = no.jpath(splitInfo.params[key], item);
         }
 
         // идентификатор подмодели берется из info.model_id
-        // он коллецкия может содержать модели только одного вида
-        var model = ns.Model.get(info.model_id, params).setData(item);
-
-        model.on('ns-model-touched', function() {
-            // increment modelCollection version on collection-item update
-            that._version++;
-        });
-
-        models.push(model);
+        // коллецкия может содержать модели только одного вида
+        return ns.Model.get(splitInfo.model_id, params).setData(item);
     });
-
-    return models;
 };
 
 /**
@@ -123,29 +104,45 @@ ns.ModelCollection.prototype._splitModels = function(items) {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._subscribeSplit = function(model) {
+    var that = this;
+    var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
 
-    // добавим нашу коллекцию с список слушающих коллекций для подмодели
-    model.eventListeners[this.key] = this;
+    this._bindModel(model, 'ns-model-changed', events, function(evt, jpath) {
+        that.onItemChanged(evt, model, jpath);
+    });
 
-    // если ранее мы не переопределяли прототипный тригер
-    // то переопеделим его
-    if (ns.Model.prototype.trigger === model.trigger) {
-        model.trigger = function(evt, data) {
-            ns.Model.prototype.trigger.call(this, evt, data);
+    this._bindModel(model, 'ns-model-touched', events, function(evt) {
+        that.onItemTouched(evt, model);
+    });
 
-            var collData = {
-                data: data,
-                model: this
-            };
+    this._bindModel(model, 'ns-model-destroyed', events, function(evt) {
+        that.onItemDestroyed(evt, model);
+    });
+};
 
-            for (var key in this.eventListeners) {
-                var collection = this.eventListeners[key];
-                if (collection) {
-                    collection.trigger(evt, collData);
-                }
-            }
-        };
-    }
+ns.ModelCollection.prototype._bindModel = function(model, eventName, events, callback) {
+    model.on(eventName, callback);
+    events[eventName] = callback;
+};
+
+ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
+    // Основной смысл этого метода в том, чтобы его можно было переопределить
+    // и триггерить изменение коллекции только для части изменений элементов коллекции.
+
+    // TODO тут можно триггерить много чего, но мы пока этого не делаем:
+    // this.trigger('ns-model-changed.items[3].some.inner.prop'); // (ЭТОГО СЕЙЧАС НЕТ).
+
+    this.trigger('ns-model-changed', { 'model': model, 'jpath': jpath });
+};
+
+ns.ModelCollection.prototype.onItemTouched = function() {
+    // У коллекции есть собственная версия (this._versionSelf) и версия элементов коллекции (this._version).
+    // Когда меняется элемент коллекции - версия самой коллекции не меняется.
+    this._version++;
+};
+
+ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
+    this.remove(model);
 };
 
 /**
@@ -178,30 +175,38 @@ ns.ModelCollection.prototype.touch = function() {
  * @param {ns.Model} model
  */
 ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
-    delete model.eventListeners[this.key];
+    if (model.key in this._modelsEvents) {
+        var events = this._modelsEvents[model.key];
+
+        for (var eventName in events) {
+            model.off(eventName, events[eventName]);
+        }
+
+        delete this._modelsEvents[model.key];
+    }
 };
 
 /**
- * Удаляет все подмодели из коллекции
- * С каждой модели происходит снятие подписки
+ * Очищает коллекцию от моделей.
+ * Не путать с remove.
  */
 ns.ModelCollection.prototype.clear = function() {
+    if (this.models) {
+        var that = this;
+        this.models.forEach(function(model) {
+            that._unsubscribeSplit(model);
+        });
+    }
 
-    this.models = this.models || [];
-
-    this.models.forEach(
-        this._unsubscribeSplit.bind(this)
-    );
-
+    // Это нужно и для начальной инициализации моделей.
     this.models = [];
 };
 
 /**
  * Вставляет подмодели в коллекцию
  *
- * @param {ns.Model[] | ns.Model} models – одна или несколько подмоделей
- *                                                 для вставки
- * @param {Number} [index] – индекс позиции, на которую вставить подмодели
+ * @param {ns.Model[] | ns.Model} models – одна или несколько подмоделей для вставки
+ * @param {Number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
  *
  * @return {Boolean} – признак успешности вставки
  */
@@ -210,9 +215,8 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         index = this.models.length;
     }
 
-    // Для удобства, одиночная модель оборачивается в массив.
-    if (!(models instanceof Array)) {
-        models = [models];
+    if (!Array.isArray(models)) {
+        models = [ models ];
     }
 
     // Вставить можно только объявленную модель
@@ -223,8 +227,6 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 
     insertion.forEach(function(model, i) {
         this.models.splice(index + i, 0, model);
-
-        // не забудем подписаться на события
         this._subscribeSplit(model);
     }, this);
 
@@ -234,24 +236,24 @@ ns.ModelCollection.prototype.insert = function(models, index) {
         this.status = this.STATUS.OK;
 
         this.trigger('ns-model-insert', insertion);
+
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 };
 
 /**
- * Удаляет подмодель из коллекции
+ * Удаляет элементы коллекции.
  *
  * @param {ns.Model | Number | ns.Model[] | Number[]} models – подмодели или индексы подмодели, которую надо удалить
- * @return {Boolean} – признак успешности удаления
+ * @return {Boolean} – признак успешности удаления.
  */
 ns.ModelCollection.prototype.remove = function(models) {
-
     var modelsRemoved = [];
 
-    if (!(models instanceof Array)) {
-        models = [models];
+    if (!Array.isArray(models)) {
+        models = [ models ];
     }
 
     models.forEach(function(modelOrIndex) {
@@ -266,7 +268,6 @@ ns.ModelCollection.prototype.remove = function(models) {
         if (index >= 0) {
             var model = this.models[index];
 
-            // не забудем отписаться от событий подмодели
             this._unsubscribeSplit(model);
             modelsRemoved.push(model);
             this.models.splice(index, 1);

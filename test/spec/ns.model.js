@@ -12,6 +12,14 @@ describe('ns.Model', function() {
             }
         });
 
+        ns.Model.define('m2', {
+            params: function(params) {
+                if (params.mode === 'custom') {
+                    return { id: params.id, more: 'added' };
+                }
+            }
+        });
+
         ns.Model.define('do-m1', {
             params: {
                 p1: null,
@@ -200,7 +208,13 @@ describe('ns.Model', function() {
 
         describe('info', function() {
 
+            it('should set ready after first call', function() {
+                expect( ns.Model.info('m1').ready )
+                    .to.eql(true);
+            });
+
             it('should return pNames property', function() {
+                var key = ns.Model.key('m1', { p1: 1, p3: 2 });
                 expect( ns.Model.info('m1').pNames )
                     .to.eql(['p1', 'p2', 'p3', 'p4']);
             });
@@ -248,7 +262,7 @@ describe('ns.Model', function() {
                 ns.Model.define('me0', {events: decl});
 
                 expect( ns.Model.info('me0').events )
-                    .to.eql(decl)
+                    .to.eql(decl);
             });
 
         });
@@ -280,6 +294,20 @@ describe('ns.Model', function() {
                 var k2 = ns.Model.key('do-m1');
 
                 expect(k1).not.to.be(k2);
+            });
+
+        });
+
+        describe('info.params as a function', function() {
+
+            it('function can return any object', function() {
+                expect( ns.Model.key('m2', { mode: 'custom', id: 1 }) )
+                    .to.be('model=m2&id=1&more=added');
+            });
+
+            it('function can return nothing', function() {
+                expect( ns.Model.key('m2', {}) )
+                    .to.be('model=m2');
             });
 
         });
@@ -453,6 +481,60 @@ describe('ns.Model', function() {
 
         });
 
+        describe('needUpdateData()', function() {
+
+            beforeEach(function() {
+                ns.Model.define('m10');
+
+                ns.Model.define('m11', {
+                    methods: {
+                        needUpdateData: function(data) {
+                            return data.isNew;
+                        }
+                    }
+                });
+            });
+
+            afterEach(function() {
+                ns.Model.clearCaches();
+            });
+
+            describe('default version', function() {
+                it('should not set data', function() {
+                    var m = ns.Model.get('m10').setData({});
+
+                    expect(m._version).to.be(1);
+                    expect(m.setData()._version).to.be(1);
+                    expect(m.setData(null)._version).to.be(1);
+                    expect(m.setData('')._version).to.be(1); // NOTE вот на это можно напоросться: пустая строка это может быть и валидное значение.
+                });
+
+                it('should set data', function() {
+                    var m = ns.Model.get('m10');
+
+                    expect(m.setData({})._version).to.be(1);
+                    expect(m.setData(true)._version).to.be(2);
+                });
+            });
+
+            describe('custom version', function() {
+                it('should set data', function() {
+                    var m = ns.Model.get('m11');
+                    m.setData({ isNew: true, some: 'data' });
+                    expect(m._version).to.be(1);
+                    expect(m.getData()).to.be.eql({ isNew: true, some: 'data' });
+                });
+
+                it('should not set data', function() {
+                    var m = ns.Model.get('m11');
+                    m.setData({ isNew: false, some: 'data' });
+                    expect(m._version).to.be(0);
+                    expect(m.getData()).to.be(null);
+                });
+            });
+
+        });
+
         describe('getData', function() {
 
             beforeEach(function() {
@@ -546,7 +628,6 @@ describe('ns.Model', function() {
             });
 
         });
-
 
         describe('destroyWith', function() {
 

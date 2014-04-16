@@ -80,8 +80,8 @@ ns.ModelCollection.prototype._beforeSetData = function(data) {
 /**
  * Создает модели из разбитых данных
  *
- * @param { Array<Object>} items – массив данных для будущих подмоделей
- * @return { Array<ns.Model> } – массив полученных подмоделей
+ * @param { Array } items – массив данных для будущих подмоделей
+ * @return { ns.Model[] } – массив полученных подмоделей
  */
 ns.ModelCollection.prototype._splitModels = function(items) {
     var splitInfo = this.info.split;
@@ -205,7 +205,7 @@ ns.ModelCollection.prototype.clear = function() {
 /**
  * Вставляет подмодели в коллекцию
  *
- * @param {Array<ns.Model> | ns.Model} models – одна или несколько подмоделей для вставки
+ * @param {ns.Model[] | ns.Model} models – одна или несколько подмоделей для вставки
  * @param {Number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
  *
  * @return {Boolean} – признак успешности вставки
@@ -246,7 +246,7 @@ ns.ModelCollection.prototype.insert = function(models, index) {
 /**
  * Удаляет элементы коллекции.
  *
- * @param {ns.Model | Number | Array<ns.Model | Number>} models – подмодели или индексы подмоделей, которые надо удалить.
+ * @param {ns.Model | Number | ns.Model[] | Number[]} models – подмодели или индексы подмодели, которую надо удалить
  * @return {Boolean} – признак успешности удаления.
  */
 ns.ModelCollection.prototype.remove = function(models) {

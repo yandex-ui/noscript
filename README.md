@@ -1,65 +1,26 @@
-noscript
-========
 [![Build Status](https://travis-ci.org/yandex-ui/noscript.png?branch=master)](https://travis-ci.org/yandex-ui/noscript)
 [![NPM version](https://badge.fury.io/js/noscript.png)](http://badge.fury.io/js/noscript)
 [![Dependency Status](https://david-dm.org/yandex-ui/noscript.png)](https://david-dm.org/yandex-ui/noscript)
+# noscript - JS MVC framework
 
-JS MVC framework
+## Ключевые сущности
 
-#### Changelog
+[Общее описание сущностей](/yandex-ui/noscript/blob/master/doc/entities.md)
 
-##### Next
-- `destroyWith` стал статическим методом `ns.Model.destroyWith`
-- статический метод `ns.Model.isCollection` вместо метода самой модели
-- новая функция `ns.assert` для проверки критичных условий и генерации ошибки, если условия не выполняются
-- вначале вернул `_unbindModels` у view, потом понял, что с ним не работает invalidate view. Отключил unbind
-- fix множественной подписки на ns-model-changed у view. Должно было стать пошустрее, но не очень заметно
-- поправил баг в ns.requestManager: иногда для модели в состоянии ошибки ставился статус, что она ок
-- добавил метод `ns.Model.prototype.needUpdateData(data)` чтобы можно было проверить, что пришли те же данные и не повышать версию модели (и не перерисоввывать view-хи)
-- у события `ns-page-before-load` добавился третий параметр `newPageUrl` (теперь обработчик должен выглядеть так `onPageBeforeLoad: function(evt, pairOfPages, newPageUrl) { .. }`)
-- фикс тестов про router (оказывается `it` отрабатывает асинхронно и тесты работали неправильно - добавил замыкание)
-- поддержка фильтров в `ns.router`: теперь можно задавать фильтр для параметра в урле `/{param==filter:type}`
-- пофиксил валидацию значения параметра (раньше `a123` тоже подходило под тип `int`, что не есть верно)
-- поддержка функции на месте `info.params` для `ns.Model`
-- поддержка функции на месте `info.params` для `ns.View`
-- fix ns.router.generateUrl(): не urlencode-ились параметры при генерации урла
+### Раскладка страницы (ns.Layout)
 
-##### 0.1.11 (12.11.2013)
-- Fix bug with bind/unbind global events
+[Декларация](/yandex-ui/noscript/blob/master/doc/ns.layout.md)
 
-##### 0.1.10 (08.11.2013)
-- Model destruction refactoring [#174](https://github.com/yandex-ui/noscript/pull/174). `ns.Model.find` renamed to `ns.Model.getValid`.
-- Add method `ns.Model.prototype.select` which always returns array of results [#170](https://github.com/yandex-ui/noscript/issues/170)
+### Вид (ns.View)
 
-##### 0.1.9 (22.10.2013)
-- Drop History API support for old browsers. Use polyfill insted. [#171](https://github.com/yandex-ui/noscript/pull/171)
+[Декларация](/yandex-ui/noscript/blob/master/doc/ns.view.md)
 
-##### 0.1.8 (15.10.2013)
-- `ns.router` decodes params from url [#168](https://github.com/yandex-ui/noscript/pull/168)
-- `ns.Model.set` triggers `ns-model-changed` event first, then `ns-model-changed.<jpath>` [#165](https://github.com/yandex-ui/noscript/pull/165)
+[Структура шаблона](/yandex-ui/noscript/blob/master/doc/ns.view-yate.md)
 
-##### 0.1.7 (7.10.2013)
-- New method `ns.router.generateUrl` [#154](https://github.com/yandex-ui/noscript/pull/154)
+### Вид-коллекция (ns.View)
 
-##### 0.1.5 (12.09.2013)
-- Улучшение поведение `ns.Box` [#157](https://github.com/yandex-ui/noscript/pull/157)
-- Добавлен метод `ns.router.generateUrl` для генерации урлов по параметрам [#154](https://github.com/yandex-ui/noscript/pull/157)
+[Декларация](/yandex-ui/noscript/blob/master/doc/ns.viewCollection.md)
 
-##### 0.1.3 (28.08.2013)
-- Новый `ns.page.history` объект для манипуляций с историей приложения
-- Исправлена проблема с конкурентными async-обновлениями.
-- Исправлен баг в `ns.router` с реврайтом урлов с параметрами (например, `/page1?foo=bar`)
-- У `ns.Model` появился метод `destroyWith` [#149](https://github.com/yandex-ui/noscript/pull/149)
+### Построение и обновление страницы (ns.Update)
 
-##### 0.1.1
-- Fix #146 `ns.action` поломал инициализацию наноблоков
-- #129 Ошибка при setData для модели коллекции без split
-- Merge pull request #131 from yandex-ui/collection-key
-- Merge pull request #141 from yandex-ui/view-collection-async
-- Merge pull request #139 from yandex-ui/view-collection-doc
-- Merge pull request #143 from yandex-ui/ns-page-typo
-
-
-##### 0.1.0
-Более менее стабильная версия. Попытка начать версионировать процесс.
-
+[Логика работы](/yandex-ui/noscript/wiki/Логика-построения-и-обновления-страницы)

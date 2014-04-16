@@ -175,7 +175,9 @@ ns.View.prototype._hide = function(events) {
         return true;
 
     } else if (this.isLoading() && this._visible !== false) {
-        // Случай для асинхронных view, которые отрендерили в состоянии async, но _show для них не выполнялся.
+        // Случай для асинхронных видов, которые отрендерили в состоянии async,
+        // но `_show` для них не выполнялся. Это происходит, например, при
+        // быстрой навигации по интерфейсу.
         this._hideNode();
         this._visible = false;
 
@@ -1084,6 +1086,12 @@ ns.View.define = function(id, info, base) {
     return ctor;
 };
 
+/**
+ * Возвращает информацию о View.
+ * @param {String} id Название модели.
+ * @returns {Object}
+ * @throws Бросает исключения, если нет
+ */
 ns.View.info = function(id) {
     var info = _infos[id];
     // если есть декларация, но еще нет pGroups, то надо завершить определение View

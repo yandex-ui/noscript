@@ -5,10 +5,9 @@
 //  ---------------------------------------------------------------------------------------------------------------  //
 
 /**
- * @class Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
+ * @classdesc Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
  * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.get().
  * @constructor
- * @namespace
  * @mixes no.Events
  */
 ns.Model = function() {};
@@ -38,7 +37,7 @@ ns.Model.prototype.STATUS = ns.M.STATUS;
 
 ns.Model.prototype._init = function(id, params, data) {
     this.id = id;
-    this.params = params;
+    this.params = params || {};
 
     this._reset();
 
@@ -96,7 +95,7 @@ ns.Model.prototype._prepareCallback = function(method) {
         method = this[method];
     }
 
-    ns.assert((typeof method === 'function'), 'ns.Model', "Can't find method '%s' in '%s'", method, this.id);
+    ns.assert((typeof method === 'function'), 'ns.Model', "Can't find method '%s' in '%s' to bind event", method, this.id);
 
     return method;
 };
@@ -445,6 +444,7 @@ ns.Model.define = function(id, info, base) {
  * Returns model's info
  * @param {String} id Model ID.
  * @returns {Object}
+ * @throws Throws exception if model is not defined.
  */
 ns.Model.info = function(id) {
     var info = ns.Model.infoLite(id);

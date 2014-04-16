@@ -760,4 +760,71 @@ describe('no.Updater', function() {
         });
     });
 
+    describe('interrupting updates of async views inside a box', function() {
+        beforeEach(function(finish) {
+            sinon.stub(ns.history, 'pushState', no.nop);
+
+            ns.layout.define('app', {
+                'app': {
+                    'box@': 'todos&'
+                }
+            });
+
+            /// Model
+            ns.Model.define('todos', { params: { category: null } });
+
+            /// Views
+            ns.View.define('app');
+            ns.View.define('todos', { models: [ 'todos' ] });
+
+            ns.router.routes = {
+                route: {
+                    '/{category:int}': 'app'
+                }
+            };
+            ns.router.init();
+
+            var server = this.server = sinon.fakeServer.create();
+            server.autoRespond = true;
+            server.respondWith('{ "models": [ { "data": {} } ] }');
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            // Run two interrupting updates.
+            ns.page.go('/1');
+            ns.page.go('/2')
+                .done(function(result) {
+                    no.Promise.wait(result.async)
+                        .done(function() {
+                            finish();
+                        }.bind(this));
+                }.bind(this));
+        });
+
+        // Restore XHR.
+        afterEach(function() {
+            this.server.restore();
+            ns.history.pushState.restore();
+        });
+
+        it('should hide async views', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async:not(.ns-view-hidden)')).to.have.length(0);
+        });
+
+        it('should show only one view', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
+        });
+
+        it('should hide other fetching views', function() {
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-hidden')).to.have.length(1);
+        });
+
+        it('should correctly switch views once navigated back', function(finish) {
+            ns.page.go('/1').done(function() {
+                expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos.ns-view-visible').getAttribute('data-key')).to.contain('category=1');
+                expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos.ns-view-hidden').getAttribute('data-key')).to.contain('category=2');
+                finish();
+            });
+        });
+    });
 });

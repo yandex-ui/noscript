@@ -481,14 +481,14 @@ describe('ns.Model', function() {
 
         });
 
-        describe('needUpdateData()', function() {
+        describe('hasDataChanged()', function() {
 
             beforeEach(function() {
                 ns.Model.define('m10');
 
                 ns.Model.define('m11', {
                     methods: {
-                        needUpdateData: function(data) {
+                        hasDataChanged: function(data) {
                             return data.isNew;
                         }
                     }

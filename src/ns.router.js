@@ -368,7 +368,6 @@ ns.router._parseSection = function(rawSection) {
  */
 ns.router._parseParam = function(param) {
     var chunks;
-    var default_parts;
     var param_type;
     var param_default;
     var param_is_optional;
@@ -376,7 +375,7 @@ ns.router._parseParam = function(param) {
 
     chunks = param.split('=');
     // название и тип всегда идут вместе "paramName:paramType"
-    var paramNameAndType = chunks[0].split(':')
+    var paramNameAndType = chunks[0].split(':');
 
     paramName = paramNameAndType[0];
     // если тип не указан, то id
@@ -392,7 +391,7 @@ ns.router._parseParam = function(param) {
     } else {
         // если в декларации одно "=", то параметр опциональный
         param_is_optional = chunks.length == 2;
-        param_default = chunks[1]
+        param_default = chunks[1];
     }
 
     // section parsed

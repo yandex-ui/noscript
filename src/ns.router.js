@@ -382,7 +382,7 @@ ns.router._parseParam = function(param) {
     param_type = paramNameAndType[1] || 'id';
 
     // фильтр "=="
-    if (chunks.length == 3) {
+    if (chunks.length === 3) {
         param_is_optional = false;
         param_default = chunks[2];
         ns.assert(param_default, 'ns.router', "Parameter '%s' value must be specified", param);
@@ -390,7 +390,7 @@ ns.router._parseParam = function(param) {
 
     } else {
         // если в декларации одно "=", то параметр опциональный
-        param_is_optional = chunks.length == 2;
+        param_is_optional = chunks.length === 2;
         param_default = chunks[1];
     }
 

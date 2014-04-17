@@ -11,6 +11,7 @@
     },
 
     "bitwise": true,
+    "eqeqeq": true,
     "curly": true,
     "eqnull": true,
     "latedef": true,

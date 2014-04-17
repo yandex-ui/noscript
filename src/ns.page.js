@@ -41,7 +41,7 @@ ns.page.go = function(url, action) {
     if (!ns.page.block.check(url)) {
         // Если мы нажали кнопку "Назад" в браузере, то событие popstate произойдет уже после смены url
         // соответственно надо поменять урл на старый, если он поменялся
-        if (url != ns.page.currentUrl) {
+        if (url !== ns.page.currentUrl) {
             ns.history.replaceState(ns.page.currentUrl);
         }
         return no.Promise.rejected('block');
@@ -213,7 +213,7 @@ ns.page.history.push = function(url) {
             var prevPage = ns.page.history.getPrevious();
 
             // user pressed back button in browser
-            if (prevPage == url) {
+            if (prevPage === url) {
                 nsHistory._history.pop();
 
             } else {

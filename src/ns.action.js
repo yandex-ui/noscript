@@ -199,13 +199,13 @@ ns.action._process = function(e) {
         }
 
         // если hostname ссылки не равен нашему хосту
-        if (target.hostname != window.location.hostname) {
+        if (target.hostname !== window.location.hostname) {
             return true;
         }
 
         //TODO: HISTORY_API_SUPPORT: hash или не хеш
         //могут быть ссылки <a href="#hash" target="_blank"/>
-        if (target.getAttribute('target') != '_blank') {
+        if (target.getAttribute('target') !== '_blank') {
             returnValue = ns.page.go(href);
             if (returnValue instanceof no.Promise) {
                 // stop go to link, but not bubbling

@@ -396,7 +396,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //          Делаем _updateHtml
                 //      1.2 view валиден, то заменим placeholder на правильный html.
                 if (!view.isValid()) {
-                   view._updateHTML(newNode, null, params, options_next, events);
+                    view._updateHTML(newNode, null, params, options_next, events);
                 } else {
                     // здесь не нужно перевешивать события, т.к. они могут быть повешены
                     // либо непосредственно на ноду, либо на document. В первом случае

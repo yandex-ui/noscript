@@ -225,7 +225,7 @@ ns.Update.prototype._update = function(async) {
     // если пустое дерево, то ничего не реднерим,
     // но кидаем события и скрываем/открываем блоки
     if (!ns.object.isEmpty(tree.views)) {
-        node = ns.tmpl(tree, null, '');
+        node = this.render(tree, this.params, this.layout);
         ns.log.debug('[ns.Update]', 'start()', this.id, 'new node', node.cloneNode(true));
     }
 
@@ -252,7 +252,21 @@ ns.Update.prototype._update = function(async) {
     }
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
+/**
+ * Рендерит дерево видов.
+ * @description
+ * Этот метод является точкой расширения в приложении.
+ * Если приложение использует yate-модули или другой шаблонизатор,
+ * то ему надо переопределить этот метод.
+ * @param {object} tree Дерево видов.
+ * @param {object} params Параметры страницы.
+ * @param {object} layout Раскладка страницы.
+ * @returns {HTMLElement}
+ */
+ns.Update.prototype.render = function(tree, params, layout) {
+    /* jshint unused: false */
+    return ns.tmpl(tree, null, '');
+};
 
 /**
  * @return {Boolean} true in case another update was created after current update.

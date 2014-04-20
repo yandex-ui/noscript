@@ -13,9 +13,9 @@
 
 ### Вид (ns.View)
 
-[Декларация](/yandex-ui/noscript/blob/master/doc/ns.view.md)
+[Декларация и принципы работы](/yandex-ui/noscript/blob/master/doc/ns.view.md)
 
-[Структура шаблона](/yandex-ui/noscript/blob/master/doc/ns.view-yate.md)
+[Структура шаблона](/yandex-ui/noscript/blob/master/doc/ns.view.yate.md)
 
 ### Вид-коллекция (ns.View)
 

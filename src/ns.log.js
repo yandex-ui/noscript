@@ -1,7 +1,5 @@
 (function(/** @type ns */ns) {
 
-    /* jshint unused: false */
-
     /**
      * Модуль логирования ошибок.
      * @namespace
@@ -12,6 +10,7 @@
      * @param {...*} str
      */
     ns.log.debug = function(str) {
+        /* jshint unused: false */
 //        console.log.apply(console, arguments);
     };
 
@@ -22,7 +21,7 @@
      * @param {String} [longText] Дополнительные данные. Длинная строка, которую надо разбить на части.
      */
     ns.log.info = function(name, data, longText) {
-
+        /* jshint unused: false */
     };
 
     /**
@@ -32,7 +31,7 @@
      * @param {String} [longText] Дополнительные данные. Длинная строка, которую надо разбить на части.
      */
     ns.log.error = function(name, data, longText) {
-
+        /* jshint unused: false */
     };
 
     /**
@@ -42,7 +41,7 @@
      * @param {Object} [data] Дополнительные данные.
      */
     ns.log.exception = function(name, exception, data) {
-
+        /* jshint unused: false */
     };
 
 })(ns);

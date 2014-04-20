@@ -1,5 +1,3 @@
-/* jshint unused: false */
-
 (function() {
 
 /**
@@ -396,6 +394,7 @@ ns.Update.prototype.isGlobal = function() {
  * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
  */
 ns.Update.handleError = function(error, update) {
+    /* jshint unused: false */
     return false;
 };
 

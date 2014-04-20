@@ -1254,7 +1254,7 @@ ns.View._initInfoEvents = function(info) {
 
                 // событие init тригерится при создании блока, поэтому вешать его надо сразу
                 // событие async тригерится до всего, его тоже надо вешать
-                if (eventName == 'ns-view-init' || eventName == 'ns-view-async') {
+                if (eventName === 'ns-view-init' || eventName === 'ns-view-async') {
                     info.createEvents.push([eventName, handler]);
 
                 } else {
@@ -1399,7 +1399,7 @@ ns.View._getKeyParams = function(id, params, info) {
                 continue;
             }
 
-            if (pValue == null || (pFilter && pValue != pFilter)) {
+            if (pValue == null || (pFilter && pValue !== pFilter)) {
                 result = null;
                 break;
             }

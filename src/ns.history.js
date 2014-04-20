@@ -38,7 +38,7 @@ ns.history.onpopstate = function() {
  * @return {Boolean}
  */
 function isFunction(fn) {
-    return 'function' == typeof fn;
+    return 'function' === typeof fn;
 }
 
 })();

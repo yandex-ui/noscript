@@ -410,7 +410,7 @@ ns.Model.define = function(id, info, base) {
     info = info || {};
 
     // Model becomes ModelCollection if it has "isCollection" or "split" property
-    if (typeof info.isCollection == 'undefined') {
+    if (typeof info.isCollection === 'undefined') {
         info.isCollection = !!info.split;
     }
 
@@ -627,7 +627,7 @@ ns.ModelUniq.prototype.isValid = function() {
     // если в ключе не присутсвует наш уникальный параметр
     // значит запрашивать 'ничего' не планируется,
     // а 'ничего' у нас закэшировано и так
-    if (this.key.indexOf('&' + this.uniqName + '=') == -1) {
+    if (this.key.indexOf('&' + this.uniqName + '=') === -1) {
         return true;
     }
     return this._superIsValid();
@@ -670,7 +670,7 @@ ns.ModelUniq.prototype.uniq = function(params, cached) {
     // создаём ту же структуру, что и в оригинальных параметрах
     if (cached) {
         for (var k in params) {
-            cached[k] = k == name ? [] : params[k];
+            cached[k] = k === name ? [] : params[k];
         }
     }
 

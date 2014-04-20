@@ -21,6 +21,10 @@
 
 [Декларация](/yandex-ui/noscript/blob/master/doc/ns.viewCollection.md)
 
+### Модель (ns.Model)
+
+[Описание](/doc/ns.model.md)
+
 ### Построение и обновление страницы (ns.Update)
 
 [Логика работы](/yandex-ui/noscript/wiki/Логика-построения-и-обновления-страницы)

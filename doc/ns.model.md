@@ -9,12 +9,13 @@
   - [events](#events)
   - [methods](#methods)
   - [params](#params)
+- [Получение экземпляра модели](#Получение-экземпляра-модели)
 - [Работа с данными](#Работа-с-данными)
 - [Постобработка данных](#Пре--и-постобработка-данных)
-  - extractData(#extractdata)
-  - extractError(#extracterror)
-  - hasDataChanged(#hasdatachanged)
-  - preprocessData(#preprocessdata)
+  - [extractData](#extractdata)
+  - [extractError](#extracterror)
+  - [hasDataChanged](#hasdatachanged)
+  - [preprocessData](#preprocessdata)
 - [События](#События)
 
 ## Декларация
@@ -30,7 +31,7 @@ ns.Model.define('modelName', modelDeclObject[, baseModel])
 
 `ctor` - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самой модели, т.о. в конструкторе еще не доступны некоторые свойства.
 
-```
+```js
 /**
  * @classdesc prj.mMyModel
  * @augments ns.Model
@@ -70,13 +71,13 @@ ns.Model.define('my-model', {
 
 `methods` - объект с методами. По сути является прототипом объекта.
 
-```
+```js
 /**
  * @classdesc prj.mMyModel
  * @augments ns.Model
  */
 ns.Model.define('my-model', {
-    /** @lends prj.mMyModel.prototype
+    /** @lends prj.mMyModel.prototype */
     methods: {
         BAR: 100
         foo: function(){}
@@ -102,9 +103,14 @@ ns.Model.define('my-model', {
 });
 ```
 
+## Получение экземпляра модели
+
+ - `ns.Model.get('modelName', params)` - строит ключ из `params` и возвращает соответствующую модель. Если такого экземпляра нет, то он будет создан.
+ - `ns.Model.getValid('modelName', params)` - тоже самое что и `ns.Model.get`. Только экземпляр еще проверяется на валидность. Если валидный экземпляр не найден, то возвращается `null`.
+
 ## Работа с данными
 
-Методы для получения данных:
+**Методы для получения данных**:
  - `#getData()` - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.
  - `#get(jpath)` - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.
 ```js
@@ -129,9 +135,9 @@ this.get('.foo') -> ["1"]
 this.get('.bar.id') -> ["1"]
 ```
 
-Методы для изменения данных:
+**Методы для изменения данных**:
  - `#set(jpath, value)` - изменяет данные по jpath. Поддерживаются только несложные jpath.
-```
+```js
 this.set('.foo', 2);
 ```
  - `#setData(data)` - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.
@@ -193,7 +199,7 @@ ns.Model.define('my-model', {
 Этот метод позволяет обработать полученные данные.
 Аргументом метода являются новые данные, должен вернуть обработанные данные.
 
-```
+```js
 ns.Model.define('my-model', {
     methods: {
         _index: null,

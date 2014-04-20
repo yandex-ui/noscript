@@ -71,17 +71,10 @@
     "excludeFiles": [
         "Gruntfile.js",
 
-        "cfg",
-        "cfgs",
+        "css",
+        "doc",
         "dist",
-        "js/externals",
-        "js4wmi",
-        "jsx",
-        "models/*/*.wmi.js",
-        "models/*.info.js",
         "node_modules",
-        "static",
-        "test",
-        "tools"
+        "test"
     ]
 }

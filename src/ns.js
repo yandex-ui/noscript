@@ -1,5 +1,3 @@
-/*jshint unused: vars */
-
 /**
  * noscript MVC framework
  * @namespace
@@ -155,6 +153,7 @@ ns.transaction = function(cb) {
  * @param {String} message Сообщение об ошибке.
  */
 ns.assert = function(truthy, contextName, message) {
+    /* jshint unused: false */
     if (!truthy) {
         ns.assert.fail.apply(this, Array.prototype.slice.call(arguments, 1));
     }

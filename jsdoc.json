@@ -18,7 +18,7 @@
     "source": {
         "include": [
             "../src",
-            "../README.md"
+            "README.md"
         ]
     },
     "templates": {

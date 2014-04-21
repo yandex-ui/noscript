@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Tutorial: ns.router</title>
     
     
     
@@ -1246,43 +1246,99 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title" data-filename="index.html">Index</h1>
+            <h1 class="page-title">Tutorial: ns.router</h1>
         
 
-        
-
-
+        <section>
+    
+<header>
     
 
+    <h2>ns.router</h2>
+</header>  
 
-    <h3> </h3>
+<article>
+    <h2>ns.router</h2><p>Умеет:</p>
+<ul>
+<li>получать из урла - <code>id</code> страницы (layout) и параметры <code>params</code></li>
+<li>генерировать url-ы по <code>id</code> страницы и параметрам <code>params</code></li>
+</ul>
+<h3>API</h3><h4><code>ns.router.baseDir</code>: <code>{string}</code></h4><p>Базовая часть урла (если приложение располагается не в корне сайта.</p>
+<h4><code>ns.router(url)</code>: <code>{ page:string, params:{object} }</code></h4><p>Выполняет роутинг: вычисляет по <code>url</code> какая это страница <code>page</code> (это <code>id</code> layout-а) и вытаскивает параметры из урла.
+Если в урле были GET параметры - они подклеиваются в итоговый набор <code>params</code>.</p>
+<p>Когда выполняется роутинг выполняются:</p>
+<ul>
+<li>(опционально) redirect-ы (получаем новый урл после redirect-а и ещё раз выполняем роутинг)</li>
+<li>(опционально) rewrite (текущий урл заменяется на прописанный в rewrite-е, параметры подклеиваются в конце как GET параметры)</li>
+<li>роутинг (ищем первый подходящий шаблон урла, подробнее см. <code>ns.router.routes</code>. Если не удалось заматчится - считаем, что получили страницу с <code>not-found</code>)</li>
+<li>(опционально) rewrite параметров (при желании, меняем что-то в полученном объекте с параметрами <code>params</code>).</li>
+</ul>
+<h4><code>ns.router.url(url)</code>: <code>{ string }</code></h4><p>Генерация урла, когда урл известен и нужно только дописать базовую часть.
+Странный метод, лучше использовать <code>ns.router.generateUrl</code></p>
+<h4><code>ns.router.generateUrl(id, params)</code>: <code>{string}</code></h4><p>Генерация урла по <code>id</code> страницы (layout) и по набору параметров.
+Это операция, обратная той, которую делает <code>ns.router</code>.
+Умеет разворачивать rewrite-ы (после генерации урла проверяет, есть ли <code>rewrite</code> правила для полученного урла и выполняет их в обратную сторону).
+В случае неуспеха - кидает ошибку.</p>
+<h4><code>ns.router.routes</code>: <code>{object}</code></h4><p>Это объект, в котором нужно указать все урлы, rewrite-ы и redirect-ы.
+Кроме этого поддерживается rewrite параметров.</p>
+<p><code>redirect</code> - прописываются редиректы. Можно указать шаблон урла, который надо заматчить и можно указать функцию, которая вычисляет, куда делается редирект.</p>
+<p><code>rewriteUrl</code> - тут указаны урлы (не шаблоны урлов) и можно указать rewrite для конкретного урла на другой конкретный урл.</p>
+<p><code>route</code> - тут прописано соответствие шаблона урла - странице (layout-у).
+Матчинг урла выполняется сверху вниз. А значит у урла, который выше - больше приоритет.
+Отсюда правило - более общие шаблоны урлов указывать ниже.
+Матчинг выполняется до первого успешного сопоставления.
+Одной и тоже странице может соответствовать несколько шаблонов урлов.</p>
+<p><code>rewriteParams</code> - для страницы (layout-а) можно указать функцию, в которой произвольным образом поменять <code>params</code>.</p>
+<pre><code class="lang-js">ns.router.routes = {
+    redirect: {
+        '/': '/inbox',
+        '/inbox/old/{int:int}': '/inbox',
+        '/inbox/my': function() {
+            return '/inbox';
+        },
+        '/inbox/my/{int:int}': function(params) {
+            return '/inbox/' + params.int;
+        }
+    },
+    rewriteUrl: {
+        '/page1': '/page/1'
+    },
+    route: {
+        '/inbox': 'messages',
+        '/message/{mid:int}': 'message',
+        '/page/prefix{page:int}': 'url-with-prefix',
+        '/search/{request:any}': 'search'
+    },
+    rewriteParams: {
+        'message': function(params) {
+            return { id: params.mid };
+        }
+    }
+};
+</code></pre>
+<h4><code>ns.router.regexps</code>: <code>{object}</code></h4><p>Тут задаются типы параметров в виде регулярных выражения.</p>
+<p>Начальный набор такой:</p>
+<pre><code class="lang-js">ns.router.regexps = {
+    'id': '[A-Za-z_][A-Za-z0-9_-]*',
+    'int': '[0-9]+'
+};
+</code></pre>
+<h3>Параметры</h3><p>Параметры в урле задаются в <code>{}</code>, к примеру, <code>/message/{message-id}</code>.
+Параметр может быть как между <code>/</code>-ами, так и в промежутках, к примеру, <code>/archive/{year}-{month}-{day}</code>.</p>
+<p>Тип указывается после имени параметра и отделяется <code>:</code>: <code>{page:int}</code>.
+Если параметр указан без типа - ему присваивается тип <code>id</code>. Т.е. <code>{message-id}</code> соответствует <code>{message-id:id}</code>.</p>
+<p>Параметр может быть опциональным.
+В этом случае, слеш перед ним тоже становится опциональным.
+Чтобы указать, что параметр опционален - нужно дописать <code>=</code> или <code>=default</code> после имени параметра (или типа, если он указан),
+примерно так: <code>{page=}</code>, <code>{page=0}</code>, <code>{page:int=}</code> или <code>{page:int=0}</code>.
+Если в исходном урле параметр не задан, но указано дефолтное значение - оно будет в итоговом наборе параметров страницы <code>params</code>.</p>
+<p>Можно указать фильтр значения параметра.
+В этом случае параметр должен иметь строго указанное значение, только в этом случае урл будет заматчен.
+Чтобы указать фильтр нужно дописать <code>==filter</code> после имени параметра (или типа, если он указан), примерно так: <code>{color==green}</code> или <code>{color:colors==green}</code>.</p>
+<p><strong>Можно указать либо дефолтное значение, либо фильтр</strong>.</p>
+</article>
 
-
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article class="readme"><h1>noscript</h1><p>JS MVC framework рассчитанный, в первую очередь, для создания многостраничных приложений без перезагрузки.</p>
-<h2>Ключевые сущности</h2><p><a href="tutorial-entities.html">Общее описание сущностей</a></p>
-<h3>Раскладка страницы (ns.layout)</h3><p><a href="tutorial-ns.layout_.html">Декларация</a></p>
-<h3>Маршрутизатор (ns.router)</h3><p><a href="tutorial-ns.router_.html">Описание</a></p>
-<h3>Вид (ns.View)</h3><p><a href="tutorial-ns.view_.html">Декларация и принципы работы</a></p>
-<p><a href="tutorial-ns.view.yate.html">Структура шаблона</a></p>
-<h3>Вид-коллекция (ns.View)</h3><p><a href="tutorial-ns.viewCollection_.md">Декларация</a></p>
-<h3>Модель (ns.Model)</h3><p><a href="tutorial-ns.model_.md">Описание</a></p></article>
-    </section>
-
-
-
-
+</section>  
 
 
         
@@ -1294,7 +1350,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:31 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:32 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

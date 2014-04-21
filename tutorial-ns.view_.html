@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Tutorial: ns.view</title>
     
     
     
@@ -1246,43 +1246,193 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title" data-filename="index.html">Index</h1>
+            <h1 class="page-title">Tutorial: ns.view</h1>
         
 
-        
-
-
+        <section>
+    
+<header>
     
 
+    <h2>ns.view</h2>
+</header>  
 
-    <h3> </h3>
+<article>
+    <h1>ns.View</h1><p>Вид представляет собой элемент интерфейса.
+Он однозначно идентифицируется своим ключом, который строится во время инициализации.
+Разный ключ всегда означает разный экземпляр вида.</p>
+<p>Не стоит ожидать, что при изменении параметров будет перерисован тот же самый вид. Этого можно достичь, но в общем виде будет создан и отрисован новый экземпляр.</p>
+<ul>
+<li><a href="#Декларация">Декларация</a><ul>
+<li><a href="#ctor">ctor</a></li>
+<li><a href="#events">events</a><ul>
+<li><a href="#dom-события">DOM-события</a></li>
+<li><a href="#События-noscript">События noscript</a></li>
+<li><a href="#Встроенные-события">Встроенные события</a></li>
+</ul>
+</li>
+<li><a href="#methods">methods</a></li>
+<li><a href="#models">models</a></li>
+<li><a href="#Параметры">Параметры</a><ul>
+<li><a href="#params+">params+</a></li>
+<li><a href="#params-">params-</a></li>
+<li><a href="#params">params</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#Валидность">Валидность и перерисовки</a></li>
+<li><a href="#Взаимодействие">Взаимодействие с видом</a></li>
+<li><a href="#async">async</a></li>
+</ul>
+<h2>Декларация</h2><p>Определение нового вида происходит через статическую функцию <code>ns.View.define</code></p>
+<pre><code class="lang-js">ns.View.define('viewName', viewDeclObject[, baseView])
+</code></pre>
+<p>Объект-декларация состоит из следующих свойств.</p>
+<h3>ctor</h3><p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самого вида, т.о. в конструкторе еще не доступеы некоторые свойства.</p>
+<p>Полностью готовый экземпляр бросает событие <code>ns-view-init</code>.</p>
+<pre><code>/**
+ * @classdesc prj.vMyView
+ * @augments ns.View
+ */
+ns.View.define('my-view', {
+    /**
+     * @constructs prj.vMyView
+     */
+    ctor: function() {
+        this._state = 'initial';
+        this.CONST = 100;
+    }
+});
+</code></pre><h3><code>events</code></h3><p><code>events</code> - объект с декларацией подписок на события, как DOM, так и noscript.</p>
+<p>Любая подписка имеет вид:</p>
+<pre><code class="lang-json">{
+    &quot;на что подписаться@когда&quot;: &quot;обработчик&quot;
+}
+</code></pre>
+<p>Обработчиков может быть названием метода из прототипа или функция.</p>
+<p>События с суффиксом <code>@show</code> вешаются во время показа вида (событие <code>ns-view-show</code>) и снимаются во время скрытия (событие <code>ns-view-hide</code>).
+Аналогично, <code>@init</code> суффикс означает, что событие будет активировано на <code>ns-view-htmlinit</code> и деактивировано на <code>ns-view-htmldestroy</code> (это поведение поумолчанию).</p>
+<h4>DOM-события</h4><p>DOM-события от события noscript различаются согласно массиву <code>ns.V.DOM_EVENTS</code>. Все, что не входит в этот массив, является событием noscript.</p>
+<p>DOM-события навешиваются через механизм делегирования.</p>
+<p>Примеры деклараций:</p>
+<pre><code class="lang-js">{
+    // событие click на корневой ноде вида
+    &quot;click&quot;: &quot;onClick&quot;,
+    // событие click на нодах к классом selector внутри вида
+    &quot;click .selector&quot;: &quot;onSelectorClick&quot;
+}
+</code></pre>
+<h4>События noscript</h4><p>Декларируются как и остальные события</p>
+<pre><code class="lang-js">{
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
+    &quot;my-custom-show@show&quot;: &quot;onCustomShow&quot;
+}
+</code></pre>
+<h4>Встроенные события</h4><p>Список событий:</p>
+<ul>
+<li><code>ns-view-hide</code> - вида был скрыт и больше не виден на странице</li>
+<li><code>ns-view-htmldestroy</code> - старая нода у вида была уничтожена</li>
+<li><code>ns-view-htmlinit</code> - у вида появилась новая нода</li>
+<li><code>ns-view-async</code> - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view</li>
+<li><code>ns-view-show</code> - view был показан и теперь виден на странице</li>
+<li><p><code>ns-view-repaint</code> - view виден и был затронут в процессе обновления страницы</p>
+</li>
+<li><p>События генерируются снизу вверх, т.е. сначала их получают дочерние вида, потом родительские.</p>
+</li>
+<li>События генерируются пачками, т.е. сначала одно событие у всех view, потом другое событие у всех view.</li>
+<li>События генерируются в строго определенном порядке, указанном выше</li>
+</ul>
+<p>Примеры последовательностей событий:</p>
+<ul>
+<li>инициализация view: <code>ns-view-htmlinit -> ns-view-show -> ns-view-repaint</code></li>
+<li>перерисовка страница, если view валиден: <code>ns-view-repaint</code></li>
+<li>view был скрыт: <code>ns-view-hide</code> (без <code>ns-view-repaint</code>)</li>
+<li>view был показан: <code>ns-view-show -> ns-view-repaint</code></li>
+<li>view был перерисован: <code>ns-view-hide -> ns-view-htmldestroy -> ns-view-htmlinit -> ns-view-show -> ns-view-repaint</code> (<code>ns-view-hide</code> тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на <code>ns-view-show/ns-view-hide</code> и при обновлении ноды, они должны быть переинициализированы)</li>
+</ul>
+<h3>methods</h3><p><code>methods</code> - объект с методами вида. По сути является прототипом объекта.</p>
+<pre><code>/**
+ * @classdesc prj.vMyView
+ * @augments ns.View
+ */
+ns.View.define('my-view', {
+    /** @lends prj.vMyView.prototype
+    methods: {
+        BAR: 100
+        foo: function(){}
+    }
+});
+</code></pre><h3>models</h3><p><code>models</code> - массив с названиями моделей, от которых зависит вид.</p>
+<pre><code class="lang-js">ns.View.define('super-view', {
+  models: [ 'album', 'photo' ]
+});
+</code></pre>
+<h3>Параметры</h3><p>Параметры нужны для построения ключа.</p>
+<p>По умолчанию, если <code>params</code> не указан, то параметры собираются из параметров всех моделей в порядке их объявления.
+Добавлять или удалять из собранных параметров моделей можно с помощью объектов <code>params+</code> и <code>params-</code></p>
+<p>Если <code>params</code> явно заданы — нельзя использовать <code>params+</code> / <code>params-</code>.</p>
+<p>Если ключ view нельзя построить бросается <strong>исключение</strong>.</p>
+<h4>params+</h4><p>Добавляет в результирующий набор дополнительные параметры:</p>
+<pre><code class="lang-js">ns.View.define('super-view', {
+  &quot;models&quot;: [ 'album', 'photo' ],
+  &quot;params+&quot;: { page: 23 }
+});
+</code></pre>
+<h4>params-</h4><p>Добавляет в результирующий набор указанные параметры:</p>
+<pre><code class="lang-js">ns.View.define('super-view', {
+  &quot;models&quot;: [ 'album', 'photo' ],
+  &quot;params-&quot;: [ 'album-id' ]
+});
+</code></pre>
+<h4>params</h4><p><code>params</code> может быть массивов объектов или функцией.
+Также можно указать объект - это короткая запись массива с одним элементом.</p>
+<p>Каждый объект представляет собой группу параметров.
+Это позволяет строить ключ по-разному в зависимости от набора.</p>
+<pre><code class="lang-js">ns.View.define('super-view', {
+  params: [
+    { &quot;context&quot;: &quot;album&quot;, &quot;album-id&quot;: null },
+    { &quot;context&quot;: null }
+  ]
+});
+</code></pre>
+<p>Как строится ключ:</p>
+<ul>
+<li>каждое свойство объекта — это обязательный параметр</li>
+<li>если значение свойства <code>null</code> — параметр обязателен, но значение его может быть любым</li>
+<li>если значение свойства не <code>null</code> — это <strong>фильтр</strong>, параметр из урла должен иметь именно это значение</li>
+<li>если есть все нужные параметры и выполняются все фильтры — ключ можно строить</li>
+<li>иначе — пытаемся строить по следующей группе параметров</li>
+</ul>
+<p>Т.о. при использовании <code>params</code> все параметры являются обязательными.
+Чтобы сделать их необязательными, используйте <code>params+</code>.</p>
+<p>Если указана функция, то она строит ключ сама на основе переданных параметров.</p>
+<pre><code class="lang-js">ns.View.define('view', {
+  // ns.key - готовая функция для склеивания параметров в строку
+  params: ns.key
+})
+</code></pre>
+<h2>Валидность</h2><p>Валидность view считается по двум факторам:</p>
+<ul>
+<li>собственный статус <code>ns.V.STATUS</code></li>
+<li>статус привязанных моделей</li>
+</ul>
+<p>При отрисовке вид запоминает все версии моделей и в дальшейшем сравнимает их. Если версия изменилась, то вид будет перерисован.</p>
+<p>Также у вида есть собственный статус <code>this.static</code> значением, которого может быть тип ns.V.STATUS. Если статус не <code>ns.V.STATUS.OK</code>, то вид будет перерисован.</p>
+<p>Инвалидировать вид можно методом <code>this.invalidate()</code>.</p>
+<p>Вид безусловно подписывается на все изменения моделей и автоматически инвалидирует себя при изменениях.</p>
+<h2>Взаимодействие</h2><p>В noscript нет какого-либо способа получить созданный экземпляр вида.
+Поэтому любое внешнее взаимодействие с ним осуществляется исключительно через механизм <a href="#События-noscript">событий noscript</a></p>
+<h2>async</h2><p>Вид может быть &quot;асинхронным&quot;. Такое поведение полезно, когда некоторые модели могут запрашиваться с сервера продолжительное время.</p>
+<p>Схема работы:</p>
+<ol>
+<li>Если у вида есть все необходимые данные (все модели валидны) для отрисовки, то он отрисуется в общем потоке.</li>
+<li>Если модели не валидны, то сначала отрисуется заглушка - мода <code>ns-view-async-content</code>, где будут доступны все валидные на данный момент данные, и сделан запрос за остальными моделями. У вида будет вызвано событие <code>ns-view-async</code>.</li>
+<li>После получения данных вид будет перерисован с обычной модой <code>ns-view-content</code> и поведет себя как обычно</li>
+</ol>
+</article>
 
-
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article class="readme"><h1>noscript</h1><p>JS MVC framework рассчитанный, в первую очередь, для создания многостраничных приложений без перезагрузки.</p>
-<h2>Ключевые сущности</h2><p><a href="tutorial-entities.html">Общее описание сущностей</a></p>
-<h3>Раскладка страницы (ns.layout)</h3><p><a href="tutorial-ns.layout_.html">Декларация</a></p>
-<h3>Маршрутизатор (ns.router)</h3><p><a href="tutorial-ns.router_.html">Описание</a></p>
-<h3>Вид (ns.View)</h3><p><a href="tutorial-ns.view_.html">Декларация и принципы работы</a></p>
-<p><a href="tutorial-ns.view.yate.html">Структура шаблона</a></p>
-<h3>Вид-коллекция (ns.View)</h3><p><a href="tutorial-ns.viewCollection_.md">Декларация</a></p>
-<h3>Модель (ns.Model)</h3><p><a href="tutorial-ns.model_.md">Описание</a></p></article>
-    </section>
-
-
-
-
+</section>  
 
 
         
@@ -1294,7 +1444,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:31 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:32 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

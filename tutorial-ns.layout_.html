@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Tutorial: ns.layout</title>
     
     
     
@@ -1246,43 +1246,124 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title" data-filename="index.html">Index</h1>
+            <h1 class="page-title">Tutorial: ns.layout</h1>
         
 
-        
-
-
+        <section>
+    
+<header>
     
 
+    <h2>ns.layout</h2>
+</header>  
 
-    <h3> </h3>
+<article>
+    <h2>Раскладка страницы (ns.Layout)</h2><p>Раскладка служит для декларативного описания структуры видов. При определении раскладки указывается её id и декларация.</p>
+<pre><code>    ns.layout.define('main', {
+        app: {
+            view1: true,
+            view2: {
+                view21: true
+            }
+        }
+    });
+</code></pre><p>В примере создаётся раскладка страницы, состоящей из четырёх видов. Корневой вид <code>app</code> содержит в себе <code>view1</code> и <code>view2</code>, а <code>view2</code> содержит в себе <code>view21</code>.</p>
+<p>Каждый узел декларации соответствует виду. Ключ указывает на класс вида, в значении содержится декларация вложенных видов.</p>
+<p>Способы описания структуры видов</p>
+<pre><code>    ns.layout.define('main', {
+        app: {
+
+            // Для описания вида без вложенностей значение устанавливается в true
+            view1: true,
+
+            // Для описания одного вложенного вида в значении указывается его класс
+            view2: 'view21',
+
+            // Для описания статической структуры видов используется объект
+            view3: {
+                view31: true,
+                view32: 'view321'
+            },
+            // Для описания динамической структуры видов узел объяляется боксом,
+            // а вложенность задаётся функцией.
+            // В params приходят параметры страницы.
+            // Функция может вернуть любой из выше перечисленных форматов декларации
+            // видов, или falsy, чтобы отменить добавление вида в страницу.
+            view4@: function(params) {
+                if (params.value1) {
+                    return null;
+                }
+                if (params.value2) {
+                    return 'view41';
+                }
+                if (params.value3) {
+                    return {
+                        'view42': {
+                            'view421': true;
+                        }
+                    };
+                }
+            }
+        }
+    });
+</code></pre><p>Кроме описания структуры видов раскладка так же позволяет декларировать специальные атрибуты видов.</p>
+<h3>Бокс</h3><p>Бокс - это специальный вид-контейнер. Он не имеет собственного html-содержимого и представлен в DOM только одним узлом, содержащим непосредственно в себе все вложенности. Бокс позволяет решать следующие задачи.</p>
+<p>Кеширование экземпляров вида</p>
+<pre><code>    ns.layout.define('main', {
+        app: {
+            box@: 'view1'
+        }
+    });
+</code></pre><p>В примере <code>box</code> будет содержать один вложенный вид <code>view1</code>. Если <code>view1</code> зависит от параметров, то при изменении параметров предыдущие html-узлы будут скрываться, но оставаться в DOM-дереве, а новые - добавляться в <code>box</code> и показываться. При возврате к одному из предыдущих наборов параметров будет показан ранее сгенерированный соответствующий ему html-узел.</p>
+<p>Создание динамической раскладки</p>
+<pre><code>    ns.layout.define('main', {
+        app: {
+            view1: true,
+            view2@: function(params) {
+                if (params.value1) {
+                    return null;
+                }
+                if (params.value2) {
+                    return 'view41';
+                }
+                if (params.value3) {
+                    return {
+                        'view42': 'view421',
+                        'view43': 'view431'
+                    };
+                }
+            }
+        }
+    });
+</code></pre><p>В примере вид в зависимости от параметров может отсутствовать, содержать единственный вид <code>view41</code>, или содержать <code>view42</code> и <code>view43</code>, содержащие в свою очередь соответственно <code>view421</code> и <code>view431</code>. Для создания такой структуры <code>view2</code> обязательно должен быть боксом. Обычный view, содержащий вложенные виды, при их исчезновении после обновления может работать некорректно.</p>
+<h3>Асинхронные виды</h3><p>Асинхронный вид позволяет на время загрузки его моделей рисовать его в виде заглушки. Updater запросит модели асинхронных видов отдельными запросами и отрисует страницу до получения этих данных. Загрузив модели, Updater сделает повторный проход только по асинхронным видам и обновит их.</p>
+<pre><code>    ns.layout.define('main', {
+        app: {
+            viewLight: true,
+            viewHard&: true
+        }
+    });
+</code></pre><pre><code>    ns.View.define('viewLight', {
+        models: ['modelLight']
+    })
+    ns.View.define('viewHard', {
+        models: ['modelHard']
+    })
+</code></pre><pre><code>    match .view[id=&quot;viewLight&quot;] ns-view {
+        // основное html-содержимое вида viewLight
+    }
 
 
+    match .view[id=&quot;viewHard&quot;] ns-view-async {
+        // html-содержимое заглушки для вида viewHard
+    }
+    match .view[id=&quot;viewHard&quot;] ns-view {
+        // основное html-содержимое вида viewHard
+    }
+</code></pre><p>Предположим, что modelLight запросить легко, а запрос modelHard требует заметного времени. При обновлении Updater запросит модели отдельно: сначала modelLight, а затем modelHard. Получив данные для modelLight, Updater отрисует страницу. Вид viewHard при этом отрисуется в виде заглушки (с использованием шаблона ns-view-async). После получения данных для modelHard Updater сделает ещё один такт обновления и вместо заглушки отрисует основное содержимое viewHard.</p>
+</article>
 
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article class="readme"><h1>noscript</h1><p>JS MVC framework рассчитанный, в первую очередь, для создания многостраничных приложений без перезагрузки.</p>
-<h2>Ключевые сущности</h2><p><a href="tutorial-entities.html">Общее описание сущностей</a></p>
-<h3>Раскладка страницы (ns.layout)</h3><p><a href="tutorial-ns.layout_.html">Декларация</a></p>
-<h3>Маршрутизатор (ns.router)</h3><p><a href="tutorial-ns.router_.html">Описание</a></p>
-<h3>Вид (ns.View)</h3><p><a href="tutorial-ns.view_.html">Декларация и принципы работы</a></p>
-<p><a href="tutorial-ns.view.yate.html">Структура шаблона</a></p>
-<h3>Вид-коллекция (ns.View)</h3><p><a href="tutorial-ns.viewCollection_.md">Декларация</a></p>
-<h3>Модель (ns.Model)</h3><p><a href="tutorial-ns.model_.md">Описание</a></p></article>
-    </section>
-
-
-
-
+</section>  
 
 
         

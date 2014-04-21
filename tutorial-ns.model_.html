@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Tutorial: ns.model</title>
     
     
     
@@ -1246,43 +1246,193 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title" data-filename="index.html">Index</h1>
+            <h1 class="page-title">Tutorial: ns.model</h1>
         
 
-        
-
-
+        <section>
+    
+<header>
     
 
+    <h2>ns.model</h2>
+</header>  
 
-    <h3> </h3>
+<article>
+    <h1>ns.Model</h1><p>Модель представляет собой данные.
+Она однозначно идентифицируется своим ключом, который строится во время инициализации.
+Разный ключ всегда означает разный экземпляр модели.</p>
+<ul>
+<li><a href="#Декларация">Декларация</a><ul>
+<li><a href="#ctor">ctor</a></li>
+<li><a href="#events">events</a></li>
+<li><a href="#methods">methods</a></li>
+<li><a href="#params">params</a></li>
+</ul>
+</li>
+<li><a href="#Получение-экземпляра-модели">Получение экземпляра модели</a></li>
+<li><a href="#Работа-с-данными">Работа с данными</a></li>
+<li><a href="#Пре--и-постобработка-данных">Постобработка данных</a><ul>
+<li><a href="#extractdata">extractData</a></li>
+<li><a href="#extracterror">extractError</a></li>
+<li><a href="#hasdatachanged">hasDataChanged</a></li>
+<li><a href="#preprocessdata">preprocessData</a></li>
+</ul>
+</li>
+<li><a href="#События">События</a></li>
+</ul>
+<h2>Декларация</h2><p>Определение новой модели происходит через статическую функцию <code>ns.Model.define</code></p>
+<pre><code class="lang-js">ns.Model.define('modelName', modelDeclObject[, baseModel])
+</code></pre>
+<p>Объект-декларация состоит из следующих свойств.</p>
+<h3>ctor</h3><p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самой модели, т.о. в конструкторе еще не доступны некоторые свойства.</p>
+<pre><code class="lang-js">/**
+ * @classdesc prj.mMyModel
+ * @augments ns.Model
+ */
+ns.Model.define('my-model', {
+    /**
+     * @constructs prj.mMyModel
+     */
+    ctor: function() {
+        this._state = 'initial';
+        this.CONST = 100;
+    }
+});
+</code></pre>
+<h3><code>events</code></h3><p><code>events</code> - объект с декларацией подписок на события noscript.</p>
+<p>Любая подписка имеет вид:</p>
+<pre><code class="lang-json">{
+    &quot;на что подписаться&quot;: &quot;обработчик&quot;
+}
+</code></pre>
+<p>Обработчиком может быть название метода из прототипа или функция.</p>
+<p>Пример:</p>
+<pre><code class="lang-js">{
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
+    &quot;my-custom-show@show&quot;: &quot;onCustomShow&quot;
+}
+</code></pre>
+<h3>methods</h3><p><code>methods</code> - объект с методами. По сути является прототипом объекта.</p>
+<pre><code class="lang-js">/**
+ * @classdesc prj.mMyModel
+ * @augments ns.Model
+ */
+ns.Model.define('my-model', {
+    /** @lends prj.mMyModel.prototype */
+    methods: {
+        BAR: 100
+        foo: function(){}
+    }
+});
+</code></pre>
+<h3>params</h3><p>Параметры нужны для как для построения ключа, так и для запроса моделей с сервера.</p>
+<pre><code class="lang-js">ns.Model.define('my-model', {
+    params: {
+        //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
+        'author-login': null,
+        'album-id': null,
 
+        //  Этим двум параметрам заданы дефолтные значения.
+        'page': 0,
+        'pageSize': 20
+    }
+});
+</code></pre>
+<h2>Получение экземпляра модели</h2><ul>
+<li><code>ns.Model.get('modelName', params)</code> - строит ключ из <code>params</code> и возвращает соответствующую модель. Если такого экземпляра нет, то он будет создан.</li>
+<li><code>ns.Model.getValid('modelName', params)</code> - тоже самое что и <code>ns.Model.get</code>. Только экземпляр еще проверяется на валидность. Если валидный экземпляр не найден, то возвращается <code>null</code>.</li>
+</ul>
+<h2>Работа с данными</h2><p><strong>Методы для получения данных</strong>:</p>
+<ul>
+<li><code>#getData()</code> - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.</li>
+<li><code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.<pre><code class="lang-js">{
+ &quot;foo&quot;: &quot;1&quot;,
+ &quot;bar&quot;: [
+     { &quot;id&quot;: 1 }
+ ]
+}
+this.get('.foo') -> &quot;1&quot;
+this.get('.bar.id') -> [&quot;1&quot;]
+</code></pre>
+</li>
+<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre><code class="lang-js">{
+ &quot;foo&quot;: &quot;1&quot;,
+ &quot;bar&quot;: [
+     { &quot;id&quot;: 1 }
+ ]
+}
+this.get('.foo') -> [&quot;1&quot;]
+this.get('.bar.id') -> [&quot;1&quot;]
+</code></pre>
+</li>
+</ul>
+<p><strong>Методы для изменения данных</strong>:</p>
+<ul>
+<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.<pre><code class="lang-js">this.set('.foo', 2);
+</code></pre>
+</li>
+<li><code>#setData(data)</code> - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.</li>
+</ul>
+<h2>Пре- и постобработка данных</h2><h3>extractData</h3><p>Метод извлекает данные из ответа сервера. По умолчанию берется поле <code>data</code> из ответа. Если метод не возвращает данные, то считается, что модель загружена с ошибкой.</p>
+<pre><code class="lang-js">ns.Model.define('my-model', {
+    methods: {
+        extractData: function(serverResponse) {
+            if (serverResponse) {
+                return serverResponse.result;
+            }
+        }
+    }
+});
+</code></pre>
+<h3>extractError</h3><p>Метода извлекает данные об ошибке сервера. По умолчанию берется поле <code>error</code> из ответа.</p>
+<p>Метод вызывается, когда <code>#extractData()</code> не вернул данные.</p>
+<pre><code class="lang-js">ns.Model.define('my-model', {
+    methods: {
+        extractError: function(serverResponse) {
+            if (serverResponse) {
+                return serverResponse.error;
+            }
+        }
+    }
+});
+</code></pre>
+<h3>hasDataChanged</h3><p>Этот метод может контроллировать изменились ли данные на самом деле, чтобы не вызывать лишних события и перерисовок.
+Аргументом метода являются новые данные, а старые можно получить способами описанными выше, например <code>#getData</code>. Должен вернуть <code>boolean</code>.</p>
+<pre><code class="lang-js">ns.Model.define('my-model', {
+    methods: {
+        hasDataChanged: function(newData) {
+            var oldData = this.getData;
+            // изменяем данные, только если изменилось поле id
+            return oldData.id !== newData.id
+        }
+    }
+});
+</code></pre>
+<h3>preprocessData</h3><p>Этот метод позволяет обработать полученные данные.
+Аргументом метода являются новые данные, должен вернуть обработанные данные.</p>
+<pre><code class="lang-js">ns.Model.define('my-model', {
+    methods: {
+        _index: null,
+        preprocessData: function(newData) {
+            var that = this;
+            // строим индекс для быстрого поиска
+            newData.forEach(function(item) {
+                that._index[item.id] = item;
+            });
+            return newData;
+        }
+    }
+});
+</code></pre>
+<h2>События</h2><ul>
+<li><code>ns-model-changed</code> - модель изменилась. В аргументах приходит jpath, по которому было сделано изменение. Если он пустой, то изменилась вся модель (обычно методом <code>#setData()</code>)</li>
+<li><code>ns-model-changed<.jpath></code> - изменились данные по указанному jpath. В аргументах приходит jpath, по которому было сделано изменение. События кидаются иерархично, т.о. для <code>.for.bar</code> будет три события: <code>ns-model-changed.foo.bar</code>, <code>ns-model-changed.foo</code>, <code>ns-model-changed</code></li>
+<li><code>ns-model-destroyed</code> - модель была инвалидированна и уничтожена.</li>
+<li><code>ns-model-touched</code> - у модели изменилась версия. Такое событие будет как результатом изменения данных через <code>#set</code> или <code>#setData</code>, так и прямым вызовом метода <code>#touch()</code></li>
+</ul>
+</article>
 
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article class="readme"><h1>noscript</h1><p>JS MVC framework рассчитанный, в первую очередь, для создания многостраничных приложений без перезагрузки.</p>
-<h2>Ключевые сущности</h2><p><a href="tutorial-entities.html">Общее описание сущностей</a></p>
-<h3>Раскладка страницы (ns.layout)</h3><p><a href="tutorial-ns.layout_.html">Декларация</a></p>
-<h3>Маршрутизатор (ns.router)</h3><p><a href="tutorial-ns.router_.html">Описание</a></p>
-<h3>Вид (ns.View)</h3><p><a href="tutorial-ns.view_.html">Декларация и принципы работы</a></p>
-<p><a href="tutorial-ns.view.yate.html">Структура шаблона</a></p>
-<h3>Вид-коллекция (ns.View)</h3><p><a href="tutorial-ns.viewCollection_.md">Декларация</a></p>
-<h3>Модель (ns.Model)</h3><p><a href="tutorial-ns.model_.md">Описание</a></p></article>
-    </section>
-
-
-
-
+</section>  
 
 
         
@@ -1294,7 +1444,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:31 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:32 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

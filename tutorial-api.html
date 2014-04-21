@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Tutorial: api</title>
     
     
     
@@ -1246,43 +1246,63 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title" data-filename="index.html">Index</h1>
+            <h1 class="page-title">Tutorial: api</h1>
         
 
-        
-
-
+        <section>
+    
+<header>
     
 
+    <h2>api</h2>
+</header>  
 
-    <h3> </h3>
+<article>
+    <h3><code>ns.Model</code></h3><pre><code class="lang-js">// Static API
+ns.Model.define(id, info, base)
+ns.Model.info(id)
+ns.Model.infoLite(id)
+ns.Model.key(id, params, info)
+ns.Model.get(id, params)
+ns.Model.getValid(id, params)
+ns.Model.isValid(id, params)
+ns.Model.invalidate(id, filter)
+ns.Model.destroy(model)
+ns.Model.destroyWith(targetModel, withModels)
+ns.Model.isCollection(model)
 
+// Instance API
+model.getRequestParams()
+model.prepareRequest(requestId)
+model.canRetry()
+model.extractData(result)
+model.extractError(result)
+model.preprocessData(data)
+model.setData(data, options) // options.silent
+model.set(jpath, value, options) // options.silent
+model.getData() // Returns whole data object
+model.get(jpath) // Returns some data object property
+model.select(jpath) // Returns an array of values, selected from data object (useful when there are many results returned by the same jpath)
+model.setError(error)
+model.getError()
+model.isValid()
+model.isDo()
+model.getVersion()
+model.touch()
+model.invalidate()
+</code></pre>
+<h3><code>ns.ModelCollection</code></h3><pre><code class="lang-js">// Instance API
+collection.insert(models, index)
+collection.remove(models)
+collection.getSelfVersion()
+collection.clear()
+collection.onItemChanged(evt, model, jpath)
+collection.onItemTouched(evt, model)
+collection.onItemDestroyed(evt, model)
+</code></pre>
+</article>
 
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article class="readme"><h1>noscript</h1><p>JS MVC framework рассчитанный, в первую очередь, для создания многостраничных приложений без перезагрузки.</p>
-<h2>Ключевые сущности</h2><p><a href="tutorial-entities.html">Общее описание сущностей</a></p>
-<h3>Раскладка страницы (ns.layout)</h3><p><a href="tutorial-ns.layout_.html">Декларация</a></p>
-<h3>Маршрутизатор (ns.router)</h3><p><a href="tutorial-ns.router_.html">Описание</a></p>
-<h3>Вид (ns.View)</h3><p><a href="tutorial-ns.view_.html">Декларация и принципы работы</a></p>
-<p><a href="tutorial-ns.view.yate.html">Структура шаблона</a></p>
-<h3>Вид-коллекция (ns.View)</h3><p><a href="tutorial-ns.viewCollection_.md">Декларация</a></p>
-<h3>Модель (ns.Model)</h3><p><a href="tutorial-ns.model_.md">Описание</a></p></article>
-    </section>
-
-
-
-
+</section>  
 
 
         

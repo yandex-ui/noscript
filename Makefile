@@ -3,10 +3,14 @@ export NPM_BIN
 
 jsdoc: node_modules
 	$(NPM_BIN)/jsdoc -c jsdoc.json -d .
-	touch node_modules
+
+publish: jsdoc
+	git add -A
+	git commit -m 'publish jsdoc'
+	git push
 
 node_modules: package.json
 	npm install
 	touch node_modules
 
-.PHONY: jsdoc
+.PHONY: jsdoc publish

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Tutorial: ns.view.yate</title>
     
     
     
@@ -1246,43 +1246,107 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title" data-filename="index.html">Index</h1>
+            <h1 class="page-title">Tutorial: ns.view.yate</h1>
         
 
-        
-
-
+        <section>
+    
+<header>
     
 
+    <h2>ns.view.yate</h2>
+</header>  
 
-    <h3> </h3>
+<article>
+    <h1>Шаблонизация ns.View в yate</h1><p>Каждый вид отрисовывается изолированно. Корнем является JSON-структура описанная ниже.</p>
+<p>Исходя из сменя контекста для каждого вида, не стоит увлекаться созданием ключей и глобальных переменных в yate, т.к. они будут перевычислять для каждого вида.
+Более правильным способом является вынос таких данных в external-функции.</p>
+<h2>Создание View</h2><p>За создание DOM-обертки и содержимого отвечает мода <code>ns-view</code>. Ее стоит использовать только для управления местом отрисовки дочерних View.
+<strong>Не стоит переопределять эту моду без крайней необходимости!</strong></p>
+<p>Пример использования</p>
+<pre><code>match .my-view1 ns-view-content {
+    <div class=&quot;view1-content&quot;>
+        // в этом месте отрисуются все дочерние view
+        apply /.views.* ns-view
+    </div>
+}
 
+match .my-view2 ns-view-content {
+    <div class=&quot;view2-content&quot;>
+        <div class=&quot;view2-content__child&quot;>
+            // в этом месте отрисуются дочерний view my-child1
+            apply /.views.my-child1 ns-view
+        </div>
+        <div class=&quot;view2-content__child&quot;>
+            // в этом месте отрисуются дочерний view my-child2
+            apply /.views.my-child2 ns-view
+        </div>
+    </div>
+}
+</code></pre><h2>Атрибуты обертки View</h2><ul>
+<li><code>ns-view-add-attrs</code> - с помощью этой моды можно дописать собственные атрибуты в DOM-обертку. Например,</li>
+</ul>
+<pre><code>match .my-view2 ns-view-add-attrs {
+    @data-id = 'my-id'
+}
+</code></pre><ul>
+<li><code>ns-view-add-class</code> - с помощью этой моды можно дописать собственные классы в DOM-обертку. Например,</li>
+</ul>
+<pre><code>match .my-view2 ns-view-add-attrs {
+    // пробел в начале обязателен
+    &quot; my-class&quot;
+}
+</code></pre><h2>Содержимое View</h2><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
+<pre><code>match .my-view1 ns-view-content {
+    <div class=&quot;view1-content&quot;>
+        // в этом месте отрисуются все дочерние view
+        apply /.views.* ns-view
+    </div>
+}
+</code></pre><p><code>ns-view-async-content</code> - мода отвечает за содержимое View в режиме async.
+В большинстве случаев тут стоит рисовать лоадер пока грузятся данные.
+В async-режиме у view не бывает дочерних элементов. Они появляются в нормальной отрисовке, когда используется <code>ns-view-content</code></p>
+<pre><code>match .my-view1 ns-view-content {
+    <div class=&quot;view1-content&quot;>
+        <img src=&quot;loader.gif&quot;/>
+    </div>
+}
+</code></pre><p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.</p>
+<h2>Элементы ViewСollection</h2><p>В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: <code>ns-view-content</code> и <code>ns-view-async-content</code>.
+Для управления местом вставки элементов коллекции есть мода <code>ns-view-desc</code>.
+Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.</p>
+<pre><code>match .my-view-collection ns-view-content {
+    <div class=&quot;my-view-collection__wrapper&quot;>
+        <div class=&quot;my-view-collection__text&quot;>My View Collection</div>
+        <div class=&quot;my-view-collection__items&quot;>
+            // сюда будут отрисованы элементы коллекции
+            apply . ns-view-desc
+        </div>
+    </div>
+}
+</code></pre><h2>Yate-хелперы</h2><ul>
+<li><code>model('model-name')</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому предпочтительнее jpath <code>/.models.model-name</code></li>
+<li><code>ns-url</code> - external-функция для <code>ns.router.generateUrl</code></li>
+</ul>
+<h2>Структура JSON для отрисовки</h2><pre><code class="lang-js">{
+    async: false, // boolean, view находится в async-режиме
+    errors: { // объект с моделями, для которые не удалось получить данные
+        model3: {} // данные ошибки
+    },
+    is_models_valid: true, // boolean, флаг валидности моделей
+    key: 'view=app', // string, ключ view
+    models: { // object, объект с данными моделей
+        model1: {} // данные модели1
+        model2: {} // данные модели2
+    },
+    page: {}, // object, параметры страницы, идентичен ns.page.current
+    params: {}, // object, параметры view
+    views: {} // object, объект c дочерними view
+}
+</code></pre>
+</article>
 
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article class="readme"><h1>noscript</h1><p>JS MVC framework рассчитанный, в первую очередь, для создания многостраничных приложений без перезагрузки.</p>
-<h2>Ключевые сущности</h2><p><a href="tutorial-entities.html">Общее описание сущностей</a></p>
-<h3>Раскладка страницы (ns.layout)</h3><p><a href="tutorial-ns.layout_.html">Декларация</a></p>
-<h3>Маршрутизатор (ns.router)</h3><p><a href="tutorial-ns.router_.html">Описание</a></p>
-<h3>Вид (ns.View)</h3><p><a href="tutorial-ns.view_.html">Декларация и принципы работы</a></p>
-<p><a href="tutorial-ns.view.yate.html">Структура шаблона</a></p>
-<h3>Вид-коллекция (ns.View)</h3><p><a href="tutorial-ns.viewCollection_.md">Декларация</a></p>
-<h3>Модель (ns.Model)</h3><p><a href="tutorial-ns.model_.md">Описание</a></p></article>
-    </section>
-
-
-
-
+</section>  
 
 
         
@@ -1294,7 +1358,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:31 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:32 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

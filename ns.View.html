@@ -1,0 +1,8549 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Class: View</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jaguar.css">
+    
+    
+    <script>
+    var config = {"monospaceLinks":true,"cleverLinks":true,"applicationName":"noscript","disqus":true,"googleAnalytics":false,"meta":{"title":"","description":"","keyword":""},"openGraph":false,"default":{}};
+    </script>
+    
+
+    
+</head>
+<body>
+<div id="wrap" class="clearfix">
+    
+<div class="navigation">
+    <h3 class="applicationName"><a href="index.html">noscript</a></h3>
+
+    <div class="search">
+        <input id="search" type="text" class="form-control input-sm" placeholder="Search Documentations">
+    </div>
+    <ul class="list">
+    
+        <li class="item" data-name="ns">
+            <span class="title">
+                <a href="ns.html">ns</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.IS_TOUCH"><a href="ns.html#IS_TOUCH">IS_TOUCH</a></li>
+            
+                <li data-name="ns.L"><a href="ns.html#L">L</a></li>
+            
+                <li data-name="ns.MAIN_VIEW"><a href="ns.html#MAIN_VIEW">MAIN_VIEW</a></li>
+            
+                <li data-name="ns.R"><a href="ns.html#R">R</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.assert"><a href="ns.html#assert">assert</a></li>
+            
+                <li data-name="ns.byClass"><a href="ns.html#byClass">byClass</a></li>
+            
+                <li data-name="ns.clean"><a href="ns.html#clean">clean</a></li>
+            
+                <li data-name="ns.deentityify"><a href="ns.html#deentityify">deentityify</a></li>
+            
+                <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
+            
+                <li data-name="ns.extendRecursive"><a href="ns.html#extendRecursive">extendRecursive</a></li>
+            
+                <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
+            
+                <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
+            
+                <li data-name="ns.http"><a href="ns.html#http">http</a></li>
+            
+                <li data-name="ns.init"><a href="ns.html#init">init</a></li>
+            
+                <li data-name="ns.initMainView"><a href="ns.html#initMainView">initMainView</a></li>
+            
+                <li data-name="ns.key"><a href="ns.html#key">key</a></li>
+            
+                <li data-name="ns.parseQuery"><a href="ns.html#parseQuery">parseQuery</a></li>
+            
+                <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
+            
+                <li data-name="ns.replaceNode"><a href="ns.html#replaceNode">replaceNode</a></li>
+            
+                <li data-name="ns.tmpl"><a href="ns.html#tmpl">tmpl</a></li>
+            
+                <li data-name="ns.todo"><a href="ns.html#todo">todo</a></li>
+            
+                <li data-name="ns.transaction"><a href="ns.html#transaction">transaction</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.action">
+            <span class="title">
+                <a href="ns.action.html">ns.action</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.action._process"><a href="ns.action.html#_process">_process</a></li>
+            
+                <li data-name="ns.action.copy"><a href="ns.action.html#copy">copy</a></li>
+            
+                <li data-name="ns.action.define"><a href="ns.action.html#define">define</a></li>
+            
+                <li data-name="ns.action.getParams"><a href="ns.action.html#getParams">getParams</a></li>
+            
+                <li data-name="ns.action.init"><a href="ns.action.html#init">init</a></li>
+            
+                <li data-name="ns.action.run"><a href="ns.action.html#run">run</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.history">
+            <span class="title">
+                <a href="ns.history.html">ns.history</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.history.init"><a href="ns.history.html#init">init</a></li>
+            
+                <li data-name="ns.history.onpopstate"><a href="ns.history.html#onpopstate">onpopstate</a></li>
+            
+                <li data-name="ns.history.pushState"><a href="ns.history.html#pushState">pushState</a></li>
+            
+                <li data-name="ns.history.replaceState"><a href="ns.history.html#replaceState">replaceState</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.layout">
+            <span class="title">
+                <a href="ns.layout.html">ns.layout</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.layout.define"><a href="ns.layout.html#define">define</a></li>
+            
+                <li data-name="ns.layout.page"><a href="ns.layout.html#page">page</a></li>
+            
+                <li data-name="ns.layout.undefine"><a href="ns.layout.html#undefine">undefine</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.log">
+            <span class="title">
+                <a href="ns.log.html">ns.log</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.log.debug"><a href="ns.log.html#debug">debug</a></li>
+            
+                <li data-name="ns.log.error"><a href="ns.log.html#error">error</a></li>
+            
+                <li data-name="ns.log.exception"><a href="ns.log.html#exception">exception</a></li>
+            
+                <li data-name="ns.log.info"><a href="ns.log.html#info">info</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.M">
+            <span class="title">
+                <a href="ns.M.html">ns.M</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.M.STATUS"><a href="ns.M.html#STATUS">STATUS</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.object">
+            <span class="title">
+                <a href="ns.object.html">ns.object</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.object.clone"><a href="ns.object.html#clone">clone</a></li>
+            
+                <li data-name="ns.object.isEmpty"><a href="ns.object.html#isEmpty">isEmpty</a></li>
+            
+                <li data-name="ns.object.isEqual"><a href="ns.object.html#isEqual">isEqual</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.page">
+            <span class="title">
+                <a href="ns.page.html">ns.page</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.page._lastUrl"><a href="ns.page.html#_lastUrl">_lastUrl</a></li>
+            
+                <li data-name="ns.page._stop"><a href="ns.page.html#_stop">_stop</a></li>
+            
+                <li data-name="ns.page.current"><a href="ns.page.html#current">current</a></li>
+            
+                <li data-name="ns.page.currentUrl"><a href="ns.page.html#currentUrl">currentUrl</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.page.getCurrentUrl"><a href="ns.page.html#getCurrentUrl">getCurrentUrl</a></li>
+            
+                <li data-name="ns.page.getDefaultUrl"><a href="ns.page.html#getDefaultUrl">getDefaultUrl</a></li>
+            
+                <li data-name="ns.page.go"><a href="ns.page.html#go">go</a></li>
+            
+                <li data-name="ns.page.redirect"><a href="ns.page.html#redirect">redirect</a></li>
+            
+                <li data-name="ns.page.title"><a href="ns.page.html#title">title</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.page.block">
+            <span class="title">
+                <a href="ns.page.block.html">ns.page.block</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.page.block.checkers"><a href="ns.page.block.html#checkers">checkers</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.page.block.add"><a href="ns.page.block.html#add">add</a></li>
+            
+                <li data-name="ns.page.block.check"><a href="ns.page.block.html#check">check</a></li>
+            
+                <li data-name="ns.page.block.remove"><a href="ns.page.block.html#remove">remove</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.page.history">
+            <span class="title">
+                <a href="ns.page.history.html">ns.page.history</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.page.history._current"><a href="ns.page.history.html#_current">_current</a></li>
+            
+                <li data-name="ns.page.history._history"><a href="ns.page.history.html#_history">_history</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.page.history.back"><a href="ns.page.history.html#back">back</a></li>
+            
+                <li data-name="ns.page.history.getPrevious"><a href="ns.page.history.html#getPrevious">getPrevious</a></li>
+            
+                <li data-name="ns.page.history.push"><a href="ns.page.history.html#push">push</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.request">
+            <span class="title">
+                <a href="ns.request.html">ns.request</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
+            
+                <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.request.addRequestParams"><a href="ns.request.html#addRequestParams">addRequestParams</a></li>
+            
+                <li data-name="ns.request.canProcessResponse"><a href="ns.request.html#canProcessResponse">canProcessResponse</a></li>
+            
+                <li data-name="ns.request.models"><a href="ns.request.html#models">models</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.router">
+            <span class="title">
+                <a href="ns.router.html">ns.router</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.router._routes"><a href="ns.router.html#_routes">_routes</a></li>
+            
+                <li data-name="ns.router.baseDir"><a href="ns.router.html#baseDir">baseDir</a></li>
+            
+                <li data-name="ns.router.regexps"><a href="ns.router.html#regexps">regexps</a></li>
+            
+                <li data-name="ns.router.routes"><a href="ns.router.html#routes">routes</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.router._generateParamRegexp"><a href="ns.router.html#_generateParamRegexp">_generateParamRegexp</a></li>
+            
+                <li data-name="ns.router._generateSectionRegexp"><a href="ns.router.html#_generateSectionRegexp">_generateSectionRegexp</a></li>
+            
+                <li data-name="ns.router._generateUrl"><a href="ns.router.html#_generateUrl">_generateUrl</a></li>
+            
+                <li data-name="ns.router._getParamsRouteFromUrl"><a href="ns.router.html#_getParamsRouteFromUrl">_getParamsRouteFromUrl</a></li>
+            
+                <li data-name="ns.router._isParamValid"><a href="ns.router.html#_isParamValid">_isParamValid</a></li>
+            
+                <li data-name="ns.router._parseParam"><a href="ns.router.html#_parseParam">_parseParam</a></li>
+            
+                <li data-name="ns.router._parseSection"><a href="ns.router.html#_parseSection">_parseSection</a></li>
+            
+                <li data-name="ns.router.compile"><a href="ns.router.html#compile">compile</a></li>
+            
+                <li data-name="ns.router.generateUrl"><a href="ns.router.html#generateUrl">generateUrl</a></li>
+            
+                <li data-name="ns.router.init"><a href="ns.router.html#init">init</a></li>
+            
+                <li data-name="ns.router.undefine"><a href="ns.router.html#undefine">undefine</a></li>
+            
+                <li data-name="ns.router.url"><a href="ns.router.html#url">url</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.U">
+            <span class="title">
+                <a href="ns.U.html">ns.U</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.U.EXEC"><a href="ns.U.html#EXEC">EXEC</a></li>
+            
+                <li data-name="ns.U.STATUS"><a href="ns.U.html#STATUS">STATUS</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.V">
+            <span class="title">
+                <a href="ns.V.html">ns.V</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.V.DOM_EVENTS"><a href="ns.V.html#DOM_EVENTS">DOM_EVENTS</a></li>
+            
+                <li data-name="ns.V.EVENTS"><a href="ns.V.html#EVENTS">EVENTS</a></li>
+            
+                <li data-name="ns.V.NS_EVENTS"><a href="ns.V.html#NS_EVENTS">NS_EVENTS</a></li>
+            
+                <li data-name="ns.V.STATUS"><a href="ns.V.html#STATUS">STATUS</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.Box">
+            <span class="title">
+                <a href="ns.Box.html">ns.Box</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.Box#_addView"><a href="ns.Box.html#_addView">_addView</a></li>
+            
+                <li data-name="ns.Box#_getDescendants"><a href="ns.Box.html#_getDescendants">_getDescendants</a></li>
+            
+                <li data-name="ns.Box#_getRequestViews"><a href="ns.Box.html#_getRequestViews">_getRequestViews</a></li>
+            
+                <li data-name="ns.Box#_getUpdateTree"><a href="ns.Box.html#_getUpdateTree">_getUpdateTree</a></li>
+            
+                <li data-name="ns.Box#_getView"><a href="ns.Box.html#_getView">_getView</a></li>
+            
+                <li data-name="ns.Box#_getViewTree"><a href="ns.Box.html#_getViewTree">_getViewTree</a></li>
+            
+                <li data-name="ns.Box#_hide"><a href="ns.Box.html#_hide">_hide</a></li>
+            
+                <li data-name="ns.Box#_hideNode"><a href="ns.Box.html#_hideNode">_hideNode</a></li>
+            
+                <li data-name="ns.Box#_show"><a href="ns.Box.html#_show">_show</a></li>
+            
+                <li data-name="ns.Box#_showNode"><a href="ns.Box.html#_showNode">_showNode</a></li>
+            
+                <li data-name="ns.Box#_updateHTML"><a href="ns.Box.html#_updateHTML">_updateHTML</a></li>
+            
+                <li data-name="ns.Box#isNone"><a href="ns.Box.html#isNone">isNone</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.Model">
+            <span class="title">
+                <a href="ns.Model.html">ns.Model</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.Model#_version"><a href="ns.Model.html#_version">_version</a></li>
+            
+                <li data-name="ns.Model#STATUS"><a href="ns.Model.html#STATUS">STATUS</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.Model._find"><a href="ns.Model.html#_find">_find</a></li>
+            
+                <li data-name="ns.Model._getKeyParams"><a href="ns.Model.html#_getKeyParams">_getKeyParams</a></li>
+            
+                <li data-name="ns.Model.define"><a href="ns.Model.html#define">define</a></li>
+            
+                <li data-name="ns.Model.destroy"><a href="ns.Model.html#destroy">destroy</a></li>
+            
+                <li data-name="ns.Model.destroyWith"><a href="ns.Model.html#destroyWith">destroyWith</a></li>
+            
+                <li data-name="ns.Model.get"><a href="ns.Model.html#get">get</a></li>
+            
+                <li data-name="ns.Model.getValid"><a href="ns.Model.html#getValid">getValid</a></li>
+            
+                <li data-name="ns.Model.info"><a href="ns.Model.html#info">info</a></li>
+            
+                <li data-name="ns.Model.infoLite"><a href="ns.Model.html#infoLite">infoLite</a></li>
+            
+                <li data-name="ns.Model.invalidate"><a href="ns.Model.html#invalidate">invalidate</a></li>
+            
+                <li data-name="ns.Model.isCollection"><a href="ns.Model.html#isCollection">isCollection</a></li>
+            
+                <li data-name="ns.Model.isValid"><a href="ns.Model.html#isValid">isValid</a></li>
+            
+                <li data-name="ns.Model.key"><a href="ns.Model.html#key">key</a></li>
+            
+                <li data-name="ns.Model.undefine"><a href="ns.Model.html#undefine">undefine</a></li>
+            
+                <li data-name="ns.Model#_beforeSetData"><a href="ns.Model.html#_beforeSetData">_beforeSetData</a></li>
+            
+                <li data-name="ns.Model#_bindEvents"><a href="ns.Model.html#_bindEvents">_bindEvents</a></li>
+            
+                <li data-name="ns.Model#_init"><a href="ns.Model.html#_init">_init</a></li>
+            
+                <li data-name="ns.Model#_prepareCallback"><a href="ns.Model.html#_prepareCallback">_prepareCallback</a></li>
+            
+                <li data-name="ns.Model#_reset"><a href="ns.Model.html#_reset">_reset</a></li>
+            
+                <li data-name="ns.Model#canRetry"><a href="ns.Model.html#canRetry">canRetry</a></li>
+            
+                <li data-name="ns.Model#destroyWith"><a href="ns.Model.html#destroyWith">destroyWith</a></li>
+            
+                <li data-name="ns.Model#extractData"><a href="ns.Model.html#extractData">extractData</a></li>
+            
+                <li data-name="ns.Model#extractError"><a href="ns.Model.html#extractError">extractError</a></li>
+            
+                <li data-name="ns.Model#get"><a href="ns.Model.html#get">get</a></li>
+            
+                <li data-name="ns.Model#getData"><a href="ns.Model.html#getData">getData</a></li>
+            
+                <li data-name="ns.Model#getError"><a href="ns.Model.html#getError">getError</a></li>
+            
+                <li data-name="ns.Model#getRequestParams"><a href="ns.Model.html#getRequestParams">getRequestParams</a></li>
+            
+                <li data-name="ns.Model#getVersion"><a href="ns.Model.html#getVersion">getVersion</a></li>
+            
+                <li data-name="ns.Model#hasDataChanged"><a href="ns.Model.html#hasDataChanged">hasDataChanged</a></li>
+            
+                <li data-name="ns.Model#invalidate"><a href="ns.Model.html#invalidate">invalidate</a></li>
+            
+                <li data-name="ns.Model#isDo"><a href="ns.Model.html#isDo">isDo</a></li>
+            
+                <li data-name="ns.Model#isValid"><a href="ns.Model.html#isValid">isValid</a></li>
+            
+                <li data-name="ns.Model#prepareRequest"><a href="ns.Model.html#prepareRequest">prepareRequest</a></li>
+            
+                <li data-name="ns.Model#preprocessData"><a href="ns.Model.html#preprocessData">preprocessData</a></li>
+            
+                <li data-name="ns.Model#select"><a href="ns.Model.html#select">select</a></li>
+            
+                <li data-name="ns.Model#set"><a href="ns.Model.html#set">set</a></li>
+            
+                <li data-name="ns.Model#setData"><a href="ns.Model.html#setData">setData</a></li>
+            
+                <li data-name="ns.Model#setError"><a href="ns.Model.html#setError">setError</a></li>
+            
+                <li data-name="ns.Model#touch"><a href="ns.Model.html#touch">touch</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.ModelCollection">
+            <span class="title">
+                <a href="ns.ModelCollection.html">ns.ModelCollection</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
+            
+                <li data-name="ns.ModelCollection#_versionSelf"><a href="ns.ModelCollection.html#_versionSelf">_versionSelf</a></li>
+            
+                <li data-name="ns.ModelCollection#STATUS"><a href="ns.ModelCollection.html#STATUS">STATUS</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.ModelCollection#_beforeSetData"><a href="ns.ModelCollection.html#_beforeSetData">_beforeSetData</a></li>
+            
+                <li data-name="ns.ModelCollection#_bindEvents"><a href="ns.ModelCollection.html#_bindEvents">_bindEvents</a></li>
+            
+                <li data-name="ns.ModelCollection#_bindModel"><a href="ns.ModelCollection.html#_bindModel">_bindModel</a></li>
+            
+                <li data-name="ns.ModelCollection#_init"><a href="ns.ModelCollection.html#_init">_init</a></li>
+            
+                <li data-name="ns.ModelCollection#_prepareCallback"><a href="ns.ModelCollection.html#_prepareCallback">_prepareCallback</a></li>
+            
+                <li data-name="ns.ModelCollection#_reset"><a href="ns.ModelCollection.html#_reset">_reset</a></li>
+            
+                <li data-name="ns.ModelCollection#_splitModels"><a href="ns.ModelCollection.html#_splitModels">_splitModels</a></li>
+            
+                <li data-name="ns.ModelCollection#_subscribeSplit"><a href="ns.ModelCollection.html#_subscribeSplit">_subscribeSplit</a></li>
+            
+                <li data-name="ns.ModelCollection#_unsubscribeSplit"><a href="ns.ModelCollection.html#_unsubscribeSplit">_unsubscribeSplit</a></li>
+            
+                <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
+            
+                <li data-name="ns.ModelCollection#clear"><a href="ns.ModelCollection.html#clear">clear</a></li>
+            
+                <li data-name="ns.ModelCollection#destroyWith"><a href="ns.ModelCollection.html#destroyWith">destroyWith</a></li>
+            
+                <li data-name="ns.ModelCollection#extractData"><a href="ns.ModelCollection.html#extractData">extractData</a></li>
+            
+                <li data-name="ns.ModelCollection#extractError"><a href="ns.ModelCollection.html#extractError">extractError</a></li>
+            
+                <li data-name="ns.ModelCollection#get"><a href="ns.ModelCollection.html#get">get</a></li>
+            
+                <li data-name="ns.ModelCollection#getData"><a href="ns.ModelCollection.html#getData">getData</a></li>
+            
+                <li data-name="ns.ModelCollection#getError"><a href="ns.ModelCollection.html#getError">getError</a></li>
+            
+                <li data-name="ns.ModelCollection#getRequestParams"><a href="ns.ModelCollection.html#getRequestParams">getRequestParams</a></li>
+            
+                <li data-name="ns.ModelCollection#getSelfVersion"><a href="ns.ModelCollection.html#getSelfVersion">getSelfVersion</a></li>
+            
+                <li data-name="ns.ModelCollection#getVersion"><a href="ns.ModelCollection.html#getVersion">getVersion</a></li>
+            
+                <li data-name="ns.ModelCollection#hasDataChanged"><a href="ns.ModelCollection.html#hasDataChanged">hasDataChanged</a></li>
+            
+                <li data-name="ns.ModelCollection#insert"><a href="ns.ModelCollection.html#insert">insert</a></li>
+            
+                <li data-name="ns.ModelCollection#invalidate"><a href="ns.ModelCollection.html#invalidate">invalidate</a></li>
+            
+                <li data-name="ns.ModelCollection#isDo"><a href="ns.ModelCollection.html#isDo">isDo</a></li>
+            
+                <li data-name="ns.ModelCollection#isValid"><a href="ns.ModelCollection.html#isValid">isValid</a></li>
+            
+                <li data-name="ns.ModelCollection#onItemChanged"><a href="ns.ModelCollection.html#onItemChanged">onItemChanged</a></li>
+            
+                <li data-name="ns.ModelCollection#onItemDestroyed"><a href="ns.ModelCollection.html#onItemDestroyed">onItemDestroyed</a></li>
+            
+                <li data-name="ns.ModelCollection#onItemTouched"><a href="ns.ModelCollection.html#onItemTouched">onItemTouched</a></li>
+            
+                <li data-name="ns.ModelCollection#prepareRequest"><a href="ns.ModelCollection.html#prepareRequest">prepareRequest</a></li>
+            
+                <li data-name="ns.ModelCollection#preprocessData"><a href="ns.ModelCollection.html#preprocessData">preprocessData</a></li>
+            
+                <li data-name="ns.ModelCollection#remove"><a href="ns.ModelCollection.html#remove">remove</a></li>
+            
+                <li data-name="ns.ModelCollection#select"><a href="ns.ModelCollection.html#select">select</a></li>
+            
+                <li data-name="ns.ModelCollection#set"><a href="ns.ModelCollection.html#set">set</a></li>
+            
+                <li data-name="ns.ModelCollection#setData"><a href="ns.ModelCollection.html#setData">setData</a></li>
+            
+                <li data-name="ns.ModelCollection#setError"><a href="ns.ModelCollection.html#setError">setError</a></li>
+            
+                <li data-name="ns.ModelCollection#touch"><a href="ns.ModelCollection.html#touch">touch</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.ModelUniq">
+            <span class="title">
+                <a href="ns.ModelUniq.html">ns.ModelUniq</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.ModelUniq#_version"><a href="ns.ModelUniq.html#_version">_version</a></li>
+            
+                <li data-name="ns.ModelUniq#STATUS"><a href="ns.ModelUniq.html#STATUS">STATUS</a></li>
+            
+                <li data-name="ns.ModelUniq#uniqCached"><a href="ns.ModelUniq.html#uniqCached">uniqCached</a></li>
+            
+                <li data-name="ns.ModelUniq#uniqFromJSON"><a href="ns.ModelUniq.html#uniqFromJSON">uniqFromJSON</a></li>
+            
+                <li data-name="ns.ModelUniq#uniqName"><a href="ns.ModelUniq.html#uniqName">uniqName</a></li>
+            
+                <li data-name="ns.ModelUniq#uniqPath"><a href="ns.ModelUniq.html#uniqPath">uniqPath</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.ModelUniq#_beforeSetData"><a href="ns.ModelUniq.html#_beforeSetData">_beforeSetData</a></li>
+            
+                <li data-name="ns.ModelUniq#_bindEvents"><a href="ns.ModelUniq.html#_bindEvents">_bindEvents</a></li>
+            
+                <li data-name="ns.ModelUniq#_init"><a href="ns.ModelUniq.html#_init">_init</a></li>
+            
+                <li data-name="ns.ModelUniq#_prepareCallback"><a href="ns.ModelUniq.html#_prepareCallback">_prepareCallback</a></li>
+            
+                <li data-name="ns.ModelUniq#_reset"><a href="ns.ModelUniq.html#_reset">_reset</a></li>
+            
+                <li data-name="ns.ModelUniq#canRetry"><a href="ns.ModelUniq.html#canRetry">canRetry</a></li>
+            
+                <li data-name="ns.ModelUniq#destroyWith"><a href="ns.ModelUniq.html#destroyWith">destroyWith</a></li>
+            
+                <li data-name="ns.ModelUniq#extractData"><a href="ns.ModelUniq.html#extractData">extractData</a></li>
+            
+                <li data-name="ns.ModelUniq#extractError"><a href="ns.ModelUniq.html#extractError">extractError</a></li>
+            
+                <li data-name="ns.ModelUniq#get"><a href="ns.ModelUniq.html#get">get</a></li>
+            
+                <li data-name="ns.ModelUniq#getData"><a href="ns.ModelUniq.html#getData">getData</a></li>
+            
+                <li data-name="ns.ModelUniq#getError"><a href="ns.ModelUniq.html#getError">getError</a></li>
+            
+                <li data-name="ns.ModelUniq#getRequestParams"><a href="ns.ModelUniq.html#getRequestParams">getRequestParams</a></li>
+            
+                <li data-name="ns.ModelUniq#getVersion"><a href="ns.ModelUniq.html#getVersion">getVersion</a></li>
+            
+                <li data-name="ns.ModelUniq#hasDataChanged"><a href="ns.ModelUniq.html#hasDataChanged">hasDataChanged</a></li>
+            
+                <li data-name="ns.ModelUniq#invalidate"><a href="ns.ModelUniq.html#invalidate">invalidate</a></li>
+            
+                <li data-name="ns.ModelUniq#isDo"><a href="ns.ModelUniq.html#isDo">isDo</a></li>
+            
+                <li data-name="ns.ModelUniq#isValid"><a href="ns.ModelUniq.html#isValid">isValid</a></li>
+            
+                <li data-name="ns.ModelUniq#prepareRequest"><a href="ns.ModelUniq.html#prepareRequest">prepareRequest</a></li>
+            
+                <li data-name="ns.ModelUniq#preprocessData"><a href="ns.ModelUniq.html#preprocessData">preprocessData</a></li>
+            
+                <li data-name="ns.ModelUniq#select"><a href="ns.ModelUniq.html#select">select</a></li>
+            
+                <li data-name="ns.ModelUniq#set"><a href="ns.ModelUniq.html#set">set</a></li>
+            
+                <li data-name="ns.ModelUniq#setData"><a href="ns.ModelUniq.html#setData">setData</a></li>
+            
+                <li data-name="ns.ModelUniq#setError"><a href="ns.ModelUniq.html#setError">setError</a></li>
+            
+                <li data-name="ns.ModelUniq#touch"><a href="ns.ModelUniq.html#touch">touch</a></li>
+            
+                <li data-name="ns.ModelUniq#uniq"><a href="ns.ModelUniq.html#uniq">uniq</a></li>
+            
+                <li data-name="ns.ModelUniq#uniqFromKey"><a href="ns.ModelUniq.html#uniqFromKey">uniqFromKey</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.Update">
+            <span class="title">
+                <a href="ns.Update.html">ns.Update</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.Update#_EVENTS_ORDER"><a href="ns.Update.html#_EVENTS_ORDER">_EVENTS_ORDER</a></li>
+            
+                <li data-name="ns.Update#EXEC_FLAG"><a href="ns.Update.html#EXEC_FLAG">EXEC_FLAG</a></li>
+            
+                <li data-name="ns.Update#STATUS"><a href="ns.Update.html#STATUS">STATUS</a></li>
+            
+                <li data-name="ns.Update#stopped"><a href="ns.Update.html#stopped">stopped</a></li>
+            
+                <li data-name="ns.Update#view"><a href="ns.Update.html#view">view</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
+            
+                <li data-name="ns.Update#_expired"><a href="ns.Update.html#_expired">_expired</a></li>
+            
+                <li data-name="ns.Update#_update"><a href="ns.Update.html#_update">_update</a></li>
+            
+                <li data-name="ns.Update#abort"><a href="ns.Update.html#abort">abort</a></li>
+            
+                <li data-name="ns.Update#addToQueue"><a href="ns.Update.html#addToQueue">addToQueue</a></li>
+            
+                <li data-name="ns.Update#done"><a href="ns.Update.html#done">done</a></li>
+            
+                <li data-name="ns.Update#error"><a href="ns.Update.html#error">error</a></li>
+            
+                <li data-name="ns.Update#isGlobal"><a href="ns.Update.html#isGlobal">isGlobal</a></li>
+            
+                <li data-name="ns.Update#removeFromQueue"><a href="ns.Update.html#removeFromQueue">removeFromQueue</a></li>
+            
+                <li data-name="ns.Update#render"><a href="ns.Update.html#render">render</a></li>
+            
+                <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.View">
+            <span class="title">
+                <a href="ns.View.html">ns.View</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.View#$node"><a href="ns.View.html#$node">$node</a></li>
+            
+                <li data-name="ns.View#_$document"><a href="ns.View.html#_$document">_$document</a></li>
+            
+                <li data-name="ns.View#_$window"><a href="ns.View.html#_$window">_$window</a></li>
+            
+                <li data-name="ns.View#_eventNS"><a href="ns.View.html#_eventNS">_eventNS</a></li>
+            
+                <li data-name="ns.View#_modelsVersions"><a href="ns.View.html#_modelsVersions">_modelsVersions</a></li>
+            
+                <li data-name="ns.View#_uniqID"><a href="ns.View.html#_uniqID">_uniqID</a></li>
+            
+                <li data-name="ns.View#async"><a href="ns.View.html#async">async</a></li>
+            
+                <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
+            
+                <li data-name="ns.View#isValid"><a href="ns.View.html#isValid">isValid</a></li>
+            
+                <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+            
+                <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
+            
+                <li data-name="ns.View#status"><a href="ns.View.html#status">status</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.View._getKeyParams"><a href="ns.View.html#_getKeyParams">_getKeyParams</a></li>
+            
+                <li data-name="ns.View._initInfoEvents"><a href="ns.View.html#_initInfoEvents">_initInfoEvents</a></li>
+            
+                <li data-name="ns.View._initInfoParams"><a href="ns.View.html#_initInfoParams">_initInfoParams</a></li>
+            
+                <li data-name="ns.View._initInfoSubviews"><a href="ns.View.html#_initInfoSubviews">_initInfoSubviews</a></li>
+            
+                <li data-name="ns.View._prepareModels"><a href="ns.View.html#_prepareModels">_prepareModels</a></li>
+            
+                <li data-name="ns.View.create"><a href="ns.View.html#create">create</a></li>
+            
+                <li data-name="ns.View.define"><a href="ns.View.html#define">define</a></li>
+            
+                <li data-name="ns.View.getKey"><a href="ns.View.html#getKey">getKey</a></li>
+            
+                <li data-name="ns.View.getKeyAndParams"><a href="ns.View.html#getKeyAndParams">getKeyAndParams</a></li>
+            
+                <li data-name="ns.View.info"><a href="ns.View.html#info">info</a></li>
+            
+                <li data-name="ns.View.undefine"><a href="ns.View.html#undefine">undefine</a></li>
+            
+                <li data-name="ns.View#_addView"><a href="ns.View.html#_addView">_addView</a></li>
+            
+                <li data-name="ns.View#_apply"><a href="ns.View.html#_apply">_apply</a></li>
+            
+                <li data-name="ns.View#_bindCreateEvents"><a href="ns.View.html#_bindCreateEvents">_bindCreateEvents</a></li>
+            
+                <li data-name="ns.View#_bindEventHandlers"><a href="ns.View.html#_bindEventHandlers">_bindEventHandlers</a></li>
+            
+                <li data-name="ns.View#_bindEvents"><a href="ns.View.html#_bindEvents">_bindEvents</a></li>
+            
+                <li data-name="ns.View#_bindModel"><a href="ns.View.html#_bindModel">_bindModel</a></li>
+            
+                <li data-name="ns.View#_bindModels"><a href="ns.View.html#_bindModels">_bindModels</a></li>
+            
+                <li data-name="ns.View#_extractNode"><a href="ns.View.html#_extractNode">_extractNode</a></li>
+            
+                <li data-name="ns.View#_getDescendants"><a href="ns.View.html#_getDescendants">_getDescendants</a></li>
+            
+                <li data-name="ns.View#_getDescViewTree"><a href="ns.View.html#_getDescViewTree">_getDescViewTree</a></li>
+            
+                <li data-name="ns.View#_getEvents"><a href="ns.View.html#_getEvents">_getEvents</a></li>
+            
+                <li data-name="ns.View#_getModelsData"><a href="ns.View.html#_getModelsData">_getModelsData</a></li>
+            
+                <li data-name="ns.View#_getModelsError"><a href="ns.View.html#_getModelsError">_getModelsError</a></li>
+            
+                <li data-name="ns.View#_getPlaceholderTree"><a href="ns.View.html#_getPlaceholderTree">_getPlaceholderTree</a></li>
+            
+                <li data-name="ns.View#_getRequestViews"><a href="ns.View.html#_getRequestViews">_getRequestViews</a></li>
+            
+                <li data-name="ns.View#_getUpdateTree"><a href="ns.View.html#_getUpdateTree">_getUpdateTree</a></li>
+            
+                <li data-name="ns.View#_getView"><a href="ns.View.html#_getView">_getView</a></li>
+            
+                <li data-name="ns.View#_getViewTree"><a href="ns.View.html#_getViewTree">_getViewTree</a></li>
+            
+                <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
+            
+                <li data-name="ns.View#_hideNode"><a href="ns.View.html#_hideNode">_hideNode</a></li>
+            
+                <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
+            
+                <li data-name="ns.View#_htmlinit"><a href="ns.View.html#_htmlinit">_htmlinit</a></li>
+            
+                <li data-name="ns.View#_init"><a href="ns.View.html#_init">_init</a></li>
+            
+                <li data-name="ns.View#_initModels"><a href="ns.View.html#_initModels">_initModels</a></li>
+            
+                <li data-name="ns.View#_prepareCallback"><a href="ns.View.html#_prepareCallback">_prepareCallback</a></li>
+            
+                <li data-name="ns.View#_saveModelsVersions"><a href="ns.View.html#_saveModelsVersions">_saveModelsVersions</a></li>
+            
+                <li data-name="ns.View#_setNode"><a href="ns.View.html#_setNode">_setNode</a></li>
+            
+                <li data-name="ns.View#_show"><a href="ns.View.html#_show">_show</a></li>
+            
+                <li data-name="ns.View#_showNode"><a href="ns.View.html#_showNode">_showNode</a></li>
+            
+                <li data-name="ns.View#_tryPushToRequest"><a href="ns.View.html#_tryPushToRequest">_tryPushToRequest</a></li>
+            
+                <li data-name="ns.View#_unbindEvents"><a href="ns.View.html#_unbindEvents">_unbindEvents</a></li>
+            
+                <li data-name="ns.View#_unbindModels"><a href="ns.View.html#_unbindModels">_unbindModels</a></li>
+            
+                <li data-name="ns.View#_updateHTML"><a href="ns.View.html#_updateHTML">_updateHTML</a></li>
+            
+                <li data-name="ns.View#getModel"><a href="ns.View.html#getModel">getModel</a></li>
+            
+                <li data-name="ns.View#getModelData"><a href="ns.View.html#getModelData">getModelData</a></li>
+            
+                <li data-name="ns.View#invalidate"><a href="ns.View.html#invalidate">invalidate</a></li>
+            
+                <li data-name="ns.View#invalidateSubview"><a href="ns.View.html#invalidateSubview">invalidateSubview</a></li>
+            
+                <li data-name="ns.View#isLoading"><a href="ns.View.html#isLoading">isLoading</a></li>
+            
+                <li data-name="ns.View#isModelsValid"><a href="ns.View.html#isModelsValid">isModelsValid</a></li>
+            
+                <li data-name="ns.View#isModelsValidWithVersions"><a href="ns.View.html#isModelsValidWithVersions">isModelsValidWithVersions</a></li>
+            
+                <li data-name="ns.View#isNone"><a href="ns.View.html#isNone">isNone</a></li>
+            
+                <li data-name="ns.View#isOk"><a href="ns.View.html#isOk">isOk</a></li>
+            
+                <li data-name="ns.View#isSubviewsOk"><a href="ns.View.html#isSubviewsOk">isSubviewsOk</a></li>
+            
+                <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="ns.ViewCollection">
+            <span class="title">
+                <a href="ns.ViewCollection.html">ns.ViewCollection</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="ns.ViewCollection#$node"><a href="ns.ViewCollection.html#$node">$node</a></li>
+            
+                <li data-name="ns.ViewCollection#_$document"><a href="ns.ViewCollection.html#_$document">_$document</a></li>
+            
+                <li data-name="ns.ViewCollection#_$window"><a href="ns.ViewCollection.html#_$window">_$window</a></li>
+            
+                <li data-name="ns.ViewCollection#_eventNS"><a href="ns.ViewCollection.html#_eventNS">_eventNS</a></li>
+            
+                <li data-name="ns.ViewCollection#_modelsVersions"><a href="ns.ViewCollection.html#_modelsVersions">_modelsVersions</a></li>
+            
+                <li data-name="ns.ViewCollection#_uniqID"><a href="ns.ViewCollection.html#_uniqID">_uniqID</a></li>
+            
+                <li data-name="ns.ViewCollection#async"><a href="ns.ViewCollection.html#async">async</a></li>
+            
+                <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
+            
+                <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+            
+                <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
+            
+                <li data-name="ns.ViewCollection#status"><a href="ns.ViewCollection.html#status">status</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="ns.ViewCollection.define"><a href="ns.ViewCollection.html#define">define</a></li>
+            
+                <li data-name="ns.ViewCollection#_addView"><a href="ns.ViewCollection.html#_addView">_addView</a></li>
+            
+                <li data-name="ns.ViewCollection#_apply"><a href="ns.ViewCollection.html#_apply">_apply</a></li>
+            
+                <li data-name="ns.ViewCollection#_bindCreateEvents"><a href="ns.ViewCollection.html#_bindCreateEvents">_bindCreateEvents</a></li>
+            
+                <li data-name="ns.ViewCollection#_bindEventHandlers"><a href="ns.ViewCollection.html#_bindEventHandlers">_bindEventHandlers</a></li>
+            
+                <li data-name="ns.ViewCollection#_bindEvents"><a href="ns.ViewCollection.html#_bindEvents">_bindEvents</a></li>
+            
+                <li data-name="ns.ViewCollection#_bindModel"><a href="ns.ViewCollection.html#_bindModel">_bindModel</a></li>
+            
+                <li data-name="ns.ViewCollection#_bindModels"><a href="ns.ViewCollection.html#_bindModels">_bindModels</a></li>
+            
+                <li data-name="ns.ViewCollection#_deleteView"><a href="ns.ViewCollection.html#_deleteView">_deleteView</a></li>
+            
+                <li data-name="ns.ViewCollection#_extractNode"><a href="ns.ViewCollection.html#_extractNode">_extractNode</a></li>
+            
+                <li data-name="ns.ViewCollection#_getDescendants"><a href="ns.ViewCollection.html#_getDescendants">_getDescendants</a></li>
+            
+                <li data-name="ns.ViewCollection#_getDescViewTree"><a href="ns.ViewCollection.html#_getDescViewTree">_getDescViewTree</a></li>
+            
+                <li data-name="ns.ViewCollection#_getEvents"><a href="ns.ViewCollection.html#_getEvents">_getEvents</a></li>
+            
+                <li data-name="ns.ViewCollection#_getModelsData"><a href="ns.ViewCollection.html#_getModelsData">_getModelsData</a></li>
+            
+                <li data-name="ns.ViewCollection#_getModelsError"><a href="ns.ViewCollection.html#_getModelsError">_getModelsError</a></li>
+            
+                <li data-name="ns.ViewCollection#_getPlaceholderTree"><a href="ns.ViewCollection.html#_getPlaceholderTree">_getPlaceholderTree</a></li>
+            
+                <li data-name="ns.ViewCollection#_getRequestViews"><a href="ns.ViewCollection.html#_getRequestViews">_getRequestViews</a></li>
+            
+                <li data-name="ns.ViewCollection#_getUpdateTree"><a href="ns.ViewCollection.html#_getUpdateTree">_getUpdateTree</a></li>
+            
+                <li data-name="ns.ViewCollection#_getView"><a href="ns.ViewCollection.html#_getView">_getView</a></li>
+            
+                <li data-name="ns.ViewCollection#_getViewByKey"><a href="ns.ViewCollection.html#_getViewByKey">_getViewByKey</a></li>
+            
+                <li data-name="ns.ViewCollection#_getViewTree"><a href="ns.ViewCollection.html#_getViewTree">_getViewTree</a></li>
+            
+                <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
+            
+                <li data-name="ns.ViewCollection#_hideNode"><a href="ns.ViewCollection.html#_hideNode">_hideNode</a></li>
+            
+                <li data-name="ns.ViewCollection#_htmldestroy"><a href="ns.ViewCollection.html#_htmldestroy">_htmldestroy</a></li>
+            
+                <li data-name="ns.ViewCollection#_htmlinit"><a href="ns.ViewCollection.html#_htmlinit">_htmlinit</a></li>
+            
+                <li data-name="ns.ViewCollection#_init"><a href="ns.ViewCollection.html#_init">_init</a></li>
+            
+                <li data-name="ns.ViewCollection#_initModels"><a href="ns.ViewCollection.html#_initModels">_initModels</a></li>
+            
+                <li data-name="ns.ViewCollection#_prepareCallback"><a href="ns.ViewCollection.html#_prepareCallback">_prepareCallback</a></li>
+            
+                <li data-name="ns.ViewCollection#_saveModelsVersions"><a href="ns.ViewCollection.html#_saveModelsVersions">_saveModelsVersions</a></li>
+            
+                <li data-name="ns.ViewCollection#_setNode"><a href="ns.ViewCollection.html#_setNode">_setNode</a></li>
+            
+                <li data-name="ns.ViewCollection#_show"><a href="ns.ViewCollection.html#_show">_show</a></li>
+            
+                <li data-name="ns.ViewCollection#_showNode"><a href="ns.ViewCollection.html#_showNode">_showNode</a></li>
+            
+                <li data-name="ns.ViewCollection#_tryPushToRequest"><a href="ns.ViewCollection.html#_tryPushToRequest">_tryPushToRequest</a></li>
+            
+                <li data-name="ns.ViewCollection#_unbindEvents"><a href="ns.ViewCollection.html#_unbindEvents">_unbindEvents</a></li>
+            
+                <li data-name="ns.ViewCollection#_unbindModels"><a href="ns.ViewCollection.html#_unbindModels">_unbindModels</a></li>
+            
+                <li data-name="ns.ViewCollection#_updateHTML"><a href="ns.ViewCollection.html#_updateHTML">_updateHTML</a></li>
+            
+                <li data-name="ns.ViewCollection#getModel"><a href="ns.ViewCollection.html#getModel">getModel</a></li>
+            
+                <li data-name="ns.ViewCollection#getModelData"><a href="ns.ViewCollection.html#getModelData">getModelData</a></li>
+            
+                <li data-name="ns.ViewCollection#invalidate"><a href="ns.ViewCollection.html#invalidate">invalidate</a></li>
+            
+                <li data-name="ns.ViewCollection#invalidateSubview"><a href="ns.ViewCollection.html#invalidateSubview">invalidateSubview</a></li>
+            
+                <li data-name="ns.ViewCollection#isLoading"><a href="ns.ViewCollection.html#isLoading">isLoading</a></li>
+            
+                <li data-name="ns.ViewCollection#isModelsValid"><a href="ns.ViewCollection.html#isModelsValid">isModelsValid</a></li>
+            
+                <li data-name="ns.ViewCollection#isModelsValidWithVersions"><a href="ns.ViewCollection.html#isModelsValidWithVersions">isModelsValidWithVersions</a></li>
+            
+                <li data-name="ns.ViewCollection#isNone"><a href="ns.ViewCollection.html#isNone">isNone</a></li>
+            
+                <li data-name="ns.ViewCollection#isOk"><a href="ns.ViewCollection.html#isOk">isOk</a></li>
+            
+                <li data-name="ns.ViewCollection#isSubviewsOk"><a href="ns.ViewCollection.html#isSubviewsOk">isSubviewsOk</a></li>
+            
+                <li data-name="ns.ViewCollection#isValid"><a href="ns.ViewCollection.html#isValid">isValid</a></li>
+            
+                <li data-name="ns.ViewCollection#isValidDesc"><a href="ns.ViewCollection.html#isValidDesc">isValidDesc</a></li>
+            
+                <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+    </ul>
+</div>
+    <div class="main">
+        
+            <h1 class="page-title" data-filename="ns.View.html">Class: View</h1>
+        
+
+        
+
+
+
+<section>
+    
+<header>
+    <h2>
+        <span class="ancestors"><a href="ns.html">ns</a>.</span>
+    
+    View
+    </h2>
+    
+        <div class="class-description"><p>Класс, реализующий View</p></div>
+    
+</header>  
+
+<article>
+    <div class="container-overview">
+    
+    
+    
+        
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="View">
+            
+            new ns.View<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 19
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-tutorial">Tutorials:</dt>
+    <dd class="tag-tutorial">
+        <ul>
+            <li><a href="tutorial-ns.view_.html">ns.view</a></li>
+        
+            <li><a href="tutorial-ns.view.yate.html">ns.view.yate</a></li>
+        
+            <li><a href="tutorial-ns.view_.html">ns.view</a></li>
+        
+            <li><a href="tutorial-ns.view.yate.html">ns.view.yate</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+    
+    </div>
+    
+    
+    
+    
+        <h3 class="subsection-title">Mixes In</h3>
+        
+        <ul>
+            <li>no.Events</li>
+        </ul>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        <h3 class="subsection-title">Members</h3>
+        
+        <dl>
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="$node">$node<span class="type-signature type jquery">jQuery</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>jQuerified view node</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_$document"><span class="type-signature ">private</span>_$document<span class="type-signature type jquery">jQuery</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Закешированный $(document)</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_$window"><span class="type-signature ">private</span>_$window<span class="type-signature type jquery">jQuery</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Закешированный $(window)</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_eventNS"><span class="type-signature ">private</span>_eventNS<span class="type-signature type string">string</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Uniq namespace for events so view can bind/unbind events properly.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_modelsVersions"><span class="type-signature ">protected</span>_modelsVersions<span class="type-signature type object">object</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Save models version to track changes.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_uniqID"><span class="type-signature ">private</span>_uniqID<span class="type-signature type number">number</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Uniq View ID</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="async">async<span class="type-signature type boolean">boolean</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Флаг того, что view может быть асинхронным.
+Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="asyncState">asyncState<span class="type-signature type boolean">Boolean</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Флаг, означающий, что view грузится асинхронно.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isValid">isValid</h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Возвращает true, если блок валиден.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="node">node<span class="type-signature type htmlelement">HTMLElement</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>View node</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="STATUS">STATUS<span class="type-signature type ns.v.status"><a href="ns.V.html#STATUS">ns.V.STATUS</a></span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="ns.V.html#STATUS">ns.V.STATUS</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="status"><span class="type-signature ">private</span>status<span class="type-signature type number">number</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Статус View.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="ns.V.html#STATUS">ns.V.STATUS</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        </dl>
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
+        
+        <dl>
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getKeyParams">
+            
+            <span class="type-signature ">private,static</span>ns.View._getKeyParams<span class="signature">(id, params, info)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{*}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1481
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_initInfoEvents">
+            
+            <span class="type-signature ">private,static</span>ns.View._initInfoEvents<span class="signature">(info)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1266
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_initInfoParams">
+            
+            <span class="type-signature ">private,static</span>ns.View._initInfoParams<span class="signature">(info)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1192
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_initInfoSubviews">
+            
+            <span class="type-signature static">static</span>ns.View._initInfoSubviews<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1410
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Парсим информацию про subview.</p>
+<pre><code>    В info.subviews приходит структура такого вида:
+        {
+            //  Определяем subview 'labels':
+            'labels': [
+                //  зависящее от поля '.labels' модели 'message',
+                'message .labels',
+                //  и от модели 'labels' целиком.
+                'labels'
+            ],
+            //  Пустая строка в качестве имени subview означает все view целиком.
+            //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
+            '': 'folders'
+            ...
+        }
+
+    На выходе в info.subviews такая структура:
+        {
+                //  Название модели.
+                'message': {
+                //  jpath.
+                '.labels': {
+                    //  Список subview, которые зависят от этого jpath в данной модели.
+                    'labels': true
+                }
+            },
+            'labels': {
+                //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
+                '': {
+                    'labels': true
+                }
+            },
+            'folders': {
+                '': {
+                    //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
+                    '': true
+                }
+            },
+            ...
+        }
+</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_prepareModels">
+            
+            <span class="type-signature ">private,static</span>ns.View._prepareModels<span class="signature">(models)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1550
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>models</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">ns.Model[]</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="create">
+            
+            <span class="type-signature static">static</span>ns.View.create<span class="signature">(id, <span class="optional">params</span>, <span class="optional">async</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.View.html">ns.View</a>}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1531
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Фабрика ns.View</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                <p>ID view.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Параметры view.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>async</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Может ли view бы асинхронным.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="define">
+            
+            <span class="type-signature static">static</span>ns.View.define<span class="signature">(id, <span class="optional">info</span>, <span class="optional">base</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{function}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1139
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>no.events представляет из себя объект {&quot;eventDecl1&quot;: &quot;handler1&quot;, &quot;eventDecl2&quot;: &quot;handler2&quot;}.
+&quot;eventDecl&quot; записывается в виде &quot;eventName [ selector ]&quot;.
+&quot;selector&quot; опционален, если его нет, то события регистрируется на ноду View.
+&quot;handler&quot; может быть строка (тогда она заменится на метод прототипа) или функция.
+Все хендлеры биндятся на экземпляр View.
+Разделение на типы событий происходит автоматически по следующим правилам (в порядке приоритета):</p>
+<ul>
+<li>если selector === &quot;window&quot; || selector == &quot;document&quot;, то обработчик регистрируется по событию show</li>
+<li>если eventName === &quot;resize&quot;, то обработчик регистрируется по событию show</li>
+<li>если eventName === &quot;scroll&quot;, то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)</li>
+<li>иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)</li>
+</ul>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                <p>Название View.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Декларация View.</p>
+                
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>ctor</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Конструтор.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>methods</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Методы, переопределяющие стандартные методы View.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>models</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>DOM-события, на которые подписывается View.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>sibviews</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+            </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>base</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                    ns.View
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Базовый View для наследования</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+<h5>Returns:</h5>
+View.
+<br />
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getKey">
+            
+            <span class="type-signature static">static</span>ns.View.getKey<span class="signature">(id, params, info)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1438
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getKeyAndParams">
+            
+            <span class="type-signature static">static</span>ns.View.getKeyAndParams<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1447
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает ключ объекта и параметры с учётом rewriteParamsOnInit
+В этом методе собрана вся логика рерайтов параметров при создании view</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="info">
+            
+            <span class="type-signature static">static</span>ns.View.info<span class="signature">(id)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1176
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает информацию о View.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название модели.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+    <div class="param-desc">
+    
+        Бросает исключения, если нет
+    
+    </div>
+
+
+        
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="undefine">
+            
+            <span class="type-signature static">static</span>ns.View.undefine<span class="signature">(<span class="optional">id</span>)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1571
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Удаляет определение view.
+Используется только в юнит-тестах.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>ID view.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_addView">
+            
+            <span class="type-signature ">private</span>_addView<span class="signature">(id, params, type)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{*}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 140
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ns.html#L">ns.L</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_apply">
+            
+            <span class="type-signature ">private</span>_apply<span class="signature">(callback)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 609
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Вызываем callback для всех подблоков.
+Это плоский метод. Он работает только с подблоками и не уходит рекурсивно вглубь by design.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_bindCreateEvents">
+            
+            <span class="type-signature ">private</span>_bindCreateEvents<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 470
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_bindEventHandlers">
+            
+            <span class="type-signature ">private</span>_bindEventHandlers<span class="signature">(events, handlerPos)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Array}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 373
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Копирует массив деклараций событий и возвращает такой же массив, но с забинженными на этот инстанс обработчиками.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>handlerPos</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Позиция хендлера в массиве.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+<h5>Returns:</h5>
+events c забинженными обработчиками.
+<br />
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_bindEvents">
+            
+            <span class="type-signature ">private</span>_bindEvents<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 418
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Регистрирует обработчики событий после создания ноды.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_bindModel">
+            
+            <span class="type-signature ">private</span>_bindModel<span class="signature">(model, eventName, events, callback)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 327
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>model</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ns.Model.html">ns.Model</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>eventName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_bindModels">
+            
+            <span class="type-signature ">private</span>_bindModels<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 263
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Биндится на изменение моделей.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_extractNode">
+            
+            <span class="type-signature ">private</span>_extractNode<span class="signature">(node)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 955
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getDescendants">
+            
+            <span class="type-signature ">private</span>_getDescendants<span class="signature">(<span class="optional">views</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Array}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 907
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает массив всех вложенных view, включая себя
+FIXME: это же _getDescendantsOrSelf</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>views</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                    []
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Начальный массив.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getDescViewTree">
+            
+            <span class="type-signature ">private</span>_getDescViewTree<span class="signature">(layout, params)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 761
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>layout</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getEvents">
+            
+            <span class="type-signature ">private</span>_getEvents<span class="signature">(type)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 395
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возващает обработчики событий для View.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Тип обработчиков: 'init' или 'show'.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getModelsData">
+            
+            <span class="type-signature ">private</span>_getModelsData<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{*}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 802
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getModelsError">
+            
+            <span class="type-signature ">private</span>_getModelsError<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{*}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 830
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getPlaceholderTree">
+            
+            _getPlaceholderTree<span class="signature">(layout, params)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 777
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает декларацию вида для вставки плейсхолдера</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>layout</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Currently processing layout.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Params.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getRequestViews">
+            
+            _getRequestViews<span class="signature">(updated, pageLayout, params)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 626
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
+требующие перерисовки. Раскладываем их в две &quot;кучки&quot;: sync и async.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>updated</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Hash for sync and async views.</p>
+                
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>sync</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">ns.View[]</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Sync views.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>async</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">ns.View[]</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Sync views.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+            </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>pageLayout</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Currently processing layout.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Params.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getUpdateTree">
+            
+            _getUpdateTree<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 693
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Строим дерево для шаблонизатора.</p>
+<p> В tree.views будет дерево блоков, которые нужно сгенерить,
+ причем на верхнем уровне будут т.н. toplevel-блоки --
+ это невалидные блоки и выше их все блоки валидны.
+ В частности, это значит, что если блок невалидный, то он будет перерисован
+ со всеми своими подблоками.</p>
+<p> В tree.models будут все модели, требуемые для этих блоков.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getView">
+            
+            <span class="type-signature ">private</span>_getView<span class="signature">(id)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.View.html">ns.View</a>}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 128
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getViewTree">
+            
+            _getViewTree<span class="signature">(layout, params)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 711
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Строим дерево блоков.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>layout</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Currently processing layout.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Params.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_hide">
+            
+            <span class="type-signature ">protected</span>_hide<span class="signature">(<span class="optional">events</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 179
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Скрывает view</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Массив событий.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_hideNode">
+            
+            <span class="type-signature ">private</span>_hideNode<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 212
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_htmldestroy">
+            
+            <span class="type-signature ">protected</span>_htmldestroy<span class="signature">(<span class="optional">events</span>)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 158
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Обработчик htmldestroy</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Массив событий.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_htmlinit">
+            
+            <span class="type-signature ">protected</span>_htmlinit<span class="signature">(<span class="optional">events</span>)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 168
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Обработчик htmlinit</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Массив событий.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_init">
+            
+            <span class="type-signature ">private</span>_init<span class="signature">(id, params, async)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 49
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>async</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_initModels">
+            
+            <span class="type-signature ">private</span>_initModels<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 109
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_prepareCallback">
+            
+            <span class="type-signature ">private</span>_prepareCallback<span class="signature">(fn)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{function}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 356
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns function or method from prototype.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>fn</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Function or method name from prototype.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_saveModelsVersions">
+            
+            <span class="type-signature ">protected</span>_saveModelsVersions<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1107
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Safe models versions to track changes.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_setNode">
+            
+            <span class="type-signature ">protected</span>_setNode<span class="signature">(node)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 922
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Set view node</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_show">
+            
+            <span class="type-signature ">protected</span>_show<span class="signature">(<span class="optional">events</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 222
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Показывает View</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Массив событий.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_showNode">
+            
+            _showNode<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 246
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_tryPushToRequest">
+            
+            _tryPushToRequest<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 653
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Добавляет вид в соответствующий список &quot;запрашиваемых&quot; видов в случае,
+если запрос необходим</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_unbindEvents">
+            
+            <span class="type-signature ">private</span>_unbindEvents<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 481
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Удаляет обработчики событий перед удалением ноды.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_unbindModels">
+            
+            <span class="type-signature ">private</span>_unbindModels<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 336
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Отписываемся от изменений моделей.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_updateHTML">
+            
+            <span class="type-signature ">private</span>_updateHTML<span class="signature">(node, layout, params, updateOptions, events)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 984
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Обновляем (если нужно) ноду блока.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>layout</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>updateOptions</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getModel">
+            
+            getModel<span class="signature">(id)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.Model.html">ns.Model</a>}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 849
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns model.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Model ID</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getModelData">
+            
+            getModelData<span class="signature">(id)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{*}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 858
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns data of model.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Model ID</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="invalidate">
+            
+            invalidate<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 517
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Инвалидует себя и своих потомков.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="invalidateSubview">
+            
+            invalidateSubview<span class="signature">(subviewId)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 254
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>subviewId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isLoading">
+            
+            isLoading<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 537
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isModelsValid">
+            
+            isModelsValid<span class="signature">(<span class="optional">modelsVersions</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 578
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает true, если все модели валидны.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>modelsVersions</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Также проверяем, что кеш модели не свежее переданной версии.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isModelsValidWithVersions">
+            
+            isModelsValidWithVersions<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 569
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns true if models are valid and not be updated after last view update.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isNone">
+            
+            isNone<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 545
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns true if view has status NONE</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isOk">
+            
+            isOk<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 529
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isSubviewsOk">
+            
+            isSubviewsOk<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 553
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>FIXME: Может нужно как-то объединить isOk и isSubviewsOk?</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="tmpl">
+            
+            tmpl<span class="signature">(mode, extra)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 876
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Быстро что-нибудь сгенерить из данных блока.
+Можно передать моду и дополнительный объект, который попадет в /.extra:</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>mode</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>extra</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+        <h5>Example</h5>
+        
+
+    
+    <pre class="prettyprint"><code class="lang-js">block.tmpl()
+block.tmpl('mode')
+block.tmpl({ ... })
+block.tmpl('mode', { ... })
+</code></pre>
+    
+
+    
+</dd>
+
+        </dl>
+    
+    
+    
+    
+    
+</article>
+
+</section>  
+
+
+
+
+
+        
+        <!-- disqus code -->
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        <!-- // disqus code -->
+        
+
+        <footer>
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Apr 21 2014 16:48:31 GMT+0400 (MSK)
+        </footer>
+    </div>
+</div>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script src="scripts/main.js"></script>
+</body>
+</html>

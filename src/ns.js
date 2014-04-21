@@ -1,6 +1,7 @@
 /**
  * noscript MVC framework
  * @namespace
+ * @tutotial entities
  */
 var ns = {};
 

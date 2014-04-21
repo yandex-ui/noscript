@@ -5,6 +5,7 @@
      * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.get().
      * @constructor
      * @mixes no.Events
+     * @tutorial ns.model
      */
     ns.Model = function() {};
 

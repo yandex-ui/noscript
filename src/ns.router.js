@@ -3,6 +3,7 @@
  * @namespace
  * @param {string} url
  * @returns {object}
+ * @tutorial ns.router
  */
 ns.router = function(url) {
     var baseDir = ns.router.baseDir;

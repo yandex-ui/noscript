@@ -13,6 +13,8 @@
      * @tutorial ns.view.yate
      * @constructor
      * @mixes no.Events
+     * @tutorial ns.view
+     * @tutorial ns.view.yate
      */
     ns.View = function() {};
     no.extend(ns.View.prototype, no.Events);

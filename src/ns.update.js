@@ -16,6 +16,7 @@
      * var update = new ns.Update(AppBlock, layout, route.params);
      * update.start();
      * ```
+     * @tutorial ns.update.logic
      */
     ns.Update = function(view, layout, params, options) {
         /**

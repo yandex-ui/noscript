@@ -5,11 +5,11 @@
 
 ## Ключевые сущности
 
-[Общее описание сущностей](/yandex-ui/noscript/blob/master/doc/entities.md)
+[Общее описание сущностей](/doc/entities.md)
 
 ### Раскладка страницы (ns.layout)
 
-[Декларация](/yandex-ui/noscript/blob/master/doc/ns.layout.md)
+[Декларация](/doc/ns.layout.md)
 
 ### Маршрутизатор (ns.router)
 
@@ -17,13 +17,13 @@
 
 ### Вид (ns.View)
 
-[Декларация и принципы работы](/yandex-ui/noscript/blob/master/doc/ns.view.md)
+[Декларация и принципы работы](/doc/ns.view.md)
 
-[Структура шаблона](/yandex-ui/noscript/blob/master/doc/ns.view.yate.md)
+[Структура шаблона](/doc/ns.view.yate.md)
 
 ### Вид-коллекция (ns.View)
 
-[Декларация](/yandex-ui/noscript/blob/master/doc/ns.viewCollection.md)
+[Декларация](/doc/ns.viewCollection.md)
 
 ### Модель (ns.Model)
 
@@ -31,4 +31,4 @@
 
 ### Построение и обновление страницы (ns.Update)
 
-[Логика работы](/yandex-ui/noscript/wiki/Логика-построения-и-обновления-страницы)
+[Логика работы](/doc/ns.update.logic.ms)

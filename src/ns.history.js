@@ -3,6 +3,7 @@
     /**
      * Объект для работы с историей и адресной строкой браузера.
      * @namespace
+     * @tutorial ns.history
      */
     ns.history = {};
 

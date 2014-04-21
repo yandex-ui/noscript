@@ -19,7 +19,7 @@ describe('ns.ViewCollection', function() {
                 ns.ViewCollection.define('collection');
             } catch(e) {}
 
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.ok();
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
         });
 
         it('should throw exception if I define viewCollection without ModelCollection', function() {
@@ -29,7 +29,7 @@ describe('ns.ViewCollection', function() {
                 });
             } catch(e) {}
 
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.ok();
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
         });
 
         it('should throw exception if I define viewCollection with several ModelCollections', function() {
@@ -39,7 +39,7 @@ describe('ns.ViewCollection', function() {
                 });
             } catch(e) {}
 
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.ok();
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
         });
 
         it('should throw exception if I define viewCollection with single ModelCollection but without split.view_id', function() {
@@ -49,7 +49,7 @@ describe('ns.ViewCollection', function() {
                 });
             } catch(e) {}
 
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.ok();
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
         });
 
         it('should not throw exception if I define viewCollection with single ModelCollection and split.view_id', function() {
@@ -62,7 +62,7 @@ describe('ns.ViewCollection', function() {
                 });
             } catch(e) {}
 
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.not.be.ok();
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(false);
         });
 
     });
@@ -145,21 +145,21 @@ describe('ns.ViewCollection', function() {
             it('should not request m-collection twice', function() {
                 expect(
                     ns.request.models.getCall(1).calledWith([])
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
         }
 
         function shouldSaveVCollectionNode() {
             it('should save view-collection node', function() {
                 var newVCollectionNode = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
-                expect(newVCollectionNode).to.be(this.vCollectionNodeList[0])
+                expect(newVCollectionNode).to.be.equal(this.vCollectionNodeList[0])
             });
         }
 
         function shouldSaveNVCollectionItemNode(n) {
             it('should save view-collection-item[' + n + '] node', function() {
                 var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[n];
-                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[n])
+                expect(newVCollectionItemNode).to.be.equal(this.vCollectionItemNodeList[n])
             });
         }
 
@@ -257,7 +257,7 @@ describe('ns.ViewCollection', function() {
             it('should request m-collection once', function() {
                 expect(
                     ns.request.models.calledWith( [ns.Model.get('m-collection')] )
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
 
         });
@@ -301,7 +301,7 @@ describe('ns.ViewCollection', function() {
 
             it('should render new view-collection-item[0] node', function() {
                 var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
-                expect(newVCollectionItemNode).to.not.be(this.vCollectionItemNodeList[0])
+                expect(newVCollectionItemNode).to.not.be.equal(this.vCollectionItemNodeList[0])
             });
 
             shouldSaveNVCollectionItemNode(1);
@@ -353,7 +353,7 @@ describe('ns.ViewCollection', function() {
             it('should save view-collection-item[1] node', function() {
                 var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
                 // we've removed first item, so new item[0] should be the same with old[1]
-                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
+                expect(newVCollectionItemNode).to.be.equal(this.vCollectionItemNodeList[1])
             });
 
         });
@@ -374,7 +374,7 @@ describe('ns.ViewCollection', function() {
 
             it('should save view-collection-item[1] node', function() {
                 var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[0];
-                expect(newVCollectionItemNode).to.be(this.vCollectionItemNodeList[1])
+                expect(newVCollectionItemNode).to.be.equal(this.vCollectionItemNodeList[1])
             });
         });
 
@@ -398,7 +398,7 @@ describe('ns.ViewCollection', function() {
 
             it('should render new view-collection node', function() {
                 var newVCollectionNode = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
-                expect(newVCollectionNode).to.not.be(this.vCollectionNodeList[0])
+                expect(newVCollectionNode).to.not.be.equal(this.vCollectionNodeList[0])
             });
 
             shouldSaveNVCollectionItemNode(0);
@@ -476,12 +476,12 @@ describe('ns.ViewCollection', function() {
         });
 
         it('shouldn`t find destroyed models', function() {
-            expect(ns.Model.getValid('mItem', {id: '0'})).not.to.be.ok();
-            expect(ns.Model.getValid('mItem', {id: '1'})).not.to.be.ok();
+            expect(ns.Model.getValid('mItem', {id: '0'})).not.to.be.equal(true);
+            expect(ns.Model.getValid('mItem', {id: '1'})).not.to.be.equal(true);
         });
 
         it('should have 1 node for view vItem', function() {
-            expect(this.APP.node.querySelectorAll('.ns-view-vItem').length).to.be(1);
+            expect(this.APP.node.querySelectorAll('.ns-view-vItem').length).to.be.equal(1);
         });
 
     });
@@ -606,12 +606,12 @@ describe('ns.ViewCollection', function() {
             cols['1.1.1'] = cols['1.1'].find('.ns-view-v-collection-2[data-key="view=v-collection-2&id=1.1.1"]');
             cols['2.x'] = cols['2'].find('.ns-view-v-collection-2');
 
-            expect(cols['1'].length).to.be(1);
-            expect(cols['2'].length).to.be(1);
-            expect(cols['1.1'].length).to.be(1);
-            expect(cols['1.2'].length).to.be(1);
-            expect(cols['1.1.1'].length).to.be(1);
-            expect(cols['2.x'].length).to.be(0);
+            expect(cols['1'].length).to.be.equal(1);
+            expect(cols['2'].length).to.be.equal(1);
+            expect(cols['1.1'].length).to.be.equal(1);
+            expect(cols['1.2'].length).to.be.equal(1);
+            expect(cols['1.1.1'].length).to.be.equal(1);
+            expect(cols['2.x'].length).to.be.equal(0);
         });
 
         after(function() {
@@ -665,7 +665,7 @@ describe('ns.ViewCollection', function() {
             it('view should have valid models', function() {
                 expect(
                     this.viewCollection.isModelsValidWithVersions()
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
 
             it('view should have not valid models after touch model', function(done) {
@@ -673,7 +673,7 @@ describe('ns.ViewCollection', function() {
                     this.viewCollection.models.model.set('.foo', 2);
                     expect(
                         this.viewCollection.isModelsValidWithVersions()
-                    ).not.to.be.ok();
+                    ).not.to.be.equal(true);
                     done();
                 }.bind(this), 1);
             });

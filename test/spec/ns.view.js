@@ -17,16 +17,16 @@ describe('ns.View', function() {
                 ns.View.define('test-view-define');
             } catch(e) {}
 
-            expect(ns.View.define.getCall(1).threw()).to.be.ok();
+            expect(ns.View.define.getCall(1).threw()).to.be.equal(true);
         });
 
         it('should return new view', function() {
-            expect(this.view).to.be.ok();
+            expect(this.view).to.be.a('function');
         });
 
         it('instance of new view should be ns.View', function() {
             var instance = ns.View.create('test-view-define', {});
-            expect(instance instanceof ns.View).to.be.ok();
+            expect(instance instanceof ns.View).to.be.equal(true);
         });
     });
 
@@ -60,11 +60,11 @@ describe('ns.View', function() {
         });
 
         it("getModel should returns view's model", function() {
-            expect(this.view.getModel('test-getModel')).to.be(this.model);
+            expect(this.view.getModel('test-getModel')).to.be.equal(this.model);
         });
 
         it("getModelData should returns view's model data", function() {
-            expect(this.view.getModelData('test-getModel')).to.be(this.modelData);
+            expect(this.view.getModelData('test-getModel')).to.be.equal(this.modelData);
         });
 
     });
@@ -113,23 +113,23 @@ describe('ns.View', function() {
                     });
 
                     it('наследуемый view должен быть ns.View', function() {
-                        expect(this.view instanceof ns.View).to.be.ok();
+                        expect(this.view instanceof ns.View).to.be.equal(true);
                     });
 
                     it('методы наследуются от базового view', function() {
-                        expect(this.view.superMethod).to.be.ok();
+                        expect(this.view.superMethod).to.be.a('function');
                     });
 
                     it('методы от базового view не ушли в ns.View', function() {
-                        expect(ns.View.prototype.superMethod).to.not.be.ok();
+                        expect(ns.View.prototype.superMethod).to.be.an('undefined');
                     });
 
                     it('методы ns.View на месте', function() {
-                        expect(this.view.isOk).to.be.ok();
+                        expect(this.view.isOk).to.be.a('function');
                     });
 
                     it('методы из info.methods тоже не потерялись', function() {
-                        expect(this.view.oneMore).to.be.ok();
+                        expect(this.view.oneMore).to.be.a('function');
                     });
 
                 });
@@ -215,7 +215,7 @@ describe('ns.View', function() {
 
                 var view = ns.View.create('test-view-render_complex', {}, false);
 
-                expect( view.isModelsValid() ).to.be.ok();
+                expect( view.isModelsValid() ).to.be.equal(true);
             });
 
             it('required model is invalid, the rest is valid', function() {
@@ -228,7 +228,7 @@ describe('ns.View', function() {
                 c.setData({ data: 'c' });
 
                 var view = ns.View.create('test-view-render_complex', {}, false);
-                expect( view.isModelsValid() ).not.to.be.ok();
+                expect( view.isModelsValid() ).not.to.be.equal(true);
             });
 
             it('render errors also', function() {
@@ -266,7 +266,7 @@ describe('ns.View', function() {
             });
             ns.View.create('myblock');
 
-            expect(spy.calledOnce).to.be.ok();
+            expect(spy.calledOnce).to.be.equal(true);
         });
 
         it('should call event handler defined as string with ns.View instance', function() {
@@ -281,7 +281,7 @@ describe('ns.View', function() {
             });
             ns.View.create('myblock');
 
-            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.ok();
+            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.equal(true);
         });
 
         it('should bind event defined as function', function() {
@@ -293,7 +293,7 @@ describe('ns.View', function() {
             });
             ns.View.create('myblock');
 
-            expect(spy.calledOnce).to.be.ok();
+            expect(spy.calledOnce).to.be.equal(true);
         });
 
         it('should bind event defined as function with ns.View instance', function() {
@@ -305,7 +305,7 @@ describe('ns.View', function() {
             });
             ns.View.create('myblock');
 
-            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.ok();
+            expect(spy.getCall(0).thisValue instanceof ns.View).to.be.equal(true);
         });
 
     });
@@ -353,7 +353,7 @@ describe('ns.View', function() {
             });
 
             it('Ключ не должен строиться, если параметров не хватает', function() {
-                expect(function() { ns.View.getKey('photo:v2', { login: 'test' }); }).to.throwError();
+                expect(function() { ns.View.getKey('photo:v2', { login: 'test' }); }).to.throw();
             });
 
             it('В view.info.params задано значение для параметра (фильтр) и в params -- такое же значение', function() {
@@ -361,11 +361,11 @@ describe('ns.View', function() {
             });
 
             it('В view.info.params задано одно значение для параметра, а в params пришло другое', function() {
-                expect(function() { ns.View.getKey('photo:v3', { login: 'lynn', id: 3 }); }).to.throwError();
+                expect(function() { ns.View.getKey('photo:v3', { login: 'lynn', id: 3 }); }).to.throw();
             });
 
             it('В view.info.params задано значение для параметра, а в params значение отсутствует', function() {
-                expect(function() { ns.View.getKey('photo:v3', { id: 3 }); }).to.throwError();
+                expect(function() { ns.View.getKey('photo:v3', { id: 3 }); }).to.throw();
             });
         });
 
@@ -398,7 +398,7 @@ describe('ns.View', function() {
             });
 
             it('Ни один из вариантов не подходит', function() {
-                expect(function() { ns.View.getKey('slider', { album: 6, context_new: 'tag', id: 8, tag_new: 'girls' }); }).to.throwError();
+                expect(function() { ns.View.getKey('slider', { album: 6, context_new: 'tag', id: 8, tag_new: 'girls' }); }).to.throw();
             });
         });
 
@@ -439,7 +439,7 @@ describe('ns.View', function() {
             });
 
             it('Нельзя указывать одновременно params и params+/-', function() {
-                expect(function() { ns.View.info('slider'); }).to.throwError();
+                expect(function() { ns.View.info('slider'); }).to.throw();
             });
         });
 
@@ -565,7 +565,7 @@ describe('ns.View', function() {
             });
 
             it('"async-view" should have different nodes after redraw', function() {
-                expect(this.asyncViewNode2).not.to.be(this.asyncViewNode1);
+                expect(this.asyncViewNode2).not.to.be.equal(this.asyncViewNode1);
             });
 
             it('"async-view" should have child view', function() {
@@ -721,7 +721,7 @@ describe('ns.View', function() {
         });
 
         it('should have 1 node for view vSimple', function() {
-            expect(this.APP.node.querySelectorAll('.ns-view-vSimple').length).to.be(1);
+            expect(this.APP.node.querySelectorAll('.ns-view-vSimple').length).to.be.equal(1);
         });
 
     });

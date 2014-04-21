@@ -118,7 +118,7 @@ describe('ns.Box', function() {
             });
 
             it('should have visible node for "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2').hasClass('ns-view-visible')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content2').hasClass('ns-view-visible')).to.be.equal(true);
             });
 
         });
@@ -136,7 +136,7 @@ describe('ns.Box', function() {
 
             it('should have visible node for "content2" ', function() {
                 //TODO: i'm not sure that this is valid test
-                expect($(this.APP.node).find('.ns-view-content3').hasClass('ns-view-visible')).to.not.be.ok();
+                expect($(this.APP.node).find('.ns-view-content3').hasClass('ns-view-visible')).to.be.equal(false);
             });
 
         });
@@ -167,7 +167,7 @@ describe('ns.Box', function() {
             });
 
             it('should have visible node for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1').hasClass('ns-view-visible')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content1').hasClass('ns-view-visible')).to.be.equal(true);
             });
 
             it('should have node for "content2" ', function() {
@@ -175,7 +175,7 @@ describe('ns.Box', function() {
             });
 
             it('should have hidden node for "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2').hasClass('ns-view-hidden')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content2').hasClass('ns-view-hidden')).to.be.equal(true);
             });
 
         });
@@ -203,11 +203,11 @@ describe('ns.Box', function() {
             });
 
             it('should have first hidden node for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1:eq(0)').hasClass('ns-view-hidden')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content1:eq(0)').hasClass('ns-view-hidden')).to.be.equal(true);
             });
 
             it('should have second visible node for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1:eq(1)').hasClass('ns-view-visible')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content1:eq(1)').hasClass('ns-view-visible')).to.be.equal(true);
             });
 
         });
@@ -336,11 +336,11 @@ describe('ns.Box', function() {
             });
 
             it('should have first hidden node for "content4" ', function() {
-                expect($(this.APP.node).find('.ns-view-content4:eq(0)').hasClass('ns-view-hidden')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content4:eq(0)').hasClass('ns-view-hidden')).to.be.equal(true);
             });
 
             it('should have second visible node for "content4" ', function() {
-                expect($(this.APP.node).find('.ns-view-content4:eq(1)').hasClass('ns-view-visible')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content4:eq(1)').hasClass('ns-view-visible')).to.be.equal(true);
             });
 
         });
@@ -363,11 +363,11 @@ describe('ns.Box', function() {
             });
 
             it('should have two nodes for view "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1').length).to.be(2);
+                expect($(this.APP.node).find('.ns-view-content1').length).to.be.equal(2);
             });
 
             it('should have one visible node for view "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1.ns-view-visible').length).to.be(1);
+                expect($(this.APP.node).find('.ns-view-content1.ns-view-visible').length).to.be.equal(1);
             });
         });
 
@@ -389,11 +389,11 @@ describe('ns.Box', function() {
             });
 
             it('should have one node for view "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2').length).to.be(1);
+                expect($(this.APP.node).find('.ns-view-content2').length).to.be.equal(1);
             });
 
             it('should have one visible for view "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2:eq(0)').hasClass('ns-view-visible')).to.be.ok();
+                expect($(this.APP.node).find('.ns-view-content2:eq(0)').hasClass('ns-view-visible')).to.be.equal(true);
             });
         });
 
@@ -466,15 +466,15 @@ describe('ns.Box', function() {
                 });
 
                 it('should have 2 visible nodes for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be(2);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be.equal(2);
                 });
 
                 it('should have 1 visible node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be(1);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be.equal(1);
                 });
 
                 it('should have 1 hidden node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be(1);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be.equal(1);
                 });
             });
 
@@ -514,15 +514,15 @@ describe('ns.Box', function() {
                 });
 
                 it('should have 2 visible nodes for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be(2);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be.equal(2);
                 });
 
                 it('should have 1 visible node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be(1);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be.equal(1);
                 });
 
                 it('should have 1 hidden node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be(1);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be.equal(1);
                 });
             });
 

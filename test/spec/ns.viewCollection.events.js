@@ -7,9 +7,9 @@ describe('ns.ViewСollection ns-view-* events', function() {
                 it('should ' + (not == false ? 'not ': '') + ' trigger "' + event + '" for "' + view + '" (' + check + ')', function() {
                     var spyName = view + '-' + event + '-spy';
                     if (not === false) {
-                        expect(this.events[spyName][check]).to.not.be.ok();
+                        expect(this.events[spyName][check]).to.be.equal(false);
                     } else {
-                        expect(this.events[spyName][check]).to.be.ok();
+                        expect(this.events[spyName][check]).to.be.equal(true);
                     }
                 });
             })(def[0], def[1], def[2], def[3]);
@@ -36,7 +36,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
                         nextSpy = nextSpy.getCall(nextPos);
                     }
 
-                    expect(spy.calledBefore(nextSpy)).to.be.ok();
+                    expect(spy.calledBefore(nextSpy)).to.be.equal(true);
                 });
             })(def[0], def[1], def[2], defNext[0], defNext[1], defNext[2]);
 

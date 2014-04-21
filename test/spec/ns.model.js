@@ -60,7 +60,7 @@ describe('ns.Model', function() {
                 var define = function() { ns.Model.define('dm1'); };
                 define();
 
-                expect(define).to.throwException();
+                expect(define).to.throw();
             });
 
             it('should fill _infos', function() {
@@ -76,7 +76,7 @@ describe('ns.Model', function() {
                     ctor: ctor
                 });
 
-                expect(ns.Model.privats()._ctors['dm1']).to.be(ctor);
+                expect(ns.Model.privats()._ctors['dm1']).to.be.equal(ctor);
             });
 
             it('should fill _ctors with one, contained methods', function() {
@@ -124,41 +124,41 @@ describe('ns.Model', function() {
             });
 
             it('наследуемая model должен быть ns.Model', function() {
-                expect(this.model instanceof ns.Model).to.be.ok();
+                expect(this.model instanceof ns.Model).to.be.equal(true);
             });
 
             it('методы наследуются от базовой модели', function() {
-                expect(this.model.superMethod).to.be.ok();
+                expect(this.model.superMethod).to.be.a('function');
             });
 
-            it('методы от базового view не ушли в ns.View', function() {
-                expect(ns.Model.prototype.superMethod).to.not.be.ok();
+            it('методы от базового model не ушли в ns.Model', function() {
+                expect(ns.Model.prototype.superMethod).to.be.an('undefined');
             });
 
-            it('методы ns.View на месте', function() {
-                expect(this.model.isValid).to.be.ok();
+            it('методы ns.Model на месте', function() {
+                expect(this.model.isValid).to.be.a('function');
             });
 
             it('методы из info.methods тоже не потерялись', function() {
-                expect(this.model.oneMore).to.be.ok();
+                expect(this.model.oneMore).to.be.a('function');
             });
         });
 
         describe('ns.Model.getValid():', function() {
 
             it('should return null if model doesn\'t exists', function() {
-                expect(ns.Model.getValid('m1')).to.be(null);
+                expect(ns.Model.getValid('m1')).to.be.equal(null);
             });
 
             it('should return valid model if exists', function() {
                 var m = ns.Model.get('m1');
                 m.setData({foo: 'bar'});
-                expect(ns.Model.getValid('m1')).to.be.ok(m);
+                expect(ns.Model.getValid('m1')).to.be.equal(m);
             });
 
             it('should throw exception if model is not defined', function() {
                 var exists = function() { ns.Model.getValid('non-exists-model'); };
-                expect(exists).to.throwException();
+                expect(exists).to.throw();
             });
 
         });
@@ -166,17 +166,17 @@ describe('ns.Model', function() {
         describe('ns.Model.get():', function() {
 
             it('should always return model', function() {
-                expect(ns.Model.get('m1')).to.not.be(ns.Model);
+                expect(ns.Model.get('m1')).to.not.be.equal(ns.Model);
             });
 
             it('should return cached model if exists', function() {
                 var m = ns.Model.get('m1');
-                expect(ns.Model.get('m1')).to.be(m);
+                expect(ns.Model.get('m1')).to.be.equal(m);
             });
 
             it('should throw exception if model is not defined', function() {
                 var exists = function() { ns.Model.getValid('non-exists-model'); };
-                expect(exists).to.throwException();
+                expect(exists).to.throw();
             });
 
         });
@@ -187,21 +187,21 @@ describe('ns.Model', function() {
                 var model = ns.Model.get('m1', {p1: 1, p3: 3});
 
                 expect(model.key)
-                    .to.be('model=m1&p1=1&p2=2&p3=3&p4=foo');
+                    .to.be.equal('model=m1&p1=1&p2=2&p3=3&p4=foo');
             });
 
             it('should init model info', function() {
                 var model = ns.Model.get('m1', {p1: 1, p3: 4});
 
                 expect(model.info)
-                    .to.have.keys(['params', 'events', 'pNames', 'isDo', 'isCollection']);
+                    .to.contain.keys('params', 'events', 'pNames', 'isDo', 'isCollection');
             });
 
             it('should return cached model', function() {
                 var old = ns.Model.get('m1', {p1: 1, p3: 5});
                 var model = ns.Model.get('m1', {p1: 1, p3: 5});
 
-                expect(model).to.be(old);
+                expect(model).to.be.equal(old);
             });
 
         });
@@ -221,22 +221,22 @@ describe('ns.Model', function() {
 
             it('should return isDo=true in for do models', function() {
                 expect( ns.Model.info('do-m1').isDo )
-                    .to.be(true);
+                    .to.be.equal(true);
             });
 
             it('should return isDo=false for non-do models', function() {
                 expect( ns.Model.info('m1').isDo )
-                    .to.be(false);
+                    .to.be.equal(false);
             });
 
             it('should return isCollection=true for split models', function() {
                 expect( ns.Model.info('split1').isCollection)
-                    .to.be(true);
+                    .to.be.equal(true);
             });
 
             it('should return isCollection=false for non-split models', function() {
                 expect( ns.Model.info('m1').isCollection)
-                    .to.be(false);
+                    .to.be.equal(false);
             });
 
             it('should initialize \'params\' property', function() {
@@ -271,17 +271,17 @@ describe('ns.Model', function() {
 
             it('should return right key', function() {
                 expect( ns.Model.key('m1', {p1: 'foo', p2: 'bar', p3: 'baz', p4: 'aaz'}) )
-                    .to.be('model=m1&p1=foo&p2=bar&p3=baz&p4=aaz');
+                    .to.be.equal('model=m1&p1=foo&p2=bar&p3=baz&p4=aaz');
             });
 
             it('should return right key with defaults', function() {
                 expect( ns.Model.key('m1', {p1: 'bar', p3: 'aaz'}) )
-                    .to.be('model=m1&p1=bar&p2=2&p3=aaz&p4=foo');
+                    .to.be.equal('model=m1&p1=bar&p2=2&p3=aaz&p4=foo');
             });
 
             it('should return right incomplete key', function() {
                 expect( ns.Model.key('m1', {p2: 'bar', p4: 'aaz'}) )
-                    .to.be('model=m1&p2=bar&p4=aaz');
+                    .to.be.equal('model=m1&p2=bar&p4=aaz');
             });
 
             it('should return specific key for do-model', function() {
@@ -293,7 +293,7 @@ describe('ns.Model', function() {
                 var k1 = ns.Model.key('do-m1');
                 var k2 = ns.Model.key('do-m1');
 
-                expect(k1).not.to.be(k2);
+                expect(k1).not.to.be.equal(k2);
             });
 
         });
@@ -302,12 +302,12 @@ describe('ns.Model', function() {
 
             it('function can return any object', function() {
                 expect( ns.Model.key('m2', { mode: 'custom', id: 1 }) )
-                    .to.be('model=m2&id=1&more=added');
+                    .to.be.equal('model=m2&id=1&more=added');
             });
 
             it('function can return nothing', function() {
                 expect( ns.Model.key('m2', {}) )
-                    .to.be('model=m2');
+                    .to.be.equal('model=m2');
             });
 
         });
@@ -337,19 +337,19 @@ describe('ns.Model', function() {
             it('should null all properties', function() {
                 this.model._reset();
 
-                expect(this.model.data).to.be(null);
-                expect(this.model.error).to.be(null);
+                expect(this.model.data).to.be.equal(null);
+                expect(this.model.error).to.be.equal(null);
 
-                expect(this.model.status).to.be(this.model.STATUS.NONE);
-                expect(this.model.retries).to.be(0);
+                expect(this.model.status).to.be.equal(this.model.STATUS.NONE);
+                expect(this.model.retries).to.be.equal(0);
 
-                expect(this.model.getVersion()).to.be(0);
+                expect(this.model.getVersion()).to.be.equal(0);
             });
 
             it('should null all properties with custom status', function() {
                 this.model._reset('foo');
 
-                expect(this.model.status).to.be('foo');
+                expect(this.model.status).to.be.equal('foo');
             });
 
         });
@@ -363,17 +363,17 @@ describe('ns.Model', function() {
                 sinon.spy(model, '_bindEvents');
                 model._init('m1', {p1: 1, p2: 2, p3: 3, p4: 4}, {foo: 'bar'});
 
-                expect(model.id).to.be('m1');
+                expect(model.id).to.be.equal('m1');
                 expect(model.params).to.eql({p1: 1, p2: 2, p3: 3, p4: 4});
 
-                expect(model._reset.calledOnce).to.be.ok();
-                expect(model.setData.calledWith({foo: 'bar'})).to.be.ok();
+                expect(model._reset.calledOnce).to.be.equal(true);
+                expect(model.setData.calledWith({foo: 'bar'})).to.be.equal(true);
 
-                expect(model.info).to.be( ns.Model.info('m1') );
+                expect(model.info).to.be.equal( ns.Model.info('m1') );
                 expect(model.key)
-                    .to.be( ns.Model.key('m1', {p1: 1, p2: 2, p3: 3, p4: 4}), model.info );
+                    .to.be.equal( ns.Model.key('m1', {p1: 1, p2: 2, p3: 3, p4: 4}), model.info );
 
-                expect(model._bindEvents.calledOnce).to.be.ok();
+                expect(model._bindEvents.calledOnce).to.be.equal(true);
             });
 
         });
@@ -403,10 +403,10 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.preprocessData.calledOnce)
-                    .to.be.ok();
+                    .to.be.equal(true);
 
                 expect(this.model.preprocessData.calledWith(this.data))
-                    .to.be.ok();
+                    .to.be.equal(true);
             });
 
             it('should reset error', function() {
@@ -415,7 +415,7 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.error)
-                    .to.be(null);
+                    .to.be.equal(null);
             });
 
             it('should set status -> ok', function() {
@@ -424,7 +424,7 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.status)
-                    .to.be(this.model.STATUS.OK);
+                    .to.be.equal(this.model.STATUS.OK);
             });
 
             it('should touch model', function() {
@@ -433,14 +433,14 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.touch.calledOnce)
-                    .to.be.ok();
+                    .to.be.equal(true);
             });
 
             it('should set model data', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.data)
-                    .to.be(this.data);
+                    .to.be.equal(this.data);
             });
 
             it('should trigger only two events', function() {
@@ -449,7 +449,7 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.trigger.calledTwice)
-                    .to.be.ok();
+                    .to.be.equal(true);
             });
 
             it('should trigger \'ns-model-changed\' event', function() {
@@ -458,7 +458,7 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.trigger.calledWith('ns-model-changed'))
-                    .to.be.ok();
+                    .to.be.equal(true);
             });
 
             it('should trigger \'ns-model-touched\' event', function() {
@@ -467,7 +467,7 @@ describe('ns.Model', function() {
                 this.model.setData(this.data);
 
                 expect(this.model.trigger.calledWith('ns-model-touched'))
-                    .to.be.ok();
+                    .to.be.equal(true);
             });
 
             it('should not trigger \'ns-model-changed\' event when {silent: true}', function() {
@@ -476,7 +476,7 @@ describe('ns.Model', function() {
                 this.model.setData(this.data, {silent: true});
 
                 expect(this.model.trigger.calledWith('ns-model-changed'))
-                    .not.to.be.ok();
+                    .not.to.be.equal(true);
             });
 
         });
@@ -503,17 +503,17 @@ describe('ns.Model', function() {
                 it('should not set data', function() {
                     var m = ns.Model.get('m10').setData({});
 
-                    expect(m._version).to.be(1);
-                    expect(m.setData()._version).to.be(1);
-                    expect(m.setData(null)._version).to.be(1);
-                    expect(m.setData('')._version).to.be(1); // NOTE вот на это можно напоросться: пустая строка это может быть и валидное значение.
+                    expect(m._version).to.be.equal(1);
+                    expect(m.setData()._version).to.be.equal(1);
+                    expect(m.setData(null)._version).to.be.equal(1);
+                    expect(m.setData('')._version).to.be.equal(1); // NOTE вот на это можно напоросться: пустая строка это может быть и валидное значение.
                 });
 
                 it('should set data', function() {
                     var m = ns.Model.get('m10');
 
-                    expect(m.setData({})._version).to.be(1);
-                    expect(m.setData(true)._version).to.be(2);
+                    expect(m.setData({})._version).to.be.equal(1);
+                    expect(m.setData(true)._version).to.be.equal(2);
                 });
             });
 
@@ -521,15 +521,15 @@ describe('ns.Model', function() {
                 it('should set data', function() {
                     var m = ns.Model.get('m11');
                     m.setData({ isNew: true, some: 'data' });
-                    expect(m._version).to.be(1);
+                    expect(m._version).to.be.equal(1);
                     expect(m.getData()).to.be.eql({ isNew: true, some: 'data' });
                 });
 
                 it('should not set data', function() {
                     var m = ns.Model.get('m11');
                     m.setData({ isNew: false, some: 'data' });
-                    expect(m._version).to.be(0);
-                    expect(m.getData()).to.be(null);
+                    expect(m._version).to.be.equal(0);
+                    expect(m.getData()).to.be.equal(null);
                 });
             });
 
@@ -548,14 +548,14 @@ describe('ns.Model', function() {
                 model.setData(data);
 
                 expect( model.getData() )
-                    .to.be(data);
+                    .to.be.equal(data);
             });
 
             it('should return no data if model is invalid', function() {
                 var model = ns.Model.get('m1', {p1: 1, p3: 2});
 
                 expect( model.getData() )
-                    .to.be(null);
+                    .to.be.equal(null);
             });
 
             it('should return data of splitted model', function() {
@@ -605,26 +605,26 @@ describe('ns.Model', function() {
             });
 
             it('should call callback on .setData()', function() {
-                expect(this.changedCb.calledOnce).to.be.ok();
+                expect(this.changedCb.calledOnce).to.be.equal(true);
             });
 
             it('should call callback on .setData() with "model" as this', function() {
-                expect(this.changedCb.calledOn(this.model)).to.be.ok();
+                expect(this.changedCb.calledOn(this.model)).to.be.equal(true);
             });
 
             it('should call callback on .set()', function() {
                 this.model.set('.data', 2);
-                expect(this.changedJpathCb.calledOnce).to.be.ok();
+                expect(this.changedJpathCb.calledOnce).to.be.equal(true);
             });
 
             it('should call callback on .set() with "model" as this', function() {
                 this.model.set('.data', 2);
-                expect(this.changedJpathCb.calledOn(this.model)).to.be.ok();
+                expect(this.changedJpathCb.calledOn(this.model)).to.be.equal(true);
             });
 
             it('should call callback on .set() with params', function() {
                 this.model.set('.data', 2);
-                expect(this.changedJpathCb.calledWith('ns-model-changed.data', '.data')).to.be.ok();
+                expect(this.changedJpathCb.calledWith('ns-model-changed.data', '.data')).to.be.equal(true);
             });
 
         });
@@ -657,16 +657,15 @@ describe('ns.Model', function() {
                 this.model2.destroyWith(this.model1);
                 ns.Model.destroy(this.model1);
 
-                expect(ns.Model.getValid('model2', { id: 1 })).not.to.be.ok();
+                expect(ns.Model.getValid('model2', { id: 1 })).not.to.be.equal(true);
             });
 
             it('should throw error if tried to destroy ns.Model with string', function() {
-                expect(function() { this.model1.destroyWith('string'); }).to.throwException();
+                expect(function() { this.model1.destroyWith('string'); }).to.throw();
             });
 
             it('should throw error if tried to destroy ns.Model with undefined', function() {
-                expect(function() { this.model1.destroyWith(ns.Model.getValid('model2', {id: 2})); }).to.throwException();
-
+                expect(function() { this.model1.destroyWith(ns.Model.getValid('model2', {id: 2})); }).to.throw();
             });
         });
 

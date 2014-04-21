@@ -17,14 +17,14 @@
     },
     "devDependencies": {
         "borschik": "0.4.x",
-        "es5-shim": "2.1.0",
-        "expect.js": "*",
-        "grunt": "0.4.2",
-        "grunt-cli": "0.1.11",
-        "grunt-contrib-jshint": "*",
-        "grunt-mocha": "0.4.7",
         "jscs": "1.0.11",
-        "sinon": "1.7.3",
+        "jshint": "2.5.x",
+        "karma": "0.12.x",
+        "karma-borschik-preprocessor": "~0.1.2",
+        "karma-mocha": "^0.1.3",
+        "karma-phantomjs-launcher": "~0.1.0",
+        "karma-sinon-chai": "0.1.x",
+        "mocha": "^1.18.2",
         "yate": "*"
     },
     "optionalDependencies": {},
@@ -36,12 +36,10 @@
         "dist",
         "src",
         "yate",
-
         "noscript.borschik.js"
     ],
     "scripts": {
         "prepublish": "make yate && mkdir -p dist && borschik -i noscript.borschik.js -o dist/noscript.js -m no && borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes",
-        "test": "grunt && jscs ."
+        "test": "jshint src && jscs . && ./node_modules/karma/bin/karma start"
     }
 }
-

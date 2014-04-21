@@ -146,9 +146,9 @@ describe('ns.router', function() {
             });
         };
 
-        test_route('/search/airport/image/1', 'view', { context: 'search', query: 'airport', id: 1 });
-        test_route('/tag/airport/image/2',    'view', { context: 'tag', tag: 'airport', id: 2 });
-        test_route('/top/image/3',            'view', { context: 'top', id: 3 });
+        test_route('/search/airport/image/1', 'view', { context: 'search', query: 'airport', id: '1' });
+        test_route('/tag/airport/image/2',    'view', { context: 'tag', tag: 'airport', id: '2' });
+        test_route('/top/image/3',            'view', { context: 'top', id: '3' });
     });
 
     describe('baseDir: routing', function() {
@@ -245,7 +245,7 @@ describe('ns.router', function() {
                 'route': {
                     'page': 'layout',
                     'params': {
-                        'id': 1
+                        'id': '1'
                     }
                 }
             },
@@ -255,7 +255,7 @@ describe('ns.router', function() {
                 'route': {
                     'page': 'layout',
                     'params': {
-                        'id': 1,
+                        'id': '1',
                         'foo': 'bar'
                     }
                 }

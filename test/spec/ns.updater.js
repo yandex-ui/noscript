@@ -51,7 +51,7 @@ describe('no.Updater', function() {
                     })
                     .fail(function(result) {
                         try {
-                            expect(result.error).to.be(ns.U.STATUS.EXPIRED);
+                            expect(result.error).to.be.equal(ns.U.STATUS.EXPIRED);
                             finish();
                         } catch(e) {
                             finish(e);
@@ -193,8 +193,6 @@ describe('no.Updater', function() {
         describe('update+async update', function() {
 
             beforeEach(function(finish) {
-                sinon.stub(ns.history, 'pushState', no.nop);
-
                 ns.layout.define('page1', {
                     app: {
                         'box@': {
@@ -272,12 +270,10 @@ describe('no.Updater', function() {
 
             afterEach(function() {
                 delete this.promise;
-
-                ns.history.pushState.restore();
             });
 
             it('should save state for page2', function() {
-                expect(ns.MAIN_VIEW.$node.find('.ns-view-my_view2').hasClass('ns-view-visible')).to.be.ok();
+                expect(ns.MAIN_VIEW.$node.find('.ns-view-my_view2').hasClass('ns-view-visible')).to.be.equal(true);
             });
 
         });
@@ -327,7 +323,7 @@ describe('no.Updater', function() {
 
             it('should return no.Promise', function() {
                 var returnValue = this.updater.start();
-                expect(returnValue).to.be.a(no.Promise);
+                expect(returnValue).to.be.instanceOf(no.Promise);
             });
         });
 
@@ -406,7 +402,7 @@ describe('no.Updater', function() {
                 var returnValue = this.updater.start();
                 returnValue.done(function(data) {
                     try {
-                        expect(data.async).to.be.a(Array);
+                        expect(data.async).to.be.a('array');
                         finish();
                     } catch(e) {
                         finish(e);
@@ -517,7 +513,7 @@ describe('no.Updater', function() {
                     }
                 }
             };
-            expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.ok();
+            expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.equal(true);
         });
     });
 
@@ -661,24 +657,24 @@ describe('no.Updater', function() {
 
         it('should update subview', function(finish) {
             var appView = this.view;
-            expect($('.ns-subview-version', appView.node).html()).to.be('1');
+            expect($('.ns-subview-version', appView.node).html()).to.be.equal('1');
 
             ns.Model.get('data').set('.version', 2);
 
             this.runUpdate().done(function() {
-                expect($('.ns-subview-version', appView.node).html()).to.be('2');
+                expect($('.ns-subview-version', appView.node).html()).to.be.equal('2');
                 finish();
             });
         });
 
         it('should do nothing when model changes but subview is not binded to that change', function(finish) {
             var appView = this.view;
-            expect($('.ns-subview-version', appView.node).html()).to.be('1');
+            expect($('.ns-subview-version', appView.node).html()).to.be.equal('1');
 
             ns.Model.get('data').set('.data', 'nothing will be redrawn');
 
             this.runUpdate().done(function() {
-                expect($('.ns-subview-version', appView.node).html()).to.be('1');
+                expect($('.ns-subview-version', appView.node).html()).to.be.equal('1');
                 finish();
             });
         });
@@ -692,7 +688,7 @@ describe('no.Updater', function() {
             dataModel.set('.version', 2);
 
             this.runUpdate().done(function() {
-                expect(htmlDestroySpy.callCount).to.be(0);
+                expect(htmlDestroySpy.callCount).to.be.equal(0);
                 finish();
             });
         });
@@ -700,7 +696,6 @@ describe('no.Updater', function() {
 
     describe('interrupting updates of async views inside a box', function() {
         beforeEach(function(finish) {
-
             ns.layout.define('app', {
                 'app': {
                     'box@': 'todos&'
@@ -733,7 +728,7 @@ describe('no.Updater', function() {
                 .done(function(result) {
                     no.Promise.wait(result.async)
                         .done(function() {
-                            ns.page.go().done(function() {
+                            ns.page.go('/2').done(function() {
                                 finish();
                             }.bind(this));
                         }.bind(this));
@@ -760,8 +755,6 @@ describe('no.Updater', function() {
 
     describe('interrupting updates of async views inside a box', function() {
         beforeEach(function(finish) {
-            sinon.stub(ns.history, 'pushState', no.nop);
-
             ns.layout.define('app', {
                 'app': {
                     'box@': 'todos&'
@@ -802,7 +795,6 @@ describe('no.Updater', function() {
         // Restore XHR.
         afterEach(function() {
             this.server.restore();
-            ns.history.pushState.restore();
         });
 
         it('should hide async views', function() {

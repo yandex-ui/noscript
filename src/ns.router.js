@@ -400,8 +400,8 @@ ns.router._parseParam = function(param) {
     if (chunks.length === 3) {
         param_is_optional = false;
         param_default = chunks[2];
-        ns.assert(param_default, 'ns.router', "Parameter '%s' value must be specified", param);
-        ns.assert(ns.router._isParamValid(param_default, param_type), 'ns.router', "Wrong value for '%s' parameter", param);
+        ns.assert(param_default, 'ns.router', "Parameter '%s' value must be specified", paramName);
+        ns.assert(ns.router._isParamValid(param_default, param_type), 'ns.router', "Wrong value for '%s' parameter", paramName);
 
     } else {
         // если в декларации одно "=", то параметр опциональный

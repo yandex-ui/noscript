@@ -13,11 +13,8 @@ node_modules: package.json
 clean-node_modules:
 	rm -rf node_modules
 
-grunt: node_modules yate
-	$(NPM_BIN)/grunt
-
-test: grunt
-	$(NPM_BIN)/jscs .
+test: node_modules
+	npm test
 
 gh-pages:
 	git clone -b gh-pages git@github.com:yandex-ui/noscript.git gh-pages
@@ -28,4 +25,4 @@ jsdoc: gh-pages
 jsdoc-publish: gh-pages
 	$(MAKE) -C gh-pages publish
 
-.PHONY: clean-node_modules grunt jsdoc jsdoc-publish yate test
+.PHONY: clean-node_modules jsdoc jsdoc-publish yate test

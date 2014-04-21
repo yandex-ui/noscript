@@ -95,15 +95,15 @@ describe('ns.View bind events', function() {
             describe('window', function() {
 
                 it('should bind 2 events', function() {
-                    expect(this.view._$window.on.calledTwice).to.be.ok();
+                    expect(this.view._$window.on.calledTwice).to.be.equal(true);
                 });
 
                 it('should bind scroll event', function() {
-                    expect(this.view._$window.on.calledWith('scroll' + this.eventNS)).to.be.ok();
+                    expect(this.view._$window.on.calledWith('scroll' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind resize event', function() {
-                    expect(this.view._$window.on.calledWith('resize' + this.eventNS)).to.be.ok();
+                    expect(this.view._$window.on.calledWith('resize' + this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -111,15 +111,15 @@ describe('ns.View bind events', function() {
             describe('document', function() {
 
                 it('should bind 2 events', function() {
-                    expect(this.view._$document.on.calledTwice).to.be.ok();
+                    expect(this.view._$document.on.calledTwice).to.be.equal(true);
                 });
 
                 it('should bind scroll event', function() {
-                    expect(this.view._$document.on.calledWith('scroll' + this.eventNS)).to.be.ok();
+                    expect(this.view._$document.on.calledWith('scroll' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind resize event', function() {
-                    expect(this.view._$document.on.calledWith('resize' + this.eventNS)).to.be.ok();
+                    expect(this.view._$document.on.calledWith('resize' + this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -127,31 +127,31 @@ describe('ns.View bind events', function() {
             describe('$node', function() {
 
                 it('should bind 3 delegated events', function() {
-                    expect(this.view.$node.on.callCount).to.be(3);
+                    expect(this.view.$node.on.callCount).to.be.equal(3);
                 });
 
                 it('should bind scroll', function() {
-                    expect(this.view.$node.on.calledWith('scroll' + this.eventNS)).to.be.ok();
+                    expect(this.view.$node.on.calledWith('scroll' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind mousedown without selector', function() {
-                    expect(this.view.$node.on.calledWith('mousedown' + this.eventNS)).to.be.ok();
+                    expect(this.view.$node.on.calledWith('mousedown' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind click with selector', function() {
-                    expect(this.view.$node.on.calledWith('click' + this.eventNS, '.bar-init')).to.be.ok();
+                    expect(this.view.$node.on.calledWith('click' + this.eventNS, '.bar-init')).to.be.equal(true);
                 });
 
                 it('should bind 1 non-delegated events', function() {
-                    expect(this.findOnSpy.calledOnce).to.be.ok();
+                    expect(this.findOnSpy.calledOnce).to.be.equal(true);
                 });
 
                 it('should call find for non-delegated scroll event', function() {
-                    expect(this.view.$node.find.calledWith('.foo-init')).to.be.ok();
+                    expect(this.view.$node.find.calledWith('.foo-init')).to.be.equal(true);
                 });
 
                 it('should bind non-delegated scroll event', function() {
-                    expect(this.findOnSpy.calledWith('scroll' + this.eventNS)).to.be.ok();
+                    expect(this.findOnSpy.calledWith('scroll' + this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -173,11 +173,11 @@ describe('ns.View bind events', function() {
             describe('window', function() {
 
                 it('should call unbind once', function() {
-                    expect(this.view._$window.off.calledOnce).to.be.ok();
+                    expect(this.view._$window.off.calledOnce).to.be.equal(true);
                 });
 
                 it('should unbind events by namespace', function() {
-                    expect(this.view._$window.off.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.view._$window.off.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -185,11 +185,11 @@ describe('ns.View bind events', function() {
             describe('document', function() {
 
                 it('should call unbind once', function() {
-                    expect(this.view._$document.off.calledOnce).to.be.ok();
+                    expect(this.view._$document.off.calledOnce).to.be.equal(true);
                 });
 
                 it('should unbind events by namespace', function() {
-                    expect(this.view._$document.off.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.view._$document.off.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -197,19 +197,19 @@ describe('ns.View bind events', function() {
             describe('$node', function() {
 
                 it('should unbind delegated events once', function() {
-                    expect(this.view.$node.off.callCount).to.be(1);
+                    expect(this.view.$node.off.callCount).to.be.equal(1);
                 });
 
                 it('should unbind delegated events by namespace', function() {
-                    expect(this.view.$node.off.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.view.$node.off.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
                 it('should call find for non-delegated scroll event', function() {
-                    expect(this.view.$node.find.calledWith('.foo-init')).to.be.ok();
+                    expect(this.view.$node.find.calledWith('.foo-init')).to.be.equal(true);
                 });
 
                 it('should unbind non-delegated scroll event', function() {
-                    expect(this.findOffSpy.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.findOffSpy.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -235,15 +235,15 @@ describe('ns.View bind events', function() {
             describe('window', function() {
 
                 it('should bind 2 events', function() {
-                    expect(this.view._$window.on.calledTwice).to.be.ok();
+                    expect(this.view._$window.on.calledTwice).to.be.equal(true);
                 });
 
                 it('should bind scroll event', function() {
-                    expect(this.view._$window.on.calledWith('click' + this.eventNS)).to.be.ok();
+                    expect(this.view._$window.on.calledWith('click' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind resize event', function() {
-                    expect(this.view._$window.on.calledWith('mousedown' + this.eventNS)).to.be.ok();
+                    expect(this.view._$window.on.calledWith('mousedown' + this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -251,15 +251,15 @@ describe('ns.View bind events', function() {
             describe('document', function() {
 
                 it('should bind 2 events', function() {
-                    expect(this.view._$document.on.calledTwice).to.be.ok();
+                    expect(this.view._$document.on.calledTwice).to.be.equal(true);
                 });
 
                 it('should bind scroll event', function() {
-                    expect(this.view._$document.on.calledWith('click' + this.eventNS)).to.be.ok();
+                    expect(this.view._$document.on.calledWith('click' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind resize event', function() {
-                    expect(this.view._$document.on.calledWith('mousedown' + this.eventNS)).to.be.ok();
+                    expect(this.view._$document.on.calledWith('mousedown' + this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -267,31 +267,31 @@ describe('ns.View bind events', function() {
             describe('$node', function() {
 
                 it('should bind 3 delegated events', function() {
-                    expect(this.view.$node.on.callCount).to.be(3);
+                    expect(this.view.$node.on.callCount).to.be.equal(3);
                 });
 
                 it('should bind scroll', function() {
-                    expect(this.view.$node.on.calledWith('scroll' + this.eventNS)).to.be.ok();
+                    expect(this.view.$node.on.calledWith('scroll' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind mousedown without selector', function() {
-                    expect(this.view.$node.on.calledWith('mousedown' + this.eventNS)).to.be.ok();
+                    expect(this.view.$node.on.calledWith('mousedown' + this.eventNS)).to.be.equal(true);
                 });
 
                 it('should bind click with selector', function() {
-                    expect(this.view.$node.on.calledWith('click' + this.eventNS, '.bar-show')).to.be.ok();
+                    expect(this.view.$node.on.calledWith('click' + this.eventNS, '.bar-show')).to.be.equal(true);
                 });
 
                 it('should bind 1 non-delegated events', function() {
-                    expect(this.findOnSpy.calledOnce).to.be.ok();
+                    expect(this.findOnSpy.calledOnce).to.be.equal(true);
                 });
 
                 it('should call find for non-delegated scroll event', function() {
-                    expect(this.view.$node.find.calledWith('.foo-show')).to.be.ok();
+                    expect(this.view.$node.find.calledWith('.foo-show')).to.be.equal(true);
                 });
 
                 it('should bind non-delegated scroll event', function() {
-                    expect(this.findOnSpy.calledWith('scroll' + this.eventNS)).to.be.ok();
+                    expect(this.findOnSpy.calledWith('scroll' + this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -312,11 +312,11 @@ describe('ns.View bind events', function() {
             describe('window', function() {
 
                 it('should call unbind once', function() {
-                    expect(this.view._$window.off.calledOnce).to.be.ok();
+                    expect(this.view._$window.off.calledOnce).to.be.equal(true);
                 });
 
                 it('should unbind events by namespace', function() {
-                    expect(this.view._$window.off.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.view._$window.off.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -324,11 +324,11 @@ describe('ns.View bind events', function() {
             describe('document', function() {
 
                 it('should call unbind once', function() {
-                    expect(this.view._$document.off.calledOnce).to.be.ok();
+                    expect(this.view._$document.off.calledOnce).to.be.equal(true);
                 });
 
                 it('should unbind events by namespace', function() {
-                    expect(this.view._$document.off.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.view._$document.off.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
             });
@@ -336,19 +336,19 @@ describe('ns.View bind events', function() {
             describe('$node', function() {
 
                 it('should unbind delegated events once', function() {
-                    expect(this.view.$node.off.callCount).to.be(1);
+                    expect(this.view.$node.off.callCount).to.be.equal(1);
                 });
 
                 it('should unbind delegated events by namespace', function() {
-                    expect(this.view.$node.off.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.view.$node.off.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
                 it('should call find for non-delegated scroll event', function() {
-                    expect(this.view.$node.find.calledWith('.foo-show')).to.be.ok();
+                    expect(this.view.$node.find.calledWith('.foo-show')).to.be.equal(true);
                 });
 
                 it('should unbind non-delegated scroll event', function() {
-                    expect(this.findOffSpy.calledWith(this.eventNS)).to.be.ok();
+                    expect(this.findOffSpy.calledWith(this.eventNS)).to.be.equal(true);
                 });
 
             });

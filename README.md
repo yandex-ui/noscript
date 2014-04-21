@@ -13,7 +13,7 @@
 
 ### Маршрутизатор (ns.router)
 
-[Описание](/yandex-ui/noscript/blob/master/doc/ns.router.md)
+[Описание](/doc/ns.router.md)
 
 ### Вид (ns.View)
 

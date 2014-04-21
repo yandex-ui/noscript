@@ -20,8 +20,6 @@ ns.Box = function(id, params) {
     this._visible = false;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 ns.Box.prototype._getView = function(id, params) {
     var key = ns.View.getKey(id, params);
     return this.views[key];
@@ -40,8 +38,6 @@ ns.Box.prototype._addView = function(id, params, type) {
     return view;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 ns.Box.prototype._getDescendants = function(descs) {
     var views = this.views;
     var active = this.active;
@@ -57,8 +53,6 @@ ns.Box.prototype._getDescendants = function(descs) {
     return descs;
 };
 
-//  ---------------------------------------------------------------------------------------------------------------  //
-
 //  Ищем все новые блоки и блоки, требующие перерисовки.
 ns.Box.prototype._getRequestViews = function(updated, layout, params) {
     for (var id in layout) {
@@ -69,8 +63,6 @@ ns.Box.prototype._getRequestViews = function(updated, layout, params) {
         view._getRequestViews(updated, layout[id].views, params);
     }
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
 ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
@@ -105,8 +97,6 @@ ns.Box.prototype._getViewTree = function(layout, params) {
 
     return tree;
 };
-
-//  ---------------------------------------------------------------------------------------------------------------  //
 
 //  Обновляем бокс.
 ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {

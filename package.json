@@ -1,0 +1,14 @@
+{
+    "name": "noscript-gh-pages",
+    "description": "",
+    "version": "0.0.0",
+    "homepage": "http://yandex-ui.github.io/noscript/",
+    "dependencies": {
+        "jaguarjs-jsdoc": "git://github.com/doochik/jaguarjs-jsdoc.git",
+        "jsdoc": "3.3.x"
+    },
+    "engines": {
+        "node": "0.10"
+    }
+}
+

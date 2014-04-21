@@ -1,0 +1,37 @@
+{
+    "markdown": {
+        "hardwrap": true,
+        "parser": "gfm",
+        "tags": [
+            "description",
+            "examples"
+        ]
+    },
+    "opts": {
+        "private": true,
+        "template": "./node_modules/jaguarjs-jsdoc",
+        "tutorials": "../doc"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "source": {
+        "include": [
+            "../src",
+            "../README.md"
+        ]
+    },
+    "templates": {
+        "applicationName": "noscript",
+        "cleverLinks": true,
+        "disqus": true,
+        "googleAnalytics": false,
+        "meta": {
+            "title": "",
+            "description": "",
+            "keyword": ""
+        },
+        "monospaceLinks": true,
+        "openGraph": false
+    }
+}

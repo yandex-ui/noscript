@@ -1,5 +1,14 @@
+/**
+ * Хелперы для работы с объектами
+ * @namespace
+ */
 ns.object = {};
 
+/**
+ * Клонирует объект.
+ * @param {object} obj Объект для клонирования.
+ * @returns {object}
+ */
 ns.object.clone = function(obj) {
     if (obj && typeof obj === 'object') {
         var r;
@@ -23,9 +32,10 @@ ns.object.clone = function(obj) {
 };
 
 /**
-    @param {!Object} obj
-    @return {boolean} Определяет, пустой ли объект или нет.
-*/
+ * Определяет, пустой ли объект или нет.
+ * @param {object} obj Тестируемый объект.
+ * @returns {boolean}
+ */
 ns.object.isEmpty = function(obj) {
     /* jshint unused: false */
     for (var key in obj) {
@@ -35,8 +45,13 @@ ns.object.isEmpty = function(obj) {
     return true;
 };
 
-//  FIXME: Как-то это все коряво. Нужно переписать и прооптимизировать.
-//NOTE: doochik@: в expect.js есть отличный сравнятор, можно взять оттуда
+/**
+ * FIXME: Как-то это все коряво. Нужно переписать и прооптимизировать.
+ * NOTE: doochik@: в expect.js есть отличный сравнятор, можно взять оттуда
+ * @param {object} a
+ * @param {object} b
+ * @returns {boolean}
+ */
 ns.object.isEqual = function(a, b) {
     if (a === b) { return true; }
     if (a == null || b == null) { return false; }

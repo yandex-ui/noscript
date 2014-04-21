@@ -11,16 +11,32 @@
      * @type {{page: string, params: Object}}
      */
     ns.page.current = {};
+
+    /**
+     *
+     * @type {null}
+     */
     ns.page.currentUrl = null;
 
+    /**
+     *
+     * @type {boolean}
+     * @private
+     */
     ns.page._stop = false;
+
+    /**
+     *
+     * @type {string}
+     * @private
+     */
     ns.page._lastUrl = '';
 
     /**
      * Осуществляем переход по ссылке.
-     * @param {String} [url=ns.page.getCurrentUrl()]
-     * @param {String} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
-     * @return {no.Promise}
+     * @param {string} [url=ns.page.getCurrentUrl()]
+     * @param {string} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
+     * @returns {no.Promise}
      */
     ns.page.go = function(url, action) {
         if (!action) {
@@ -90,7 +106,7 @@
 
     /**
      * Redirects to given url.
-     * @param {String} url New page url.
+     * @param {string} url New page url.
      * @returns {no.Promise}
      */
     ns.page.redirect = function(url) {
@@ -100,7 +116,7 @@
 
     /**
      * Returns document title.
-     * @param {String} url Page URL.
+     * @param {string} url Page URL.
      * @returns {string}
      */
     ns.page.title = function(url) {
@@ -149,7 +165,7 @@
     /**
      * Detect if possible to go to the url.
      * You can add your own checkers with ns.page.block.add(checkerFn)
-     * @param {String} url URL to go.
+     * @param {string} url URL to go.
      * @returns {Boolean}
      */
     ns.page.block.check = function(url) {

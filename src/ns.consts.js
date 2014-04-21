@@ -1,3 +1,7 @@
+/**
+ * Типы узлов ns.layout
+ * @enum {string}
+ */
 ns.L = {};
 
 ns.L.VIEW = 'view';
@@ -6,15 +10,13 @@ ns.L.BOX = 'box';
 
 /**
  * Константы для ns.View.
- * @type {Object}
- * @constant
+ * @namespace
  */
 ns.V = {};
 
 /**
  * Статусы View.
- * @enum {Number}
- * @constant
+ * @enum {string}
  */
 ns.V.STATUS = {
     /**
@@ -38,19 +40,15 @@ ns.V.STATUS = {
     INVALID: 'invalid'
 };
 
-// ----------------------------------------------------------------------------------------------------------------- //
-
 /**
  * Константы для ns.Model.
- * @type {Object}
- * @constant
+ * @namespace
  */
 ns.M = {};
 
 /**
  * Статусы Model.
- * @enum {String}
- * @constant
+ * @enum {string}
  */
 ns.M.STATUS = {
     /**
@@ -76,8 +74,7 @@ ns.M.STATUS = {
 
 /**
  * Константы для ns.router.
- * @enum {String}
- * @constant
+ * @enum {string}
  */
 ns.R = {
 
@@ -101,15 +98,13 @@ ns.R = {
 
 /**
  * Constants for ns.Updater.
- * @type {Object}
- * @constant
+ * @namespace
  */
 ns.U = {};
 
 /**
  * Statuses of ns.Updater.
- * @enum {Number}
- * @constant
+ * @enum {string}
  */
 ns.U.STATUS = {
     /**
@@ -125,8 +120,7 @@ ns.U.STATUS = {
 
 /**
  * Execution statuses of ns.Updater.
- * @enum {Number}
- * @constant
+ * @enum {string}
  */
 ns.U.EXEC = {
     'GLOBAL': 'global',

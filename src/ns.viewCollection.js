@@ -1,15 +1,20 @@
 /**
- * Views collection
- * @see https://github.com/pasaran/noscript/blob/master/doc/ns.viewCollection.md
- * @namespace
+ * Создает коллекцию видов.
+ * @classdesc Коллекция видов.
+ * @tutorial ns.viewCollection
  * @augments ns.View
  * @constructor
- * @borrows ns.View.define as define
  */
 ns.ViewCollection = function() {};
 
 no.inherit(ns.ViewCollection, ns.View);
 
+/**
+ *
+ * @param {string} id
+ * @param {object} info
+ * @returns {ns.View}
+ */
 ns.ViewCollection.define = function(id, info) {
     info = info || {};
     var ctor = ns.View.define(id, info, ns.ViewCollection);
@@ -40,6 +45,10 @@ ns.ViewCollection.define = function(id, info) {
     return ctor;
 };
 
+/**
+ *
+ * @private
+ */
 ns.ViewCollection.prototype._init = function() {
     ns.View.prototype._init.apply(this, arguments);
 
@@ -73,10 +82,18 @@ ns.ViewCollection.prototype._bindModels = function() {
     }
 };
 
+/**
+ *
+ * @returns {boolean}
+ */
 ns.ViewCollection.prototype.isValid = function() {
     return this.isValidSelf() && this.isValidDesc();
 };
 
+/**
+ *
+ * @returns {boolean}
+ */
 ns.ViewCollection.prototype.isValidDesc = function() {
     for (var key in this.views) {
         if (!this.views[key].isValid()) {
@@ -88,8 +105,8 @@ ns.ViewCollection.prototype.isValidDesc = function() {
 
 /**
  * Возвращает true, если все модели валидны.
- * @param {Object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
- * @return {Boolean}
+ * @param {object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
+ * @returns {Boolean}
  */
 ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
     var models = this.models;
@@ -120,15 +137,35 @@ ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
     return true;
 };
 
+/**
+ *
+ * @param {string} id
+ * @param {object} params
+ * @returns {*}
+ * @private
+ */
 ns.ViewCollection.prototype._getView = function(id, params) {
     var key = ns.View.getKey(id, params);
     return this._getViewByKey(key);
 };
 
+/**
+ *
+ * @param {string} key
+ * @returns {ns.View}
+ * @private
+ */
 ns.ViewCollection.prototype._getViewByKey = function(key) {
     return this.views && this.views[key] || null;
 };
 
+/**
+ *
+ * @param {string} id
+ * @param {object} params
+ * @returns {ns.View}
+ * @private
+ */
 ns.ViewCollection.prototype._addView = function(id, params) {
     var view = this._getView(id, params);
     if (!view) {
@@ -144,10 +181,20 @@ ns.ViewCollection.prototype._addView = function(id, params) {
     return view;
 };
 
+/**
+ *
+ * @param {ns.View} view
+ * @private
+ */
 ns.ViewCollection.prototype._deleteView = function(view) {
     delete this.views[view.key];
 };
 
+/**
+ *
+ * @param {function} callback
+ * @private
+ */
 ns.ViewCollection.prototype._apply = function(callback) {
     var views = this.views;
     for (var key in views) {
@@ -157,6 +204,14 @@ ns.ViewCollection.prototype._apply = function(callback) {
 
 ns.ViewCollection.prototype._getRequestViews = ns.View.prototype._tryPushToRequest;
 
+/**
+ *
+ * @param {object} tree
+ * @param {object} layout
+ * @param {object} params
+ * @returns {object}
+ * @private
+ */
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
     var decl;
     if (this.isValidSelf()) {
@@ -171,6 +226,13 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
     return tree;
 };
 
+/**
+ *
+ * @param {object} layout
+ * @param {object} params
+ * @returns {object}
+ * @private
+ */
 ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
     var result = {};
     result[this.info.split.view_id] = [];
@@ -220,6 +282,13 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
     return result;
 };
 
+/**
+ *
+ * @param {object} layout
+ * @param {object} params
+ * @returns {object}
+ * @private
+ */
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     var tree = {
         async: false,
@@ -254,6 +323,15 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
+/**
+ *
+ * @param {HTMLElement} node
+ * @param {object} layout
+ * @param {object} params
+ * @param {object} updateOptions
+ * @param {object} events
+ * @private
+ */
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
     var newNode = this._extractNode(node);

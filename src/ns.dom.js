@@ -1,8 +1,4 @@
 /**
- * @fileOverview noscript dom helpers
- */
-
-/**
  * Replaces oldNode with newNode
  * @param {Element} oldNode
  * @param {Element} newNode
@@ -24,7 +20,7 @@ ns.removeNode = function(node) {
 
 /**
  * Generates DOM from HTML-string.
- * @param {String} html
+ * @param {string} html
  * @returns {Element}
  */
 ns.html2node = function(html) {
@@ -35,13 +31,13 @@ ns.html2node = function(html) {
 };
 
 /**
- @param {string} className
- @param {Element} context
- @return {(Element|undefined)}
+ * Полифил getElementsByClassName для IE8.
+ * @function
+ * @name ns.byClass
+ * @param {string} className
+ * @param {Element} context
+ * @returns {Node[]}
  */
-//  FIXME: Мне не нравится использовать jQuery в noscript'е,
-//  со временем я хочу выпилить jQuery совсем.
-//  Пока что вот так странно.
 if ((typeof document !== 'undefined') && document.getElementsByClassName) {
 
     ns.byClass = function(className, context) {

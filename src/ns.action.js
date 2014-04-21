@@ -1,4 +1,4 @@
-(function(/** @type ns */ns, undefined) {
+(function(ns, undefined) {
 
     /**
      * Объект, реализующий экшены.
@@ -38,8 +38,8 @@
 
     /**
      * Copy action with different name.
-     * @param {String} existentAction Action id.
-     * @param {String} newAction Action id.
+     * @param {string} existentAction Action id.
+     * @param {string} newAction Action id.
      */
     ns.action.copy = function(existentAction, newAction) {
         if (newAction in _actions) {
@@ -53,11 +53,11 @@
 
     /**
      * Run action by name
-     * @param {String} id Action name
-     * @param {Object} [params] Params
+     * @param {string} id Action name
+     * @param {object} [params] Params
      * @param {Element} [node]
      * @param {Event} [event]
-     * @return {*}
+     * @returns {*}
      */
     ns.action.run = function(id, params, node, event) {
         var action = _actions[id];
@@ -70,6 +70,11 @@
         }
     };
 
+    /**
+     * Получает параметры экшена из ноды
+     * @param {Node} node
+     * @returns {object}
+     */
     ns.action.getParams = function(node) {
         var paramString = node.getAttribute('data-params');
         if (paramString && paramString.charAt(0) === '{') {

@@ -1,5 +1,10 @@
 (function() {
 
+    /**
+     * Модуль "Раскладка страницы".
+     * @tutorial ns.layout
+     * @namespace
+     */
     ns.layout = {};
 
     //  Хранилище "сырых" layout'ов.
@@ -7,6 +12,12 @@
 
     var hasSpacesRE = /\s+/;
 
+    /**
+     * Определяет раскладку.
+     * @param {string} id ID новой раскладки.
+     * @param {object} layout Раскладка.
+     * @param {string} parent_id ID родителя
+     */
     ns.layout.define = function(id, layout, parent_id) {
         if ( _pages[id] ) {
             throw new Error("[ns.layout] Can't redefine '" + id + "'");
@@ -19,10 +30,10 @@
     };
 
     /**
-     * Возвращает layout страницы с заданным id и params.
-     * @param {String} id
-     * @param {Object} [params]
-     * @return {Object}
+     * Возвращает раскладку страницы с заданным id и params.
+     * @param {string} id ID раскладки
+     * @param {object} [params] Параметры страницы.
+     * @returns {object}
      */
     ns.layout.page = function(id, params) {
         var raw = _pages[id];
@@ -41,9 +52,13 @@
         return layout;
     };
 
-    //  Компилирует layout в зависимости от параметров params.
-    //  Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
-    //
+    /**
+     * Компилирует layout в зависимости от параметров params.
+     * Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
+     * @param {*} layout
+     * @param {object} params
+     * @returns {object}
+     */
     function compile(layout, params) {
         var t = {};
         if (typeof layout === 'string') {
@@ -108,8 +123,12 @@
         return result;
     }
 
-    //  Наследуем layout от parent'а.
-    //
+    /**
+     * Наследует layout от parent'а.
+     * @param {object} layout
+     * @param {object} parent
+     * @returns {object}
+     */
     function inherit(layout, parent) {
         var result = ns.object.clone(parent);
 
@@ -164,10 +183,12 @@
     }
 
     if (window['mocha']) {
+
         /**
          * Удаляет определение layout.
          * Используется только в юнит-тестах.
-         * @param {String} [id] Layout ID.
+         * @param {string} [id] Layout ID.
+         * @private
          */
         ns.layout.undefine = function(id) {
             if (id) {

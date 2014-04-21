@@ -1,8 +1,10 @@
 /**
- * @class Box - это тип View, который умеет выбирать какие View показывать.
+ * Это внутренний класс, который не должен использоваться приложением.
+ * @classdesc Box - это тип View, который умеет выбирать какие View показывать.
  * @param {string} id
  * @param {object} params
  * @constructor
+ * @private
  */
 ns.Box = function(id, params) {
     this.id = id;
@@ -20,11 +22,26 @@ ns.Box = function(id, params) {
     this._visible = false;
 };
 
+/**
+ *
+ * @param {string} id
+ * @param {object} params
+ * @returns {ns.View}
+ * @private
+ */
 ns.Box.prototype._getView = function(id, params) {
     var key = ns.View.getKey(id, params);
     return this.views[key];
 };
 
+/**
+ *
+ * @param {string} id
+ * @param {object} params
+ * @param {ns.L} type
+ * @returns {ns.View}
+ * @private
+ */
 ns.Box.prototype._addView = function(id, params, type) {
     var view = this._getView(id, params);
     if (!view) {
@@ -38,6 +55,12 @@ ns.Box.prototype._addView = function(id, params, type) {
     return view;
 };
 
+/**
+ *
+ * @param {array} descs
+ * @returns {array}
+ * @private
+ */
 ns.Box.prototype._getDescendants = function(descs) {
     var views = this.views;
     var active = this.active;
@@ -53,7 +76,13 @@ ns.Box.prototype._getDescendants = function(descs) {
     return descs;
 };
 
-//  Ищем все новые блоки и блоки, требующие перерисовки.
+/**
+ * Ищем все новые блоки и блоки, требующие перерисовки.
+ * @param {object} updated
+ * @param {object} layout
+ * @param {object} params
+ * @private
+ */
 ns.Box.prototype._getRequestViews = function(updated, layout, params) {
     for (var id in layout) {
         //  Согласно новому layout'у здесь должен быть view с id/params.
@@ -64,7 +93,13 @@ ns.Box.prototype._getRequestViews = function(updated, layout, params) {
     }
 };
 
-//  Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
+/**
+ * Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
+ * @param {object} tree
+ * @param {object} layout
+ * @param {object} params
+ * @private
+ */
 ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
     if ( this.isNone() ) {
         tree.views[this.id] = this._getViewTree(layout, params);
@@ -78,7 +113,13 @@ ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
     }
 };
 
-//  Строим дерево блоков.
+/**
+ * Строим дерево блоков.
+ * @param {object} layout
+ * @param {object} params
+ * @returns {object}
+ * @private
+ */
 ns.Box.prototype._getViewTree = function(layout, params) {
     //  Для бокса это всегда объект (возможно, пустой).
     var tree = {
@@ -98,7 +139,15 @@ ns.Box.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
-//  Обновляем бокс.
+/**
+ * Обновляем бокс.
+ * @param {HTMLElement} node
+ * @param {object} layout
+ * @param {object} params
+ * @param {object} options
+ * @param {object} events
+ * @private
+ */
 ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     var oldNode;
     // Если
@@ -186,6 +235,11 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     this._show();
 };
 
+/**
+ *
+ * @returns {boolean}
+ * @private
+ */
 ns.Box.prototype._show = function() {
     if (this._visible === false) {
         this._showNode();
@@ -198,7 +252,7 @@ ns.Box.prototype._show = function() {
 
 /**
  * Скрывает view
- * @return {Boolean}
+ * @returns {Boolean}
  * @protected
  */
 ns.Box.prototype._hide = function() {
@@ -218,6 +272,10 @@ ns.Box.prototype._hideNode = function() {
     this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
 };
 
+/**
+ *
+ * @private
+ */
 ns.Box.prototype._showNode = function() {
     this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
 };

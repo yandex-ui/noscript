@@ -1,4 +1,4 @@
-(function(/** @type ns */ns) {
+(function(ns) {
 
     // @see http://jsperf.com/entityify-test
 
@@ -20,8 +20,8 @@
 
     /**
      * Преобразует специальные символы в HTML сущности.
-     * @param {String} s Строка
-     * @returns {String}
+     * @param {string} s Строка
+     * @returns {string}
      */
     ns.entityify = function(s) {
         return s.toString().replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
@@ -48,8 +48,8 @@
 
     /**
      * Преобразует HTML-сущности в символы.
-     * @param {String} s Строка
-     * @returns {String}
+     * @param {string} s Строка
+     * @returns {string}
      */
     ns.deentityify = function(s) {
         return s.replace(DEENTITYIFY_REGEXP, DEENTITYIFY_REPLACER);

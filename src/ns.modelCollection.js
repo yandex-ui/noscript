@@ -1,8 +1,8 @@
 (function() {
 
     /**
-     * Models collection
-     * @namespace
+     * Создает модель-коллекцию.
+     * @classdesc Модель-коллекция.
      * @constructor
      * @augments ns.Model
      */
@@ -10,6 +10,10 @@
 
     no.inherit(ns.ModelCollection, ns.Model);
 
+    /**
+     *
+     * @private
+     */
     ns.ModelCollection.prototype._init = function() {
         ns.Model.prototype._init.apply(this, arguments);
 
@@ -17,6 +21,10 @@
         this._modelsEvents = {};
     };
 
+    /**
+     *
+     * @returns {{}|*}
+     */
     ns.ModelCollection.prototype.getData = function() {
         // TODO а точно это нужно? Можно ведь просто всегда взять элементы из collection.models.
 
@@ -52,6 +60,10 @@
         return this.data;
     };
 
+    /**
+     *
+     * @private
+     */
     ns.ModelCollection.prototype._reset = function() {
         ns.Model.prototype._reset.apply(this, arguments);
 
@@ -81,7 +93,7 @@
      * Создает модели из разбитых данных
      *
      * @param { Array } items – массив данных для будущих подмоделей
-     * @return { ns.Model[] } – массив полученных подмоделей
+     * @returns { ns.Model[] } – массив полученных подмоделей
      */
     ns.ModelCollection.prototype._splitModels = function(items) {
         var splitInfo = this.info.split;
@@ -120,11 +132,25 @@
         });
     };
 
+    /**
+     *
+     * @param {ns.Model} model
+     * @param {string} eventName
+     * @param {object} events
+     * @param {function} callback
+     * @private
+     */
     ns.ModelCollection.prototype._bindModel = function(model, eventName, events, callback) {
         model.on(eventName, callback);
         events[eventName] = callback;
     };
 
+    /**
+     *
+     * @param {string} evt
+     * @param {ns.Model} model
+     * @param {string} jpath
+     */
     ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
         // Основной смысл этого метода в том, чтобы его можно было переопределить
         // и триггерить изменение коллекции только для части изменений элементов коллекции.
@@ -135,12 +161,20 @@
         this.trigger('ns-model-changed', { 'model': model, 'jpath': jpath });
     };
 
+    /**
+     *
+     */
     ns.ModelCollection.prototype.onItemTouched = function() {
         // У коллекции есть собственная версия (this._versionSelf) и версия элементов коллекции (this._version).
         // Когда меняется элемент коллекции - версия самой коллекции не меняется.
         this._version++;
     };
 
+    /**
+     *
+     * @param {string} evt
+     * @param {ns.Model} model
+     */
     ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
         this.remove(model);
     };
@@ -206,9 +240,9 @@
      * Вставляет подмодели в коллекцию
      *
      * @param {ns.Model[] | ns.Model} models – одна или несколько подмоделей для вставки
-     * @param {Number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
+     * @param {number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
      *
-     * @return {Boolean} – признак успешности вставки
+     * @returns {Boolean} – признак успешности вставки
      */
     ns.ModelCollection.prototype.insert = function(models, index) {
         if (isNaN(index)) {
@@ -247,7 +281,7 @@
      * Удаляет элементы коллекции.
      *
      * @param {ns.Model | Number | ns.Model[] | Number[]} models – подмодели или индексы подмодели, которую надо удалить
-     * @return {Boolean} – признак успешности удаления.
+     * @returns {Boolean} – признак успешности удаления.
      */
     ns.ModelCollection.prototype.remove = function(models) {
         var modelsRemoved = [];

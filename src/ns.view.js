@@ -8,8 +8,9 @@
 
     /**
      * Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.
-     * @class Класс, реализующий View
-     * @see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md
+     * @classdesc Класс, реализующий View
+     * @tutorial ns.view
+     * @tutorial ns.view.yate
      * @constructor
      * @mixes no.Events
      */
@@ -18,8 +19,7 @@
 
     /**
      * @see ns.V.STATUS
-     * @enum {Number}
-     * @borrows ns.V.STATUS as ns.View.prototype.STATUS
+     * @enum {ns.V.STATUS}
      */
     ns.View.prototype.STATUS = ns.V.STATUS;
 
@@ -37,13 +37,20 @@
      */
     ns.View.prototype._$window = $(window);
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {boolean} async
+     * @private
+     */
     ns.View.prototype._init = function(id, params, async) {
         this.id = id;
 
         /**
          * Флаг того, что view может быть асинхронным.
          * Факт того, что сейчас view находится в асинхронном состоянии определяется this.status и this.asyncState
-         * @type {Boolean}
+         * @type {boolean}
          */
         this.async = async;
 
@@ -68,7 +75,7 @@
         /**
          * Статус View.
          * @see ns.V.STATUS
-         * @type {Number}
+         * @type {number}
          * @private
          */
         this.status = this.STATUS.NONE;
@@ -82,7 +89,7 @@
 
         /**
          * Uniq namespace for events so view can bind/unbind events properly.
-         * @type {String}
+         * @type {string}
          * @private
          */
         this._eventNS = '.ns-view-' + this.id + '-' + this._uniqID;
@@ -93,6 +100,10 @@
         this.trigger('ns-view-init');
     };
 
+    /**
+     *
+     * @private
+     */
     ns.View.prototype._initModels = function() {
         if (!this.models) {
             this.models = {};
@@ -106,10 +117,24 @@
         }
     };
 
+    /**
+     *
+     * @param {string} id
+     * @returns {ns.View}
+     * @private
+     */
     ns.View.prototype._getView = function(id) {
         return this.views[id];
     };
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {ns.L} type
+     * @returns {*}
+     * @private
+     */
     ns.View.prototype._addView = function(id, params, type) {
         var view = this._getView(id);
         if (!view) {
@@ -135,7 +160,7 @@
 
     /**
      * Обработчик htmlinit
-     * @param {Array} [events] Массив событий.
+     * @param {array} [events] Массив событий.
      * @protected
      */
     ns.View.prototype._htmlinit = function(events) {
@@ -145,8 +170,8 @@
 
     /**
      * Скрывает view
-     * @param {Array} [events] Массив событий.
-     * @return {Boolean}
+     * @param {array} [events] Массив событий.
+     * @returns {boolean}
      * @protected
      */
     ns.View.prototype._hide = function(events) {
@@ -188,9 +213,9 @@
 
     /**
      * Показывает View
-     * @param {Array} [events] Массив событий.
+     * @param {array} [events] Массив событий.
      * @protected
-     * @return {Boolean}
+     * @returns {boolean}
      */
     ns.View.prototype._show = function(events) {
         // При создании блока у него this._visible === undefined.
@@ -220,6 +245,10 @@
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
     };
 
+    /**
+     *
+     * @param {string} subviewId
+     */
     ns.View.prototype.invalidateSubview = function(subviewId) {
         //  FIXME: ns.SV.STATUS.INVALID?
         this._invalidSubviews[subviewId] = ns.V.STATUS.INVALID;
@@ -285,6 +314,14 @@
         }
     };
 
+    /**
+     *
+     * @param {ns.Model} model
+     * @param {string} eventName
+     * @param {object} events
+     * @param {function} callback
+     * @private
+     */
     ns.View.prototype._bindModel = function(model, eventName, events, callback) {
         model.on(eventName, callback);
         events[eventName] = callback;
@@ -327,8 +364,8 @@
     /**
      * Копирует массив деклараций событий и возвращает такой же массив, но с забинженными на этот инстанс обработчиками.
      * @param {Array} events
-     * @param {Number} handlerPos Позиция хендлера в массиве.
-     * @return {Array} Копия events c забинженными обработчиками.
+     * @param {number} handlerPos Позиция хендлера в массиве.
+     * @returns {Array} Копия events c забинженными обработчиками.
      * @private
      */
     ns.View.prototype._bindEventHandlers = function(events, handlerPos) {
@@ -349,8 +386,8 @@
 
     /**
      * Возващает обработчики событий для View.
-     * @param {String} type Тип обработчиков: 'init' или 'show'.
-     * @return {Object}
+     * @param {string} type Тип обработчиков: 'init' или 'show'.
+     * @returns {object}
      * @private
      */
     ns.View.prototype._getEvents = function(type) {
@@ -424,6 +461,10 @@
         }
     };
 
+    /**
+     *
+     * @private
+     */
     ns.View.prototype._bindCreateEvents = function() {
         for (var i = 0, j = this.info.createEvents.length; i < j; i++) {
             var event = this.info.createEvents[i];
@@ -479,10 +520,18 @@
         }
     };
 
+    /**
+     *
+     * @returns {boolean}
+     */
     ns.View.prototype.isOk = function() {
         return (this.status === this.STATUS.OK);
     };
 
+    /**
+     *
+     * @returns {boolean}
+     */
     ns.View.prototype.isLoading = function() {
         return (this.status === this.STATUS.LOADING);
     };
@@ -495,14 +544,17 @@
         return (this.status === this.STATUS.NONE);
     };
 
-    //  FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
+    /**
+     * FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
+     * @returns {boolean}
+     */
     ns.View.prototype.isSubviewsOk = function() {
         return ns.object.isEmpty(this._invalidSubviews);
     };
 
     /**
      * Возвращает true, если блок валиден.
-     * @return {Boolean}
+     * @returns {boolean}
      */
     ns.View.prototype.isValid = ns.View.prototype.isValidSelf = function() {
         return this.isOk() && this.isSubviewsOk() && this.isModelsValidWithVersions();
@@ -518,8 +570,8 @@
 
     /**
      * Возвращает true, если все модели валидны.
-     * @param {Object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
-     * @return {Boolean}
+     * @param {object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
+     * @returns {Boolean}
      */
     ns.View.prototype.isModelsValid = function(modelsVersions) {
         var models = this.models;
@@ -546,8 +598,12 @@
         return true;
     };
 
-    //  Вызываем callback для всех подблоков.
-    //  Это плоский метод. Он работает только с подблоками и не уходит рекурсивно вглубь by design.
+    /**
+     * Вызываем callback для всех подблоков.
+     * Это плоский метод. Он работает только с подблоками и не уходит рекурсивно вглубь by design.
+     * @param {function} callback
+     * @private
+     */
     ns.View.prototype._apply = function(callback) {
         var views = this.views;
         for (var id in views) {
@@ -558,12 +614,12 @@
     /**
      * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
      * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
-     * @param {Object} updated Hash for sync and async views.
+     * @param {object} updated Hash for sync and async views.
      * @param {ns.View[]} updated.sync Sync views.
      * @param {ns.View[]} updated.async Sync views.
-     * @param {Object} pageLayout Currently processing layout.
-     * @param {Object} params Params.
-     * @return {*}
+     * @param {object} pageLayout Currently processing layout.
+     * @param {object} params Params.
+     * @returns {object}
      */
     ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
 
@@ -646,9 +702,9 @@
 
     /**
      * Строим дерево блоков.
-     * @param {Object} layout Currently processing layout.
-     * @param {Object} params Params.
-     * @return {Object}
+     * @param {object} layout Currently processing layout.
+     * @param {object} params Params.
+     * @returns {object}
      */
     ns.View.prototype._getViewTree = function(layout, params) {
         var tree = {
@@ -693,6 +749,13 @@
         return tree;
     };
 
+    /**
+     *
+     * @param {object} layout
+     * @param {object} params
+     * @returns {object}
+     * @private
+     */
     ns.View.prototype._getDescViewTree = function(layout, params) {
         var views = {};
         //  Собираем дерево рекурсивно из подблоков.
@@ -705,9 +768,9 @@
 
     /**
      * Возвращает декларацию вида для вставки плейсхолдера
-     * @param {Object} layout Currently processing layout.
-     * @param {Object} params Params.
-     * @return {Object}
+     * @param {object} layout Currently processing layout.
+     * @param {object} params Params.
+     * @returns {object}
      */
     ns.View.prototype._getPlaceholderTree = function(layout, params) {
         var tree = {
@@ -729,6 +792,11 @@
         return tree;
     };
 
+    /**
+     *
+     * @returns {*}
+     * @private
+     */
     ns.View.prototype._getModelsData = function() {
         var r = {};
 
@@ -752,6 +820,11 @@
         return r;
     };
 
+    /**
+     *
+     * @returns {*}
+     * @private
+     */
     ns.View.prototype._getModelsError = function() {
         var r = {};
 
@@ -768,7 +841,7 @@
 
     /**
      * Returns model.
-     * @param {String} id Model ID
+     * @param {string} id Model ID
      * @returns {ns.Model}
      */
     ns.View.prototype.getModel = function(id) {
@@ -777,22 +850,27 @@
 
     /**
      * Returns data of model.
-     * @param {String} id Model ID
+     * @param {string} id Model ID
      * @returns {*}
      */
     ns.View.prototype.getModelData = function(id) {
         return this.getModel(id).getData();
     };
 
-    //  Быстро что-нибудь сгенерить из данных блока.
-    //  Можно передать моду и дополнительный объект,
-    //  который попадет в /.extra:
-    //
-    //      block.tmpl()
-    //      block.tmpl('mode')
-    //      block.tmpl({ ... })
-    //      block.tmpl('mode', { ... })
-    //
+    /**
+     * Быстро что-нибудь сгенерить из данных блока.
+     * Можно передать моду и дополнительный объект, который попадет в /.extra:
+     * @param {string} mode
+     * @param {object} extra
+     * @returns {HTMLElement}
+     * @example
+     * ```js
+     * block.tmpl()
+     * block.tmpl('mode')
+     * block.tmpl({ ... })
+     * block.tmpl('mode', { ... })
+     * ```
+     */
     ns.View.prototype.tmpl = function(mode, extra) {
         switch (arguments.length) {
             case 0:
@@ -821,7 +899,7 @@
      * Возвращает массив всех вложенных view, включая себя
      * FIXME: это же _getDescendantsOrSelf
      * @param {Array} [views=[]] Начальный массив.
-     * @return {Array}
+     * @returns {Array}
      * @private
      */
     ns.View.prototype._getDescendants = function(views) {
@@ -866,6 +944,12 @@
         }
     };
 
+    /**
+     *
+     * @param {HTMLElement} node
+     * @returns {HTMLElement}
+     * @private
+     */
     ns.View.prototype._extractNode = function(node) {
         var viewNode;
         // Найдём ноду по классу
@@ -886,7 +970,15 @@
         return viewNode;
     };
 
-    //  Обновляем (если нужно) ноду блока.
+    /**
+     * Обновляем (если нужно) ноду блока.
+     * @param {HTMLElement} node
+     * @param {object} layout
+     * @param {object} params
+     * @param {object} updateOptions
+     * @param {object} events
+     * @private
+     */
     ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
 
         //  FIXME nop@: Велик могучим русский языка!
@@ -1032,15 +1124,15 @@
      *   - если eventName === "resize", то обработчик регистрируется по событию show
      *   - если eventName === "scroll", то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)
      *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
-     * @param {String} id Название View.
-     * @param {Object} [info={}] Декларация View.
+     * @param {string} id Название View.
+     * @param {object} [info={}] Декларация View.
      * @param {Function} [info.ctor] Конструтор.
-     * @param {Object} [info.methods] Методы, переопределяющие стандартные методы View.
+     * @param {object} [info.methods] Методы, переопределяющие стандартные методы View.
      * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
-     * @param {Object} [info.events] DOM-события, на которые подписывается View.
-     * @param {Object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
+     * @param {object} [info.events] DOM-события, на которые подписывается View.
+     * @param {object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
      * @param {Function|String} [base=ns.View] Базовый View для наследования
-     * @return {Function} Созданный View.
+     * @returns {Function} Созданный View.
      */
     ns.View.define = function(id, info, base) {
         ns.assert(!(id in _infos), 'ns.View', "Can't redefine '%s'", id);
@@ -1075,8 +1167,8 @@
 
     /**
      * Возвращает информацию о View.
-     * @param {String} id Название модели.
-     * @returns {Object}
+     * @param {string} id Название модели.
+     * @returns {object}
      * @throws Бросает исключения, если нет
      */
     ns.View.info = function(id) {
@@ -1090,6 +1182,11 @@
         return info;
     };
 
+    /**
+     *
+     * @param {object} info
+     * @private
+     */
     ns.View._initInfoParams = function(info) {
         if (info.params) {
             ns.assert(!info['params+'], 'ns.View', 'you cannot specify params and params+ at the same time');
@@ -1159,6 +1256,11 @@
         }
     };
 
+    /**
+     *
+     * @param {object} info
+     * @private
+     */
     ns.View._initInfoEvents = function(info) {
         /**
          * События, которые надо повесить сразу при создании view
@@ -1168,7 +1270,7 @@
 
         /**
          * События, которые вешаются на htmlinit, снимаются на htmldestroy
-         * @type {Object}
+         * @type {object}
          */
         info.initEvents = {
             'bind': [],
@@ -1177,7 +1279,7 @@
 
         /**
          * События, которые вешаются на show, снимаются на hide
-         * @type {Object}
+         * @type {object}
          */
         info.showEvents = {
             'bind': [],
@@ -1186,7 +1288,7 @@
 
         /**
          * Декларации подписок на кастомные события при создании View.
-         * @type {Object}
+         * @type {object}
          */
         info.initNoevents = {
             'global': [],
@@ -1195,7 +1297,7 @@
 
         /**
          * Декларации подписок на кастомные события при показе View.
-         * @type {Object}
+         * @type {object}
          */
         info.showNoevents = {
             'global': [],
@@ -1324,6 +1426,13 @@
         info.subviews = subviewTree;
     };
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {object} info
+     * @returns {string}
+     */
     ns.View.getKey = function(id, params, info) {
         return this.getKeyAndParams(id, params, info).key;
     };
@@ -1331,7 +1440,7 @@
     /**
      * Возвращает ключ объекта и параметры с учётом rewriteParamsOnInit
      * В этом методе собрана вся логика рерайтов параметров при создании view
-     * @return Object
+     * @returns {object}
      */
     ns.View.getKeyAndParams = function(id, params, info) {
         //  Ключ можно вычислить даже для неопределенных view,
@@ -1359,6 +1468,14 @@
         };
     };
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {object} info
+     * @returns {*}
+     * @private
+     */
     ns.View._getKeyParams = function(id, params, info) {
         var pGroups = info.pGroups || [];
 
@@ -1404,10 +1521,10 @@
 
     /**
      * Фабрика ns.View
-     * @param {String} id ID view.
-     * @param {Object} [params] Параметры view.
+     * @param {string} id ID view.
+     * @param {object} [params] Параметры view.
      * @param {Boolean} [async=false] Может ли view бы асинхронным.
-     * @return {ns.View}
+     * @returns {ns.View}
      */
     ns.View.create = function(id, params, async) {
         var Ctor = _ctors[id];
@@ -1422,6 +1539,12 @@
         return view;
     };
 
+    /**
+     *
+     * @param {ns.Model[]} models
+     * @returns {{}}
+     * @private
+     */
     ns.View._prepareModels = function(models) {
         var _models = {};
 
@@ -1441,7 +1564,7 @@
         /**
          * Удаляет определение view.
          * Используется только в юнит-тестах.
-         * @param {String} [id] ID view.
+         * @param {string} [id] ID view.
          */
         ns.View.undefine = function(id) {
             if (id) {

@@ -7,10 +7,11 @@
      *   - array item[], params - массив моделей и опциональные единые для всех параметры
      *   - array item[] - массив моделей вида {id: modelName, params: modelParams}
      * @param {String|Array|Object} items Массив названий моделей.
-     * @param {Object} [params] Параметры моделей.
-     * @param {Object} [options] Опции запроса.
+     * @param {object} [params] Параметры моделей.
+     * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @return {no.Promise}
+     * @returns {no.Promise}
+     * @namespace
      */
     ns.request = function(items, params, options) {
         return ns.request.models(items2models(items, params), options);
@@ -20,10 +21,10 @@
      * Делает запрос моделей с сервера, не учитывая их закешированности.
      * @see ns.request
      * @param {String|Array|Object} items Массив названий моделей.
-     * @param {Object} [params] Параметры моделей.
-     * @param {Object} [options] Опции запроса.
+     * @param {object} [params] Параметры моделей.
+     * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @return {no.Promise}
+     * @returns {no.Promise}
      */
     ns.forcedRequest = function(items, params, options) {
         options = options || {};
@@ -34,9 +35,9 @@
     /**
      * Делает запрос моделей с сервера.
      * @param {ns.Model[]} models Массив моделей.
-     * @param {Object} [options] Опции запроса.
+     * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @return {no.Promise}
+     * @returns {no.Promise}
      */
     ns.request.models = function(models, options) {
 
@@ -54,13 +55,13 @@
      * Дополнительные общие параметры запроса.
      * Эти параметры добавляются в любой запрос.
      * @public
-     * @type {Object}
+     * @type {object}
      */
     ns.request.requestParams = {};
 
     /**
      * Добавляет к params, параметры из ns.request.requestParams.
-     * @param {Object} params Параметры запроса.
+     * @param {object} params Параметры запроса.
      */
     ns.request.addRequestParams = function(params) {
         no.extend(params, ns.request.requestParams);
@@ -68,7 +69,7 @@
 
     /**
      * Урл до сервера.
-     * @type {String}
+     * @type {string}
      */
     ns.request.URL = '/models/';
 
@@ -84,7 +85,7 @@
     ns.request.Manager = {
 
         /**
-         * @enum {Number}
+         * @enum {number}
          */
         STATUS: {
             LOADING: 0,
@@ -97,9 +98,9 @@
         /**
          * Добавляет запрос модели.
          * @param {ns.Model} model Модель.
-         * @param {Number} requestId ID запроса.
+         * @param {number} requestId ID запроса.
          * @param {Boolean} forced Флаг принудительного запроса.
-         * @return {Boolean|ns.Model} Если true - модель надо запросить, false - ничег не надо делать, ns.Model - дождаться ресолва промиса возвращенной модели.
+         * @returns {Boolean|ns.Model} Если true - модель надо запросить, false - ничег не надо делать, ns.Model - дождаться ресолва промиса возвращенной модели.
          */
         add: function(model, requestId, forced) {
             var REQUEST_STATUS = this.STATUS;
@@ -202,7 +203,7 @@
         /**
          * Записывает информацию о запросе.
          * @param {ns.Model} model Запрашиваемая модель.
-         * @param {Number} requestId ID запроса.
+         * @param {number} requestId ID запроса.
          * @private
          */
         _createRequest: function(model, requestId) {
@@ -226,7 +227,7 @@
     var Request = function(models, options) {
         /**
          * ID запроса.
-         * @type {Number}
+         * @type {number}
          * @private
          */
         this.id = REQUEST_ID++;
@@ -240,7 +241,7 @@
 
         /**
          * Опции запроса.
-         * @type {Object}
+         * @type {object}
          * @private
          */
         this.options = options || {};
@@ -414,8 +415,8 @@
     /**
      * Приводит запрашиваемые модели к формату №3 из ns.request.
      * @param {Array} items Массив названией моделей.
-     * @param {Object} params Параметры моделей.
-     * @return {Array}
+     * @param {object} params Параметры моделей.
+     * @returns {Array}
      */
     function normalizeItems(items, params) {
         var _items = [];
@@ -432,7 +433,7 @@
     /**
      * Возвращает promise из model
      * @param {ns.Model} model Модель
-     * @return {no.Promise}
+     * @returns {no.Promise}
      */
     function model2Promise(model) {
         return model.promise;
@@ -441,8 +442,8 @@
     /**
      * Приводит аргументы из ns.request к моделям.
      * @param {String|Array|Object} items Массив названий моделей.
-     * @param {Object} [params] Параметры моделей.
-     * @return {ns.Model[]}
+     * @param {object} [params] Параметры моделей.
+     * @returns {ns.Model[]}
      */
     function items2models(items, params) {
         // приводим к формату №2

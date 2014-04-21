@@ -1,4 +1,4 @@
-(function(/** @type ns */ns) {
+(function(ns) {
 
     /**
      * Модуль логирования ошибок.
@@ -16,9 +16,9 @@
 
     /**
      * Логирует сообщение.
-     * @param {String} name Название сообщение.
-     * @param {Object} [data] Данные
-     * @param {String} [longText] Дополнительные данные. Длинная строка, которую надо разбить на части.
+     * @param {string} name Название сообщение.
+     * @param {object} [data] Данные
+     * @param {string} [longText] Дополнительные данные. Длинная строка, которую надо разбить на части.
      */
     ns.log.info = function(name, data, longText) {
         /* jshint unused: false */
@@ -26,9 +26,9 @@
 
     /**
      * Логирует ошибку.
-     * @param {String} name Название ошибки.
-     * @param {Object} [data] Данные
-     * @param {String} [longText] Дополнительные данные. Длинная строка, которую надо разбить на части.
+     * @param {string} name Название ошибки.
+     * @param {object} [data] Данные
+     * @param {string} [longText] Дополнительные данные. Длинная строка, которую надо разбить на части.
      */
     ns.log.error = function(name, data, longText) {
         /* jshint unused: false */
@@ -36,9 +36,9 @@
 
     /**
      * Логирует JS-исключение.
-     * @param {String} name Название ошибки.
+     * @param {string} name Название ошибки.
      * @param {Error} exception Пойманное исключение.
-     * @param {Object} [data] Дополнительные данные.
+     * @param {object} [data] Дополнительные данные.
      */
     ns.log.exception = function(name, exception, data) {
         /* jshint unused: false */

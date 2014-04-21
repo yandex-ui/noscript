@@ -1,10 +1,6 @@
 /**
- * @fileOverview DOM events for ns.View
- */
-
-/**
  * Хеш событий для удобного биндинга touch/desktop
- * @type {Object}
+ * @type {object}
  */
 ns.V.EVENTS = {
     'click': 'click',

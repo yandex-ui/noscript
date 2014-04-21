@@ -1,8 +1,9 @@
 /**
  * Find best page for url.
+ * @namespace
  * @param {string} url
- * @return {{ page: string, params: Object }}
-*/
+ * @returns {object}
+ */
 ns.router = function(url) {
     var baseDir = ns.router.baseDir;
     var routesDef = ns.router._routes;
@@ -93,8 +94,8 @@ ns.router = function(url) {
 /**
  * Get params for router from url
  * @param {string} url - current url
- * @param {Object} route - compiled route or redirect
- * @returns {{}}
+ * @param {object} route - compiled route or redirect
+ * @returns {object}
  * @private
  */
 ns.router._getParamsRouteFromUrl = function(url, route) {
@@ -183,7 +184,7 @@ ns.router.init = function() {
 /**
  * Generate url.
  * @param {string} url Relative url.
- * @return {String} Valid url that takes into consideration baseDir.
+ * @returns {string} Valid url that takes into consideration baseDir.
  */
 ns.router.url = function(url) {
     return (ns.router.baseDir + url) || '/';
@@ -191,8 +192,8 @@ ns.router.url = function(url) {
 
 /**
  * @param {string} id Page (layout) name.
- * @param {Object} params Url generation params.
- * @return {?string} Generated url.
+ * @param {object} params Url generation params.
+ * @returns {string} Generated url.
  */
 ns.router.generateUrl = function(id, params) {
     var url;
@@ -213,6 +214,13 @@ ns.router.generateUrl = function(id, params) {
     return ns.router.url(url);
 };
 
+/**
+ *
+ * @param {object} def
+ * @param {object} params
+ * @returns {string}
+ * @private
+ */
 ns.router._generateUrl = function(def, params) {
     var url;
     var result = [];
@@ -287,9 +295,9 @@ ns.router._generateUrl = function(def, params) {
 
 /**
  * Compile route.
- * @param {String} route
- * @return {{ regexp: RegExp, tokens: Array.<string> }}
-*/
+ * @param {string} route
+ * @returns {object}
+ */
 ns.router.compile = function(route) {
     // Удаляем слеши в начале и в конце урла.
     route = route
@@ -318,6 +326,12 @@ ns.router.compile = function(route) {
     };
 };
 
+/**
+ *
+ * @param {string} rawSection
+ * @returns {object}
+ * @private
+ */
 ns.router._parseSection = function(rawSection) {
     var curIndex = 0;
     var openBraketIndex = -1;
@@ -363,7 +377,7 @@ ns.router._parseSection = function(rawSection) {
 
 /**
  * Парсит декларацию параметра (то, что внутри фигурных скобок).
- * @returns {Object}
+ * @returns {object}
  * @private
  */
 ns.router._parseParam = function(param) {
@@ -403,6 +417,12 @@ ns.router._parseParam = function(param) {
     };
 };
 
+/**
+ *
+ * @param {object} section
+ * @returns {string}
+ * @private
+ */
 ns.router._generateSectionRegexp = function(section) {
     var re = '';
 
@@ -419,6 +439,12 @@ ns.router._generateSectionRegexp = function(section) {
     return re;
 };
 
+/**
+ *
+ * @param {object} p
+ * @returns {RegExp}
+ * @private
+ */
 ns.router._generateParamRegexp = function(p) {
     var re;
     var regexps = ns.router.regexps;
@@ -449,6 +475,13 @@ ns.router._generateParamRegexp = function(p) {
     return re;
 };
 
+/**
+ *
+ * @param {string} pvalue
+ * @param {string} ptype
+ * @returns {boolean}
+ * @private
+ */
 ns.router._isParamValid = function(pvalue, ptype) {
     var _regexp = ns.router._regexps[ptype];
     ns.assert(_regexp, 'ns.router', "Could not find regexp for type '%s'!", ptype);
@@ -457,13 +490,13 @@ ns.router._isParamValid = function(pvalue, ptype) {
 
 /**
  * Базовая часть урла, относительно которой строятся урлы. Без слэша на конце.
- * @type {String}
+ * @type {string}
  */
 ns.router.baseDir = '';
 
 /**
  * Скомпилированные данные.
- * @type {Object}
+ * @type {object}
  * @private
  */
 ns.router._routes = null;
@@ -471,13 +504,13 @@ ns.router._routes = null;
 /**
  * Маршруты.
  * Этот массив должен быть объявлен в проекте.
- * @type {Object}
+ * @type {object}
  */
 ns.router.routes = {};
 
 /**
  * Регулярные выражения для проверки типов параметров.
- * @type {Object}
+ * @type {object}
  */
 ns.router.regexps = {
     'id': '[A-Za-z_][A-Za-z0-9_-]*',
@@ -485,6 +518,9 @@ ns.router.regexps = {
 };
 
 if (window['mocha']) {
+    /**
+     * @private
+     */
     ns.router.undefine = function() {
         ns.router._routes = null;
         ns.router.routes = {};

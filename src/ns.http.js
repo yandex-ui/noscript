@@ -1,10 +1,10 @@
 /**
-    Creates and executes ajax request (a POST request with json return data type by default).
-    @param {string} url
-    @param {object} params Request parameters.
-    @param {object=} options Standart jQuery.ajax settings object.
-    @return {no.Promise}
-*/
+ * Creates and executes ajax request (a POST request with json return data type by default).
+ * @param {string} url
+ * @param {object} params Request parameters.
+ * @param {object=} options Standart jQuery.ajax settings object.
+ * @returns {no.Promise}
+ */
 ns.http = function(url, params, options) {
     options = no.extend({ type: 'POST', dataType: 'json' }, options || {});
     options.url = url;

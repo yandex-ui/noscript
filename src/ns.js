@@ -28,7 +28,7 @@ ns.IS_TOUCH = Boolean(
     Do not clone functions, only data.
     @param {!Object} dest
     @param {!Object} src
-    @return {!Object}
+    @returns {!Object}
 */
 ns.extendRecursive = function(dest, src) {
     for (var key in src) {
@@ -53,14 +53,17 @@ ns.extendRecursive = function(dest, src) {
     return dest;
 };
 
+/**
+ *
+ */
 ns.todo = function() {
     throw new Error('Unimplemented');
 };
 
 /**
  * Parse query string to object.
- * @param {String} s Query string
- * @returns {Object}
+ * @param {string} s Query string
+ * @returns {object}
  */
 ns.parseQuery = function(s) {
     var o = {};
@@ -97,8 +100,8 @@ ns.parseQuery = function(s) {
 /**
  * Performs json templating.
  * @param {*} json
- * @param {String} mode
- * @param {String} [module='main']
+ * @param {string} mode
+ * @param {string} [module='main']
  * @returns {Element}
  */
 ns.tmpl = function(json, mode, module) {
@@ -149,8 +152,8 @@ ns.transaction = function(cb) {
  * Выполняет проверку, что первый аргумент истиннен.
  * Если это не так - кидает ошибку.
  * @param {?} truthy Любое значение, которое проверяется на истинность.
- * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
- * @param {String} message Сообщение об ошибке.
+ * @param {string} contextName Контекст для быстрого поиска места возникновения ошибки.
+ * @param {string} message Сообщение об ошибке.
  */
 ns.assert = function(truthy, contextName, message) {
     /* jshint unused: false */
@@ -161,8 +164,8 @@ ns.assert = function(truthy, contextName, message) {
 
 /**
  * Кидает ошибку с понятным сообщением.
- * @param {String} contextName Контекст для быстрого поиска места возникновения ошибки.
- * @param {String} message Сообщение об ошибке.
+ * @param {string} contextName Контекст для быстрого поиска места возникновения ошибки.
+ * @param {string} message Сообщение об ошибке.
  */
 ns.assert.fail = function(contextName, message) {
     var messageArgs = Array.prototype.slice.call(arguments, 2);
@@ -175,8 +178,8 @@ ns.assert.fail = function(contextName, message) {
 /**
  * Строит ключ по готовому объекту параметров.
  * @param {string} prefix Префикс ключа.
- * @param {Object} params Объект с параметрами составляющими ключ.
- * @return {string} Строка ключа.
+ * @param {object} params Объект с параметрами составляющими ключ.
+ * @returns {string} Строка ключа.
  */
 ns.key = function(prefix, params) {
     var key = prefix;
@@ -191,6 +194,7 @@ if (window['mocha']) {
 
     /**
      * Clean internal data after tests
+     * @private
      */
     ns.clean = function() {
         ns.layout.undefine();

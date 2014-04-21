@@ -2,18 +2,20 @@
 
     /**
      * Создает ns.Update
-     * @class ns.Update
+     * @classdesc ns.Update
      * @param {ns.View} view Корневой view.
-     * @param {Object} layout Layout для этого view, результат от ns.layout.page()
-     * @param {Object} params Параметры, результат от ns.router()
-     * @param {Object} [options] Options for ns.Update
+     * @param {object} layout Layout для этого view, результат от ns.layout.page()
+     * @param {object} params Параметры, результат от ns.router()
+     * @param {object} [options] Options for ns.Update
      * @param {ns.U.EXEC} [options.execFlag=ns.U.EXEC.GLOBAL] Options for ns.Update
      * @constructor
      * @example
+     * ```js
      * var route = ns.router('/folder/123/message/456');
      * var layout = ns.layout.page(route.page, route.params);
      * var update = new ns.Update(AppBlock, layout, route.params);
      * update.start();
+     * ```
      */
     ns.Update = function(view, layout, params, options) {
         /**
@@ -54,14 +56,13 @@
 
     /**
      * Id последнего созданного update-а.
-     * @type {Number}
+     * @type {number}
      */
     var update_id = -1;
 
     /**
      * @see ns.U.STATUS
-     * @enum {Number}
-     * @borrows ns.U.STATUS as ns.Update.prototype.STATUS
+     * @type {ns.U.STATUS}
      */
     ns.Update.prototype.STATUS = ns.U.STATUS;
 
@@ -75,7 +76,7 @@
     /**
      * Начинает работу updater'а.
      * @param {boolean} [async=false] Флаг асинхронного updater'а.
-     * @return {no.Promise}
+     * @returns {no.Promise}
      */
     ns.Update.prototype.start = function(async) {
         var resultPromise = new no.Promise();
@@ -265,13 +266,16 @@
     };
 
     /**
-     * @return {Boolean} true in case another update was created after current update.
+     * @returns {Boolean} true in case another update was created after current update.
      * @private
      */
     ns.Update.prototype._expired = function() {
         return this.stopped || currentUpdates.indexOf(this) === -1;
     };
 
+    /**
+     *
+     */
     ns.Update.prototype.abort = function() {
         //TODO: Should we abort ns.request?
 
@@ -387,7 +391,7 @@
 
     /**
      * Global error handler.
-     * @param {Object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
+     * @param {object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
      * @param {ns.Update} update Update instance so that we can abort it if we want to.
      * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
      */

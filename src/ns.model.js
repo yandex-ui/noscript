@@ -20,11 +20,18 @@
 
     /**
      * @see ns.M.STATUS
-     * @enum {String}
+     * @enum {string}
      * @borrows ns.M.STATUS as ns.Model.prototype.STATUS
      */
     ns.Model.prototype.STATUS = ns.M.STATUS;
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {*} data
+     * @private
+     */
     ns.Model.prototype._init = function(id, params, data) {
         this.id = id;
         this.params = params || {};
@@ -39,6 +46,11 @@
         this._bindEvents();
     };
 
+    /**
+     *
+     * @param {ns.M.STATUS} status
+     * @private
+     */
     ns.Model.prototype._reset = function(status) {
         this.data = null;
         this.error = null;
@@ -78,7 +90,7 @@
      * Нужен для навешивания коллбеков
      *
      * @param {String | Function} method
-     * @return {Function}
+     * @returns {Function}
      */
     ns.Model.prototype._prepareCallback = function(method) {
         if (typeof method === 'string') {
@@ -90,14 +102,25 @@
         return method;
     };
 
+    /**
+     *
+     */
     ns.Model.prototype.invalidate = function() {
         this._reset(this.STATUS.INVALID);
     };
 
+    /**
+     *
+     * @returns {boolean}
+     */
     ns.Model.prototype.isValid = function() {
         return (this.status === this.STATUS.OK);
     };
 
+    /**
+     *
+     * @returns {null|*}
+     */
     ns.Model.prototype.getData = function() {
         return this.data;
     };
@@ -133,9 +156,9 @@
 
     /**
      * Сохраняет value по пути jpath.
-     * @param {String} jpath jpath до значения.
+     * @param {string} jpath jpath до значения.
      * @param {*} value Новое значение.
-     * @param {Object} [options] Флаги.
+     * @param {object} [options] Флаги.
      * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
      */
     ns.Model.prototype.set = function(jpath, value, options) {
@@ -177,7 +200,7 @@
     /**
      * Устанавливает новые данные модели.
      * @param {*} data Новые данные.
-     * @param {Object} [options] Флаги.
+     * @param {object} [options] Флаги.
      * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
      * @returns {ns.Model}
      */
@@ -204,28 +227,56 @@
         return this;
     };
 
+    /**
+     *
+     * @param {*} data
+     * @returns {boolean}
+     */
     ns.Model.prototype.hasDataChanged = function(data) {
         return !!data;
     };
 
+    /**
+     *
+     * @returns {*}
+     */
     ns.Model.prototype.getError = function() {
         return this.error;
     };
 
+    /**
+     *
+     * @param {*} error
+     */
     ns.Model.prototype.setError = function(error) {
         this.data = null;
         this.error = error;
         this.status = this.STATUS.ERROR;
     };
 
+    /**
+     *
+     * @param {*} data
+     * @returns {*}
+     * @private
+     */
     ns.Model.prototype._beforeSetData = function(data) {
         return data;
     };
 
+    /**
+     *
+     * @param {*} data
+     * @returns {*}
+     */
     ns.Model.prototype.preprocessData = function(data) {
         return data;
     };
 
+    /**
+     *
+     * @returns {object}
+     */
     ns.Model.prototype.getRequestParams = function() {
         return ns.Model._getKeyParams(this.id, this.params, this.info);
     };
@@ -239,18 +290,32 @@
         return ( !this.isDo() && this.retries < 3 );
     };
 
+    /**
+     *
+     * @param {*} result
+     * @returns {*}
+     */
     ns.Model.prototype.extractData = function(result) {
         if (result) {
             return result.data;
         }
     };
 
+    /**
+     *
+     * @param {*} result
+     * @returns {*}
+     */
     ns.Model.prototype.extractError = function(result) {
         if (result) {
             return result.error;
         }
     };
 
+    /**
+     *
+     * @returns {boolean}
+     */
     ns.Model.prototype.isDo = function() {
         return this.info.isDo;
     };
@@ -263,6 +328,9 @@
         return this._version;
     };
 
+    /**
+     *
+     */
     ns.Model.prototype.touch = function() {
         this._version++;
         this.trigger('ns-model-touched');
@@ -270,8 +338,8 @@
 
     /**
      * Подготавливает модель к запросу.
-     * @param {Number} requestID ID запроса.
-     * @return {ns.Model}
+     * @param {number} requestID ID запроса.
+     * @returns {ns.Model}
      */
     ns.Model.prototype.prepareRequest = function(requestID) {
         this.requestID = requestID;
@@ -281,6 +349,10 @@
         return this;
     };
 
+    /**
+     *
+     * @param {ns.Model[]} models
+     */
     ns.Model.prototype.destroyWith = function(models) {
         ns.Model.destroyWith(this, models);
     };
@@ -288,8 +360,8 @@
     /**
      * Models factory. Returns cached instance or creates new.
      * @static
-     * @param {String} id Model's ID.
-     * @param {Object} [params] Model's params.
+     * @param {string} id Model's ID.
+     * @param {object} [params] Model's params.
      * @returns {ns.Model}
      */
     ns.Model.get = function(id, params) {
@@ -311,8 +383,8 @@
 
     /**
      * Returns valid cached model instance.
-     * @param {String} id Model's ID.
-     * @param {Object} [params] Model's params
+     * @param {string} id Model's ID.
+     * @param {object} [params] Model's params
      * @returns {ns.Model|null}
      */
     ns.Model.getValid = function(id, params) {
@@ -325,8 +397,8 @@
 
     /**
      * Returns cached model instance.
-     * @param {String} id Model's ID.
-     * @param {Object} [params] Model's params
+     * @param {string} id Model's ID.
+     * @param {object} [params] Model's params
      * @returns {ns.Model|null}
      */
     ns.Model._find = function(id, params) {
@@ -363,17 +435,23 @@
         }
     };
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @returns {boolean}
+     */
     ns.Model.isValid = function(id, params) {
         return !!ns.Model.getValid(id, params);
     };
 
     /**
      * Определяет новую модель.
-     * @param {String} id Название модели.
-     * @param {Object} [info]
+     * @param {string} id Название модели.
+     * @param {object} [info]
      * @param {Function} [info.ctor] Конструтор.
-     * @param {Object} [info.methods] Методы прототипа.
-     * @param {Object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
+     * @param {object} [info.methods] Методы прототипа.
+     * @param {object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
      * @param {ns.Model} [base=ns.Model] Базовый класс для наследования
      * @examples
      * //  Простая модель, без параметров.
@@ -430,8 +508,8 @@
 
     /**
      * Returns model's info
-     * @param {String} id Model ID.
-     * @returns {Object}
+     * @param {string} id Model ID.
+     * @returns {object}
      * @throws Throws exception if model is not defined.
      */
     ns.Model.info = function(id) {
@@ -440,13 +518,13 @@
         if (info && !info.ready) {
             /**
              * Параметры моделей.
-             * @type {Object}
+             * @type {object}
              */
             info.params = info.params || {};
 
             /**
              * Обработчики событий.
-             * @type {Object}
+             * @type {object}
              */
             info.events = info.events || {};
 
@@ -464,8 +542,8 @@
 
     /**
      * Returns model's info without processing.
-     * @param {String} id Model ID.
-     * @returns {Object}
+     * @param {string} id Model ID.
+     * @returns {object}
      */
     ns.Model.infoLite = function(id) {
         var info = _infos[id];
@@ -474,6 +552,13 @@
         return info;
     };
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {object} info
+     * @returns {string}
+     */
     ns.Model.key = function(id, params, info) {
         info = info || ns.Model.info(id);
 
@@ -489,6 +574,14 @@
         return ns.key(keyPrefix, keyParams);
     };
 
+    /**
+     *
+     * @param {string} id
+     * @param {object} params
+     * @param {object} info
+     * @returns {*}
+     * @private
+     */
     ns.Model._getKeyParams = function(id, params, info) {
         params = params || {};
         info = info || ns.Model.info(id);
@@ -522,7 +615,7 @@
     /**
      * Инвалидирует все модели с заданным id, удовлетворяющие filter.
      * @static
-     * @param {String} id ID модели.
+     * @param {string} id ID модели.
      * @param {Function} [filter] Функция-фильтр, принимающая параметром модель и возвращающая boolean.
      */
     ns.Model.invalidate = function(id, filter) {
@@ -560,6 +653,11 @@
         }
     };
 
+    /**
+     *
+     * @param {ns.Model} model
+     * @returns {boolean}
+     */
     ns.Model.isCollection = function(model) {
         return (model.info || ns.Model.infoLite(model.id)).isCollection;
     };
@@ -645,8 +743,8 @@
 
     /**
      * Хэлпер, который помогает вырезать из параметров уже загруженные значения
-     * @param {Object} params
-     * @param {Object} cached ссылка, на объект, в который будет сложена закэшированная часть параметров
+     * @param {object} params
+     * @param {object} cached ссылка, на объект, в который будет сложена закэшированная часть параметров
      * @type Object
      */
     ns.ModelUniq.prototype.uniq = function(params, cached) {
@@ -689,7 +787,7 @@
     /**
      * Из ключа кэша делает массив по параметру, уникальность которого достигаем
      * @private
-     * @param {String} key
+     * @param {string} key
      * @type Array
      */
     ns.ModelUniq.prototype.uniqFromKey = function(key) {
@@ -701,14 +799,14 @@
      * @private
      * @abstract
      * @param {Node} xml
-     * @param {String} uniq
+     * @param {string} uniq
      * @type Node
      */
     ns.ModelUniq.prototype.uniqFromJSON = ns.todo;
 
     /**
      * Возвращает кэш по параметрам
-     * @return {*}
+     * @returns {*}
      */
     ns.ModelUniq.prototype.getData = function(params) {
         var that = this;
@@ -746,7 +844,7 @@
         /**
          * Удаляет определение модели.
          * Используется только в юнит-тестах.
-         * @param {String} [id] ID модели.
+         * @param {string} [id] ID модели.
          */
         ns.Model.undefine = function(id) {
             if (id) {

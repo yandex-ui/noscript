@@ -211,8 +211,6 @@
         var layout = this.layout;
 
         var tree = {
-            'location': document.location,
-            'layout-params': params,
             'views': {}
         };
         this.view._getUpdateTree(tree, layout.views, params);

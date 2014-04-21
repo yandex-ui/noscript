@@ -488,8 +488,6 @@ describe('no.Updater', function() {
 
         it('check arg to ns.tmpl', function() {
             var renderJSON = {
-                'location': window.location,
-                'layout-params': {},
                 'views': {
                     'main': {
                         'async': false,

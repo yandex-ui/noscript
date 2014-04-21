@@ -19,4 +19,13 @@ grunt: node_modules yate
 test: grunt
 	$(NPM_BIN)/jscs .
 
-.PHONY: clean-node_modules grunt yate test
+gh-pages:
+	git clone -b gh-pages git@github.com:yandex-ui/noscript.git gh-pages
+
+jsdoc: gh-pages
+	$(MAKE) -C gh-pages
+
+jsdoc-publish: gh-pages
+	$(MAKE) -C gh-pages publish
+
+.PHONY: clean-node_modules grunt jsdoc jsdoc-publish yate test

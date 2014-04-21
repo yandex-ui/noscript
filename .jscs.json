@@ -74,6 +74,7 @@
         "css",
         "doc",
         "dist",
+        "gh-pages",
         "node_modules",
         "test"
     ]

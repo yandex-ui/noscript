@@ -1,5 +1,6 @@
 .idea
 dist
+gh-pages
 node_modules
 *.yate.obj
 *.yate.ast

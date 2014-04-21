@@ -6,6 +6,7 @@
 ## Ключевые сущности
 
 [Общее описание сущностей](/doc/entities.md)
+[Документация в формате JSDoc](https://yandex-ui.github.io/noscript/)
 
 ### Раскладка страницы (ns.layout)
 

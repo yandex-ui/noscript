@@ -7,9 +7,13 @@
 
 [Общее описание сущностей](/yandex-ui/noscript/blob/master/doc/entities.md)
 
-### Раскладка страницы (ns.Layout)
+### Раскладка страницы (ns.layout)
 
 [Декларация](/yandex-ui/noscript/blob/master/doc/ns.layout.md)
+
+### Маршрутизатор (ns.router)
+
+[Описание](/yandex-ui/noscript/blob/master/doc/ns.router.md)
 
 ### Вид (ns.View)
 

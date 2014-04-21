@@ -24,7 +24,7 @@
      * @returns {string}
      */
     ns.entityify = function(s) {
-        return s.toString().replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
+        return String(s).replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
     };
 
     /**
@@ -52,7 +52,7 @@
      * @returns {string}
      */
     ns.deentityify = function(s) {
-        return s.replace(DEENTITYIFY_REGEXP, DEENTITYIFY_REPLACER);
+        return String(s).replace(DEENTITYIFY_REGEXP, DEENTITYIFY_REPLACER);
     };
 
 })(ns);

@@ -29,22 +29,22 @@ describe('ns.js', function() {
 
     describe('ns.assert', function() {
         it('should be ok', function() {
-            expect(function() { ns.assert(true, '', '');  }).to.not.throwError();
+            expect(function() { ns.assert(true, '', '');  }).to.not.throw();
         });
         it('should throw error', function() {
-            expect(function() { ns.assert(false, 'context', 'message');  }).to.throwError(/\[context\] message/);
+            expect(function() { ns.assert(false, 'context', 'message');  }).to.throw(/\[context\] message/);
         });
         it('should throw error with params', function() {
-            expect(function() { ns.assert(false, 'context', 'error code %s', 7);  }).to.throwError(/\[context\] error code 7/);
+            expect(function() { ns.assert(false, 'context', 'error code %s', 7);  }).to.throw(/\[context\] error code 7/);
         });
     });
 
     describe('ns.assert.fail', function() {
         it('should throw error', function() {
-            expect(function() { ns.assert.fail('context', 'message');  }).to.throwError(/\[context\] message/);
+            expect(function() { ns.assert.fail('context', 'message');  }).to.throw(/\[context\] message/);
         });
         it('should throw error with params', function() {
-            expect(function() { ns.assert.fail('context', 'error code %s', 7);  }).to.throwError(/\[context\] error code 7/);
+            expect(function() { ns.assert.fail('context', 'error code %s', 7);  }).to.throw(/\[context\] error code 7/);
         });
     });
 

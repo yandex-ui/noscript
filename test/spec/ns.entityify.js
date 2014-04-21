@@ -48,7 +48,7 @@ describe('ns.entityify', function() {
         var deentityifyTests = [].concat(commonTests);
 
         deentityifyTests.push(
-            {'raw': 1, 'entity': '1'}
+            {'raw': '1', 'entity': '1'}
         );
 
         deentityifyTests.forEach(function(test) {

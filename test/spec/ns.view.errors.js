@@ -41,12 +41,12 @@ describe('ns.View error handling', function() {
             var that = this;
             var update = this.update;
             ns.Update.handleError = function(_error, _update) {
-                expect(_update).to.be(update);
-                expect(_error.error).to.be('models');
+                expect(_update).to.be.equal(update);
+                expect(_error.error).to.be.equal('models');
                 return true;
             };
             this.update.start().done(function() {
-                expect($('.ns-view-letter', that.APP.node).html()).to.be('view-error-content');
+                expect($('.ns-view-letter', that.APP.node).html()).to.be.equal('view-error-content');
                 finish();
             });
         });
@@ -74,7 +74,7 @@ describe('ns.View error handling', function() {
                         }
                     }
                 };
-                expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.ok();
+                expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.equal(true);
                 finish();
             });
         });

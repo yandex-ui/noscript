@@ -35,7 +35,7 @@ describe('router: new route parsing method', function() {
             'param==':          { throw: "[ns.router] Parameter 'param' value must be specified" },
             'param:int==':      { throw: "[ns.router] Parameter 'param' value must be specified" },
             'param==value':     { name: 'param', type: 'id', default_value: 'value', is_optional: false },
-            'param:int==value': { throw: "[ns\.router\] Wrong value for 'param' parameter" },
+            'param:int==value': { throw: "[ns.router] Wrong value for 'param' parameter" },
             'param:int==123':   { name: 'param', type: 'int', default_value: '123', is_optional: false }
         };
 
@@ -44,7 +44,7 @@ describe('router: new route parsing method', function() {
                 it(test, function() {
                     var result = _tests[test];
                     if (result.throw) {
-                        expect(function() { ns.router._parseParam(test); }).to.throwError(result.throw);
+                        expect(function() { ns.router._parseParam(test); }).to.throw(result.throw);
                     } else {
                         expect(ns.router._parseParam(test)).to.be.eql(result);
                     }
@@ -65,7 +65,7 @@ describe('router: new route parsing method', function() {
             (function(test) {
                 var name = '' + test.value + ' (' + typeof (test.value) + ') ' + (test.result ? 'is' : 'is not') + ' ' + test.type;
                 it(name, function() {
-                    expect(ns.router._isParamValid(test.value, test.type)).to.be(test.result);
+                    expect(ns.router._isParamValid(test.value, test.type)).to.be.equal(test.result);
                 });
             })(_tests[i]);
         }
@@ -94,7 +94,7 @@ describe('router: new route parsing method', function() {
                 it(test, function() {
                     var result = _tests[test];
                     if (result.throw) {
-                        expect(function() { ns.router._generateParamRegexp(ns.router._parseParam(test)); }).to.throwError(result.throw);
+                        expect(function() { ns.router._generateParamRegexp(ns.router._parseParam(test)); }).to.throw(result.throw);
                     } else {
                         expect(ns.router._generateParamRegexp(ns.router._parseParam(test))).to.be.eql(result);
                     }
@@ -131,7 +131,7 @@ describe('router: new route parsing method', function() {
                 it(test, function() {
                     var result = _tests[test];
                     if (result.throw) {
-                        expect(function() { ns.router._parseSection(test); }).to.throwError(result);
+                        expect(function() { ns.router._parseSection(test); }).to.throw(result);
                     } else {
                         expect(ns.router._parseSection(test)).to.be.eql(result);
                     }
@@ -152,7 +152,7 @@ describe('router: new route parsing method', function() {
         for (var test in _tests) {
             (function(test) {
                 it(test, function() {
-                    expect( ns.router._generateSectionRegexp( ns.router._parseSection(test) )).to.be(_tests[test] );
+                    expect( ns.router._generateSectionRegexp( ns.router._parseSection(test) )).to.be.equal(_tests[test] );
                 });
             })(test);
         }
@@ -243,7 +243,7 @@ describe('router: new route parsing method', function() {
             (function(test) {
                 it(test.name, function() {
                     if (test.result.throw) {
-                        expect(function() { ns.router.generateUrl(test.id, test.params); }).to.throwError(test.result.throw);
+                        expect(function() { ns.router.generateUrl(test.id, test.params); }).to.throw(test.result.throw);
                     } else {
                         expect(ns.router.generateUrl(test.id, test.params)).to.be.eql(test.result);
                     }

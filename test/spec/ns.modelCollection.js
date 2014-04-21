@@ -98,7 +98,7 @@ describe('ns.ModelCollection', function() {
             });
 
             it('should split data', function() {
-                expect(this.models.length).to.be(3);
+                expect(this.models.length).to.be.equal(3);
             });
 
             it('should set data to nested models', function() {
@@ -108,9 +108,9 @@ describe('ns.ModelCollection', function() {
             });
 
             it('should set params to nested models', function() {
-                expect(this.models[0].params).to.eql({id: 1, foo: 'foo'});
-                expect(this.models[1].params).to.eql({id: 2, foo: 'bar'});
-                expect(this.models[2].params).to.eql({id: 3, foo: 'baz'});
+                expect(this.models[0].params).to.eql({id: '1', foo: 'foo'});
+                expect(this.models[1].params).to.eql({id: '2', foo: 'bar'});
+                expect(this.models[2].params).to.eql({id: '3', foo: 'baz'});
             });
 
             it('should call _beforeSetData for split-models', function() {
@@ -120,38 +120,38 @@ describe('ns.ModelCollection', function() {
                 this.model.setData(ns.Model.TESTDATA.split1);
 
                 expect(this.model._beforeSetData.calledOnce)
-                    .to.be.ok();
+                    .to.be.equal(true);
 
                 expect(this.model._beforeSetData.calledWith(ns.Model.TESTDATA.split1))
-                    .to.be.ok();
+                    .to.be.equal(true);
             });
 
             it('should trigger `ns-model-changed` event', function() {
                 this.models[0].setData({ id: 3, foo: 'barrr' });
-                expect(this.changedCallback.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be.equal(1);
             });
 
             it('should not duplicate trigger `ns-model-changed` event', function() {
                 this.model.setData(this.data, { silent: true });
                 this.model.setData(this.data, { silent: true });
                 this.models[0].setData({ id: 1, foo: 'barrr' });
-                expect(this.changedCallback.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be.equal(1);
             });
 
             it('should trigger events by methodName', function() {
                 this.models[0].trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(0);
+                expect(this.methodNameCallback.callCount).to.be.equal(0);
 
                 this.model.trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(1);
+                expect(this.methodNameCallback.callCount).to.be.equal(1);
             });
 
             it('should trigger events by func', function() {
                 this.models[0].trigger('event2');
-                expect(this.methodCallback.callCount).to.be(0);
+                expect(this.methodCallback.callCount).to.be.equal(0);
 
                 this.model.trigger('event2');
-                expect(this.methodCallback.callCount).to.be(1);
+                expect(this.methodCallback.callCount).to.be.equal(1);
             });
 
             it('should not duplicate trigger events by methodName', function() {
@@ -159,10 +159,10 @@ describe('ns.ModelCollection', function() {
                 this.model.setData(this.data, { silent: true });
 
                 this.models[0].trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(0);
+                expect(this.methodNameCallback.callCount).to.be.equal(0);
 
                 this.model.trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(1);
+                expect(this.methodNameCallback.callCount).to.be.equal(1);
             });
 
             it('should not duplicate trigger events by func', function() {
@@ -170,10 +170,10 @@ describe('ns.ModelCollection', function() {
                 this.model.setData(this.data, { silent: true });
 
                 this.models[0].trigger('event2');
-                expect(this.methodCallback.callCount).to.be(0);
+                expect(this.methodCallback.callCount).to.be.equal(0);
 
                 this.model.trigger('event2');
-                expect(this.methodCallback.callCount).to.be(1);
+                expect(this.methodCallback.callCount).to.be.equal(1);
             });
 
             it('should not trigger if submodel not in collection now', function() {
@@ -185,7 +185,7 @@ describe('ns.ModelCollection', function() {
 
                 model.setData({id: 1, foo: 'foo', bar: 'bar'});
 
-                expect(this.changedCallback.called).not.to.be.ok();
+                expect(this.changedCallback.called).not.to.be.equal(true);
             });
 
             it('should set models to collection without split', function() {
@@ -255,31 +255,31 @@ describe('ns.ModelCollection', function() {
 
             it('should be valid after inserting, if was "none"', function() {
                 this.model.insert(this.item1);
-                expect(this.model.isValid()).to.be(true);
+                expect(this.model.isValid()).to.be.equal(true);
             });
 
             it('should be valid after inserting, if was "invalid"', function() {
                 this.model.insert(this.item1);
                 this.model.invalidate();
                 this.model.insert(this.item2);
-                expect(this.model.isValid()).to.be(true);
+                expect(this.model.isValid()).to.be.equal(true);
             });
 
             it('should insert item in begin', function() {
                 this.model.insert(this.item1, 0);
-                expect(this.models.length).to.be(4);
+                expect(this.models.length).to.be.equal(4);
                 expect(this.models[0].data).to.eql(this.item1.data);
             });
 
             it('should insert item by index', function() {
                 this.model.insert(this.item1, 2);
-                expect(this.models.length).to.be(4);
+                expect(this.models.length).to.be.equal(4);
                 expect(this.models[2].data).to.eql(this.item1.data);
             });
 
             it('should insert few items into empty model', function() {
                 this.modelEmpty.insert(this.packItems);
-                expect(this.modelEmpty.models.length).to.be(3);
+                expect(this.modelEmpty.models.length).to.be.equal(3);
                 expect(this.modelEmpty.models[0].data).to.eql(this.item1.data);
                 expect(this.modelEmpty.models[1].data).to.eql(this.item2.data);
                 expect(this.modelEmpty.models[2].data).to.eql(this.item3.data);
@@ -287,7 +287,7 @@ describe('ns.ModelCollection', function() {
 
             it('should insert few items into empty model by index', function() {
                 this.model.insert(this.packItems, 2);
-                expect(this.models.length).to.be(6);
+                expect(this.models.length).to.be.equal(6);
                 expect(this.models[0].data).to.eql(this.data.item[0]);
                 expect(this.models[1].data).to.eql(this.data.item[1]);
                 expect(this.models[2].data).to.eql(this.item1.data);
@@ -321,29 +321,29 @@ describe('ns.ModelCollection', function() {
             it('should binding `ns-model-changed` event', function() {
                 this.model.insert(this.item1, 2);
                 this.models[2].setData({id: 100, value: 'ololo'});
-                expect(this.changedCallback.callCount).to.be(1);
+                expect(this.changedCallback.callCount).to.be.equal(1);
             });
 
             it('should binding `ns-model-changed` event for few models', function() {
                 this.model.insert(this.packItems);
                 this.models[0].setData({ id: 1, value: 'foo' });
                 this.models[3].setData({ id: 100, value: 'foo' });
-                expect(this.changedCallback.callCount).to.be(2);
+                expect(this.changedCallback.callCount).to.be.equal(2);
             });
 
             it('should trigger `ns-insert` event once', function() {
-                expect(this.insertCallback.callCount).to.be(1);
+                expect(this.insertCallback.callCount).to.be.equal(1);
             });
 
             it('should trigger `ns-insert` event twice', function() {
                 this.model.insert(this.packItems);
-                expect(this.insertCallback.callCount).to.be(2);
+                expect(this.insertCallback.callCount).to.be.equal(2);
             });
 
             it('should not insert duplicate models', function() {
                 this.modelEmpty.insert(this.item1);
                 this.modelEmpty.insert([this.item1, this.item2]);
-                expect(this.modelEmpty.models.length).to.be(2);
+                expect(this.modelEmpty.models.length).to.be.equal(2);
                 expect(this.modelEmpty.models[0]).to.eql(this.item1);
                 expect(this.modelEmpty.models[1]).to.eql(this.item2);
             });
@@ -353,7 +353,7 @@ describe('ns.ModelCollection', function() {
                 this.model.insert(this.item1);
 
                 // 2 is expected since one insertion has already happened.
-                expect(this.insertCallback.callCount).to.be(2);
+                expect(this.insertCallback.callCount).to.be.equal(2);
             });
 
             it('should return false for completely duplicate insertion only', function() {
@@ -363,8 +363,8 @@ describe('ns.ModelCollection', function() {
                 var completelyDuplicate = this.modelEmpty.insert([this.item1, this.item2]);
                 var partiallyDuplicate = this.modelEmpty.insert(this.packItems);
 
-                expect(completelyDuplicate).to.be(false);
-                expect(partiallyDuplicate).to.be(true);
+                expect(completelyDuplicate).to.be.equal(false);
+                expect(partiallyDuplicate).to.be.equal(true);
             });
 
         });
@@ -396,47 +396,47 @@ describe('ns.ModelCollection', function() {
 
             it('should remove item', function() {
                 this.model.remove(this.item1);
-                expect(this.models.length).to.be(2);
+                expect(this.models.length).to.be.equal(2);
             });
 
             it('should not trigger `ns-model-changed` event', function() {
                 this.model.remove(this.item1);
                 this.item1.setData({ id: 1, foo: 'bar' });
-                expect(this.changedCallback.callCount).to.be(0);
+                expect(this.changedCallback.callCount).to.be.equal(0);
             });
 
             it('should not trigger custom event', function() {
                 this.model.remove(this.item1);
                 this.item1.trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(0);
+                expect(this.methodNameCallback.callCount).to.be.equal(0);
             });
 
             it('should not trigger `ns-remove` event', function() {
-                expect(this.removeCallback.callCount).to.be(0);
+                expect(this.removeCallback.callCount).to.be.equal(0);
             });
 
             it('should trigger `ns-remove` event once', function() {
                 this.model.remove(this.item1);
-                expect(this.removeCallback.callCount).to.be(1);
+                expect(this.removeCallback.callCount).to.be.equal(1);
             });
 
             it('should automatically remove destroyed models', function() {
                 // Test `setData`-inserted model.
                 ns.Model.destroy(this.item1);
 
-                expect(this.model.models.length).to.be(2);
-                expect(this.removeCallback.callCount).to.be(1);
+                expect(this.model.models.length).to.be.equal(2);
+                expect(this.removeCallback.callCount).to.be.equal(1);
 
                 // Test `insert`-ed model.
                 this.modelEmpty.insert(this.item2);
-                expect(this.modelEmpty.models.length).to.be(1);
+                expect(this.modelEmpty.models.length).to.be.equal(1);
 
                 ns.Model.destroy(this.item2);
-                expect(this.modelEmpty.models.length).to.be(0);
+                expect(this.modelEmpty.models.length).to.be.equal(0);
 
                 // `item2` was simultaneously removed from both
                 // `model` and `modelEmpty`.
-                expect(this.removeCallback.callCount).to.be(3);
+                expect(this.removeCallback.callCount).to.be.equal(3);
             });
 
         });
@@ -462,19 +462,19 @@ describe('ns.ModelCollection', function() {
 
             it('should remove all items', function() {
                 this.model.clear();
-                expect(this.model.models.length).to.be(0);
+                expect(this.model.models.length).to.be.equal(0);
             });
 
             it('should not trigger `change` event', function() {
                 this.model.clear();
                 this.item1.setData({ id: 1, foo: 'bar' });
-                expect(this.changedCallback.callCount).to.be(0);
+                expect(this.changedCallback.callCount).to.be.equal(0);
             });
 
             it('should not trigger custom event', function() {
                 this.model.clear();
                 this.item1.trigger('event1');
-                expect(this.methodNameCallback.callCount).to.be(0);
+                expect(this.methodNameCallback.callCount).to.be.equal(0);
             });
 
         });
@@ -513,33 +513,33 @@ describe('ns.ModelCollection', function() {
 
                 changedModel.setData({});
 
-                expect(this.onItemTouchedSpy.callCount).to.be(1);
-                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', changedModel)).to.be.ok();
+                expect(this.onItemTouchedSpy.callCount).to.be.equal(1);
+                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', changedModel)).to.be.equal(true);
 
-                expect(this.onItemChangedSpy.callCount).to.be(1);
-                expect(this.onItemChangedSpy.calledWithExactly('ns-model-changed', changedModel, '')).to.be.ok();
+                expect(this.onItemChangedSpy.callCount).to.be.equal(1);
+                expect(this.onItemChangedSpy.calledWithExactly('ns-model-changed', changedModel, '')).to.be.equal(true);
 
-                expect(this.touchSpy.callCount).to.be(0);
-                expect(this.changedCallback.callCount).to.be(1);
-                expect(this.changedCallback.calledWithExactly('ns-model-changed', { 'model': changedModel, 'jpath': ''})).to.be.ok();
+                expect(this.touchSpy.callCount).to.be.equal(0);
+                expect(this.changedCallback.callCount).to.be.equal(1);
+                expect(this.changedCallback.calledWithExactly('ns-model-changed', { 'model': changedModel, 'jpath': ''})).to.be.equal(true);
             });
 
             it('ns-model-touched', function() {
                 var touchedModel = this.models[0];
 
                 touchedModel.touch();
-                expect(this.touchSpy.callCount).to.be(0);
-                expect(this.onItemTouchedSpy.callCount).to.be(1);
-                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.ok();
+                expect(this.touchSpy.callCount).to.be.equal(0);
+                expect(this.onItemTouchedSpy.callCount).to.be.equal(1);
+                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.equal(true);
             });
 
             it('ns-model-destroyed', function() {
                 var touchedModel = this.models[1];
 
                 touchedModel.touch();
-                expect(this.touchSpy.callCount).to.be(0);
-                expect(this.onItemTouchedSpy.callCount).to.be(1);
-                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.ok();
+                expect(this.touchSpy.callCount).to.be.equal(0);
+                expect(this.onItemTouchedSpy.callCount).to.be.equal(1);
+                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.equal(true);
             });
         });
 
@@ -556,8 +556,8 @@ describe('ns.ModelCollection', function() {
                 var changedModel = this.models[0];
                 changedModel.setData({});
 
-                expect(this.onItemTouchedSpy.callCount).to.be(1);
-                expect(this.changedCallback.callCount).to.be(0);
+                expect(this.onItemTouchedSpy.callCount).to.be.equal(1);
+                expect(this.changedCallback.callCount).to.be.equal(0);
             });
         });
 
@@ -567,12 +567,12 @@ describe('ns.ModelCollection', function() {
 
                 // Before remove: events are heared
                 removedModel.setData({});
-                expect(this.onItemChangedSpy.callCount).to.be(1);
+                expect(this.onItemChangedSpy.callCount).to.be.equal(1);
 
                 // After remove: no more
                 this.mc.remove(removedModel);
                 removedModel.setData({});
-                expect(this.onItemChangedSpy.callCount).to.be(1);
+                expect(this.onItemChangedSpy.callCount).to.be.equal(1);
             });
         });
 
@@ -592,8 +592,8 @@ describe('ns.ModelCollection', function() {
                 this.mc2.insert(this.mc.models[0]);
 
                 this.mc.models[0].setData({});
-                expect(this.onItemChangedSpy.callCount).to.be(1);
-                expect(this.onItemChangedSpy2.callCount).to.be(1);
+                expect(this.onItemChangedSpy.callCount).to.be.equal(1);
+                expect(this.onItemChangedSpy2.callCount).to.be.equal(1);
             });
 
             it('когда удаляется из одной коллекции - другая продолжает слышать события (на примере ns-model-changed)', function() {
@@ -603,8 +603,8 @@ describe('ns.ModelCollection', function() {
                 this.mc2.remove(this.mc.models[0]);
                 this.mc.models[0].setData({});
 
-                expect(this.onItemChangedSpy.callCount).to.be(2);
-                expect(this.onItemChangedSpy2.callCount).to.be(1);
+                expect(this.onItemChangedSpy.callCount).to.be.equal(2);
+                expect(this.onItemChangedSpy2.callCount).to.be.equal(1);
             });
 
         });

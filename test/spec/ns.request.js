@@ -23,7 +23,7 @@ describe('ns.request.js', function() {
             it('should call ns.request.models once', function() {
                 ns.request('test-model');
 
-                expect(ns.request.models.calledOnce).to.be.ok();
+                expect(ns.request.models.calledOnce).to.be.equal(true);
             });
 
             it('should call ns.request.models with requested model', function() {
@@ -32,7 +32,7 @@ describe('ns.request.js', function() {
                 var model = ns.Model.get('test-model');
                 expect(
                     ns.request.models.calledWith([model])
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
         });
 
@@ -43,14 +43,14 @@ describe('ns.request.js', function() {
             });
 
             it('should call ns.request.models once', function() {
-                expect(ns.request.models.calledOnce).to.be.ok();
+                expect(ns.request.models.calledOnce).to.be.equal(true);
             });
 
             it('should call ns.request.models with requested model', function() {
                 var model = ns.Model.get('test-model-with-params', {id: 1});
                 expect(
                     ns.request.models.calledWith([model])
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
         });
 
@@ -61,7 +61,7 @@ describe('ns.request.js', function() {
             });
 
             it('should call ns.request.models once', function() {
-                expect(ns.request.models.calledOnce).to.be.ok();
+                expect(ns.request.models.calledOnce).to.be.equal(true);
             });
 
             it('should call ns.request.models with requested models', function() {
@@ -70,7 +70,7 @@ describe('ns.request.js', function() {
 
                 expect(
                     ns.request.models.calledWith([model1, model2])
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
         });
 
@@ -81,7 +81,7 @@ describe('ns.request.js', function() {
             });
 
             it('should call ns.request.models once', function() {
-                expect(ns.request.models.calledOnce).to.be.ok();
+                expect(ns.request.models.calledOnce).to.be.equal(true);
             });
 
             it('should call ns.request.models with requested models', function() {
@@ -90,7 +90,7 @@ describe('ns.request.js', function() {
 
                 expect(
                     ns.request.models.calledWith([model1, model2])
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
         });
 
@@ -111,7 +111,7 @@ describe('ns.request.js', function() {
             });
 
             it('should call ns.request.models once', function() {
-                expect(ns.request.models.calledOnce).to.be.ok();
+                expect(ns.request.models.calledOnce).to.be.equal(true);
             });
 
             it('should call ns.request.models with requested models', function() {
@@ -120,7 +120,7 @@ describe('ns.request.js', function() {
 
                 expect(
                     ns.request.models.calledWith([model1, model2])
-                ).to.be.ok();
+                ).to.be.equal(true);
             });
         });
 
@@ -142,7 +142,7 @@ describe('ns.request.js', function() {
 
             expect(
                 ns.request.models.getCall(0).args[1]['forced']
-            ).to.be(true);
+            ).to.be.equal(true);
         });
     });
 
@@ -173,7 +173,7 @@ describe('ns.request.js', function() {
             });
 
             it('should create http request for model', function() {
-                expect(this.requests.length).to.be(1);
+                expect(this.requests.length).to.be.equal(1);
             });
 
             it('should not resolve promise immediately', function() {
@@ -182,15 +182,15 @@ describe('ns.request.js', function() {
                     result = true;
                 });
 
-                expect(result).to.not.be.ok();
+                expect(result).to.be.equal(false);
             });
 
             it('should increment retries', function() {
-                expect(this.model.retries).to.be(1);
+                expect(this.model.retries).to.be.equal(1);
             });
 
             it('should set requestID', function() {
-                expect(this.model.requestID).to.be.ok();
+                expect(this.model.requestID).to.be.a('number');
             });
 
             it('should resolve promise after response', function() {
@@ -209,7 +209,7 @@ describe('ns.request.js', function() {
                     })
                 );
 
-                expect(result).to.be.ok();
+                expect(result).to.be.equal(true);
             });
         });
 
@@ -223,7 +223,7 @@ describe('ns.request.js', function() {
             describe('regular', function() {
                 it('should not create http request for model', function() {
                     ns.request('test-model');
-                    expect(this.requests.length).to.be(0);
+                    expect(this.requests.length).to.be.equal(0);
                 });
 
                 it('should resolve promise immediately for model', function() {
@@ -232,7 +232,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    expect(result).to.be.ok();
+                    expect(result).to.be.equal(true);
                 });
             });
 
@@ -247,7 +247,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should create http request for model', function() {
-                    expect(this.requests.length).to.be(1);
+                    expect(this.requests.length).to.be.equal(1);
                 });
 
                 it('should not resolve promise immediately', function() {
@@ -256,7 +256,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    expect(result).to.not.be.ok();
+                    expect(result).to.be.equal(false);
                 });
 
                 it('should resolve promise after response', function() {
@@ -275,7 +275,7 @@ describe('ns.request.js', function() {
                         })
                     );
 
-                    expect(result).to.be.ok();
+                    expect(result).to.be.equal(true);
                 });
             });
         });
@@ -290,7 +290,7 @@ describe('ns.request.js', function() {
 
             it('should not create http request for model', function() {
                 no.request('test-model');
-                expect(this.requests.length).to.be(0);
+                expect(this.requests.length).to.be.equal(0);
             });
 
             it('should resolve promise immediately for model', function() {
@@ -299,7 +299,7 @@ describe('ns.request.js', function() {
                     result = true;
                 });
 
-                expect(result).to.be.ok();
+                expect(result).to.be.equal(true);
             });
         });
 
@@ -314,7 +314,7 @@ describe('ns.request.js', function() {
             describe('regular', function() {
                 it('should not create http request for model', function() {
                     no.request('test-model');
-                    expect(this.requests.length).to.be(0);
+                    expect(this.requests.length).to.be.equal(0);
                 });
 
                 it('should not resolve promise immediately for model', function() {
@@ -323,7 +323,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    expect(result).to.not.be.ok();
+                    expect(result).to.be.equal(false);
                 });
             });
 
@@ -338,7 +338,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should create http request for model', function() {
-                    expect(this.requests.length).to.be(1);
+                    expect(this.requests.length).to.be.equal(1);
                 });
 
                 it('should not resolve promise immediately for model', function() {
@@ -347,7 +347,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    expect(result).to.not.be.ok();
+                    expect(result).to.be.equal(false);
                 });
             });
         });
@@ -372,11 +372,11 @@ describe('ns.request.js', function() {
                 });
 
                 it('should call model.canRetry', function() {
-                    expect(this.model.canRetry.calledOnce).to.be.ok();
+                    expect(this.model.canRetry.calledOnce).to.be.equal(true);
                 });
 
                 it('should call model.canRetry with no args', function() {
-                    expect(this.model.canRetry.calledWithExactly()).to.be.ok();
+                    expect(this.model.canRetry.calledWithExactly()).to.be.equal(true);
                 });
             });
 
@@ -390,11 +390,11 @@ describe('ns.request.js', function() {
                 });
 
                 it('should not create http request', function() {
-                    expect(this.requests.length).to.be(0);
+                    expect(this.requests.length).to.be.equal(0);
                 });
 
                 it('should set status to STATUS.ERROR', function() {
-                    expect(this.model.status).to.be(this.model.STATUS.ERROR);
+                    expect(this.model.status).to.be.equal(this.model.STATUS.ERROR);
                 });
 
                 it('should resolve promise immediately', function() {
@@ -403,7 +403,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    expect(result).to.be.ok();
+                    expect(result).to.be.equal(true);
                 });
             });
 
@@ -417,7 +417,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should create http request', function() {
-                    expect(this.requests.length).to.be(1);
+                    expect(this.requests.length).to.be.equal(1);
                 });
 
                 it('should not resolve promise immediately', function() {
@@ -426,7 +426,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    expect(result).to.not.be.ok();
+                    expect(result).to.be.equal(false);
                 });
             });
 
@@ -460,7 +460,7 @@ describe('ns.request.js', function() {
         });
 
         it('request should call ns.request.addRequestParams', function() {
-            expect(ns.request.addRequestParams.calledOnce).to.be.ok();
+            expect(ns.request.addRequestParams.calledOnce).to.be.equal(true);
         });
 
         it('request should add ns.request.requestParams to xhr.params', function() {
@@ -514,7 +514,7 @@ describe('ns.request.js', function() {
                 this.request1.then(function() {
                     res = true;
                 });
-                expect(res).to.be(true);
+                expect(res).to.be.equal(true);
             });
 
             it('resolve second request', function() {
@@ -522,7 +522,7 @@ describe('ns.request.js', function() {
                 this.request2.then(function() {
                     res = true;
                 });
-                expect(res).to.be(true);
+                expect(res).to.be.equal(true);
             });
         });
 
@@ -550,7 +550,7 @@ describe('ns.request.js', function() {
             });
 
             it('should create two requests', function() {
-                expect(this.promises.length).to.be(2);
+                expect(this.promises.length).to.be.equal(2);
             });
 
             it('should not resolve first promise after first response', function() {
@@ -560,7 +560,7 @@ describe('ns.request.js', function() {
                     ]
                 });
 
-                expect(promiseIsResolved(this.request1)).to.be(false);
+                expect(promiseIsResolved(this.request1)).to.be.equal(false);
             });
 
             it('should not resolve second promise after first response', function() {
@@ -570,7 +570,7 @@ describe('ns.request.js', function() {
                     ]
                 });
 
-                expect(promiseIsResolved(this.request2)).to.be(false);
+                expect(promiseIsResolved(this.request2)).to.be.equal(false);
             });
 
             it('should resolve first promise after second response', function() {
@@ -580,7 +580,7 @@ describe('ns.request.js', function() {
                     ]
                 });
 
-                expect(promiseIsResolved(this.request1)).to.be(true);
+                expect(promiseIsResolved(this.request1)).to.be.equal(true);
             });
 
             it('should resolve second promise after second response', function() {
@@ -590,7 +590,7 @@ describe('ns.request.js', function() {
                     ]
                 });
 
-                expect(promiseIsResolved(this.request2)).to.be(true);
+                expect(promiseIsResolved(this.request2)).to.be.equal(true);
             });
         });
     });

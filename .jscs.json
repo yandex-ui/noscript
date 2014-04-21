@@ -69,7 +69,7 @@
     },
     "disallowSpaceAfterObjectKeys": true,
     "excludeFiles": [
-        "Gruntfile.js",
+        "karma.conf.js",
 
         "css",
         "doc",

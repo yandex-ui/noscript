@@ -6,6 +6,9 @@
 ## Ключевые сущности
 
 [Общее описание сущностей](/doc/entities.md)
+
+[Инициализация и настройка фреймворка](/doc/ns.init.md)
+
 [Документация в формате JSDoc](https://yandex-ui.github.io/noscript/)
 
 ### Раскладка страницы (ns.layout)
@@ -32,4 +35,4 @@
 
 ### Построение и обновление страницы (ns.Update)
 
-[Логика работы](/doc/ns.update.logic.ms)
+[Логика работы](/doc/ns.update.logic.md)

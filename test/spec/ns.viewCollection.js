@@ -1,7 +1,5 @@
 describe('ns.ViewCollection', function() {
-
     describe('ns.ViewCollection.define', function() {
-
         beforeEach(function() {
             this.sinon.spy(ns.ViewCollection, 'define');
 
@@ -648,27 +646,17 @@ describe('ns.ViewCollection', function() {
 
             });
 
-            afterEach(function() {
-                delete this.viewCollection;
-            });
-
             it('view should have valid models', function() {
                 expect(
                     this.viewCollection.isModelsValidWithVersions()
                 ).to.be.equal(true);
             });
 
-            it('view should have not valid models after touch model', function(done) {
-                setTimeout(function() {
-                    this.viewCollection.models.model.set('.foo', 2);
-                    expect(
-                        this.viewCollection.isModelsValidWithVersions()
-                    ).not.to.be.equal(true);
-                    done();
-                }.bind(this), 1);
+            it('view should be invalid after touch single model', function() {
+                this.viewCollection.models.model.set('.foo', 2);
+
+                expect(this.viewCollection.isValid()).to.equal(false);
             });
         });
-
-
     });
 });

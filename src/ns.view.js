@@ -40,7 +40,7 @@
     ns.View.prototype._$window = $(window);
 
     /**
-     *
+     * Инициализирует экземпляр вида
      * @param {string} id
      * @param {object} params
      * @param {boolean} async
@@ -68,7 +68,13 @@
          * @protected
          */
         this._modelsVersions = {};
-        this._modelsEvents = {};
+
+        /**
+         * Обработчики событий моделей
+         * @type {object}
+         * @protected
+         */
+        this._modelsHandlers = {};
 
         this.node = null;
         this.views = null;
@@ -107,14 +113,15 @@
      * @private
      */
     ns.View.prototype._initModels = function() {
-        if (!this.models) {
-            this.models = {};
-        }
+        this.models = {};
+        this._modelsHandlers = {};
 
         // Создаём модели или берем их из кэша, если они уже есть
         for (var id in this.info.models) {
             if (!this.models[id]) {
-                this.models[id] = ns.Model.get(id, this.params);
+                var model = ns.Model.get(id, this.params);
+                this.models[id] = model;
+                this._modelsHandlers[model.key] = {};
             }
         }
     };
@@ -256,27 +263,62 @@
         this._invalidSubviews[subviewId] = ns.V.STATUS.INVALID;
     };
 
+    ns.View.prototype._bindModels = function() {
+        var that = this;
+
+        var models = this.models;
+        var decls = this.info.models;
+        var subviews = this.info.subviews;
+
+        for (var idModel in models) {
+            var model = models[idModel];
+
+            // FIXME: обратная совместимость для subview. Нужно оторвать в рамках #248
+            if (subviews[idModel]) {
+                this._bindModel(model, 'ns-model-destroyed', function() {
+                    that.invalidate();
+                });
+                continue;
+            }
+
+            var decl = decls[idModel];
+            for (var nameEvent in decl) {
+                var nameHandler = decl[nameEvent];
+                var handler = this[nameHandler];
+                if ('function' === typeof handler) {
+                    this._bindModel(model, nameEvent,
+                        this._invokeModelHandler.bind(this, handler)
+                    );
+                }
+            }
+        }
+
+        this._bindModelsSubviews();
+    };
+
+    /**
+     * Вызывает обработчик события модели
+     */
+    ns.View.prototype._invokeModelHandler = function(handler) {
+        this._saveModelsVersions();
+        return handler.apply(this, Array.prototype.slice.call(arguments, 1));
+    };
+
     /**
      * Биндится на изменение моделей.
      * @private
      */
-    ns.View.prototype._bindModels = function() {
+    ns.View.prototype._bindModelsSubviews = function() {
         var that = this;
 
         var models = this.models;
         var subviews = this.info.subviews;
 
         for (var model_id in models) {
-            var model = models[model_id];
-            var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
-
-            this._bindModel(model, 'ns-model-destroyed', events, function() {
-                that.invalidate();
-            });
-
             var jpaths = subviews[model_id];
-
             if (jpaths) {
+                var model  = models[model_id];
+
                 for (var jpath in jpaths) {
                     //  В deps объект вида:
                     //
@@ -292,13 +334,13 @@
                     if ('' in deps) {
                         //  При любом изменении модели нужно инвалидировать
                         //  весь view целиком.
-                        this._bindModel(model, 'ns-model-changed' + jpath, events, function() {
+                        this._bindModel(model, 'ns-model-changed' + jpath, function() {
                             that.invalidate();
                         });
                     } else {
                         //  Инвалидируем только соответствующие subview:
                         (function(deps) {
-                            that._bindModel(model, 'ns-model-changed' + jpath, events, function() {
+                            that._bindModel(model, 'ns-model-changed' + jpath, function() {
                                 for (var subview_id in deps) {
                                     that.invalidateSubview(subview_id);
                                 }
@@ -306,27 +348,20 @@
                         })(deps);
                     }
                 }
-            } else {
-                //  Для этой модели нет данных о том, какие subview она инвалидирует.
-                //  Значит при изменении этой модели инвалидируем весь view целиком.
-                this._bindModel(model, 'ns-model-changed', events, function() {
-                    that.invalidate();
-                });
             }
         }
     };
 
     /**
-     *
+     * Подписывает обработчик handler на событие eventName модели Model
      * @param {ns.Model} model
      * @param {string} eventName
-     * @param {object} events
-     * @param {function} callback
+     * @param {function} handler
      * @private
      */
-    ns.View.prototype._bindModel = function(model, eventName, events, callback) {
-        model.on(eventName, callback);
-        events[eventName] = callback;
+    ns.View.prototype._bindModel = function(model, eventName, handler) {
+        model.on(eventName, handler);
+        this._modelsHandlers[model.key] = handler;
     };
 
     /**
@@ -337,13 +372,13 @@
         var models = this.models;
         for (var model_id in models) {
             var model = models[model_id];
-            var events = (this._modelsEvents[model.key] || {});
+            var events = this._modelsHandlers[model.key];
 
             for (var eventName in events) {
                 model.off(eventName, events[eventName]);
             }
 
-            delete this._modelsEvents[model.key];
+            delete this._modelsHandlers[model.key];
         }
     };
 
@@ -581,18 +616,11 @@
             /** @type ns.Model */
             var model = models[id];
             if (
-                // Модель является обязательной
-                this.info.models[id] === true &&
-                (
-                    // модель не валидна
-                    !model.isValid() ||
-                    // или ее кеш более свежий
-                    (modelsVersions && model.getVersion() > modelsVersions[id])
-                )
+                // модель не валидна
+                !model.isValid() ||
+                // или у неё уже более новая версия данных
+                (modelsVersions && model.getVersion() > modelsVersions[id])
             ) {
-                //  FIXME: А не нужно ли тут поменять статус блока?
-                //  Раз уж мы заметили, что он невалидный.
-                //  chestozo: не нужно. Метод делает ровно то, что отражено в его названии: возвращает статус.
                 return false;
             }
         }
@@ -806,16 +834,9 @@
         for (var id in models) {
             var data = models[id].getData();
 
-            if ( this.info.models[id] ) {
-                if (data) {
-                    r[id] = data;
-                }
-            } else {
-                //  Для необязательной модели подойдёт и ошибка.
-                data = data || models[id].getError();
-                if (data) {
-                    r[id] = data;
-                }
+            data = data || models[id].getError();
+            if (data) {
+                r[id] = data;
             }
         }
 
@@ -1110,6 +1131,11 @@
         }
     };
 
+    /**
+     * Оставляет вид валидным после изменения моделей
+     */
+    ns.View.prototype.keepValid = ns.View.prototype._saveModelsVersions;
+
     var _infos = {};
     var _ctors = {};
 
@@ -1141,7 +1167,7 @@
 
         info = info || {};
 
-        var baseClass = ns.View;
+        var baseClass = this;
         if (typeof base === 'string') {
             // если указана строка, то берем декларацию ns.View
             baseClass = _ctors[base];
@@ -1155,7 +1181,7 @@
         // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
         ctor = no.inherit(ctor, baseClass, info.methods);
 
-        info.models = ns.View._prepareModels( info.models || {} );
+        info.models = this._formatDeclsModel( info.models || {} );
         info.events = info.events || {};
 
         // часть дополнительной обработки производится в ns.View.info
@@ -1542,24 +1568,93 @@
     };
 
     /**
+     * События моделей, обрабатываемые видом по умолчанию
+     */
+    ns.View.eventsModelDefault = {
+        'ns-model-insert': 'invalidate',
+        'ns-model-remove': 'invalidate',
+        'ns-model-changed': 'invalidate',
+        'ns-model-destroyed': 'invalidate'
+    };
+
+    /**
+     * Преобразует декларацию в виде массива ['model1', 'model2', ...]
+     * в объект {model1: 'handlerDefault1', model2: 'handlerDefault2', ...}
+     * @param {array} decls
+     * @return {object}
+     */
+    ns.View._expandDeclsModel = function(decls) {
+        if (!Array.isArray(decls)) {
+            return decls;
+        }
+
+        var declsExpanded = {};
+
+        for (var i = 0, l = decls.length; i < l; i++) {
+            declsExpanded[decls[i]] = no.extend({}, this.eventsModelDefault);
+        }
+
+        return declsExpanded;
+    };
+
+    /**
+     * Преобразует разные варианты деклараций подписки на события модели
+     * в единый расширенный формат
      *
-     * @param {ns.Model[]} models
+     * @param {object[]} decls
      * @returns {{}}
      * @private
      */
-    ns.View._prepareModels = function(models) {
-        var _models = {};
+    ns.View._formatDeclsModel = function(decls) {
+        var declsFormated = this._expandDeclsModel(decls);
 
-        if ( Array.isArray(models) ) {
-            //  Если указан массив -- все модели обязательны.
-            for (var i = 0; i < models.length; i++) {
-                _models[ models[i] ] = true;
+        // Разрвернём краткий вариант декларации в полный
+        for (var idModel in declsFormated) {
+            var declFull = getDeclMethodFull(declsFormated[idModel]);
+
+            // общий обработчик для всех событий
+            var methodCommon = null;
+            if ('string' === typeof declFull) {
+                methodCommon = declFull;
+                declFull = {};
             }
-        } else {
-            _models = models;
+
+            // нужно гарантировать подписку на все стандартные события
+            for (var nameEvent in this.eventsModelDefault) {
+
+                // обработчик события по умолчанию
+                var methodDefault = this.eventsModelDefault[nameEvent];
+
+                if (undefined === declFull[nameEvent]) {
+                    // если обработчик события явно не задан,
+                    // используем общий обработчик или, если такого нет, обработчик по умолчанию 
+                    declFull[nameEvent] = methodCommon || methodDefault;
+                } else {
+                    // если обработчик явно задан, используем его,
+                    // приведя к полному виду
+                    declFull[nameEvent] = getDeclMethodFull(declFull[nameEvent]);
+                }
+            }
+
+            declsFormated[idModel] = declFull;
         }
 
-        return _models;
+        return declsFormated;
+    };
+
+    /**
+     * Преобразует краткую декларацию (true|false) обработчика события в полную
+     * или возвращает исходную.
+     *  - true  -> invalidate
+     *  - false -> keepValid
+     */
+    var getDeclMethodFull = function(decl) {
+        if (true === decl) {
+            return 'invalidate';
+        } else if (false === decl) {
+            return 'keepValid';
+        }
+        return decl;
     };
 
     if (window['mocha']) {

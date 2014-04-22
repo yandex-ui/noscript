@@ -25,7 +25,8 @@
         "karma-phantomjs-launcher": "~0.1.0",
         "karma-sinon-chai": "0.1.x",
         "mocha": "^1.18.2",
-        "yate": "*"
+        "yate": "*",
+        "jquery": "1.11.0"
     },
     "optionalDependencies": {},
     "engines": {

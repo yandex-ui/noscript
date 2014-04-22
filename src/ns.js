@@ -25,36 +25,6 @@ ns.IS_TOUCH = Boolean(
 );
 
 /**
- * FIXME: зачем оно тут?
-    Do not clone functions, only data.
-    @param {!Object} dest
-    @param {!Object} src
-    @returns {!Object}
-*/
-ns.extendRecursive = function(dest, src) {
-    for (var key in src) {
-        var value = src[key];
-
-        if (value instanceof Array) {
-            var ar = dest[key] = [];
-            for (var j = 0, m = value.length; j < m; j++) {
-                var item = value[j];
-                ar[j] = (typeof item === 'object') ? ns.extendRecursive( {}, item ) : item;
-            }
-
-        } else if (typeof value === 'object') {
-            dest[key] = ns.extendRecursive( {}, value );
-
-        } else {
-            dest[key] = value;
-
-        }
-    }
-
-    return dest;
-};
-
-/**
  *
  */
 ns.todo = function() {

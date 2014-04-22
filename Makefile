@@ -3,7 +3,7 @@ export NPM_BIN
 
 yate: test/tests.yate.js
 
-test/tests.yate.js: test/tests.yate
+test/tests.yate.js: test/tests.yate yate/noscript.yate
 	$(NPM_BIN)/yate test/tests.yate > test/tests.yate.js
 
 node_modules: package.json

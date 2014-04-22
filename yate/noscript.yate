@@ -4,13 +4,8 @@
 
 external scalar ns-url(scalar)
 
-layout-params = /.layout-params
-
-models = /.models
-
 //  Ключ для получения моделей по имени.
-//
-key model( models.*, name() ) { . }
+key model( /.models.*, name() ) { . }
 
 // @private
 match / {

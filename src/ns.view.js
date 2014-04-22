@@ -711,6 +711,8 @@
     ns.View.prototype._getViewTree = function(layout, params) {
         var tree = {
             async: false,
+            // инстанс, чтобы работал ns-view-call
+            instance: this,
             // фейковое дерево, чтобы удобно матчится в yate
             tree: {},
             // всегда собираем данные, в том числе закешированные модели для async-view

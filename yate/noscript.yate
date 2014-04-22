@@ -4,6 +4,21 @@
 
 external scalar ns-url(scalar)
 
+/**
+ * Мост в JS для вызова метода вида
+ * @private
+ */
+external nodeset _ns-view-call(nodeset, scalar, nodeset, nodeset, nodeset, nodeset, nodeset)
+
+/**
+ * Вызывает methodName текущего вида
+ * @param {...*} Аргументы
+ * @returns nodeset
+ */
+func ns-view-call(scalar methodName, nodeset p1, nodeset p2, nodeset p3, nodeset p4, nodeset p5) {
+    _ns-view-call(/.instance, methodName, p1, p2, p3, p4, p4)
+}
+
 //  Ключ для получения моделей по имени.
 key model( /.models.*, name() ) { . }
 

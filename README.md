@@ -25,13 +25,12 @@
 
 [Структура шаблона](/doc/ns.view.yate.md)
 
-### Вид-коллекция (ns.View)
-
-[Декларация](/doc/ns.viewCollection.md)
+[Вид-коллекция](/doc/ns.viewCollection.md)
 
 ### Модель (ns.Model)
 
 [Описание](/doc/ns.model.md)
+[Модель-коллекция](/doc/ns.modelCollection.md)
 
 ### Построение и обновление страницы (ns.Update)
 

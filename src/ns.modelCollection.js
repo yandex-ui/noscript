@@ -3,6 +3,7 @@
     /**
      * Создает модель-коллекцию.
      * @classdesc Модель-коллекция.
+     * @tutorial ns.modelCollection
      * @constructor
      * @augments ns.Model
      */

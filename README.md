@@ -30,6 +30,7 @@
 ### Модель (ns.Model)
 
 [Описание](/doc/ns.model.md)
+
 [Модель-коллекция](/doc/ns.modelCollection.md)
 
 ### Построение и обновление страницы (ns.Update)

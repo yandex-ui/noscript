@@ -350,19 +350,8 @@ describe('ns.View.events', function() {
 
             ns.Model.define('content1-async-model');
 
-            this.xhr = sinon.useFakeXMLHttpRequest();
-            var requests = this.requests = [];
-            this.xhr.onCreate = function (xhr) {
-                requests.push(xhr);
-            };
-
             var layout = ns.layout.page('content1-async', {});
             new ns.Update(this.APP, layout, {}).start();
-        });
-
-        afterEach(function() {
-            this.xhr.restore();
-            ns.request.clean();
         });
 
         describe('first pass', function() {
@@ -403,7 +392,7 @@ describe('ns.View.events', function() {
         describe('second pass', function() {
 
             beforeEach(function() {
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({

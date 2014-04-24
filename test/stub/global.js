@@ -1,5 +1,7 @@
 beforeEach(function() {
-    this.sinon = sinon.sandbox.create();
+    this.sinon = sinon.sandbox.create({
+        useFakeServer: true
+    });
 
     this.sinon.spy(ns, 'tmpl');
     this.sinon.stub(ns.history, 'pushState');

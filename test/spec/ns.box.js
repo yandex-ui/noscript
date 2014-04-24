@@ -85,12 +85,6 @@ describe('ns.Box', function() {
 
         ns.Model.define('model4', {});
 
-        this.xhr = sinon.useFakeXMLHttpRequest();
-        var requests = this.requests = [];
-        this.xhr.onCreate = function (xhr) {
-            requests.push(xhr);
-        };
-
         /**
          * @type {ns.View}
          */
@@ -98,10 +92,7 @@ describe('ns.Box', function() {
     });
 
     afterEach(function() {
-        this.xhr.restore();
-
         delete this.APP;
-        delete this.xhr;
     });
 
     describe('view select', function() {
@@ -223,7 +214,7 @@ describe('ns.Box', function() {
                 ).start();
 
                 // finish first draw
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -275,7 +266,7 @@ describe('ns.Box', function() {
             describe('second pass', function() {
 
                 beforeEach(function() {
-                    this.requests[1].respond(
+                    this.sinon.server.requests[1].respond(
                         200,
                         {"Content-Type": "application/json"},
                         JSON.stringify({

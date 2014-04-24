@@ -150,17 +150,6 @@ describe('ns.request.js', function() {
 
         beforeEach(function() {
             ns.Model.define('test-model');
-
-            this.xhr = sinon.useFakeXMLHttpRequest();
-            var requests = this.requests = [];
-
-            this.xhr.onCreate = function (xhr) {
-                requests.push(xhr);
-            };
-        });
-
-        afterEach(function() {
-            this.xhr.restore();
         });
 
         describe('STATUS.NONE', function() {
@@ -169,11 +158,12 @@ describe('ns.request.js', function() {
                 ns.Model.define('test-model-none');
 
                 this.model = ns.Model.get('test-model-none');
+
                 this.promise = ns.request('test-model-none');
             });
 
             it('should create http request for model', function() {
-                expect(this.requests.length).to.be.equal(1);
+                expect(this.sinon.server.requests.length).to.be.equal(1);
             });
 
             it('should not resolve promise immediately', function() {
@@ -199,7 +189,7 @@ describe('ns.request.js', function() {
                     result = true;
                 });
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -223,7 +213,7 @@ describe('ns.request.js', function() {
             describe('regular', function() {
                 it('should not create http request for model', function() {
                     ns.request('test-model');
-                    expect(this.requests.length).to.be.equal(0);
+                    expect(this.sinon.server.requests.length).to.be.equal(0);
                 });
 
                 it('should resolve promise immediately for model', function() {
@@ -247,7 +237,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should create http request for model', function() {
-                    expect(this.requests.length).to.be.equal(1);
+                    expect(this.sinon.server.requests.length).to.be.equal(1);
                 });
 
                 it('should not resolve promise immediately', function() {
@@ -265,7 +255,7 @@ describe('ns.request.js', function() {
                         result = true;
                     });
 
-                    this.requests[0].respond(
+                    this.sinon.server.requests[0].respond(
                         200,
                         {"Content-Type": "application/json"},
                         JSON.stringify({
@@ -290,7 +280,7 @@ describe('ns.request.js', function() {
 
             it('should not create http request for model', function() {
                 no.request('test-model');
-                expect(this.requests.length).to.be.equal(0);
+                expect(this.sinon.server.requests.length).to.be.equal(0);
             });
 
             it('should resolve promise immediately for model', function() {
@@ -314,7 +304,7 @@ describe('ns.request.js', function() {
             describe('regular', function() {
                 it('should not create http request for model', function() {
                     no.request('test-model');
-                    expect(this.requests.length).to.be.equal(0);
+                    expect(this.sinon.server.requests.length).to.be.equal(0);
                 });
 
                 it('should not resolve promise immediately for model', function() {
@@ -338,7 +328,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should create http request for model', function() {
-                    expect(this.requests.length).to.be.equal(1);
+                    expect(this.sinon.server.requests.length).to.be.equal(1);
                 });
 
                 it('should not resolve promise immediately for model', function() {
@@ -390,7 +380,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should not create http request', function() {
-                    expect(this.requests.length).to.be.equal(0);
+                    expect(this.sinon.server.requests.length).to.be.equal(0);
                 });
 
                 it('should set status to STATUS.ERROR', function() {
@@ -417,7 +407,7 @@ describe('ns.request.js', function() {
                 });
 
                 it('should create http request', function() {
-                    expect(this.requests.length).to.be.equal(1);
+                    expect(this.sinon.server.requests.length).to.be.equal(1);
                 });
 
                 it('should not resolve promise immediately', function() {
@@ -601,24 +591,18 @@ describe('ns.request.js', function() {
             ns.Model.define('model1');
             ns.Model.define('model2');
 
-            this.xhr = sinon.useFakeXMLHttpRequest();
-            this.xhr.onCreate = function(xhr) {
-                window.setTimeout(function() {
-                    xhr.respond(
-                        200,
-                        {"Content-Type": "application/json"},
-                        JSON.stringify({
-                            models: [
-                                { error: 'unknown error' }
-                            ]
-                        })
-                    );
-                }, 1);
-            };
-        });
-
-        afterEach(function() {
-            this.xhr.restore();
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            { error: 'unknown error' }
+                        ]
+                    })
+                );
+            });
         });
 
         it('if model was requested and request was done it does not mean that we model is ok', function(done) {

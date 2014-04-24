@@ -129,12 +129,6 @@ describe('ns.ViewСollection ns-view-* events', function() {
          * @type {ns.View}
          */
         this.APP = ns.View.create('app');
-
-        this.xhr = sinon.useFakeXMLHttpRequest();
-        var requests = this.requests = [];
-        this.xhr.onCreate = function (xhr) {
-            requests.push(xhr);
-        };
     });
 
     afterEach(function() {
@@ -170,7 +164,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
             update.start();
 
             // finish first draw
-            this.requests[0].respond(
+            this.sinon.server.requests[0].respond(
                 200,
                 {"Content-Type": "application/json"},
                 JSON.stringify({
@@ -209,7 +203,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
             update.start();
 
             // finish first draw
-            this.requests[0].respond(
+            this.sinon.server.requests[0].respond(
                 200,
                 {"Content-Type": "application/json"},
                 JSON.stringify({

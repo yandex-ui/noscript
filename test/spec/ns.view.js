@@ -521,20 +521,18 @@ describe('ns.View', function() {
 
                 var APP = ns.View.create('app');
 
-                this.xhr = sinon.useFakeXMLHttpRequest();
-                this.xhr.onCreate = function (xhr) {
-                    window.setTimeout(function() {
-                        xhr.respond(
-                            200,
-                            {"Content-Type": "application/json"},
-                            JSON.stringify({
-                                models: [
-                                    { data: true }
-                                ]
-                            })
-                        );
-                    }, 1);
-                };
+                this.sinon.server.autoRespond = true;
+                this.sinon.server.respond(function(xhr) {
+                    xhr.respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                { data: true }
+                            ]
+                        })
+                    );
+                });
 
                 var layout = ns.layout.page('app', {});
                 new ns.Update(APP, layout, {})
@@ -559,7 +557,6 @@ describe('ns.View', function() {
             });
 
             afterEach(function() {
-                this.xhr.restore();
                 delete this.asyncViewNode1;
                 delete this.asyncViewNode2;
             });

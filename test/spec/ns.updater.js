@@ -2,19 +2,6 @@ describe('no.Updater', function() {
 
     describe('concurent ns.Update instances', function() {
 
-        beforeEach(function() {
-            this.xhr = sinon.useFakeXMLHttpRequest();
-            var requests = this.requests = [];
-            this.xhr.onCreate = function (xhr) {
-                requests.push(xhr);
-            };
-        });
-
-        afterEach(function() {
-            this.xhr.restore();
-            delete this.xhr;
-        });
-
         describe('2 concurent global ns.Update', function() {
 
             beforeEach(function() {
@@ -60,7 +47,7 @@ describe('no.Updater', function() {
 
                 this.updater2.start();
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -82,7 +69,7 @@ describe('no.Updater', function() {
                         finish('second ns.Update was rejected');
                     });
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -136,7 +123,7 @@ describe('no.Updater', function() {
                             finish('First async promise was rejected');
                         });
 
-                    this.requests[0].respond(
+                    this.sinon.server.requests[0].respond(
                         200,
                         {"Content-Type": "application/json"},
                         JSON.stringify({
@@ -145,7 +132,7 @@ describe('no.Updater', function() {
                             ]
                         })
                     );
-                    this.requests[1].respond(
+                    this.sinon.server.requests[1].respond(
                         200,
                         {"Content-Type": "application/json"},
                         JSON.stringify({
@@ -167,7 +154,7 @@ describe('no.Updater', function() {
                             finish('Second async promise was rejected');
                         });
 
-                    this.requests[0].respond(
+                    this.sinon.server.requests[0].respond(
                         200,
                         {"Content-Type": "application/json"},
                         JSON.stringify({
@@ -176,7 +163,7 @@ describe('no.Updater', function() {
                             ]
                         })
                     );
-                    this.requests[1].respond(
+                    this.sinon.server.requests[1].respond(
                         200,
                         {"Content-Type": "application/json"},
                         JSON.stringify({
@@ -243,7 +230,7 @@ describe('no.Updater', function() {
                             .done(function() {
 
                                 // get response for async-view
-                                that.requests[0].respond(
+                                that.sinon.server.requests[0].respond(
                                     200,
                                     {"Content-Type": "application/json"},
                                     JSON.stringify({
@@ -294,18 +281,9 @@ describe('no.Updater', function() {
             });
 
             this.view = ns.View.create('main');
-
-            this.xhr = sinon.useFakeXMLHttpRequest();
-            var requests = this.requests = [];
-            this.xhr.onCreate = function (xhr) {
-                requests.push(xhr);
-            };
         });
 
         afterEach(function() {
-            ns.clean();
-
-            this.xhr.restore();
             delete this.updater;
             delete this.view;
         });
@@ -344,7 +322,7 @@ describe('no.Updater', function() {
                     finish();
                 });
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -370,7 +348,7 @@ describe('no.Updater', function() {
 
                 });
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     500,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -424,7 +402,7 @@ describe('no.Updater', function() {
                     });
                 });
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
                     JSON.stringify({
@@ -449,7 +427,7 @@ describe('no.Updater', function() {
                     });
                 });
 
-                this.requests[0].respond(
+                this.sinon.server.requests[0].respond(
                     500,
                     {"Content-Type": "application/json"},
                     JSON.stringify({

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: ns.history</title>
+    <title>Tutorial: ns.init</title>
     
     
     
@@ -1242,7 +1242,7 @@
 </div>
     <div class="main">
         
-            <h1 class="page-title">Tutorial: ns.history</h1>
+            <h1 class="page-title">Tutorial: ns.init</h1>
         
 
         <section>
@@ -1250,33 +1250,88 @@
 <header>
     
 
-    <h2>ns.history</h2>
+    <h2>ns.init</h2>
 </header>  
 
 <article>
-    <h1>ns.History</h1><p>В noscript для смены URL в адресной строке используется HTML5 History API, который не поддерживается <a href="http://caniuse.com/#feat=history">в IE раньше 10</a>.</p>
-<h2>Polyfill для IE</h2><p>В качестве полифилла можно использовать <a href="https://github.com/devote/HTML5-History-API">devote/HTML5-History-API</a>. Скрипт предоставляет стандартизированное API и будет использовать смену хеш-фрагмента URL для навигации.</p>
-<pre><code>/notes/141 -> /#/notes/141
-</code></pre><p>Кроме подключения самого скрипта на страницу нужно проделать небольшую работу:</p>
-<ol>
-<li>Организовать редирект до старта приложения:</li>
-</ol>
-<pre><code class="lang-js">// Тут может произойти смена URL и перезагрузка, поэтому какие-нибудь
-// модели до редиректа запрашивать бессмысленно.
-window.history.redirect();
-
-ns.init();
+    <h2>Инициализация приложения</h2><p>При использовании конфигурации по умолчанию вся инициализация сводится к вызову
+функции <code>ns.init</code> и запуску первого апдейта:</p>
+<pre><code class="lang-js">$(function() {
+    ns.init();
+    ns.page.go();
+});
 </code></pre>
-<ol>
-<li>Переопределить вычисление текущего URL приложения:</li>
-</ol>
-<pre><code class="lang-js">var history = window.history;
+<p><code>ns.init</code> включает экшены, обрабатывает предварительно заданный роутинг и ищет
+в DOM ноду <code>#app</code> для использования ее в качестве контейнера для интерфейса.
+Вызов <code>ns.page.go</code> нужен для запуска первого глобального апдейта.</p>
+<h3>Конфигурация</h3><h4>Базовый путь в URL</h4><p>До инициализации можно задать префиксный путь для всех ссылок. Это может
+пригодиться, когда ваше приложение находится не по корневому пути
+<code>app.example.com</code>, а, например, <code>app.example.com/checkout</code>:</p>
+<pre><code class="lang-js">ns.router.baseDir = '/checkout';
+</code></pre>
+<h4>Заголовок страницы</h4><p>Noscript позволяет задавать заголовок страницы, зависящий от текущего URL,
+при переходах внутри приложения. Переопределите функцию <code>ns.page.title</code>:</p>
+<pre><code class="lang-js">ns.page.title = function(url) {
+    if ('/settings' == url) {
+        return 'App - Account Settings'
+    }
 
-if (history.emulate) {
-    ns.page.getCurrentUrl = function() {
-        return history.location.pathname + history.location.search;
-    };
-}
+    return 'App';
+};
+</code></pre>
+<p><em>Примечание</em>: При необходимости, для получения параметров страницы
+из полученного URL можно воспользоваться функцией <code>ns.router</code>:</p>
+<pre><code class="lang-js">ns.page.title = function(url) {
+    var params = ns.router(url).params;
+    // ...
+};
+</code></pre>
+<h4>URL запроса моделей</h4><p>По умолчанию фреймворк группирует запросы моделей, нужных для отрисовки
+интерфейса и запрашивает их по URL <code>/models/</code> <em>вне зависимости
+от <code>ns.router.baseDir</code></em>. Переопределите константу <code>ns.request.URL</code> для задания
+собственного пути:</p>
+<pre><code class="lang-js">ns.request.URL = '/models/v1/json/';
+</code></pre>
+<h4>Дополнительные параметры при запросе моделей</h4><p>При необходимости пробросить дополнительные параметры при запросе моделей,
+добавьте их в объект <code>ns.request.requestParams</code>:</p>
+<pre><code class="lang-js">ns.request.requestParams.token = getAuthToken();
+ns.request.requestParams.version = '0.1.1';
+</code></pre>
+<p>Это приведет к отправке запросов вида:</p>
+<pre><code>Request URL: http://example.com/models/?_m=todos
+
+Query String Parameters:
+  _m: todos
+
+Form Data:
+  category.0: home
+  token: 6a5e516725c68c
+  version: 0.1.1
+</code></pre><h4>Условная обработка ответа моделей</h4><p>Определение функции <code>ns.request.canProcessResponse</code> позволяет динамически
+заблокировать обработку ответа моделей, например, при несовпадении авторизации
+или рассинхронизации клиента с бекендом:</p>
+<pre><code class="lang-js">ns.request.canProcessResponse = function(response) {
+    // На бекенде выехала новая версия, а текущий клиент засиделся.
+    if (response.version != APP.version) {
+        location.reload();
+        return false;
+    }
+
+    return true;
+};
+</code></pre>
+<h4>Переопределение модуля Yate-шаблонов</h4><p>По умолчанию для генерации разметки из шаблонов используется модуль <code>main</code>,
+однако сохраняется возможность его динамического определения в зависимости от
+параметров страницы и текущего лейаута:</p>
+<pre><code class="lang-js">ns.Update.prototype.render = function(tree, params, layout) {
+    var module = 'main';
+
+    if (params.context === 'setup') {
+        module = 'setup';
+    }
+
+    return ns.tmpl(tree, null, module);
+};
 </code></pre>
 </article>
 

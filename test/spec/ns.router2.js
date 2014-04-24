@@ -196,10 +196,6 @@ describe('router: new route parsing method', function() {
             ns.router.init();
         });
 
-        afterEach(function() {
-            ns.router.undefine();
-        });
-
         var _tests = [
             {
                 name: 'should throw error for unknown route',

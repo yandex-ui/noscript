@@ -525,5 +525,12 @@ if (window['mocha']) {
     ns.router.undefine = function() {
         ns.router._routes = null;
         ns.router.routes = {};
+
+        ns.router.regexps = {
+            'id': '[A-Za-z_][A-Za-z0-9_-]*',
+            'int': '[0-9]+'
+        };
+
+        ns.router.baseDir = '';
     };
 }

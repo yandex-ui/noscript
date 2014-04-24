@@ -3,7 +3,7 @@ describe('ns.request.js', function() {
     describe('ns.request()', function() {
 
         beforeEach(function() {
-            sinon.stub(ns.request, 'models', no.nop);
+            this.sinon.stub(ns.request, 'models', no.nop);
 
             ns.Model.define('test-model');
             ns.Model.define('test-model2');
@@ -12,10 +12,6 @@ describe('ns.request.js', function() {
                     id: false
                 }
             });
-        });
-
-        afterEach(function() {
-            ns.request.models.restore();
         });
 
         describe('ns.request("modelName")', function() {
@@ -130,11 +126,7 @@ describe('ns.request.js', function() {
 
         beforeEach(function() {
             ns.Model.define('test-forcedRequest');
-            sinon.stub(ns.request, 'models', no.nop);
-        });
-
-        afterEach(function() {
-            ns.request.models.restore();
+            this.sinon.stub(ns.request, 'models');
         });
 
         it('should call ns.request.models with "forced" flag', function() {
@@ -354,7 +346,7 @@ describe('ns.request.js', function() {
             describe('common', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = sinon.spy(function() {
+                    this.model.canRetry = this.sinon.spy(function() {
                         return false;
                     });
 
@@ -428,7 +420,7 @@ describe('ns.request.js', function() {
     describe('addRequestParams', function() {
 
         beforeEach(function() {
-            sinon.stub(ns, 'http', function() {
+            this.sinon.stub(ns, 'http', function() {
                 return new no.Promise();
             });
 
@@ -439,14 +431,9 @@ describe('ns.request.js', function() {
                 b: 2
             };
             ns.request.requestParams = no.extend({}, this.originalParams);
-            sinon.spy(ns.request, 'addRequestParams');
+            this.sinon.spy(ns.request, 'addRequestParams');
 
             ns.request('test-model-addRequestParams');
-        });
-
-        afterEach(function() {
-            ns.request.addRequestParams.restore();
-            ns.http.restore();
         });
 
         it('request should call ns.request.addRequestParams', function() {
@@ -476,7 +463,7 @@ describe('ns.request.js', function() {
 
                 var promises = this.promises = [];
 
-                sinon.stub(ns, 'http', function() {
+                this.sinon.stub(ns, 'http', function() {
                     var promise = new no.Promise();
                     promises.push(promise);
                     return promise;
@@ -496,7 +483,6 @@ describe('ns.request.js', function() {
                 delete this.request1;
                 delete this.request2;
                 delete this.promises;
-                ns.http.restore();
             });
 
             it('resolve first request', function() {
@@ -522,7 +508,7 @@ describe('ns.request.js', function() {
 
                 var promises = this.promises = [];
 
-                sinon.stub(ns, 'http', function() {
+                this.sinon.stub(ns, 'http', function() {
                     var promise = new no.Promise();
                     promises.push(promise);
                     return promise;

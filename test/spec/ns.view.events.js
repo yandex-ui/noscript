@@ -80,7 +80,7 @@ describe('ns.View.events', function() {
             var eventsDecl = {};
             for (var k = 0, l = events.length; k < l; k++) {
                 var event = events[k];
-                var spy = sinon.spy();
+                var spy = this.sinon.spy();
 
                 eventsDecl[event + ' .'] = spy;
                 this.events[view + '-' + event + '-spy'] = spy

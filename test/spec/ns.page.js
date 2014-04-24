@@ -16,11 +16,7 @@ describe('ns.page', function() {
                 };
                 ns.router.init();
 
-                sinon.stub(ns.page, 'redirect', no.nop);
-            });
-
-            afterEach(function() {
-                ns.page.redirect.restore();
+                this.sinon.stub(ns.page, 'redirect');
             });
 
             it('calls ns.page.redirect in "/" ', function() {
@@ -49,17 +45,12 @@ describe('ns.page', function() {
                 };
                 ns.router.init();
 
-                sinon.stub(ns.page, 'title', function() {});
-                sinon.stub(ns, 'Update', function() { return { start: function() {} }; });
-            });
-
-            afterEach(function() {
-                ns.page.title.restore();
-                ns.Update.restore();
+                this.sinon.stub(ns.page, 'title');
+                this.sinon.stub(ns, 'Update', function() { return { start: function() {} }; });
             });
 
             it('should trigger ns-page-before-load event', function() {
-                var spy = sinon.spy();
+                var spy = this.sinon.spy();
                 ns.events.on('ns-page-before-load', spy);
                 ns.page.go('/inbox');
 
@@ -70,7 +61,7 @@ describe('ns.page', function() {
             });
 
             it('should trigger ns-page-before-load with old and new pages', function() {
-                var spy = sinon.spy();
+                var spy = this.sinon.spy();
                 ns.events.on('ns-page-before-load', spy);
                 ns.page.go('/inbox');
                 ns.page.go('/message/1');
@@ -91,11 +82,7 @@ describe('ns.page', function() {
     describe('getDefaultUrl', function() {
 
         beforeEach(function() {
-            sinon.stub(ns.router, 'url', no.nop);
-        });
-
-        afterEach(function() {
-            ns.router.url.restore();
+            this.sinon.stub(ns.router, 'url', no.nop);
         });
 
         it('should exists', function() {

@@ -3,15 +3,11 @@ describe('ns.ViewCollection', function() {
     describe('ns.ViewCollection.define', function() {
 
         beforeEach(function() {
-            sinon.spy(ns.ViewCollection, 'define');
+            this.sinon.spy(ns.ViewCollection, 'define');
 
             ns.Model.define('model');
             ns.Model.define('model-collection1', {isCollection: true});
             ns.Model.define('model-collection2', {isCollection: true});
-        });
-
-        afterEach(function() {
-            ns.ViewCollection.define.restore();
         });
 
         it('should throw exception if I define viewCollection without models', function() {
@@ -209,7 +205,7 @@ describe('ns.ViewCollection', function() {
                 }
             });
 
-            sinon.spy(ns.request, 'models');
+            this.sinon.spy(ns.request, 'models');
 
             // initiate first rendering
             this.APP = ns.View.create('app');
@@ -238,7 +234,6 @@ describe('ns.ViewCollection', function() {
         });
 
         afterEach(function() {
-            ns.request.models.restore();
             delete this.APP;
             delete this.vCollectionNodeList;
             delete this.vCollectionItemNodeList;
@@ -612,11 +607,6 @@ describe('ns.ViewCollection', function() {
             expect(cols['1.2'].length).to.be.equal(1);
             expect(cols['1.1.1'].length).to.be.equal(1);
             expect(cols['2.x'].length).to.be.equal(0);
-        });
-
-        after(function() {
-            ns.Model.undefine('m-collection-2');
-            ns.View.undefine('v-collection-2');
         });
     });
 

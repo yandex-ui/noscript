@@ -31,8 +31,6 @@ describe('ns.View error handling', function() {
         });
 
         afterEach(function() {
-            ns.clean();
-            this.server.restore();
             delete this.APP;
             delete this.update;
         });
@@ -123,7 +121,7 @@ describe('ns.View error handling', function() {
                 }
             });
 
-            sinon.stub(ns.Update, 'handleError', function() {
+            this.sinon.stub(ns.Update, 'handleError', function() {
                 return true;
             });
 
@@ -155,11 +153,6 @@ describe('ns.View error handling', function() {
                 .fail(function() {
                     done();
                 });
-        });
-
-        afterEach(function() {
-            ns.Update.handleError.restore();
-            ns.clean();
         });
 
         it('async view should have status ok', function() {

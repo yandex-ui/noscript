@@ -39,20 +39,20 @@ describe('ns.View bind events', function() {
         this.view._setNode(document.createElement('div'));
 
         // doochik: не знаю как это нормально проверить без доступа к приватным переменным
-        sinon.stub(this.view._$window, 'on', no.nop);
-        sinon.stub(this.view._$window, 'off', no.nop);
+        this.sinon.stub(this.view._$window, 'on', no.nop);
+        this.sinon.stub(this.view._$window, 'off', no.nop);
 
-        sinon.stub(this.view._$document, 'on', no.nop);
-        sinon.stub(this.view._$document, 'off', no.nop);
+        this.sinon.stub(this.view._$document, 'on', no.nop);
+        this.sinon.stub(this.view._$document, 'off', no.nop);
 
-        sinon.stub(this.view.$node, 'on', no.nop);
-        sinon.stub(this.view.$node, 'off', no.nop);
+        this.sinon.stub(this.view.$node, 'on', no.nop);
+        this.sinon.stub(this.view.$node, 'off', no.nop);
 
         var that = this;
-        this.findOnSpy = sinon.spy();
-        this.findOffSpy = sinon.spy();
+        this.findOnSpy = this.sinon.spy();
+        this.findOffSpy = this.sinon.spy();
 
-        sinon.stub(this.view.$node, 'find', function() {
+        this.sinon.stub(this.view.$node, 'find', function() {
             return {
                 on: that.findOnSpy,
                 off: that.findOffSpy
@@ -62,16 +62,6 @@ describe('ns.View bind events', function() {
     });
 
     afterEach(function() {
-        this.view._$window.on.restore();
-        this.view._$window.off.restore();
-
-        this.view._$document.on.restore();
-        this.view._$document.off.restore();
-
-        this.view.$node.find.restore();
-        this.view.$node.on.restore();
-        this.view.$node.off.restore();
-
         delete this.view;
         delete this.name;
         delete this.findOnSpy;
@@ -364,8 +354,8 @@ describe('ns.View bind events2', function() {
     describe('bind global events with uniq namespace', function() {
 
         beforeEach(function(cb) {
-            sinon.stub($.fn, 'on', no.nop);
-            sinon.stub($.fn, 'off', no.nop);
+            this.sinon.stub($.fn, 'on', no.nop);
+            this.sinon.stub($.fn, 'off', no.nop);
 
             // creates 2 layouts with same view in different boxes
             ns.layout.define('page1', {
@@ -414,11 +404,6 @@ describe('ns.View bind events2', function() {
                         });
 
                 });
-        });
-
-        afterEach(function() {
-            $.fn.on.restore();
-            $.fn.off.restore();
         });
 
         it('should bind global events with different namespace', function() {

@@ -552,10 +552,7 @@ describe('no.Updater', function() {
             this.promise = updater.start();
         });
 
-        // Restore XHR.
         afterEach(function() {
-            this.server.restore();
-
             delete this.promise;
         });
 
@@ -628,8 +625,6 @@ describe('no.Updater', function() {
         });
 
         afterEach(function() {
-            this.server.restore();
-            ns.clean();
             delete this.promise;
         });
 
@@ -659,7 +654,7 @@ describe('no.Updater', function() {
 
         it('should not trigger ns-view-htmldestroy when subview changes', function(finish) {
             var appView = this.view;
-            var htmlDestroySpy = sinon.spy();
+            var htmlDestroySpy = this.sinon.spy();
             appView.on('ns-view-htmldestroy', htmlDestroySpy);
 
             var dataModel = ns.Model.get('data');
@@ -713,11 +708,6 @@ describe('no.Updater', function() {
                 }.bind(this));
         });
 
-        // Restore XHR.
-        afterEach(function() {
-            this.server.restore();
-        });
-
         it('should hide async views', function() {
             expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async:not(.ns-view-hidden)')).to.have.length(0);
         });
@@ -768,11 +758,6 @@ describe('no.Updater', function() {
                             finish();
                         }.bind(this));
                 }.bind(this));
-        });
-
-        // Restore XHR.
-        afterEach(function() {
-            this.server.restore();
         });
 
         it('should hide async views', function() {

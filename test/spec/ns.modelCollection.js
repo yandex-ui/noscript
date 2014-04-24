@@ -1,11 +1,11 @@
 describe('ns.ModelCollection', function() {
 
     beforeEach(function() {
-        var methodCallback = this.methodCallback = sinon.spy();
-        var methodNameCallback = this.methodNameCallback = sinon.spy();
-        var changedCallback = this.changedCallback = sinon.spy();
-        var insertCallback = this.insertCallback = sinon.spy();
-        var removeCallback = this.removeCallback = sinon.spy();
+        var methodCallback = this.methodCallback = this.sinon.spy();
+        var methodNameCallback = this.methodNameCallback = this.sinon.spy();
+        var changedCallback = this.changedCallback = this.sinon.spy();
+        var insertCallback = this.insertCallback = this.sinon.spy();
+        var removeCallback = this.removeCallback = this.sinon.spy();
 
         ns.Model.define('mc0', {
             params: {
@@ -115,7 +115,7 @@ describe('ns.ModelCollection', function() {
 
             it('should call _beforeSetData for split-models', function() {
 
-                sinon.spy(this.model, '_beforeSetData');
+                this.sinon.spy(this.model, '_beforeSetData');
 
                 this.model.setData(ns.Model.TESTDATA.split1);
 
@@ -448,7 +448,7 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.get('mc0', { id: Math.random() });
 
-                this.model.trigger = sinon.spy();
+                this.model.trigger = this.sinon.spy();
                 this.model.setData(this.data, { silent: true });
 
                 this.item1 = this.model.models[0];
@@ -490,18 +490,13 @@ describe('ns.ModelCollection', function() {
 
             this.models = this.mc.models;
 
-            this.touchSpy = sinon.spy(this.mc, 'touch');
-            this.onItemChangedSpy = sinon.spy(this.mc, 'onItemChanged');
-            this.onItemTouchedSpy = sinon.spy(this.mc, 'onItemTouched');
-            this.onItemDestroyedSpy = sinon.spy(this.mc, 'onItemDestroyed');
+            this.touchSpy = this.sinon.spy(this.mc, 'touch');
+            this.onItemChangedSpy = this.sinon.spy(this.mc, 'onItemChanged');
+            this.onItemTouchedSpy = this.sinon.spy(this.mc, 'onItemTouched');
+            this.onItemDestroyedSpy = this.sinon.spy(this.mc, 'onItemDestroyed');
         });
 
         afterEach(function() {
-            this.mc.touch.restore();
-            this.mc.onItemChanged.restore();
-            this.mc.onItemTouched.restore();
-            this.mc.onItemDestroyed.restore();
-
             delete this.data;
             delete this.mc;
             delete this.models;
@@ -551,7 +546,7 @@ describe('ns.ModelCollection', function() {
                 // Можно переопределить метод onItemChanged и не триггеирть в нём ns-model-changed на коллекции.
                 this.mc.onItemChanged = function() {};
 
-                this.onItemChangedSpy = sinon.spy(this.mc, 'onItemChanged');
+                this.onItemChangedSpy = this.sinon.spy(this.mc, 'onItemChanged');
 
                 var changedModel = this.models[0];
                 changedModel.setData({});
@@ -581,7 +576,7 @@ describe('ns.ModelCollection', function() {
             beforeEach(function() {
                 // Дополнительно создаём вторую коллекцию.
                 this.mc2 = ns.Model.get('mc2', { id: Math.random() });
-                this.onItemChangedSpy2 = sinon.spy(this.mc2, 'onItemChanged');
+                this.onItemChangedSpy2 = this.sinon.spy(this.mc2, 'onItemChanged');
             });
 
             afterEach(function() {

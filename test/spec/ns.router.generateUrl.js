@@ -1,18 +1,8 @@
 describe('generate url', function() {
-    afterEach(function() {
-        ns.router.baseDir = '';
-        ns.router.undefine();
-    });
 
     describe('error thrown', function() {
         beforeEach(function() {
-            ns.router.routes = {};
             ns.router.init();
-        });
-
-        afterEach(function() {
-            delete ns.router.baseDir;
-            ns.router.undefine();
         });
 
         it('if page name is unknown', function() {
@@ -31,11 +21,6 @@ describe('generate url', function() {
             ns.router.init();
         });
 
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
-        });
-
         it('baseDir not specified', function() {
             expect( ns.router.generateUrl('root') ).to.be.equal('/');
             expect( ns.router.generateUrl('index') ).to.be.equal('/index');
@@ -49,6 +34,7 @@ describe('generate url', function() {
     });
 
     describe('optional parameter', function() {
+
         beforeEach(function() {
             ns.router.routes = {
                 route: {
@@ -58,11 +44,6 @@ describe('generate url', function() {
                 }
             };
             ns.router.init();
-        });
-
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
         });
 
         it('not specified', function() {
@@ -99,11 +80,6 @@ describe('generate url', function() {
             ns.router.init();
         });
 
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
-        });
-
         it('not specified', function() {
             expect(function() { ns.router.generateUrl('folder'); }).to.throw();
             expect(function() { ns.router.generateUrl('file', { name: 'inbox' }); }).to.throw();
@@ -119,11 +95,6 @@ describe('generate url', function() {
                 }
             };
             ns.router.init();
-        });
-
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
         });
 
         it ('default type is id', function() {
@@ -196,11 +167,6 @@ describe('generate url', function() {
             ns.router.init();
         });
 
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
-        });
-
         it('no matching rewrites', function() {
             expect(ns.router.generateUrl('page', { id: 2 })).to.be.eql('/page/2');
         });
@@ -225,11 +191,6 @@ describe('generate url', function() {
                 }
             };
             ns.router.init();
-        });
-
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
         });
 
         it('empty query', function() {
@@ -258,12 +219,6 @@ describe('generate url', function() {
                 }
             };
             ns.router.init();
-        });
-
-        afterEach(function() {
-            ns.router.baseDir = '';
-            ns.router.undefine();
-            delete ns.router.regexps['any'];
         });
 
         it('#', function() {

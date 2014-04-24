@@ -3,13 +3,9 @@ describe('ns.View', function() {
     describe('ns.View.define', function() {
 
         beforeEach(function() {
-            sinon.spy(ns.View, 'define');
+            this.sinon.spy(ns.View, 'define');
 
             this.view = ns.View.define('test-view-define');
-        });
-
-        afterEach(function() {
-            ns.View.define.restore();
         });
 
         it('should throw exception if I define View twice', function() {
@@ -148,17 +144,11 @@ describe('ns.View', function() {
                 ns.Model.define('c');
             });
 
-            afterEach(function() {
-                ns.Model.undefine();
-            });
-
             it('no models at all', function() {
                 ns.View.define('test-view-info-models-parse_no-models', {});
 
                 var info = ns.View.info('test-view-info-models-parse_no-models');
                 expect(info.models).to.be.eql({});
-
-                ns.View.undefine('test-view-info-models-parse_no-models');
             });
 
             it('models specified as empty array', function() {
@@ -166,8 +156,6 @@ describe('ns.View', function() {
 
                 var info = ns.View.info('test-view-info-models-parse_empty-array');
                 expect(info.models).to.be.eql({});
-
-                ns.View.undefine('test-view-info-models-parse_empty-array');
             });
 
             it('models array is converted to object', function() {
@@ -175,8 +163,6 @@ describe('ns.View', function() {
 
                 var info = ns.View.info('test-view-info-models-parse_array');
                 expect(info.models).to.be.eql({ a: true, b: true });
-
-                ns.View.undefine('test-view-info-models-parse_array');
             });
         });
     });
@@ -197,11 +183,6 @@ describe('ns.View', function() {
                         c: null
                     }
                 });
-            });
-
-            afterEach(function() {
-                ns.Model.undefine();
-                ns.View.undefine();
             });
 
             it('required models are valid, optional ones — invalid', function() {
@@ -255,7 +236,7 @@ describe('ns.View', function() {
     describe('ns-view-init event', function() {
 
         it('should call event handler defined as string', function() {
-            var spy = sinon.spy();
+            var spy = this.sinon.spy();
             ns.View.define('myblock', {
                 events: {
                     'ns-view-init': 'initCallback'
@@ -270,7 +251,7 @@ describe('ns.View', function() {
         });
 
         it('should call event handler defined as string with ns.View instance', function() {
-            var spy = sinon.spy();
+            var spy = this.sinon.spy();
             ns.View.define('myblock', {
                 events: {
                     'ns-view-init': 'initCallback'
@@ -285,7 +266,7 @@ describe('ns.View', function() {
         });
 
         it('should bind event defined as function', function() {
-            var spy = sinon.spy();
+            var spy = this.sinon.spy();
             ns.View.define('myblock', {
                 events: {
                     'ns-view-init': spy
@@ -297,7 +278,7 @@ describe('ns.View', function() {
         });
 
         it('should bind event defined as function with ns.View instance', function() {
-            var spy = sinon.spy();
+            var spy = this.sinon.spy();
             ns.View.define('myblock', {
                 events: {
                     'ns-view-init': spy
@@ -605,12 +586,6 @@ describe('ns.View', function() {
                 this.appView = ns.View.create('app');
             });
 
-            afterEach(function() {
-                for (var spyName in this.spies) {
-                    this.spies[spyName].restore();
-                }
-            });
-
             it('redraw view after model invalidate while view was hidden', function(done) {
                 var spies = this.spies;
                 var model1 = this.model1;
@@ -621,9 +596,9 @@ describe('ns.View', function() {
                 goToPage(app, { id: 1 }, function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
-                    spies.view1Invalidate = sinon.spy(view1, 'invalidate');
-                    spies.view1SetNode = sinon.spy(view1, '_setNode');
-                    spies.view1Hide = sinon.spy(view1, '_hide');
+                    spies.view1Invalidate = this.sinon.spy(view1, 'invalidate');
+                    spies.view1SetNode = this.sinon.spy(view1, '_setNode');
+                    spies.view1Hide = this.sinon.spy(view1, '_hide');
 
                     goToPage(app, { id: 2 }, function() {
                         // view1 не видно.
@@ -656,7 +631,7 @@ describe('ns.View', function() {
                 goToPage(app, { id: 1 }, function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
-                    spies.view1Invalidate = sinon.spy(view1, 'invalidate');
+                    spies.view1Invalidate = this.sinon.spy(view1, 'invalidate');
 
                     goToPage(app, { id: 2 }, function() {
                         goToPage(app, { id: 1 }, function() {

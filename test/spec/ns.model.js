@@ -358,9 +358,9 @@ describe('ns.Model', function() {
 
             it('should initialize model with given params', function() {
                 var model = new ns.Model();
-                sinon.spy(model, '_reset');
-                sinon.spy(model, 'setData');
-                sinon.spy(model, '_bindEvents');
+                this.sinon.spy(model, '_reset');
+                this.sinon.spy(model, 'setData');
+                this.sinon.spy(model, '_bindEvents');
                 model._init('m1', {p1: 1, p2: 2, p3: 3, p4: 4}, {foo: 'bar'});
 
                 expect(model.id).to.be.equal('m1');
@@ -398,7 +398,7 @@ describe('ns.Model', function() {
             });
 
             it('should call preprocessData', function() {
-                sinon.spy(this.model, 'preprocessData');
+                this.sinon.spy(this.model, 'preprocessData');
 
                 this.model.setData(this.data);
 
@@ -428,7 +428,7 @@ describe('ns.Model', function() {
             });
 
             it('should touch model', function() {
-                sinon.spy(this.model, 'touch');
+                this.sinon.spy(this.model, 'touch');
 
                 this.model.setData(this.data);
 
@@ -444,7 +444,7 @@ describe('ns.Model', function() {
             });
 
             it('should trigger only two events', function() {
-                sinon.spy(this.model, 'trigger');
+                this.sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data);
 
@@ -453,7 +453,7 @@ describe('ns.Model', function() {
             });
 
             it('should trigger \'ns-model-changed\' event', function() {
-                sinon.spy(this.model, 'trigger');
+                this.sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data);
 
@@ -462,7 +462,7 @@ describe('ns.Model', function() {
             });
 
             it('should trigger \'ns-model-touched\' event', function() {
-                sinon.spy(this.model, 'trigger');
+                this.sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data);
 
@@ -471,7 +471,7 @@ describe('ns.Model', function() {
             });
 
             it('should not trigger \'ns-model-changed\' event when {silent: true}', function() {
-                sinon.spy(this.model, 'trigger');
+                this.sinon.spy(this.model, 'trigger');
 
                 this.model.setData(this.data, {silent: true});
 
@@ -580,8 +580,8 @@ describe('ns.Model', function() {
 
                 ns.Model.define('defined-events-1');
 
-                this.changedCb = sinon.spy();
-                this.changedJpathCb = sinon.spy();
+                this.changedCb = this.sinon.spy();
+                this.changedJpathCb = this.sinon.spy();
 
                 this.eventsDeclaration = {
                     'ns-model-changed': this.changedCb,

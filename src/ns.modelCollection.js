@@ -246,6 +246,9 @@
      * @returns {Boolean} – признак успешности вставки
      */
     ns.ModelCollection.prototype.insert = function(models, index) {
+        // переинициализация после #destroy()
+        this._reinit();
+
         if (isNaN(index)) {
             index = this.models.length;
         }

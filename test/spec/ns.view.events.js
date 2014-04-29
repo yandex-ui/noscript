@@ -266,7 +266,36 @@ describe('ns.View.events', function() {
         });
     });
 
-    describe('redraw view', function() {
+    describe('redraw valid view', function() {
+
+        beforeEach(function() {
+            var layout = ns.layout.page('content1', {});
+            new ns.Update(this.APP, layout, {}).start();
+            new ns.Update(this.APP, layout, {}).start();
+        });
+
+        describe('events', function() {
+            genTests([
+                ['content1-inner', 'ns-view-hide', 'called', false],
+                ['content1', 'ns-view-hide', 'called', false],
+
+                ['content1-inner', 'ns-view-htmldestroy', 'called', false],
+                ['content1', 'ns-view-htmldestroy', 'called', false],
+
+                ['content1-inner', 'ns-view-htmlinit', 'calledOnce'],
+                ['content1', 'ns-view-htmlinit', 'calledOnce'],
+
+                ['content1-inner', 'ns-view-show', 'calledOnce'],
+                ['content1', 'ns-view-show', 'calledOnce'],
+
+                ['content1-inner', 'ns-view-repaint', 'calledTwice'],
+                ['content1', 'ns-view-repaint', 'calledTwice']
+            ]);
+        });
+
+    });
+
+    describe('redraw invalidated view', function() {
 
         beforeEach(function() {
             var layout = ns.layout.page('content1', {});

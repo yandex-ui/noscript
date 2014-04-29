@@ -37,6 +37,11 @@
 
 [Логика работы](/doc/ns.update.logic.md)
 
+## Best practice или примеры проектирования
+
+[Модель состояний](/doc/patterns/ns.pattern.model.state.md)
+[Поэтапная инициализация (дозагрузка) модели](/doc/patterns/ns.pattern.model.partial.md)
+
 ## Плагины
 
 [noscript-bosphorus](https://github.com/yandex-ui/noscript-bosphorus). Реализует мост между yate и видом/моделями и позволяет вызывать их методы из шаблона.

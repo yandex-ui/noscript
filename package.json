@@ -17,6 +17,7 @@
     },
     "devDependencies": {
         "borschik": "0.4.x",
+        "jquery": "1.11.0",
         "jscs": "1.0.11",
         "jshint": "2.5.x",
         "karma": "0.12.x",
@@ -25,8 +26,7 @@
         "karma-phantomjs-launcher": "~0.1.0",
         "karma-sinon-chai": "0.1.x",
         "mocha": "^1.18.2",
-        "yate": "*",
-        "jquery": "1.11.0"
+        "yate": "*"
     },
     "optionalDependencies": {},
     "engines": {

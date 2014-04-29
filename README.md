@@ -36,3 +36,9 @@
 ### Построение и обновление страницы (ns.Update)
 
 [Логика работы](/doc/ns.update.logic.md)
+
+## Плагины
+
+[noscript-bosphorus](https://github.com/yandex-ui/noscript-bosphorus). Реализует мост между yate и видом/моделями и позволяет вызывать их методы из шаблона.
+
+[ns-rivets](https://github.com/Lapple/ns-rivets). Реализует data-binding в видах с помощью `rivets.js`.

@@ -16,7 +16,7 @@
      * Определяет раскладку.
      * @param {string} id ID новой раскладки.
      * @param {object} layout Раскладка.
-     * @param {string} parent_id ID родителя
+     * @param {string} [parent_id] ID родителя
      */
     ns.layout.define = function(id, layout, parent_id) {
         if ( _pages[id] ) {

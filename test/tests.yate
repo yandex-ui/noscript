@@ -31,3 +31,9 @@ match .app-subview-01 ns-view-content {
         /.models.data.data
     </div>
 }
+
+match .app-ns-view-call ns-view-content {
+    <div class="js-test-call">
+        ns-view-call('someViewMethod')
+    </div>
+}

@@ -476,6 +476,47 @@ describe('ns.View', function() {
 
     });
 
+    describe('#patchTree()', function() {
+
+        beforeEach(function(done) {
+            this.patchTreeSpy = this.sinon.spy(function() {
+                return {
+                    key: '123',
+                    prop: 'foo'
+                }
+            });
+            ns.View.define('tst', {
+                methods: {
+                    patchTree: this.patchTreeSpy
+                }
+            });
+            ns.layout.define('tst', {
+                tst: true
+            });
+            var view = ns.View.create('tst');
+            new ns.Update(view, ns.layout.page('tst'), {})
+                .start()
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('при отрисовке должен вызвать #patchTree()', function() {
+            expect(this.patchTreeSpy).have.been.called;
+        });
+
+        it('в дерево отрисовки вида должны попасть добавленный свойства', function() {
+            var renderTree = ns.tmpl.getCall(0).args[0];
+            renderTree.views.tst.should.have.property('prop', 'foo');
+        });
+
+        it('в дерево отрисовки вида не должны попасть свойства, перетирающие стандартные', function() {
+            var renderTree = ns.tmpl.getCall(0).args[0];
+            renderTree.views.tst.should.not.have.property('key', 'foo');
+        });
+
+    });
+
     describe('updateHTML', function() {
 
         describe('redraw async view with child depens on same model', function() {

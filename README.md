@@ -40,6 +40,7 @@
 ## Best practice или примеры проектирования
 
 [Модель состояний](/doc/patterns/ns.pattern.model.state.md)
+
 [Поэтапная инициализация (дозагрузка) модели](/doc/patterns/ns.pattern.model.partial.md)
 
 ## Плагины

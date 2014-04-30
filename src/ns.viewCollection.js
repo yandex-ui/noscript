@@ -7,6 +7,9 @@
  */
 ns.ViewCollection = function() {};
 
+// скопируем статические методы
+no.extend(ns.ViewCollection, ns.View);
+// унаследуем прототип
 no.inherit(ns.ViewCollection, ns.View);
 
 /**
@@ -17,7 +20,7 @@ no.inherit(ns.ViewCollection, ns.View);
  */
 ns.ViewCollection.define = function(id, info) {
     info = info || {};
-    var ctor = ns.View.define(id, info, ns.ViewCollection);
+    var ctor = ns.View.define.call(this, id, info, this);
 
     // check for modelCollection
     for (var model_id in info.models) {
@@ -46,7 +49,42 @@ ns.ViewCollection.define = function(id, info) {
 };
 
 /**
- *
+ * События моделей, обрабатываемые видом по умолчанию
+ */
+ns.ViewCollection.eventsModelCollectionDefault = {
+    'ns-model-insert': 'keepValid',
+    'ns-model-remove': 'keepValid',
+    'ns-model-changed':  'invalidate',
+    'ns-model-destroyed': 'invalidate'
+};
+
+/**
+ * Преобразует декларацию в виде массива ['model1', 'model2', ...]
+ * в объект {model1: 'handlerDefault1', model2: 'handlerDefault2', ...}
+ * @param {array} decls
+ * @return {object}
+ */
+ns.ViewCollection._expandDeclsModel = function(decls) {
+    if (!Array.isArray(decls)) {
+        return decls;
+    }
+
+    var declsExpanded = {};
+
+    for (var i = 0, l = decls.length; i < l; i++) {
+        var idModel = decls[i];
+        if (ns.Model.infoLite(idModel).isCollection) {
+            declsExpanded[idModel] = no.extend({}, this.eventsModelCollectionDefault);
+        } else {
+            declsExpanded[idModel] = no.extend({}, this.eventsModelDefault);
+        }
+    }
+
+    return declsExpanded;
+};
+
+/**
+ * Инициализирует экземпляр вида
  * @private
  */
 ns.ViewCollection.prototype._init = function() {
@@ -56,30 +94,16 @@ ns.ViewCollection.prototype._init = function() {
 };
 
 /**
- * Биндится на изменение моделей.
- * @private
+ * Вызывает обработчик события модели
  */
-ns.ViewCollection.prototype._bindModels = function() {
-    var that = this;
-    var models = this.models;
-
-    for (var model_id in models) {
-        var model = models[model_id];
-
-        model.on('ns-model-destroyed', function(e, o) {
-            // проинвалидируем view, только если изменилась внешняя модель
-            if (!o || this === o.model) {
-                that.invalidate();
-            }
-        });
-
-        model.on('ns-model-changed', function(e, o) {
-            // проинвалидируем view, только если изменилась внешняя модель
-            if (!o || this === o.model) {
-                that.invalidate();
-            }
-        });
+ns.ViewCollection.prototype._invokeModelHandler = function(handler, e, o) {
+    // Отфильтруем события вложенных моделей
+    if (o && o.model) {
+        return;
     }
+
+    this._saveModelsVersions();
+    return handler.apply(this, Array.prototype.slice.call(arguments, 1));
 };
 
 /**
@@ -121,14 +145,10 @@ ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
         }
 
         if (
-            // Модель является обязательной
-            this.info.models[id] === true &&
-            (
-                // модель не валидна
-                !model.isValid() ||
-                // или ее кеш более свежий
-                (modelsVersions && modelVersion > modelsVersions[id])
-            )
+            // модель не валидна
+            !model.isValid() ||
+            // или ее кеш более свежий
+            (modelsVersions && modelVersion > modelsVersions[id])
         ) {
             return false;
         }

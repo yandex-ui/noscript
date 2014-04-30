@@ -17,6 +17,7 @@
     },
     "devDependencies": {
         "borschik": "0.4.x",
+        "jquery": "1.11.0",
         "jscs": "1.0.11",
         "jshint": "2.5.x",
         "karma": "0.12.x",

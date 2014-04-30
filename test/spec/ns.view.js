@@ -134,102 +134,132 @@ describe('ns.View', function() {
         }
     });
 
-    describe('ns.View.info models parse', function() {
-
-        describe('no models specified', function() {
-
-            beforeEach(function() {
-                ns.Model.define('a');
-                ns.Model.define('b');
-                ns.Model.define('c');
+    describe('Декларация моделей', function() {
+        describe('в виде массива', function() {
+            it('должна преобразоваться в правильную полную декларацию', function() {
+                var source = ['m1', 'm2'];
+                expect(ns.View._formatDeclsModel(source)).to.eql({
+                    m1: {
+                        'ns-model-insert': 'invalidate',
+                        'ns-model-remove': 'invalidate',
+                        'ns-model-changed': 'invalidate',
+                        'ns-model-destroyed': 'invalidate'
+                    },
+                    m2: {
+                        'ns-model-insert': 'invalidate',
+                        'ns-model-remove': 'invalidate',
+                        'ns-model-changed': 'invalidate',
+                        'ns-model-destroyed': 'invalidate'
+                    }
+                });
             });
+        });
 
-            it('no models at all', function() {
-                ns.View.define('test-view-info-models-parse_no-models', {});
-
-                var info = ns.View.info('test-view-info-models-parse_no-models');
-                expect(info.models).to.be.eql({});
+        describe('в виде объекта с boolean значениями', function() {
+            it('должна преобразоваться в правильную полную декларацию', function() {
+                var source = {'m1': true, 'm2': false};
+                expect(ns.View._formatDeclsModel(source)).to.eql({
+                    m1: {
+                        'ns-model-insert': 'invalidate',
+                        'ns-model-remove': 'invalidate',
+                        'ns-model-changed': 'invalidate',
+                        'ns-model-destroyed': 'invalidate'
+                    },
+                    m2: {
+                        'ns-model-insert': 'keepValid',
+                        'ns-model-remove': 'keepValid',
+                        'ns-model-changed': 'keepValid',
+                        'ns-model-destroyed': 'keepValid'
+                    }
+                });
             });
+        });
 
-            it('models specified as empty array', function() {
-                ns.View.define('test-view-info-models-parse_empty-array', { models: [] });
-
-                var info = ns.View.info('test-view-info-models-parse_empty-array');
-                expect(info.models).to.be.eql({});
+        describe('с явным указанием единого обработчика для каждой модели', function() {
+            it('должна преобразоваться в правильную полную декларацию', function() {
+                var source = {
+                    'm1': 'invalidate',
+                    'm2': 'keepValid'
+                };
+                expect(ns.View._formatDeclsModel(source)).to.eql({
+                    m1: {
+                        'ns-model-insert': 'invalidate',
+                        'ns-model-remove': 'invalidate',
+                        'ns-model-changed': 'invalidate',
+                        'ns-model-destroyed': 'invalidate'
+                    },
+                    m2: {
+                        'ns-model-insert': 'keepValid',
+                        'ns-model-remove': 'keepValid',
+                        'ns-model-changed': 'keepValid',
+                        'ns-model-destroyed': 'keepValid'
+                    }
+                });
             });
+        });
 
-            it('models array is converted to object', function() {
-                ns.View.define('test-view-info-models-parse_array', { models: [ 'a', 'b' ] });
-
-                var info = ns.View.info('test-view-info-models-parse_array');
-                expect(info.models).to.be.eql({ a: true, b: true });
+        describe('с явным указанием отдельных обработчиков для некоторых событий', function() {
+            it('должна преобразоваться в правильную полную декларацию', function() {
+                var source = {
+                    'm1': {
+                        'ns-model-changed': 'keepValid',
+                        'ns-model-changed.prop': 'keepValid'
+                    },
+                    'm2': {
+                        'ns-model-insert': 'keepValid',
+                        'ns-model-remove': 'keepValid'
+                    }
+                };
+                expect(ns.View._formatDeclsModel(source)).to.eql({
+                    m1: {
+                        'ns-model-insert': 'invalidate',
+                        'ns-model-remove': 'invalidate',
+                        'ns-model-changed': 'keepValid',
+                        'ns-model-changed.prop': 'keepValid',
+                        'ns-model-destroyed': 'invalidate'
+                    },
+                    m2: {
+                        'ns-model-insert': 'keepValid',
+                        'ns-model-remove': 'keepValid',
+                        'ns-model-changed': 'invalidate',
+                        'ns-model-destroyed': 'invalidate'
+                    }
+                });
             });
         });
     });
 
-    describe('ns.View render', function() {
+    describe('ns.View render errors', function() {
+        beforeEach(function() {
+            ns.Model.define('a');
+            ns.Model.define('b');
+            ns.Model.define('c');
 
-        describe('ns.View render with some invalid models', function() {
-
-            beforeEach(function() {
-                ns.Model.define('a');
-                ns.Model.define('b');
-                ns.Model.define('c');
-
-                ns.View.define('test-view-render_complex', {
-                    models: {
-                        a: true,
-                        b: false,
-                        c: null
-                    }
-                });
+            ns.View.define('test-view-render_complex', {
+                models: {
+                    a: true,
+                    b: false,
+                    c: false
+                }
             });
+        });
 
-            it('required models are valid, optional ones — invalid', function() {
-                var a = ns.Model.get('a', { id: 1 });
-                var b = ns.Model.get('b', { id: 2 });
-                var c = ns.Model.get('c', { id: 3 });
+        it('render errors also', function() {
+            var a = ns.Model.get('a', { id: 1 });
+            var b = ns.Model.get('b', { id: 2 });
+            var c = ns.Model.get('c', { id: 3 });
 
-                a.setData({ data: 'a' });
-                b.setError({ error: 'b invalid' });
-                c.setError({ error: 'c invalid' });
+            a.setData({ data: 'a' });
+            b.setError({ error: 'b invalid' });
+            c.setError({ error: 'c invalid' });
 
-                var view = ns.View.create('test-view-render_complex', {}, false);
+            var view = ns.View.create('test-view-render_complex', {}, false);
 
-                expect( view.isModelsValid() ).to.be.equal(true);
+            expect( view._getModelsData() ).to.be.eql({
+                a: { data: 'a' },
+                b: { error: 'b invalid' },
+                c: { error: 'c invalid' }
             });
-
-            it('required model is invalid, the rest is valid', function() {
-                var a = ns.Model.get('a', { id: 1 });
-                var b = ns.Model.get('b', { id: 2 });
-                var c = ns.Model.get('c', { id: 3 });
-
-                a.setError({ error: 'a invalid' });
-                b.setData({ data: 'b' });
-                c.setData({ data: 'c' });
-
-                var view = ns.View.create('test-view-render_complex', {}, false);
-                expect( view.isModelsValid() ).not.to.be.equal(true);
-            });
-
-            it('render errors also', function() {
-                var a = ns.Model.get('a', { id: 1 });
-                var b = ns.Model.get('b', { id: 2 });
-                var c = ns.Model.get('c', { id: 3 });
-
-                a.setData({ data: 'a' });
-                b.setError({ error: 'b invalid' });
-                c.setError({ error: 'c invalid' });
-
-                var view = ns.View.create('test-view-render_complex', {}, false);
-
-                expect( view._getModelsData() ).to.be.eql({
-                    a: { data: 'a' },
-                    b: { error: 'b invalid' },
-                    c: { error: 'c invalid' }
-                });
-            });
-
         });
     });
 
@@ -554,13 +584,6 @@ describe('ns.View', function() {
 
         describe('redraw old view when model was invalidated', function() {
 
-            // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
-            // После починки _unbindModels перестало работать обновление view при изменении модели.
-            // Дело тут в том, что view подписана на своим модели. Модель поменялась - view перерисовалась (model ns-model-changed -> view invalidate).
-            // Когда мы починили отписку view от модели (во время _hide) изменения модели больше не будут услышаны view (что, как бы, хорошо и by design).
-            // Но тогда, во время update-а надо проверять, что все модели view валидны. И если нет - обновлять view.
-            // Итог: не отписываем view от моделей
-
             var goToPage = function(app, params, callback) {
                 var layout = ns.layout.page('app', params);
                 return new ns.Update(app, layout, params).start().done(function() { callback(); });
@@ -608,7 +631,6 @@ describe('ns.View', function() {
 
                         // Меняется model1
                         model1.setData({ id: 1, changed: true });
-                        expect(spies.view1Invalidate.callCount).to.be.eql(1); // NOTE да да да, view даже спрятанная слышит изменения моделей.
 
                         // Идёт назад - view должно перерисоваться
                         goToPage(app, { id: 1 }, function() {

@@ -44,6 +44,21 @@
 	});
 
 	ns.Model.define('stateLetter', {
+	    events: {
+	        // записываем данные в модель при создании
+	        'ns-model-init': function() {
+                this.setData({selected: false});
+            }
+	    },
+	    methods: {
+	        toggleSelected: function() {
+    	        if (this.get('.selected')) {
+                    this.set('.selected', false);
+                } else {
+                    this.set('.selected', true);
+                }
+            }
+	    }
 		params: {
 			id: null
 		}
@@ -53,6 +68,7 @@
 
 Определена модель-коллекция `letters`, которая при загрузке автоматически порождает какое-то количество моделей `letter`. Опраделена модель `stateLetter` (состояние письма), которая зависит от тех же параметров, что и `letter`.
 
+Модель `stateLetter` инициализирует свои данные при создании.
 
 ```js
 	ns.ViewCollection.define('letters', {
@@ -68,27 +84,21 @@
 			'stateLetter': 'keepValid'
 		},
 		events: {
-			'ns-view-init': 'init',
 			'click .js-select-letter': 'toggleSelected'
 		},
 		methods: {
-			init: function() {
-				this.getModel('stateLetter').setData({selected: false});
-			},
 			toggleSelected: function() {
-				var state = this.getModel('stateLetter');
-				if (state.get('.selected')) {
-					state.set('.selected', false);
-				} else {
-					state.set('.selected', true);
-				}
+				this.getModel('stateLetter').toggleSelected();
 			}
 		}
 	});
 ```
 
-Определён вид-коллекция `letters`, который по модели `letters` создаёт внутри себя виды `letter`. Каждый вид letter зависит от моделей `letter` и `stateLetter`. Вторая инициализируется при инициализации вида `letter`.
+Определён вид-коллекция `letters`, который по модели `letters` создаёт внутри себя виды `letter`.
+Каждый вид letter зависит от моделей `letter` и `stateLetter`.
 
-При наступлении события `click` на dom-элементе `.js-select-letter` срабатывает метод `toggleSelect`, который изменяет модель состояния. Если dom-элемент `.js-select-letter` - checkbox, то при клике перерисовывать вид `letter` уже не нужно. Поэтому в зависимости вида `letter` от модели `stateLetter` указан метод `keepValid`, предотвращающий его перерисовку.
+При наступлении события `click` на dom-элементе `.js-select-letter` срабатывает метод `toggleSelected`, который изменяет модель состояния.
+Если dom-элемент `.js-select-letter` - checkbox, то при клике перерисовывать вид `letter` уже не нужно.
+Поэтому в зависимости вида `letter` от модели `stateLetter` указан метод `keepValid`, предотвращающий его перерисовку.
 
 Данная конструкция позволяет хранить состояние выделенности неограниченного количества элементов списка между запусками ns.Update. При этом атрибут, относящийся только к списку писем хранится в отдельной модели. Этот атрибут никак не будет влиять на другие виды, зависящие от модели `letter`.

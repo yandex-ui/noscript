@@ -6,6 +6,7 @@
      * @constructor
      * @mixes no.Events
      * @tutorial ns.model
+     * @fires ns.Model#ns-model-init
      */
     ns.Model = function() {};
 
@@ -20,11 +21,17 @@
     var _keySuffix = 0;
 
     /**
-     * @see ns.M.STATUS
-     * @enum {string}
-     * @borrows ns.M.STATUS as ns.Model.prototype.STATUS
+     * @type {ns.M.STATUS}
+     * @private
      */
     ns.Model.prototype.STATUS = ns.M.STATUS;
+
+    /**
+     * Состояние модели.
+     * @type {ns.M.STATUS}
+     * @private
+     */
+    ns.Model.prototype.status = ns.M.STATUS.NONE;
 
     /**
      *
@@ -44,12 +51,28 @@
 
         this.setData(data);
 
-        this._bindEvents();
+        this._reinit();
     };
 
     /**
-     *
-     * @param {ns.M.STATUS} status
+     * Переинициализирует модель после #destroy() или самой первой инициализации.
+     * @private
+     */
+    ns.Model.prototype._reinit = function() {
+        if (this.status === this.STATUS.NONE) {
+            this._bindEvents();
+            this.status = this.STATUS.INITED;
+            /**
+             * Модель создана и проинициализованна.
+             * @event ns.Model#ns-model-init
+             */
+            this.trigger('ns-model-init');
+        }
+    };
+
+    /**
+     * Сбрасывает состояние модели.
+     * @param {ns.M.STATUS} [status=ns.M.STATUS.NONE]
      * @private
      */
     ns.Model.prototype._reset = function(status) {
@@ -80,8 +103,25 @@
             }
 
             for (var i = 0, j = callbacks.length; i < j; i++) {
-                //NOTE: т.к. сейчас модели никак не удаляются, то и не надо снимать обработчики
                 this.on(event, this._prepareCallback(callbacks[i]));
+            }
+        }
+    };
+
+    /**
+     * Убирает обработчики событий.
+     * @private
+     */
+    ns.Model.prototype._unbindEvents = function() {
+        for (var event in this.info.events) {
+            var callbacks = this.info.events[event];
+            // приводим обработчики к массиву
+            if (!Array.isArray(callbacks)) {
+                callbacks = [callbacks];
+            }
+
+            for (var i = 0, j = callbacks.length; i < j; i++) {
+                this.off(event, this._prepareCallback(callbacks[i]));
             }
         }
     };
@@ -104,10 +144,19 @@
     };
 
     /**
-     *
+     * Инвалидирует модель.
      */
     ns.Model.prototype.invalidate = function() {
         this._reset(this.STATUS.INVALID);
+    };
+
+    /**
+     * Уничтожает модель.
+     */
+    ns.Model.prototype.destroy = function() {
+        this._reset(this.STATUS.NONE);
+        // еще надо убрать все обработчики
+        this._unbindEvents();
     };
 
     /**
@@ -206,6 +255,9 @@
      * @returns {ns.Model}
      */
     ns.Model.prototype.setData = function(data, options) {
+        // переинициализация после #destroy()
+        this._reinit();
+
         if (data && this.hasDataChanged(data)) {
 
             this.data = this._beforeSetData(this.preprocessData(data));
@@ -373,11 +425,13 @@
             model = new Ctor();
             model._init(id, params);
 
-            // stores model in cache except do-models
+            // сохраняем модели в кеш, за исключение do-моделей
             if ( !model.isDo() ) {
                 _cache[ id ][ model.key ] = model;
             }
         }
+
+        model._reinit();
 
         return model;
     };
@@ -426,13 +480,7 @@
         if (cached) {
             // notify subscribers about disappearance
             model.trigger('ns-model-destroyed');
-
-            // invalidate model to unsubsribe it from all listeners
-            model.invalidate();
-
-            // NOTE удалять обработчики сейчас нельзя
-            // Даже, когда для модели вызывается destroy, обработчики событий не удаляются у instance-а.
-            // https://github.com/pasaran/nommon/pull/21
+            model.destroy();
         }
     };
 

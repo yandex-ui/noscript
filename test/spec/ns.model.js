@@ -671,4 +671,61 @@ describe('ns.Model', function() {
 
     });
 
+    describe('События', function() {
+
+        describe('ns-model-init', function() {
+
+            beforeEach(function() {
+                this.nsModelInitSpy = sinon.spy();
+
+                ns.Model.define('test-init-model', {
+                    events: {
+                        'ns-model-init': this.nsModelInitSpy
+                    }
+                });
+
+                this.model = ns.Model.get('test-init-model');
+            });
+
+            afterEach(function() {
+                delete this.model;
+                delete this.nsModelInitSpy;
+            });
+
+            it('вызывается при создании модели', function() {
+                expect(this.nsModelInitSpy.calledOnce).to.be.equal(true);
+            });
+
+            it('не вызывается второй раз при получении модели', function() {
+                ns.Model.get('test-init-model');
+                expect(this.nsModelInitSpy.calledOnce).to.be.equal(true);
+            });
+
+            it('не вызывается второй раз после записи данных в модель', function() {
+                this.model.setData({'foo': 'bar'});
+                expect(this.nsModelInitSpy.calledOnce).to.be.equal(true);
+            });
+
+            describe('повторная инициализация', function() {
+
+                beforeEach(function() {
+                    this.model.destroy();
+                    this.nsModelInitSpy.reset();
+                });
+
+                it('вызывается при получения уничтоженной модели', function() {
+                    ns.Model.get('test-init-model');
+                    expect(this.nsModelInitSpy.calledOnce).to.be.equal(true);
+                });
+
+                it('вызывается при вызове #setData()', function() {
+                    this.model.setData({'foo': 'bar'});
+                    expect(this.nsModelInitSpy.calledOnce).to.be.equal(true);
+                });
+
+            });
+
+        });
+
+    });
 });

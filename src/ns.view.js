@@ -731,32 +731,53 @@
     };
 
     /**
+     * Возвращает общее дерево видов.
+     * @returns {object}
+     * @private
+     */
+    ns.View.prototype._getTree = function() {
+        var tree = {
+            key: this.key,
+            //  добавляем собственные параметры блока
+            params: this.params,
+            // фейковое дерево, чтобы удобно матчится в yate
+            tree: {},
+            // список дочерник видов
+            views: {}
+        };
+
+        // добавляем название view, чтобы можно было писать
+        // match .view-name ns-view-content
+        tree.tree[this.id] = true;
+
+        // даем возможность приложению или плагинам изменить дерево
+        var treeToAppend = this.patchTree(tree);
+
+        // если вернули правда объект, то расширяем его
+        if (treeToAppend && typeof treeToAppend === 'object' && !Array.isArray(treeToAppend)) {
+            // расширяем переданный объект, чтобы он не перетер внутренние свойства
+            tree = no.extend(treeToAppend, tree);
+        }
+
+        return tree;
+    };
+
+    /**
      * Строим дерево блоков.
      * @param {object} layout Currently processing layout.
      * @param {object} params Params.
      * @returns {object}
      */
     ns.View.prototype._getViewTree = function(layout, params) {
-        var tree = {
-            async: false,
-            // фейковое дерево, чтобы удобно матчится в yate
-            tree: {},
-            // всегда собираем данные, в том числе закешированные модели для async-view
-            models: this._getModelsData(),
-            errors: this._getModelsError(),
-            // если view находится в режиме async, то модели проверять не надо
-            is_models_valid: this.asyncState || this.isModelsValid(),
-            //  добавляем собственные параметры блока
-            params: this.params,
-            //  FIXME: Не должно ли оно приходить в параметрах Update'а?
-            page: ns.page.current,
-            views: {},
-            key: this.key
-        };
-
-        // добавляем название view, чтобы можно было писать
-        // match .view-name ns-view-content
-        tree.tree[this.id] = true;
+        var tree = this._getTree();
+        tree.async = false;
+        // всегда собираем данные, в том числе закешированные модели для async-view
+        tree.models = this._getModelsData();
+        tree.errors = this._getModelsError();
+        // если view находится в режиме async, то модели проверять не надо
+        tree.is_models_valid = this.asyncState || this.isModelsValid();
+        //  FIXME: Не должно ли оно приходить в параметрах Update'а?
+        tree.page = ns.page.current;
 
         //  Если это асинхронный блок и для него нет еще всех моделей,
         //  помечаем его как асинхронный.
@@ -778,6 +799,29 @@
 
         return tree;
     };
+
+    /**
+     * Дополняет дерево видов.
+     * @description
+     * Этот метод является точкой расширения для приложений или плагинов.
+     * Метод должен вернуть объект, который будет добавлен к дереву.
+     * Все свойства, конфликтующие с внутренними, будут перетерты.
+     * @example
+     * ```js
+     * ns.View.prototype.patchTree = function(tree) {
+     *     // добавляем в дерево ссылки на экземпляры вида и моделей
+     *     return {
+     *         instance: {
+     *             view: this,
+     *             models: this.models
+     *         }
+     *     };
+     * }
+     * ```
+     * @param {object} tree Дерево наложения.
+     * @returns {object}
+     */
+    ns.View.prototype.patchTree = no.nop;
 
     /**
      *
@@ -803,20 +847,8 @@
      * @returns {object}
      */
     ns.View.prototype._getPlaceholderTree = function(layout, params) {
-        var tree = {
-            // фейковое дерево, чтобы удобно матчится в yate
-            tree: {},
-            //  добавляем собственные параметры блока
-            params: this.params,
-            views: {},
-            key: this.key,
-            placeholder: true
-        };
-
-        // добавляем название view, чтобы можно было писать
-        // match .view-name ns-view-content
-        tree.tree[this.id] = true;
-
+        var tree = this._getTree();
+        tree.placeholder = true;
         tree.views = this._getDescViewTree(layout, params);
 
         return tree;

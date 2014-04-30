@@ -56,7 +56,7 @@ ns.V.NS_EVENTS = [
     'ns-view-init',
     'ns-view-htmlinit',
     'ns-view-show',
-    'ns-view-repaint',
+    'ns-view-touch',
     'ns-view-hide',
     'ns-view-htmldestroy'
 ];

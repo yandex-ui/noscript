@@ -45,4 +45,32 @@ ns.Model.define('my-model-collection', {
     isCollection: true,
     jpathItems: '.files'
 });
+
+ns.Model.define('my-model-item', {
+    params: {
+        id: null
+    }
+});
+
+var collection = ns.Model.get('my-model-collection');
+var collectionItem1 = ns.Model.get('my-model-item', {id : 1}).setData({'foo': 'bar'});
+var collectionItem2 = ns.Model.get('my-model-item', {id : 2}).setData({'foo': 'baz'});
+
+// добавляем элементы в коллекцию
+collection.insert(collectionItem1);
+collection.insert(collectionItem2);
+
+// т.к. указан jpathItems, то данные коллекции будут выглядет вот так
+{
+    "files": [
+        {
+            "foo": "bar"
+        },
+        {
+            "foo": "baz"
+        }
+    ]
+}
 ```
+
+

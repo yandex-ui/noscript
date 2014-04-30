@@ -68,7 +68,7 @@ describe('ns.View.events', function() {
         }, 'app');
 
         var views = ['app', 'head', 'content1', 'content1-async@content1-async-model', 'content1-inner', 'content2', 'content2-inner'];
-        var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-repaint', 'ns-view-hide', 'ns-view-htmldestroy'];
+        var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-touch', 'ns-view-hide', 'ns-view-htmldestroy'];
 
         this.events = {};
 
@@ -145,14 +145,14 @@ describe('ns.View.events', function() {
             ]);
         });
 
-        describe('ns-view-repaint', function() {
+        describe('ns-view-touch', function() {
             genTests([
-                ['app', 'ns-view-repaint', 'calledOnce'],
-                ['head', 'ns-view-repaint', 'calledOnce'],
-                ['content1', 'ns-view-repaint', 'calledOnce'],
-                ['content1-inner', 'ns-view-repaint', 'calledOnce'],
-                ['content2', 'ns-view-repaint', 'called', false],
-                ['content2-inner', 'ns-view-repaint', 'called', false]
+                ['app', 'ns-view-touch', 'calledOnce'],
+                ['head', 'ns-view-touch', 'calledOnce'],
+                ['content1', 'ns-view-touch', 'calledOnce'],
+                ['content1-inner', 'ns-view-touch', 'calledOnce'],
+                ['content2', 'ns-view-touch', 'called', false],
+                ['content2-inner', 'ns-view-touch', 'called', false]
             ]);
         });
 
@@ -190,10 +190,10 @@ describe('ns.View.events', function() {
                 ['head', 'ns-view-show'],
                 ['app', 'ns-view-show'],
 
-                ['content1-inner', 'ns-view-repaint'],
-                ['content1', 'ns-view-repaint'],
-                ['head', 'ns-view-repaint'],
-                ['app', 'ns-view-repaint']
+                ['content1-inner', 'ns-view-touch'],
+                ['content1', 'ns-view-touch'],
+                ['head', 'ns-view-touch'],
+                ['app', 'ns-view-touch']
             ]);
         });
 
@@ -214,23 +214,23 @@ describe('ns.View.events', function() {
             ['content2-inner', 'ns-view-init', 'calledOnce'],
             ['content2-inner', 'ns-view-htmlinit', 'calledOnce'],
             ['content2-inner', 'ns-view-show', 'calledOnce'],
-            ['content2-inner', 'ns-view-repaint', 'calledOnce'],
+            ['content2-inner', 'ns-view-touch', 'calledOnce'],
 
             ['content2', 'ns-view-init', 'calledOnce'],
             ['content2', 'ns-view-htmlinit', 'calledOnce'],
             ['content2', 'ns-view-show', 'calledOnce'],
-            ['content2', 'ns-view-repaint', 'calledOnce'],
+            ['content2', 'ns-view-touch', 'calledOnce'],
 
             ['app', 'ns-view-show', 'calledOnce'],
             ['content1-inner', 'ns-view-hide', 'calledOnce'],
             ['content1', 'ns-view-hide', 'calledOnce'],
 
-            ['app', 'ns-view-repaint', 'calledTwice'],
-            ['head', 'ns-view-repaint', 'calledTwice'],
-            ['content1', 'ns-view-repaint', 'calledOnce'],
-            ['content1-inner', 'ns-view-repaint', 'calledOnce'],
-            ['content2', 'ns-view-repaint', 'calledOnce'],
-            ['content2-inner', 'ns-view-repaint', 'calledOnce']
+            ['app', 'ns-view-touch', 'calledTwice'],
+            ['head', 'ns-view-touch', 'calledTwice'],
+            ['content1', 'ns-view-touch', 'calledOnce'],
+            ['content1-inner', 'ns-view-touch', 'calledOnce'],
+            ['content2', 'ns-view-touch', 'calledOnce'],
+            ['content2-inner', 'ns-view-touch', 'calledOnce']
         ]);
 
         describe('order', function() {
@@ -245,10 +245,10 @@ describe('ns.View.events', function() {
                 ['head', 'ns-view-show', 0],
                 ['app', 'ns-view-show', 0],
 
-                ['content1-inner', 'ns-view-repaint', 0],
-                ['content1', 'ns-view-repaint', 0],
-                ['head', 'ns-view-repaint', 0],
-                ['app', 'ns-view-repaint', 0],
+                ['content1-inner', 'ns-view-touch', 0],
+                ['content1', 'ns-view-touch', 0],
+                ['head', 'ns-view-touch', 0],
+                ['app', 'ns-view-touch', 0],
 
                 ['content1-inner', 'ns-view-hide', 0],
                 ['content1', 'ns-view-hide', 0],
@@ -258,10 +258,10 @@ describe('ns.View.events', function() {
                 ['content2-inner', 'ns-view-show', 0],
                 ['content2', 'ns-view-show', 0],
 
-                ['content2-inner', 'ns-view-repaint', 0],
-                ['content2', 'ns-view-repaint', 0],
-                ['head', 'ns-view-repaint', 1],
-                ['app', 'ns-view-repaint', 1]
+                ['content2-inner', 'ns-view-touch', 0],
+                ['content2', 'ns-view-touch', 0],
+                ['head', 'ns-view-touch', 1],
+                ['app', 'ns-view-touch', 1]
             ]);
         });
     });
@@ -288,8 +288,8 @@ describe('ns.View.events', function() {
                 ['content1-inner', 'ns-view-show', 'calledOnce'],
                 ['content1', 'ns-view-show', 'calledOnce'],
 
-                ['content1-inner', 'ns-view-repaint', 'calledTwice'],
-                ['content1', 'ns-view-repaint', 'calledTwice']
+                ['content1-inner', 'ns-view-touch', 'calledTwice'],
+                ['content1', 'ns-view-touch', 'calledTwice']
             ]);
         });
 
@@ -325,8 +325,8 @@ describe('ns.View.events', function() {
                 ['content1-inner', 'ns-view-show', 'calledTwice'],
                 ['content1', 'ns-view-show', 'calledTwice'],
 
-                ['content1-inner', 'ns-view-repaint', 'calledTwice'],
-                ['content1', 'ns-view-repaint', 'calledTwice']
+                ['content1-inner', 'ns-view-touch', 'calledTwice'],
+                ['content1', 'ns-view-touch', 'calledTwice']
             ]);
         });
 
@@ -342,10 +342,10 @@ describe('ns.View.events', function() {
                 ['head', 'ns-view-show', 0],
                 ['app', 'ns-view-show', 0],
 
-                ['content1-inner', 'ns-view-repaint', 0],
-                ['content1', 'ns-view-repaint', 0],
-                ['head', 'ns-view-repaint', 0],
-                ['app', 'ns-view-repaint', 0],
+                ['content1-inner', 'ns-view-touch', 0],
+                ['content1', 'ns-view-touch', 0],
+                ['head', 'ns-view-touch', 0],
+                ['app', 'ns-view-touch', 0],
 
                 ['content1-inner', 'ns-view-hide', 0],
                 ['content1', 'ns-view-hide', 0],
@@ -358,10 +358,10 @@ describe('ns.View.events', function() {
                 ['content1-inner', 'ns-view-show', 1],
                 ['content1', 'ns-view-show', 1],
 
-                ['content1-inner', 'ns-view-repaint', 1],
-                ['content1', 'ns-view-repaint', 1],
-                ['head', 'ns-view-repaint', 1],
-                ['app', 'ns-view-repaint', 1]
+                ['content1-inner', 'ns-view-touch', 1],
+                ['content1', 'ns-view-touch', 1],
+                ['head', 'ns-view-touch', 1],
+                ['app', 'ns-view-touch', 1]
             ]);
         });
     });
@@ -392,13 +392,13 @@ describe('ns.View.events', function() {
                     ['content1-async', 'ns-view-hide', 'called', false],
                     ['content1-async', 'ns-view-htmlinit', 'called', false],
                     ['content1-async', 'ns-view-show', 'called', false],
-                    ['content1-async', 'ns-view-repaint', 'called', false],
+                    ['content1-async', 'ns-view-touch', 'called', false],
 
                     ['content1-inner', 'ns-view-htmldestroy', 'called', false],
                     ['content1-inner', 'ns-view-hide', 'called', false],
                     ['content1-inner', 'ns-view-htmlinit', 'called', false],
                     ['content1-inner', 'ns-view-show', 'called', false],
-                    ['content1-inner', 'ns-view-repaint', 'called', false]
+                    ['content1-inner', 'ns-view-touch', 'called', false]
                 ])
             });
 
@@ -412,8 +412,8 @@ describe('ns.View.events', function() {
                     ['head', 'ns-view-show', 0],
                     ['app', 'ns-view-show', 0],
 
-                    ['head', 'ns-view-repaint', 0],
-                    ['app', 'ns-view-repaint', 0]
+                    ['head', 'ns-view-touch', 0],
+                    ['app', 'ns-view-touch', 0]
                 ]);
             });
         });
@@ -438,14 +438,14 @@ describe('ns.View.events', function() {
 
                     ['content1-async', 'ns-view-htmlinit', 'calledOnce'],
                     ['content1-async', 'ns-view-show', 'calledOnce'],
-                    ['content1-async', 'ns-view-repaint', 'calledOnce'],
+                    ['content1-async', 'ns-view-touch', 'calledOnce'],
 
                     ['content1-inner', 'ns-view-htmlinit', 'calledOnce'],
                     ['content1-inner', 'ns-view-show', 'calledOnce'],
-                    ['content1-inner', 'ns-view-repaint', 'calledOnce'],
+                    ['content1-inner', 'ns-view-touch', 'calledOnce'],
 
-                    ['head', 'ns-view-repaint', 'calledOnce'],
-                    ['app', 'ns-view-repaint', 'calledOnce'],
+                    ['head', 'ns-view-touch', 'calledOnce'],
+                    ['app', 'ns-view-touch', 'calledOnce'],
 
                     ['content1-async', 'ns-view-htmldestroy', 'called', false],
                     ['content1-inner', 'ns-view-htmldestroy', 'called', false]
@@ -462,8 +462,8 @@ describe('ns.View.events', function() {
                     ['head', 'ns-view-show', 0],
                     ['app', 'ns-view-show', 0],
 
-                    ['head', 'ns-view-repaint', 0],
-                    ['app', 'ns-view-repaint', 0],
+                    ['head', 'ns-view-touch', 0],
+                    ['app', 'ns-view-touch', 0],
 
                     ['content1-inner', 'ns-view-htmlinit', 0],
                     ['content1-async', 'ns-view-htmlinit', 0],
@@ -471,8 +471,8 @@ describe('ns.View.events', function() {
                     ['content1-inner', 'ns-view-show', 0],
                     ['content1-async', 'ns-view-show', 0],
 
-                    ['content1-inner', 'ns-view-repaint', 0],
-                    ['content1-async', 'ns-view-repaint', 0]
+                    ['content1-inner', 'ns-view-touch', 0],
+                    ['content1-async', 'ns-view-touch', 0]
                 ]);
             })
         });

@@ -89,7 +89,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
         });
 
         var views = ['app', 'head', 'content-collection@model-collection', 'content2'];
-        var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-repaint', 'ns-view-hide', 'ns-view-htmldestroy'];
+        var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-touch', 'ns-view-hide', 'ns-view-htmldestroy'];
 
         this.events = {};
 
@@ -149,7 +149,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
             ['content-collection', 'ns-view-init', 'calledOnce'],
             ['content-collection', 'ns-view-htmlinit', 'called', false],
             ['content-collection', 'ns-view-show', 'called', false],
-            ['content-collection', 'ns-view-repaint', 'called', false],
+            ['content-collection', 'ns-view-touch', 'called', false],
             ['content-collection', 'ns-view-hide', 'called', false],
             ['content-collection', 'ns-view-htmldestroy', 'called', false]
         ]);
@@ -188,7 +188,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
             ['content-collection', 'ns-view-init', 'calledOnce'],
             ['content-collection', 'ns-view-htmlinit', 'calledOnce'],
             ['content-collection', 'ns-view-show', 'calledOnce'],
-            ['content-collection', 'ns-view-repaint', 'calledOnce'],
+            ['content-collection', 'ns-view-touch', 'calledOnce'],
             ['content-collection', 'ns-view-hide', 'called', false],
             ['content-collection', 'ns-view-htmldestroy', 'called', false]
         ]);
@@ -230,7 +230,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
             ['content-collection', 'ns-view-init', 'calledOnce'],
             ['content-collection', 'ns-view-htmlinit', 'calledOnce'],
             ['content-collection', 'ns-view-show', 'calledOnce'],
-            ['content-collection', 'ns-view-repaint', 'calledOnce'],
+            ['content-collection', 'ns-view-touch', 'calledOnce'],
             ['content-collection', 'ns-view-hide', 'calledOnce'],
             ['content-collection', 'ns-view-htmldestroy', 'called', false]
         ]);

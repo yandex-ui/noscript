@@ -264,8 +264,6 @@
     };
 
     ns.View.prototype._bindModels = function() {
-        var that = this;
-
         var models = this.models;
         var decls = this.info.models;
         var subviews = this.info.subviews;
@@ -274,10 +272,8 @@
             var model = models[idModel];
 
             // FIXME: обратная совместимость для subview. Нужно оторвать в рамках #248
+            // Если в виде есть subview, он должен работать по-старому
             if (subviews[idModel]) {
-                this._bindModel(model, 'ns-model-destroyed', function() {
-                    that.invalidate();
-                });
                 continue;
             }
 
@@ -318,6 +314,10 @@
             var jpaths = subviews[model_id];
             if (jpaths) {
                 var model  = models[model_id];
+
+                this._bindModel(model, 'ns-model-destroyed', function() {
+                    that.invalidate();
+                });
 
                 for (var jpath in jpaths) {
                     //  В deps объект вида:

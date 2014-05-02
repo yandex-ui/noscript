@@ -1,4 +1,7 @@
-(function() {
+var no = no || require('nommon');
+var ns = ns || require('./ns.js');
+
+(function($, win, doc) {
 
     /**
      * Uniq View ID counter
@@ -28,14 +31,14 @@
      * @type {jQuery}
      * @private
      */
-    ns.View.prototype._$document = $(document);
+    ns.View.prototype._$document = $(doc);
 
     /**
      * Закешированный $(window)
      * @type {jQuery}
      * @private
      */
-    ns.View.prototype._$window = $(window);
+    ns.View.prototype._$window = $(win);
 
     /**
      * Инициализирует экземпляр вида
@@ -884,7 +887,8 @@
             tree.extra = extra;
         }
 
-        return ns.tmpl(tree, mode);
+        var html = ns.tmpl(tree, mode);
+        return ns.html2node(html);
     };
 
     /**
@@ -1044,8 +1048,8 @@
             this._saveModelsVersions();
         }
 
-        // Если view валидный и не в async-режиме, то вызывается show и touch 
-        // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch 
+        // Если view валидный и не в async-режиме, то вызывается show и touch
+        // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch
 
         // Условие звучит так "(Если мы в синхнронном ns.Update и view стал валиден) или (view был не валиден и стал валиден)"
         // Второе условие относится как к перерисованным view, так и к async-view, которые полностью отрисовались
@@ -1548,4 +1552,8 @@
         return decl;
     };
 
-})();
+})(
+    no.de ? no.nop : jQuery,
+    no.de ? null : window,
+    no.de ? null : document
+);

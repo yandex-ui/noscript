@@ -1,3 +1,6 @@
+var no = no || require('nommon');
+var ns = ns || require('./ns.js');
+
 (function() {
 
     /**
@@ -42,7 +45,7 @@
     ns.request.models = function(models, options) {
 
         // Загрузка порционных данных. В этом случае грузим не саму модель, а порцию данных.
-        models = $.map(models, function(model) {
+        models = models.map(function(model) {
             return model.getRequest ? model.getRequest() : model;
         });
 

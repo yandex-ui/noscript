@@ -1,3 +1,5 @@
+var ns = ns || require('./ns.js');
+
 /**
  * Типы узлов ns.layout
  * @enum {string}

@@ -1,3 +1,6 @@
+var no = no || require('nommon');
+var ns = ns || require('./ns.js');
+
 /**
  * Создает коллекцию видов.
  * @classdesc Коллекция видов.
@@ -409,7 +412,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         }
     }
 
-    // Если view валидный и не в async-режиме, то вызывается show и touch 
+    // Если view валидный и не в async-режиме, то вызывается show и touch
     // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch
 
     // Условие звучит так "(Если мы в синхнронном ns.Update и view стал валиден) или (view был не валиден и стал валиден)"

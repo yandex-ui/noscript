@@ -1,3 +1,5 @@
+var ns = ns || require('./ns.js');
+
 /**
  * Хеш событий для удобного биндинга touch/desktop
  * @type {object}

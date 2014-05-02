@@ -1,13 +1,32 @@
+var no = no || require('nommon');
+var ns = ns || require('./ns.js');
+
 (function() {
 
     /**
-     * Создает ns.Update
+     * Id последнего созданного update-а.
+     * @type {number}
+     */
+    var update_id = -1;
+
+    /**
+     * Current ns.Updates.
+     * @type ns.Update[]
+     * @private
+     */
+    var currentUpdates = [];
+
+    /**
+     * Создает ns.Update.
+     *
      * @classdesc ns.Update
      * @param {ns.View} view Корневой view.
-     * @param {object} layout Layout для этого view, результат от ns.layout.page()
-     * @param {object} params Параметры, результат от ns.router()
-     * @param {object} [options] Options for ns.Update
-     * @param {ns.U.EXEC} [options.execFlag=ns.U.EXEC.GLOBAL] Options for ns.Update
+     * @param {object} layout Layout для этого view, результат от ns.layout.page().
+     * @param {object} params Параметры, результат от ns.router().
+     * @param {object} [options] Опции для ns.Update.
+     * @param {ns.U.EXEC} [options.execFlag=ns.U.EXEC.GLOBAL] Тип ns.Update (GLOBAL, PARALLEL, ASYNC).
+     * @param {boolean} [options.syncOnly=] Флаг "запросить данные только для синхронных видов". Нужен для генерации html на сервере.
+     * @param {boolean} [options.renderOnly=] Флаг "нужен только HTML код". Нужен для генерации html на сервере.
      * @constructor
      * @example
      * ```js
@@ -39,27 +58,14 @@
 
         this.id = ++update_id;
 
-        options = options || {};
+        this.options = options = options || {};
 
         /**
          * Execution flag
          * @type {ns.U.EXEC}
          */
-        this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
+        this.execFlag = options.execFlag || ns.U.EXEC.GLOBAL;
     };
-
-    /**
-     * Current ns.Updates.
-     * @type ns.Update[]
-     * @private
-     */
-    var currentUpdates = [];
-
-    /**
-     * Id последнего созданного update-а.
-     * @type {number}
-     */
-    var update_id = -1;
 
     /**
      * @see ns.U.STATUS
@@ -131,11 +137,15 @@
                     return;
                 }
 
-                that._update(async);
-                // resolve main promise and return promises for async views
-                that.done({
-                    async: asyncUpdaterPromises
-                });
+                if (that.options.renderOnly) {
+                    that.done(that._render());
+                } else {
+                    that._update(async);
+                    // resolve main promise and return promises for async views
+                    that.done({
+                        async: asyncUpdaterPromises
+                    });
+                }
             }, function(models) {
                 // NOTE here we do not even try to handle the error. Or we should do it?
                 that.error({
@@ -149,6 +159,10 @@
                     models: models
                 });
             });
+
+        if (this.options.syncOnly) {
+            return resultPromise;
+        }
 
         // Для каждого async-view запрашиваем его модели.
         // Когда они приходят, запускаем точно такой же update.
@@ -200,17 +214,32 @@
                     async_view: view,
                     models: result[1]
                 });
-            })
-            .fail(function(e) {
-                asyncUpdaterPromises[asyncViewId].reject({
-                    error: e,
-                    async_view: view,
-                    models: models
-                });
             });
         });
 
         return resultPromise;
+    };
+
+    ns.Update.prototype._render = function() {
+        var params = this.params;
+        var layout = this.layout;
+
+        var tree = {
+            'views': {}
+        };
+        this.view._getUpdateTree(tree, layout.views, params);
+
+        ns.log.debug('[ns.Update]', 'start()', this.id, 'updateTree', tree);
+
+        // если пустое дерево, то ничего не реднерим,
+        // но кидаем события и скрываем/открываем блоки
+        var html;
+        if (!ns.object.isEmpty(tree.views)) {
+            html = this.render(tree, params, layout);
+            ns.log.debug('[ns.Update]', 'start()', this.id, 'rendered html', html);
+        }
+
+        return html;
     };
 
     /**
@@ -224,19 +253,10 @@
         var params = this.params;
         var layout = this.layout;
 
-        var tree = {
-            'views': {}
-        };
-        this.view._getUpdateTree(tree, layout.views, params);
-
-        ns.log.debug('[ns.Update]', 'start()', this.id, 'updateTree', tree);
-
         var node;
-        // если пустое дерево, то ничего не реднерим,
-        // но кидаем события и скрываем/открываем блоки
-        if (!ns.object.isEmpty(tree.views)) {
-            node = this.render(tree, this.params, this.layout);
-            ns.log.debug('[ns.Update]', 'start()', this.id, 'new node', node.cloneNode(true));
+        var html = this._render();
+        if (html) {
+            node = ns.html2node(html);
         }
 
         var viewEvents = {
@@ -271,7 +291,7 @@
      * @param {object} tree Дерево видов.
      * @param {object} params Параметры страницы.
      * @param {object} layout Раскладка страницы.
-     * @returns {HTMLElement}
+     * @returns {string}
      */
     ns.Update.prototype.render = function(tree, params, layout) {
         /* jshint unused: false */
@@ -353,7 +373,7 @@
         var FLAG_PARALLEL = FLAGS.PARALLEL;
         var FLAG_ASYNC = FLAGS.ASYNC;
 
-        var newRunExecutionFlag = newUpdate.EXEC_FLAG;
+        var newRunExecutionFlag = newUpdate.execFlag;
         var i;
         var j;
 
@@ -368,7 +388,7 @@
                 var run = currentRuns[i];
 
                 // don't terminated paraller updates
-                if (run.EXEC_FLAG === FLAG_PARALLEL) {
+                if (run.execFlag === FLAG_PARALLEL) {
                     survivedRuns.push(run);
 
                 } else {
@@ -382,7 +402,7 @@
 
             // check whether we have one global update
             for (i = 0, j = currentRuns.length; i < j; i++) {
-                if (currentRuns[i].EXEC_FLAG === FLAG_GLOBAL) {
+                if (currentRuns[i].execFlag === FLAG_GLOBAL) {
                     return false;
                 }
             }
@@ -399,7 +419,7 @@
      * @returns Boolean.
      */
     ns.Update.prototype.isGlobal = function() {
-        return this.EXEC_FLAG === ns.U.EXEC.GLOBAL;
+        return this.execFlag === ns.U.EXEC.GLOBAL;
     };
 
     /**

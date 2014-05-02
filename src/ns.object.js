@@ -1,3 +1,5 @@
+var ns = ns || require('./ns.js');
+
 /**
  * Хелперы для работы с объектами
  * @namespace

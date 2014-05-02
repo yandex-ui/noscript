@@ -1,4 +1,6 @@
-(function(ns) {
+var ns = ns || require('./ns.js');
+
+(function() {
 
     /**
      * Модуль логирования ошибок.
@@ -44,4 +46,4 @@
         /* jshint unused: false */
     };
 
-})(ns);
+})();

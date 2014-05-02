@@ -1,3 +1,5 @@
+var no = no || require('nommon');
+
 /**
  * noscript MVC framework
  * @namespace
@@ -6,7 +8,7 @@
  */
 var ns = {};
 
-if (typeof window === 'undefined') {
+if (no.de) {
     module.exports = ns;
 }
 
@@ -20,7 +22,7 @@ ns.events = no.extend( {}, no.Events );
  * @const
  * @type {Boolean}
  */
-ns.IS_TOUCH = Boolean(
+ns.IS_TOUCH = !no.de && Boolean(
     'ontouchstart' in window ||
     (window.DocumentTouch && document instanceof DocumentTouch)
 );
@@ -70,15 +72,14 @@ ns.parseQuery = function(s) {
 };
 
 /**
- * Performs json templating.
- * @param {*} json
- * @param {string} mode
- * @param {string} [module='main']
- * @returns {Element}
+ * Генерация HTML по json дереву видов.
+ * @param {object} json Дерево видов.
+ * @param {string} mode Начальная мода: выполнить матчинг для шаблона с этой модой.
+ * @param {string} [module='main'] id Модуля yate.
+ * @returns {string} Отрендеренный HTML код.
  */
 ns.tmpl = function(json, mode, module) {
-    var result = yr.run(module || 'main', json, mode);
-    return ns.html2node(result);
+    return yr.run(module || 'main', json, mode);
 };
 
 /**

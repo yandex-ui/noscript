@@ -33,6 +33,7 @@
     "engines": {
         "node": "*"
     },
+    "main": "src/index.js",
     "files": [
         "css",
         "dist",

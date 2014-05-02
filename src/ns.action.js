@@ -195,6 +195,11 @@
                 return false;
             }
 
+            // Чтобы работал Cmd/Ctrl/Shift + click на ссылках (открыть в новом табе/окне).
+            if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
+                return true;
+            }
+
             // если hostname ссылки не равен нашему хосту
             if (target.hostname !== window.location.hostname) {
                 return true;

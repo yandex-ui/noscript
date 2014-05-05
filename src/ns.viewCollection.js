@@ -64,7 +64,7 @@ ns.ViewCollection.eventsModelCollectionDefault = {
  * @param {array} decls
  * @return {object}
  */
-ns.ViewCollection._expandDeclsModel = function(decls) {
+ns.ViewCollection._expandModelsDecl = function(decls) {
     if (!Array.isArray(decls)) {
         return decls;
     }
@@ -76,7 +76,7 @@ ns.ViewCollection._expandDeclsModel = function(decls) {
         if (ns.Model.infoLite(idModel).isCollection) {
             declsExpanded[idModel] = no.extend({}, this.eventsModelCollectionDefault);
         } else {
-            declsExpanded[idModel] = no.extend({}, this.eventsModelDefault);
+            declsExpanded[idModel] = no.extend({}, this.defaultModelEvents);
         }
     }
 

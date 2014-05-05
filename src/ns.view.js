@@ -261,11 +261,11 @@
             var model = models[idModel];
 
             var decl = decls[idModel];
-            for (var nameEvent in decl) {
-                var nameHandler = decl[nameEvent];
-                var handler = this[nameHandler];
+            for (var eventName in decl) {
+                var handlerName = decl[eventName];
+                var handler = this[handlerName];
                 if ('function' === typeof handler) {
-                    this._bindModel(model, nameEvent,
+                    this._bindModel(model, eventName,
                         this._invokeModelHandler.bind(this, handler)
                     );
                 }
@@ -785,9 +785,8 @@
 
         var models = this.models;
         for (var id in models) {
-            var data = models[id].getData();
+            var data = models[id].getData() || models[id].getError();
 
-            data = data || models[id].getError();
             if (data) {
                 r[id] = data;
             }
@@ -1110,7 +1109,7 @@
         // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
         ctor = no.inherit(ctor, baseClass, info.methods);
 
-        info.models = this._formatDeclsModel( info.models || {} );
+        info.models = this._formatModelsDecl( info.models || {} );
         info.events = info.events || {};
 
         // часть дополнительной обработки производится в ns.View.info
@@ -1434,7 +1433,7 @@
     /**
      * События моделей, обрабатываемые видом по умолчанию
      */
-    ns.View.eventsModelDefault = {
+    ns.View.defaultModelEvents = {
         'ns-model-insert': 'invalidate',
         'ns-model-remove': 'invalidate',
         'ns-model-changed': 'invalidate',
@@ -1444,21 +1443,21 @@
     /**
      * Преобразует декларацию в виде массива ['model1', 'model2', ...]
      * в объект {model1: 'handlerDefault1', model2: 'handlerDefault2', ...}
-     * @param {array} decls
+     * @param {array} decl
      * @return {object}
      */
-    ns.View._expandDeclsModel = function(decls) {
-        if (!Array.isArray(decls)) {
-            return decls;
+    ns.View._expandModelsDecl = function(decl) {
+        if (!Array.isArray(decl)) {
+            return decl;
         }
 
-        var declsExpanded = {};
+        var declExpanded = {};
 
-        for (var i = 0, l = decls.length; i < l; i++) {
-            declsExpanded[decls[i]] = no.extend({}, this.eventsModelDefault);
+        for (var i = 0, l = decl.length; i < l; i++) {
+            declExpanded[decl[i]] = no.extend({}, this.defaultModelEvents);
         }
 
-        return declsExpanded;
+        return declExpanded;
     };
 
     /**
@@ -1469,12 +1468,12 @@
      * @returns {{}}
      * @private
      */
-    ns.View._formatDeclsModel = function(decls) {
-        var declsFormated = this._expandDeclsModel(decls);
+    ns.View._formatModelsDecl = function(decls) {
+        var declsFormated = this._expandModelsDecl(decls);
 
         // Разрвернём краткий вариант декларации в полный
         for (var idModel in declsFormated) {
-            var declFull = getDeclMethodFull(declsFormated[idModel]);
+            var declFull = getFullMethodDecl(declsFormated[idModel]);
 
             // общий обработчик для всех событий
             var methodCommon = null;
@@ -1484,19 +1483,19 @@
             }
 
             // нужно гарантировать подписку на все стандартные события
-            for (var nameEvent in this.eventsModelDefault) {
+            for (var eventName in this.defaultModelEvents) {
 
                 // обработчик события по умолчанию
-                var methodDefault = this.eventsModelDefault[nameEvent];
+                var methodDefault = this.defaultModelEvents[eventName];
 
-                if (undefined === declFull[nameEvent]) {
+                if (undefined === declFull[eventName]) {
                     // если обработчик события явно не задан,
                     // используем общий обработчик или, если такого нет, обработчик по умолчанию 
-                    declFull[nameEvent] = methodCommon || methodDefault;
+                    declFull[eventName] = methodCommon || methodDefault;
                 } else {
                     // если обработчик явно задан, используем его,
                     // приведя к полному виду
-                    declFull[nameEvent] = getDeclMethodFull(declFull[nameEvent]);
+                    declFull[eventName] = getFullMethodDecl(declFull[eventName]);
                 }
             }
 
@@ -1512,7 +1511,7 @@
      *  - true  -> invalidate
      *  - false -> keepValid
      */
-    var getDeclMethodFull = function(decl) {
+    var getFullMethodDecl = function(decl) {
         if (true === decl) {
             return 'invalidate';
         } else if (false === decl) {

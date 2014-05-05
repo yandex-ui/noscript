@@ -138,7 +138,7 @@ describe('ns.View', function() {
         describe('в виде массива', function() {
             it('должна преобразоваться в правильную полную декларацию', function() {
                 var source = ['m1', 'm2'];
-                expect(ns.View._formatDeclsModel(source)).to.eql({
+                expect(ns.View._formatModelsDecl(source)).to.eql({
                     m1: {
                         'ns-model-insert': 'invalidate',
                         'ns-model-remove': 'invalidate',
@@ -158,7 +158,7 @@ describe('ns.View', function() {
         describe('в виде объекта с boolean значениями', function() {
             it('должна преобразоваться в правильную полную декларацию', function() {
                 var source = {'m1': true, 'm2': false};
-                expect(ns.View._formatDeclsModel(source)).to.eql({
+                expect(ns.View._formatModelsDecl(source)).to.eql({
                     m1: {
                         'ns-model-insert': 'invalidate',
                         'ns-model-remove': 'invalidate',
@@ -181,7 +181,7 @@ describe('ns.View', function() {
                     'm1': 'invalidate',
                     'm2': 'keepValid'
                 };
-                expect(ns.View._formatDeclsModel(source)).to.eql({
+                expect(ns.View._formatModelsDecl(source)).to.eql({
                     m1: {
                         'ns-model-insert': 'invalidate',
                         'ns-model-remove': 'invalidate',
@@ -210,7 +210,7 @@ describe('ns.View', function() {
                         'ns-model-remove': 'keepValid'
                     }
                 };
-                expect(ns.View._formatDeclsModel(source)).to.eql({
+                expect(ns.View._formatModelsDecl(source)).to.eql({
                     m1: {
                         'ns-model-insert': 'invalidate',
                         'ns-model-remove': 'invalidate',

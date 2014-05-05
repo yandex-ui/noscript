@@ -3,39 +3,21 @@
 [![Dependency Status](https://david-dm.org/yandex-ui/noscript.png)](https://david-dm.org/yandex-ui/noscript)
 # noscript - JS MVC framework
 
-## Ключевые сущности
+## Документация
 
-[Общее описание сущностей](/doc/entities.md)
+- [Общее описание сущностей](/doc/entities.md)
+- [Инициализация и настройка фреймворка](/doc/ns.init.md)
+- [JSDoc](https://yandex-ui.github.io/noscript/)
 
-[Инициализация и настройка фреймворка](/doc/ns.init.md)
-
-[Документация в формате JSDoc](https://yandex-ui.github.io/noscript/)
-
-### Раскладка страницы (ns.layout)
-
-[Декларация](/doc/ns.layout.md)
-
-### Маршрутизатор (ns.router)
-
-[Описание](/doc/ns.router.md)
-
-### Вид (ns.View)
-
-[Декларация и принципы работы](/doc/ns.view.md)
-
-[Структура шаблона](/doc/ns.view.yate.md)
-
-[Вид-коллекция](/doc/ns.viewCollection.md)
-
-### Модель (ns.Model)
-
-[Описание](/doc/ns.model.md)
-
-[Модель-коллекция](/doc/ns.modelCollection.md)
-
-### Построение и обновление страницы (ns.Update)
-
-[Логика работы](/doc/ns.update.logic.md)
+Описания компонентов:
+- [ns.layout - раскладка страницы](/doc/ns.layout.md)
+- [ns.Model - модель](/doc/ns.model.md)
+ - [Модель-коллекция](/doc/ns.modelCollection.md)
+- [ns.router - маршрутизатор](/doc/ns.router.md)
+- [ns.Update - построение и обновление страницы](/doc/ns.update.logic.md)
+- [ns.View - вид](/doc/ns.view.md)
+ - [Структура шаблона](/doc/ns.view.yate.md)
+ - [Вид-коллекция](/doc/ns.viewCollection.md)
 
 ## Best practice или примеры проектирования
 

@@ -78,7 +78,6 @@
 
         this.node = null;
         this.views = null;
-        this._invalidSubviews = null;
 
         /**
          * Статус View.
@@ -254,28 +253,12 @@
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
     };
 
-    /**
-     *
-     * @param {string} subviewId
-     */
-    ns.View.prototype.invalidateSubview = function(subviewId) {
-        //  FIXME: ns.SV.STATUS.INVALID?
-        this._invalidSubviews[subviewId] = ns.V.STATUS.INVALID;
-    };
-
     ns.View.prototype._bindModels = function() {
         var models = this.models;
         var decls = this.info.models;
-        var subviews = this.info.subviews;
 
         for (var idModel in models) {
             var model = models[idModel];
-
-            // FIXME: обратная совместимость для subview. Нужно оторвать в рамках #248
-            // Если в виде есть subview, он должен работать по-старому
-            if (subviews[idModel]) {
-                continue;
-            }
 
             var decl = decls[idModel];
             for (var nameEvent in decl) {
@@ -288,8 +271,6 @@
                 }
             }
         }
-
-        this._bindModelsSubviews();
     };
 
     /**
@@ -298,58 +279,6 @@
     ns.View.prototype._invokeModelHandler = function(handler) {
         this._saveModelsVersions();
         return handler.apply(this, Array.prototype.slice.call(arguments, 1));
-    };
-
-    /**
-     * Биндится на изменение моделей.
-     * @private
-     */
-    ns.View.prototype._bindModelsSubviews = function() {
-        var that = this;
-
-        var models = this.models;
-        var subviews = this.info.subviews;
-
-        for (var model_id in models) {
-            var jpaths = subviews[model_id];
-            if (jpaths) {
-                var model  = models[model_id];
-
-                this._bindModel(model, 'ns-model-destroyed', function() {
-                    that.invalidate();
-                });
-
-                for (var jpath in jpaths) {
-                    //  В deps объект вида:
-                    //
-                    //      {
-                    //          //  Нужно инвалидировать subview 'foo'.
-                    //          'foo': true,
-                    //          //  Нужно инвалидировать весь view целиком.
-                    //          '': true
-                    //      }
-                    //
-                    var deps = jpaths[jpath];
-
-                    if ('' in deps) {
-                        //  При любом изменении модели нужно инвалидировать
-                        //  весь view целиком.
-                        this._bindModel(model, 'ns-model-changed' + jpath, function() {
-                            that.invalidate();
-                        });
-                    } else {
-                        //  Инвалидируем только соответствующие subview:
-                        (function(deps) {
-                            that._bindModel(model, 'ns-model-changed' + jpath, function() {
-                                for (var subview_id in deps) {
-                                    that.invalidateSubview(subview_id);
-                                }
-                            });
-                        })(deps);
-                    }
-                }
-            }
-        }
     };
 
     /**
@@ -582,19 +511,11 @@
     };
 
     /**
-     * FIXME: Может нужно как-то объединить isOk и isSubviewsOk?
-     * @returns {boolean}
-     */
-    ns.View.prototype.isSubviewsOk = function() {
-        return ns.object.isEmpty(this._invalidSubviews);
-    };
-
-    /**
      * Возвращает true, если блок валиден.
      * @returns {boolean}
      */
     ns.View.prototype.isValid = ns.View.prototype.isValidSelf = function() {
-        return this.isOk() && this.isSubviewsOk() && this.isModelsValidWithVersions();
+        return this.isOk() && this.isModelsValidWithVersions();
     };
 
     /**
@@ -1064,26 +985,7 @@
             viewNode = this._extractNode(node);
             ns.assert(viewNode, 'ns.View', "Can't find node for '%s'", this.id);
 
-            //  Тут у нас может быть несколько вариантов, почему блок нужно как-то обновлять:
-            //
-            //    * Вообще весь блок невалидный ( предположительно !this.isOk() ).
-            //
-            //    * Невалидны некоторые subview (все остальные варианты).
-            //
-
-            if ( this.isOk() ) {
-                //  Обновляем только subview.
-                for (var subview_id in this._invalidSubviews) {
-                    var className = 'ns-subview-' + subview_id;
-
-                    var new_subview_node = ns.byClass(className, viewNode)[0];
-                    var old_subview_node = ns.byClass(className, this.node)[0];
-
-                    ns.assert(new_subview_node && old_subview_node, 'ns.View', "Can't find node for subview '%s' in view '%s'", subview_id, this.id);
-
-                    ns.replaceNode(old_subview_node, new_subview_node);
-                }
-            } else {
+            if ( !this.isOk() ) {
                 //  Обновляем весь блок.
                 //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
                 //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
@@ -1092,7 +994,6 @@
                 if (updateOptions.toplevel) {
                     //  Старая нода показывает место, где должен быть блок.
                     //  Если старой ноды нет, то это блок, который вставляется в бокс.
-                    //  FIXME: Вот тут нужны два варианта: вся нода невалидна или же невалидные некоторое subview.
 
                     if (this.node) {
                         ns.replaceNode(this.node, viewNode);
@@ -1123,9 +1024,6 @@
                     events['ns-view-async'].push(this);
                 }
             }
-
-            //  Все subview теперь валидны.
-            this._invalidSubviews = {};
 
             this._saveModelsVersions();
         }
@@ -1190,7 +1088,6 @@
      * @param {object} [info.methods] Методы, переопределяющие стандартные методы View.
      * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
      * @param {object} [info.events] DOM-события, на которые подписывается View.
-     * @param {object} [info.sibviews] Subviews declarations (@see https://github.com/pasaran/noscript/blob/master/doc/ns.view.md)
      * @param {Function|String} [base=ns.View] Базовый View для наследования
      * @returns {Function} Созданный View.
      */
@@ -1237,7 +1134,6 @@
         if (info && !info.pGroups) {
             ns.View._initInfoParams(info);
             ns.View._initInfoEvents(info);
-            ns.View._initInfoSubviews(info);
         }
         return info;
     };
@@ -1420,70 +1316,6 @@
 
         // больше не нужны
         delete info.events;
-    };
-
-    /**
-        Парсим информацию про subview.
-
-        В info.subviews приходит структура такого вида:
-            {
-                //  Определяем subview 'labels':
-                'labels': [
-                    //  зависящее от поля '.labels' модели 'message',
-                    'message .labels',
-                    //  и от модели 'labels' целиком.
-                    'labels'
-                ],
-                //  Пустая строка в качестве имени subview означает все view целиком.
-                //  Если хоть как-нибудь меняется модель 'folders', то весь блок нужно перерисовать.
-                '': 'folders'
-                ...
-            }
-
-        На выходе в info.subviews такая структура:
-            {
-                    //  Название модели.
-                    'message': {
-                    //  jpath.
-                    '.labels': {
-                        //  Список subview, которые зависят от этого jpath в данной модели.
-                        'labels': true
-                    }
-                },
-                'labels': {
-                    //  Пустой jpath означает, что любое изменение модели приводит к инвалидации subview.
-                    '': {
-                        'labels': true
-                    }
-                },
-                'folders': {
-                    '': {
-                        //  Пустой ключ здесь означает, что изменять нужно весь блок целиком.
-                        '': true
-                    }
-                },
-                ...
-            }
-    */
-    ns.View._initInfoSubviews = function(info) {
-        var subviewTree = {};
-        for (var subview in info.subviews) {
-            var deps = info.subviews[subview];
-            if (typeof deps === 'string') {
-                deps = [ deps ];
-            }
-
-            for (var i = 0; i < deps.length; i++) {
-                var r = deps[i].split(' ');
-                var model_id = r[0];
-                var jpath = r[1] || '';
-
-                var byModel = subviewTree[model_id] || (( subviewTree[model_id] = {} ));
-                var byModelJpath = byModel[jpath] || (( byModel[jpath] = {} ));
-                byModelJpath[subview] = true;
-            }
-        }
-        info.subviews = subviewTree;
     };
 
     /**

@@ -513,7 +513,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         this._apply(function(/** ns.View */view) {
             // Если для view нет модели в MC, то нужно его прихлопнуть
             if (!itemsExist[view.key]) {
-                // invalidate view and all subviews
+                // invalidate view
                 view.invalidate();
 
                 //TODO: будет ли unbind для вложенных view?

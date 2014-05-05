@@ -257,10 +257,17 @@
             models = [ models ];
         }
 
-        // Вставить можно только объявленную модель
-        // и повторная вставка модели запрещена
-        var insertion = models.filter(function(model) {
-            return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id);
+        // Отфильтруем
+        //  1. модели, которые уже есть в коллекции
+        //  2. модели, дважды попавшие в массив вставляемых моделей
+        var insertion = models.filter(function(model, index) {
+            return (
+                this.models.indexOf(model) === -1 &&
+                // indexOf возвращает индекс первого вхождения. Если модель встретится
+                // в массиве повторно, то он будет отличаться от индекса итерации и
+                // модель будет отфильтрована
+                index === models.indexOf(model)
+            );
         }, this);
 
         insertion.forEach(function(model, i) {

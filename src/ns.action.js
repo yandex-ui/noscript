@@ -190,10 +190,13 @@
             if (!href) {
                 return true;
             }
+
             if (HREF_JS_REGEXP.test(href)) {
                 return false;
             }
-            if (href.indexOf('conf:sip:') === 0 || href.indexOf('meet:sip:') === 0) {
+
+            // Чтобы работал Cmd/Ctrl/Shift + click на ссылках (открыть в новом табе/окне).
+            if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
                 return true;
             }
 
@@ -202,8 +205,8 @@
                 return true;
             }
 
-            //TODO: HISTORY_API_SUPPORT: hash или не хеш
-            //могут быть ссылки <a href="#hash" target="_blank"/>
+            // TODO: HISTORY_API_SUPPORT: hash или не хеш
+            // могут быть ссылки <a href="#hash" target="_blank"/>
             if (target.getAttribute('target') !== '_blank') {
                 returnValue = ns.page.go(href);
                 if (returnValue instanceof no.Promise) {

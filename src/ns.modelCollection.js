@@ -257,18 +257,15 @@
             models = [ models ];
         }
 
-        // Отфильтруем
-        //  1. модели, которые уже есть в коллекции
-        //  2. модели, дважды попавшие в массив вставляемых моделей
-        var insertion = models.filter(function(model, index) {
-            return (
-                this.models.indexOf(model) === -1 &&
-                // indexOf возвращает индекс первого вхождения. Если модель встретится
-                // в массиве повторно, то он будет отличаться от индекса итерации и
-                // модель будет отфильтрована
-                index === models.indexOf(model)
-            );
-        }, this);
+        var insertion = [];
+        var model;
+        for (var i = 0; i < models.length; i++) {
+            model = models[i];
+            // Добавим только те модели, которых ещё нет ни в коллекции, ни в списке добавляемых
+            if (this.models.indexOf(model) < 0 && insertion.indexOf(model) < 0) {
+                insertion.push(model);
+            }
+        }
 
         insertion.forEach(function(model, i) {
             this.models.splice(index + i, 0, model);

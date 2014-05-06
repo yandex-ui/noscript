@@ -158,10 +158,12 @@ describe('ns.ViewСollection ns-view-* events', function() {
 
     describe('first rendering', function() {
 
-        beforeEach(function() {
+        beforeEach(function(finish) {
             var layout = ns.layout.page('content1', {});
             var update = new ns.Update(this.APP, layout, {});
-            update.start();
+            update.start().then(function() {
+                finish();
+            });
 
             // finish first draw
             this.sinon.server.requests[0].respond(
@@ -197,10 +199,15 @@ describe('ns.ViewСollection ns-view-* events', function() {
 
     describe('change to another layout', function() {
 
-        beforeEach(function() {
+        beforeEach(function(finish) {
             var layout = ns.layout.page('content1', {});
             var update = new ns.Update(this.APP, layout, {});
-            update.start();
+            update.start().then(function() {
+                layout = ns.layout.page('content2', {});
+                new ns.Update(this.APP, layout, {}).start().then(function() {
+                    finish();
+                });
+            }.bind(this));
 
             // finish first draw
             this.sinon.server.requests[0].respond(
@@ -220,9 +227,6 @@ describe('ns.ViewСollection ns-view-* events', function() {
                     ]
                 })
             );
-
-            layout = ns.layout.page('content2', {});
-            new ns.Update(this.APP, layout, {}).start();
         });
 
         genTests([

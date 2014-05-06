@@ -10,7 +10,7 @@
      * @param {object} [params] Параметры моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      * @namespace
      */
     ns.request = function(items, params, options) {
@@ -24,7 +24,7 @@
      * @param {object} [params] Параметры моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     ns.forcedRequest = function(items, params, options) {
         options = options || {};
@@ -37,7 +37,7 @@
      * @param {ns.Model[]} models Массив моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     ns.request.models = function(models, options) {
 
@@ -246,7 +246,7 @@
          */
         this.options = options || {};
 
-        this.promise = new no.Promise();
+        this.promise = new Vow.Promise();
     };
 
     // ------------------------------------------------------------------------------------------------------------- //
@@ -330,7 +330,7 @@
 
             // Ждем резолва всех моделей и "повторяем" запрос
             // Если какие-то ключи не пришли, они будут перезапрошены.
-            no.Promise.wait(all).then(this.start.bind(this));
+            Vow.all(all).then(this.start.bind(this));
 
         } else {
             // у всех моделей есть какой-то статус (ERROR или OK)
@@ -338,7 +338,7 @@
             ns.request.Manager.clean(this.models);
 
             // и резолвим весь ns.request
-            this.promise.resolve(this.models);
+            this.promise.fulfill(this.models);
         }
     };
 
@@ -385,7 +385,7 @@
             // это не означает, что завершится весь ns.request
             ns.request.Manager.done(model);
 
-            model.promise.resolve();
+            model.promise.fulfill();
         }
     };
 
@@ -433,7 +433,7 @@
     /**
      * Возвращает promise из model
      * @param {ns.Model} model Модель
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     function model2Promise(model) {
         return model.promise;

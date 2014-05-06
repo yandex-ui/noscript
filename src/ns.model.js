@@ -397,7 +397,7 @@
     ns.Model.prototype.prepareRequest = function(requestID) {
         this.requestID = requestID;
         this.retries++;
-        this.promise = new no.Promise();
+        this.promise = new Vow.Promise();
 
         return this;
     };

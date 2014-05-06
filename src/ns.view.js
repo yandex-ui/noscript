@@ -79,8 +79,7 @@
 
         /**
          * Статус View.
-         * @see ns.V.STATUS
-         * @type {number}
+         * @type {ns.V.STATUS}
          * @private
          */
         this.status = this.STATUS.NONE;
@@ -517,9 +516,17 @@
      * Возвращает true, если блок валиден.
      * @returns {boolean}
      */
-    ns.View.prototype.isValid = ns.View.prototype.isValidSelf = function() {
+    ns.View.prototype.isValid = function() {
         return this.isOk() && this.isModelsValidWithVersions();
     };
+
+    /**
+     * Возвращает true, если блок валиден.
+     * @ignore
+     * @method
+     * @returns {boolean}
+     */
+    ns.View.prototype.isValidSelf = ns.View.prototype.isValid;
 
     /**
      * Returns true if models are valid and not be updated after last view update.
@@ -748,6 +755,7 @@
      * ```
      * @param {object} tree Дерево наложения.
      * @returns {object}
+     * @method
      */
     ns.View.prototype.patchTree = no.nop;
 
@@ -1070,6 +1078,7 @@
 
     /**
      * Оставляет вид валидным после изменения моделей
+     * @method
      */
     ns.View.prototype.keepValid = ns.View.prototype._saveModelsVersions;
 
@@ -1453,6 +1462,7 @@
      * в объект {model1: 'handlerDefault1', model2: 'handlerDefault2', ...}
      * @param {array} decl
      * @return {object}
+     * @private
      */
     ns.View._expandModelsDecl = function(decl) {
         if (!Array.isArray(decl)) {

@@ -36,7 +36,7 @@
      * Осуществляем переход по ссылке.
      * @param {string} [url=ns.page.getCurrentUrl()]
      * @param {string} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     ns.page.go = function(url, action) {
         if (!action) {
@@ -48,7 +48,7 @@
         if (ns.page._stop) {
             ns.page._lastUrl = url;
 
-            return no.Promise.rejected('transaction');
+            return Vow.reject('transaction');
         }
 
         url = url || ns.page.getCurrentUrl();
@@ -60,7 +60,7 @@
             if (url !== ns.page.currentUrl) {
                 ns.history.replaceState(ns.page.currentUrl);
             }
-            return no.Promise.rejected('block');
+            return Vow.reject('block');
         }
 
         var route = ns.router(url);
@@ -78,7 +78,7 @@
             }
 
             // return empty non-resolved promise becase we are redirecting now
-            return no.promise();
+            return new Vow.Promise();
         }
 
         var layout = ns.layout.page(route.page, route.params);
@@ -107,7 +107,7 @@
     /**
      * Redirects to given url.
      * @param {string} url New page url.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     ns.page.redirect = function(url) {
         ns.history.replaceState(url);
@@ -243,7 +243,7 @@
 
     /**
      * Go to previous page and delete it from history.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     ns.page.history.back = function() {
         var nsHistory = ns.page.history;

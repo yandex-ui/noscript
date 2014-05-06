@@ -101,7 +101,7 @@ describe('ns.Box', function() {
 
             beforeEach(function() {
                 var layout = ns.layout.page('content2', {});
-                new ns.Update(this.APP, layout, {}).start();
+                return new ns.Update(this.APP, layout, {}).start();
             });
 
             it('should have node for "content2"', function() {
@@ -118,7 +118,7 @@ describe('ns.Box', function() {
 
             beforeEach(function() {
                 var layout = ns.layout.page('content3', {});
-                new ns.Update(this.APP, layout, {}).start();
+                return new ns.Update(this.APP, layout, {}).start();
             });
 
             it('should have node for "content3"', function() {
@@ -138,19 +138,22 @@ describe('ns.Box', function() {
 
         describe('"content2" -> "content1"', function() {
 
-            beforeEach(function() {
+            beforeEach(function(done) {
+                var that = this;
                 new ns.Update(
                     this.APP,
                     ns.layout.page('content2', {}),
                     {}
-                ).start();
-
-                var page2Params = {p: 1};
-                new ns.Update(
-                    this.APP,
-                    ns.layout.page('content1', page2Params),
-                    page2Params
-                ).start();
+                ).start().then(function() {
+                    var page2Params = {p: 1};
+                    new ns.Update(
+                        that.APP,
+                        ns.layout.page('content1', page2Params),
+                        page2Params
+                    ).start().then(function() {
+                        done()
+                    });
+                });
             });
 
             it('should have node for "content1" ', function() {
@@ -173,20 +176,23 @@ describe('ns.Box', function() {
 
         describe('"content1"(p=1) -> "content1"(p=2)', function() {
 
-            beforeEach(function() {
+            beforeEach(function(done) {
                 var page1Params = {p: 1};
+                var that = this;
                 new ns.Update(
                     this.APP,
                     ns.layout.page('content1', page1Params),
                     page1Params
-                ).start();
-
-                var page2Params = {p: 2};
-                new ns.Update(
-                    this.APP,
-                    ns.layout.page('content1', page2Params),
-                    page2Params
-                ).start();
+                ).start().then(function() {
+                    var page2Params = {p: 2};
+                    new ns.Update(
+                        that.APP,
+                        ns.layout.page('content1', page2Params),
+                        page2Params
+                    ).start().then(function() {
+                        done();
+                    });
+                });
             });
 
             it('should have two nodes for "content1" ', function() {
@@ -205,37 +211,38 @@ describe('ns.Box', function() {
 
         describe('"async-view"(p=1) -> "async-view"(p=2)', function() {
 
-            beforeEach(function(finish) {
+            beforeEach(function(done) {
                 var page1Params = {p: 1};
+                var that = this;
+
                 new ns.Update(
                     this.APP,
                     ns.layout.page('content3', page1Params),
                     page1Params
-                ).start();
+                ).start().then(function(promises) {
 
-                // finish first draw
-                this.sinon.server.requests[0].respond(
-                    200,
-                    {"Content-Type": "application/json"},
-                    JSON.stringify({
-                        models: [
-                            {data: true}
-                        ]
-                    })
-                );
+                    // finish first draw
+                    that.sinon.server.requests[0].respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {data: true}
+                            ]
+                        })
+                    );
 
-                var that = this;
-
-                window.setTimeout(function() {
-                    var page2Params = {p: 2};
-                    new ns.Update(
-                        that.APP,
-                        ns.layout.page('content3', page2Params),
-                        page2Params
-                    ).start();
-
-                    finish();
-                }, 50);
+                    Vow.all(promises.async).then(function() {
+                        var page2Params = {p: 2};
+                        new ns.Update(
+                            that.APP,
+                            ns.layout.page('content3', page2Params),
+                            page2Params
+                        ).start().then(function() {
+                            done();
+                        });
+                    });
+                });
             });
 
             describe('first pass', function() {
@@ -265,7 +272,7 @@ describe('ns.Box', function() {
 
             describe('second pass', function() {
 
-                beforeEach(function() {
+                beforeEach(function(done) {
                     this.sinon.server.requests[1].respond(
                         200,
                         {"Content-Type": "application/json"},
@@ -275,6 +282,12 @@ describe('ns.Box', function() {
                             ]
                         })
                     );
+
+                    // ждем завершения второго update
+                    // вот это неправильный код, но нет времени переписывать
+                    window.setTimeout(function() {
+                        done();
+                    }, 10);
                 });
 
                 it('should create second "content3" node', function() {
@@ -304,22 +317,26 @@ describe('ns.Box', function() {
 
         describe('"content4"(pOwn=1) -> "content4"(pOwn=2), where pOwn depends only of models', function() {
 
-            beforeEach(function() {
+            beforeEach(function(done) {
                 var model = ns.Model.get('model4');
                 model.setData({'value': 1});
 
-                new ns.Update(
-                    this.APP,
-                    ns.layout.page('content4', {}),
-                    {}
-                ).start();
+                var that = this;
 
-                model.set('.value', 2);
                 new ns.Update(
                     this.APP,
                     ns.layout.page('content4', {}),
                     {}
-                ).start();
+                ).start().then(function() {
+                    model.set('.value', 2);
+                    new ns.Update(
+                        that.APP,
+                        ns.layout.page('content4', {}),
+                        {}
+                    ).start().then(function() {
+                        done();
+                    });
+                });
             });
 
             it('should have two nodes for "content4" ', function() {
@@ -337,20 +354,24 @@ describe('ns.Box', function() {
         });
 
         describe('"parent1"(p=1) -> "parent1"(p=2)', function() {
-            beforeEach(function() {
+
+            beforeEach(function(done) {
                 var params1 = {p: 1};
+                var that = this;
                 new ns.Update(
                     this.APP,
                     ns.layout.page('parent1', params1),
                     params1
-                ).start();
-
-                var params2 = {p: 2};
-                new ns.Update(
-                    this.APP,
-                    ns.layout.page('parent1', params2),
-                    params2
-                ).start();
+                ).start().then(function() {
+                    var params2 = {p: 2};
+                    new ns.Update(
+                        that.APP,
+                        ns.layout.page('parent1', params2),
+                        params2
+                    ).start().then(function() {
+                        done();
+                    });
+                });
             });
 
             it('should have two nodes for view "content1" ', function() {
@@ -363,20 +384,24 @@ describe('ns.Box', function() {
         });
 
         describe('"parent2"(p=1) -> "parent2"(p=2)', function() {
-            beforeEach(function() {
+
+            beforeEach(function(done) {
                 var params1 = {p: 1};
+                var that = this;
                 new ns.Update(
                     this.APP,
                     ns.layout.page('parent2', params1),
                     params1
-                ).start();
-
-                var params2 = {p: 2};
-                new ns.Update(
-                    this.APP,
-                    ns.layout.page('parent2', params2),
-                    params2
-                ).start();
+                ).start().then(function() {
+                    var params2 = {p: 2};
+                    new ns.Update(
+                        that.APP,
+                        ns.layout.page('parent2', params2),
+                        params2
+                    ).start().then(function() {
+                        done();
+                    });
+                });
             });
 
             it('should have one node for view "content2" ', function() {

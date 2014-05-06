@@ -175,12 +175,7 @@ describe('ns.request.js', function() {
                 expect(this.model.requestID).to.be.a('number');
             });
 
-            it('should resolve promise after response', function() {
-                var result = false;
-                this.promise.then(function() {
-                    result = true;
-                });
-
+            it('should resolve promise after response', function(finish) {
                 this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
@@ -191,7 +186,11 @@ describe('ns.request.js', function() {
                     })
                 );
 
-                expect(result).to.be.equal(true);
+                this.promise.then(function() {
+                    finish();
+                }, function() {
+                    finish('rejected');
+                });
             });
         });
 
@@ -208,13 +207,13 @@ describe('ns.request.js', function() {
                     expect(this.sinon.server.requests.length).to.be.equal(0);
                 });
 
-                it('should resolve promise immediately for model', function() {
+                it('should resolve promise immediately for model', function(finish) {
                     var result = false;
                     ns.request('test-model').then(function() {
-                        result = true;
+                        finish()
+                    }, function() {
+                        finish('rejected');
                     });
-
-                    expect(result).to.be.equal(true);
                 });
             });
 
@@ -232,19 +231,11 @@ describe('ns.request.js', function() {
                     expect(this.sinon.server.requests.length).to.be.equal(1);
                 });
 
-                it('should not resolve promise immediately', function() {
-                    var result = false;
+                it('should resolve promise after response', function(finish) {
                     this.requestPromise.then(function() {
-                        result = true;
-                    });
-
-                    expect(result).to.be.equal(false);
-                });
-
-                it('should resolve promise after response', function() {
-                    var result = false;
-                    this.requestPromise.then(function() {
-                        result = true;
+                        finish()
+                    }, function() {
+                        finish('rejected');
                     });
 
                     this.sinon.server.requests[0].respond(
@@ -256,8 +247,6 @@ describe('ns.request.js', function() {
                             ]
                         })
                     );
-
-                    expect(result).to.be.equal(true);
                 });
             });
         });
@@ -421,7 +410,7 @@ describe('ns.request.js', function() {
 
         beforeEach(function() {
             this.sinon.stub(ns, 'http', function() {
-                return new no.Promise();
+                return new Vow.Promise();
             });
 
             ns.Model.define('test-model-addRequestParams');
@@ -464,7 +453,7 @@ describe('ns.request.js', function() {
                 var promises = this.promises = [];
 
                 this.sinon.stub(ns, 'http', function() {
-                    var promise = new no.Promise();
+                    var promise = new Vow.Promise();
                     promises.push(promise);
                     return promise;
                 });
@@ -472,7 +461,7 @@ describe('ns.request.js', function() {
                 this.request1 = ns.request('test-model-two-equal-requests');
                 this.request2 = ns.request('test-model-two-equal-requests');
 
-                this.promises[0].resolve({
+                this.promises[0].fulfill({
                     models: [
                         {data: true}
                     ]
@@ -485,20 +474,20 @@ describe('ns.request.js', function() {
                 delete this.promises;
             });
 
-            it('resolve first request', function() {
-                var res = false;
+            it('resolve first request', function(finish) {
                 this.request1.then(function() {
-                    res = true;
+                    finish();
+                }, function() {
+                    finish('reject')
                 });
-                expect(res).to.be.equal(true);
             });
 
             it('resolve second request', function() {
-                var res = false;
                 this.request2.then(function() {
-                    res = true;
+                    finish();
+                }, function() {
+                    finish('reject')
                 });
-                expect(res).to.be.equal(true);
             });
         });
 
@@ -509,7 +498,7 @@ describe('ns.request.js', function() {
                 var promises = this.promises = [];
 
                 this.sinon.stub(ns, 'http', function() {
-                    var promise = new no.Promise();
+                    var promise = new Vow.Promise();
                     promises.push(promise);
                     return promise;
                 });
@@ -530,7 +519,7 @@ describe('ns.request.js', function() {
             });
 
             it('should not resolve first promise after first response', function() {
-                this.promises[0].resolve({
+                this.promises[0].fulfill({
                     models: [
                         {data: true}
                     ]
@@ -540,7 +529,7 @@ describe('ns.request.js', function() {
             });
 
             it('should not resolve second promise after first response', function() {
-                this.promises[0].resolve({
+                this.promises[0].fulfill({
                     models: [
                         {data: true}
                     ]
@@ -549,24 +538,32 @@ describe('ns.request.js', function() {
                 expect(promiseIsResolved(this.request2)).to.be.equal(false);
             });
 
-            it('should resolve first promise after second response', function() {
-                this.promises[1].resolve({
+            it('should resolve first promise after second response', function(finish) {
+                this.promises[1].fulfill({
                     models: [
                         {data: 'second response1'}
                     ]
                 });
 
-                expect(promiseIsResolved(this.request1)).to.be.equal(true);
+                this.request1.then(function() {
+                    finish();
+                }, function() {
+                    finish('reject');
+                });
             });
 
             it('should resolve second promise after second response', function() {
-                this.promises[1].resolve({
+                this.promises[1].fulfill({
                     models: [
                         {data: 'second response2'}
                     ]
                 });
 
-                expect(promiseIsResolved(this.request2)).to.be.equal(true);
+                this.request2.then(function() {
+                    finish();
+                }, function() {
+                    finish('reject');
+                });
             });
         });
     });

@@ -106,10 +106,12 @@ describe('ns.View.events', function() {
 
     describe('first rendering', function() {
 
-        beforeEach(function() {
+        beforeEach(function(done) {
             var layout = ns.layout.page('content1', {});
             var update = new ns.Update(this.APP, layout, {});
-            update.start();
+            update.start().then(function() {
+                done();
+            }.bind(this));
         });
 
         describe('ns-view-init', function() {
@@ -201,12 +203,16 @@ describe('ns.View.events', function() {
 
     describe('change view in box', function() {
 
-        beforeEach(function() {
+        beforeEach(function(done) {
             var layout = ns.layout.page('content1', {});
-            new ns.Update(this.APP, layout, {}).start();
+            new ns.Update(this.APP, layout, {}).start().then(function() {
+                layout = ns.layout.page('content2', {});
+                new ns.Update(this.APP, layout, {}).start().then(function() {
+                    done();
+                });
+            }.bind(this));
 
-            layout = ns.layout.page('content2', {});
-            new ns.Update(this.APP, layout, {}).start();
+
         });
 
         genTests([
@@ -268,10 +274,15 @@ describe('ns.View.events', function() {
 
     describe('redraw valid view', function() {
 
-        beforeEach(function() {
+        beforeEach(function(done) {
+            var that = this;
             var layout = ns.layout.page('content1', {});
-            new ns.Update(this.APP, layout, {}).start();
-            new ns.Update(this.APP, layout, {}).start();
+            new ns.Update(this.APP, layout, {}).start().then(function() {
+                new ns.Update(that.APP, layout, {}).start().then(function() {
+                    done();
+                });
+            });
+
         });
 
         describe('events', function() {
@@ -297,18 +308,20 @@ describe('ns.View.events', function() {
 
     describe('redraw invalidated view', function() {
 
-        beforeEach(function() {
+        beforeEach(function(done) {
             var layout = ns.layout.page('content1', {});
-            new ns.Update(this.APP, layout, {}).start();
+            new ns.Update(this.APP, layout, {}).start().then(function() {
+                /**
+                 * @type {ns.View}
+                 */
+                var vContent1 = this.events['content1-ns-view-init-spy'].getCall(0).thisValue;
+                vContent1.invalidate();
 
-            /**
-             * @type {ns.View}
-             */
-            var vContent1 = this.events['content1-ns-view-init-spy'].getCall(0).thisValue;
-            vContent1.invalidate();
-
-            layout = ns.layout.page('content1', {});
-            new ns.Update(this.APP, layout, {}).start();
+                layout = ns.layout.page('content1', {});
+                new ns.Update(this.APP, layout, {}).start().then(function() {
+                    done();
+                });
+            }.bind(this));
         });
 
         describe('events', function() {
@@ -368,7 +381,7 @@ describe('ns.View.events', function() {
 
     describe('ns-view-async', function() {
 
-        beforeEach(function() {
+        beforeEach(function(done) {
             ns.layout.define('content1-async', {
                 'app content@': {
                     'content1-async&': {
@@ -380,7 +393,9 @@ describe('ns.View.events', function() {
             ns.Model.define('content1-async-model');
 
             var layout = ns.layout.page('content1-async', {});
-            new ns.Update(this.APP, layout, {}).start();
+            new ns.Update(this.APP, layout, {}).start().then(function() {
+                done();
+            });
         });
 
         describe('first pass', function() {
@@ -420,7 +435,7 @@ describe('ns.View.events', function() {
 
         describe('second pass', function() {
 
-            beforeEach(function() {
+            beforeEach(function(done) {
                 this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
@@ -430,6 +445,10 @@ describe('ns.View.events', function() {
                         ]
                     })
                 );
+
+                window.setTimeout(function() {
+                    done();
+                }, 50)
             });
 
             describe('events', function() {

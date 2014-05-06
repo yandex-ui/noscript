@@ -589,19 +589,18 @@ describe('ns.View', function() {
                 var layout = ns.layout.page('app', {});
                 new ns.Update(APP, layout, {})
                     .start()
-                    .done(function() {
+                    .then(function() {
                         model.invalidate();
                         that.asyncViewNode1 = APP.$node.find('.ns-view-async-view')[0];
 
                         new ns.Update(APP, layout, {})
                             .start()
-                            .done(function(asyncPromises) {
-                                no.Promise.wait(asyncPromises.async)
-                                    .done(function() {
+                            .then(function(asyncPromises) {
+                                Vow.all(asyncPromises.async)
+                                    .then(function() {
                                         that.asyncViewNode2 = APP.$node.find('.ns-view-async-view')[0];
                                         done();
-                                    })
-                                    .fail(function() {
+                                    }, function() {
                                         done('fail to init');
                                     });
                             });
@@ -627,7 +626,7 @@ describe('ns.View', function() {
 
             var goToPage = function(app, params, callback) {
                 var layout = ns.layout.page('app', params);
-                return new ns.Update(app, layout, params).start().done(function() { callback(); });
+                return new ns.Update(app, layout, params).start().then(function() { callback(); });
             };
 
             beforeEach(function() {
@@ -738,14 +737,14 @@ describe('ns.View', function() {
             var layout = ns.layout.page('app', {});
             new ns.Update(this.APP, layout, {})
                 .start()
-                .done(function() {
+                .then(function() {
                     ns.Model.destroy(ns.Model.get('mSimple'));
 
                     ns.Model.get('mSimple').setData({foo: 'bar2'});
 
                     new ns.Update(this.APP, layout, {})
                         .start()
-                        .done(function() {
+                        .then(function() {
                             finish();
                         }.bind(this));
                 }.bind(this));

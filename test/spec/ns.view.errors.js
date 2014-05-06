@@ -43,7 +43,7 @@ describe('ns.View error handling', function() {
                 expect(_error.error).to.be.equal('models');
                 return true;
             };
-            this.update.start().done(function() {
+            this.update.start().then(function() {
                 expect($('.ns-view-letter', that.APP.node).html()).to.be.equal('view-error-content');
                 finish();
             });
@@ -53,7 +53,7 @@ describe('ns.View error handling', function() {
             ns.Update.handleError = function() {
                 return true;
             };
-            this.update.start().done(function() {
+            this.update.start().then(function() {
                 var renderJSON = {
                     'views': {
                         'app': {
@@ -145,12 +145,11 @@ describe('ns.View error handling', function() {
             var promise = new ns.Update(app, layout, params).start();
 
             promise
-                .done(function(details) {
-                    no.Promise.wait(details.async)
+                .then(function(details) {
+                    Vow.all(details.async)
                         .done(function() { done(); })
                         .fail(function() { done(); });
-                })
-                .fail(function() {
+                }, function() {
                     done();
                 });
         });

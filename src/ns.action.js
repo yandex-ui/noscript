@@ -209,7 +209,7 @@
             // могут быть ссылки <a href="#hash" target="_blank"/>
             if (target.getAttribute('target') !== '_blank') {
                 returnValue = ns.page.go(href);
-                if (returnValue instanceof no.Promise) {
+                if (Vow.isPromise(returnValue)) {
                     // stop go to link, but not bubbling
                     e.preventDefault();
                     return true;
@@ -217,7 +217,7 @@
             }
         }
 
-        return (returnValue === undefined || returnValue instanceof no.Promise) ? false : returnValue;
+        return (returnValue === undefined || Vow.isPromise(returnValue)) ? false : returnValue;
     };
 
 })(ns);

@@ -33,10 +33,9 @@ describe('no.Updater', function() {
 
             it('should reject old ns.Update if new one is running', function(finish) {
                 this.updater1.start()
-                    .done(function() {
+                    .then(function() {
                         finish('first ns.Update was resolved');
-                    })
-                    .fail(function(result) {
+                    }, function(result) {
                         try {
                             expect(result.error).to.be.equal(ns.U.STATUS.EXPIRED);
                             finish();
@@ -62,10 +61,9 @@ describe('no.Updater', function() {
                 this.updater1.start();
 
                 this.updater2.start()
-                    .done(function() {
+                    .then(function() {
                         finish();
-                    })
-                    .fail(function() {
+                    }, function() {
                         finish('second ns.Update was rejected');
                     });
 
@@ -114,12 +112,11 @@ describe('no.Updater', function() {
             });
 
             it('should resolve first async promise', function(finish) {
-                this.promise.done(function(result) {
+                this.promise.then(function(result) {
                     result.async[0]
-                        .done(function() {
+                        .then(function() {
                             finish();
-                        })
-                        .fail(function() {
+                        }, function() {
                             finish('First async promise was rejected');
                         });
 
@@ -147,10 +144,9 @@ describe('no.Updater', function() {
             it('should resolve second async promise', function(finish) {
                 this.promise.done(function(result) {
                     result.async[1]
-                        .done(function() {
+                        .then(function() {
                             finish();
-                        })
-                        .fail(function() {
+                        }, function() {
                             finish('Second async promise was rejected');
                         });
 
@@ -221,7 +217,7 @@ describe('no.Updater', function() {
                 ns.MAIN_VIEW = ns.View.create('app');
 
                 ns.page.go('/page1')
-                    .done(function() {
+                    .then(function() {
 
                         // don't wait for async view
                         // start new global update
@@ -249,8 +245,7 @@ describe('no.Updater', function() {
                                 finish('ns.Update fails');
                             });
 
-                    })
-                    .fail(function() {
+                    }, function() {
                         finish('ns.Update fails');
                     });
             });
@@ -299,9 +294,9 @@ describe('no.Updater', function() {
                 this.updater = new ns.Update(this.view, layout, {});
             });
 
-            it('should return no.Promise', function() {
+            it('should return promise', function() {
                 var returnValue = this.updater.start();
-                expect(returnValue).to.be.instanceOf(no.Promise);
+                expect(Vow.isPromise(returnValue)).to.be.equal(true);
             });
         });
 
@@ -318,7 +313,7 @@ describe('no.Updater', function() {
 
             it('should resolve promise', function(finish) {
                 var returnValue = this.updater.start();
-                returnValue.done(function() {
+                returnValue.then(function() {
                     finish();
                 });
 
@@ -378,7 +373,7 @@ describe('no.Updater', function() {
 
             it('should return promises for async ns.Update', function(finish) {
                 var returnValue = this.updater.start();
-                returnValue.done(function(data) {
+                returnValue.then(function(data) {
                     try {
                         expect(data.async).to.be.a('array');
                         finish();
@@ -391,8 +386,8 @@ describe('no.Updater', function() {
 
             it('should resolve promise with new ns.Update instance when async view is finished', function(finish) {
                 var returnValue = this.updater.start();
-                returnValue.done(function(data) {
-                    data.async[0].done(function(result) {
+                returnValue.then(function(data) {
+                    data.async[0].then(function(result) {
                         try {
                             expect(result.async).to.have.length(0);
                             finish();
@@ -415,7 +410,7 @@ describe('no.Updater', function() {
 
             it('should reject promise with status MODELS when ns.request is failed', function(finish) {
                 var returnValue = this.updater.start();
-                returnValue.done(function(data) {
+                returnValue.then(function(data) {
                     data.async[0].fail(function(result) {
                         try {
                             expect(result).to.have.property('error', ns.U.STATUS.MODELS);
@@ -443,7 +438,7 @@ describe('no.Updater', function() {
 
     describe('box inside box', function() {
 
-        beforeEach(function() {
+        beforeEach(function(finish) {
             ns.layout.define('box-inside-box', {
                 'main': {
                     'box1@': {
@@ -457,7 +452,9 @@ describe('no.Updater', function() {
 
             var layout = ns.layout.page('box-inside-box', {});
             var updater = new ns.Update(view, layout, {});
-            updater.start();
+            updater.start().then(function() {
+                finish();
+            });
         });
 
         it('check arg to ns.tmpl', function() {
@@ -559,8 +556,8 @@ describe('no.Updater', function() {
         it('should replace all async nodes', function(finish) {
             var that = this;
             this.promise
-                .done(function(result) {
-                    no.Promise.wait(result.async)
+                .then(function(result) {
+                    Vow.all(result.async)
                         .done(function() {
                             try {
                                 expect($(that.view.node).find('.ns-async')).to.have.length(0);
@@ -572,8 +569,7 @@ describe('no.Updater', function() {
                         .fail(function() {
                             finish('async ns.Update was rejected');
                         });
-                })
-                .fail(function() {
+                }, function() {
                     finish('main ns.Update was rejected');
                 });
         });
@@ -608,16 +604,17 @@ describe('no.Updater', function() {
 
             ns.MAIN_VIEW = ns.View.create('app');
 
-            ns.page.go('/1');
-            ns.page.go('/2')
-                .done(function(result) {
-                    no.Promise.wait(result.async)
-                        .done(function() {
-                            ns.page.go('/2').done(function() {
+            ns.page.go('/1').then(function() {
+                ns.page.go('/2').then(function(result) {
+                    Vow.all(result.async)
+                        .then(function() {
+                            ns.page.go('/2').then(function() {
                                 finish();
                             }.bind(this));
                         }.bind(this));
                 }.bind(this));
+            }.bind(this));
+
         });
 
         it('should hide async views', function() {
@@ -633,7 +630,8 @@ describe('no.Updater', function() {
         });
     });
 
-    describe('interrupting updates of async views inside a box', function() {
+    describe('interrupting updates of async views inside a box - 2', function() {
+
         beforeEach(function(finish) {
             ns.layout.define('app', {
                 'app': {
@@ -662,14 +660,14 @@ describe('no.Updater', function() {
             ns.MAIN_VIEW = ns.View.create('app');
 
             // Run two interrupting updates.
-            ns.page.go('/1');
-            ns.page.go('/2')
-                .done(function(result) {
-                    no.Promise.wait(result.async)
-                        .done(function() {
+            ns.page.go('/1').then(function() {
+                ns.page.go('/2').then(function(result) {
+                    Vow.all(result.async)
+                        .then(function() {
                             finish();
                         }.bind(this));
                 }.bind(this));
+            }.bind(this));
         });
 
         it('should hide async views', function() {
@@ -685,7 +683,7 @@ describe('no.Updater', function() {
         });
 
         it('should correctly switch views once navigated back', function(finish) {
-            ns.page.go('/1').done(function() {
+            ns.page.go('/1').then(function() {
                 expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos.ns-view-visible').getAttribute('data-key')).to.contain('category=1');
                 expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos.ns-view-hidden').getAttribute('data-key')).to.contain('category=2');
                 finish();

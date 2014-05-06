@@ -1,9 +1,8 @@
+/* borschik:include:node_modules/vow/lib/vow.js */
 (function(window, document) {
     "use strict";
     /* borschik:include:node_modules/nommon/lib/no.base.js */
     /* borschik:include:node_modules/nommon/lib/no.events.js */
-    /* borschik:include:node_modules/nommon/lib/no.promise.js */
-
     /* borschik:include:node_modules/nommon/lib/no.parser.js */
     /* borschik:include:node_modules/nommon/lib/no.jpath.js */
 

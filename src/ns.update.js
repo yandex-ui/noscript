@@ -77,10 +77,10 @@
     /**
      * Начинает работу updater'а.
      * @param {boolean} [async=false] Флаг асинхронного updater'а.
-     * @returns {no.Promise}
+     * @returns {Vow.Promise}
      */
     ns.Update.prototype.start = function(async) {
-        var resultPromise = new no.Promise();
+        var resultPromise = new Vow.Promise();
         this.promise = resultPromise;
 
         if (!this.addToQueue(this)) {
@@ -105,11 +105,11 @@
 
         // create promise for each async view
         var asyncUpdaterPromises = updated.async.map(function() {
-            return new no.Promise();
+            return new Vow.Promise();
         });
 
         var syncModelsPromise = ns.request.models(models)
-            .done(function(models) {
+            .then(function(models) {
                 var error = null;
                 models = models || [];
 
@@ -136,11 +136,16 @@
                 that.done({
                     async: asyncUpdaterPromises
                 });
-            })
-            .fail(function(models) {
+            }, function(models) {
                 // NOTE here we do not even try to handle the error. Or we should do it?
                 that.error({
                     error: that.STATUS.MODELS,
+                    models: models
+                });
+            })
+            .fail(function(e) {
+                that.error({
+                    error: e,
                     models: models
                 });
             });
@@ -150,10 +155,10 @@
         // Причем ждем отрисовку sync-view, чтобы точно запуститься после него.
         updated.async.forEach(function(view, asyncViewId) {
             var models = views2models( [ view ] );
-            no.Promise.wait([
+            Vow.all([
                 syncModelsPromise,
                 ns.request.models(models)
-            ]).done(function(result) {
+            ]).then(function(result) {
                 var models = result[1];
                 //FIXME: we should delete this loop when ns.request will can reject promise
                 // check that all models is valid
@@ -183,17 +188,24 @@
                     params = that.params;
                 }
 
-                new ns.Update(that.view, layout, params, {execFlag: ns.U.EXEC.ASYNC})
-                    .start(true)
-                    // pipes ns.Update promise to asyncPromise
-                    .pipe(asyncUpdaterPromises[asyncViewId]);
+                // pipes ns.Update promise to asyncPromise
+                asyncUpdaterPromises[asyncViewId].sync(
+                    new ns.Update(that.view, layout, params, {execFlag: ns.U.EXEC.ASYNC}).start(true)
+                );
 
-            }).fail(function(result) {
+            }, function(result) {
                 //FIXME: ns.request.models can't reject promise this time, we should fix it
                 asyncUpdaterPromises[asyncViewId].reject({
                     error: that.STATUS.MODELS,
                     async_view: view,
                     models: result[1]
+                });
+            })
+            .fail(function(e) {
+                asyncUpdaterPromises[asyncViewId].reject({
+                    error: e,
+                    async_view: view,
+                    models: models
                 });
             });
         });
@@ -298,7 +310,7 @@
      */
     ns.Update.prototype.done = function(result) {
         this.removeFromQueue();
-        this.promise.resolve(result);
+        this.promise.fulfill(result);
     };
 
     /**

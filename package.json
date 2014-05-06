@@ -36,12 +36,11 @@
     "files": [
         "css",
         "dist",
-        "src",
+        "src/*.js",
         "yate",
         "noscript.borschik.js"
     ],
     "scripts": {
-        "prepublish": "make yate && mkdir -p dist && borschik -i noscript.borschik.js -o dist/noscript.js -m no && borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes",
-        "test": "jshint src && jscs . && ./node_modules/karma/bin/karma start"
+        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start"
     }
 }

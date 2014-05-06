@@ -1,19 +1,30 @@
 NPM_BIN=$(CURDIR)/node_modules/.bin
 export NPM_BIN
 
+# сборка для тестов и npm
+prepare: yate dist
+
+# сборка для npm
+dist: node_modules
+	mkdir -p dist
+	borschik -i noscript.borschik.js -o dist/noscript.js -m no
+	borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes
+
+# сбока yate для тестов
 yate: test/tests.yate.js
 
-test/tests.yate.js: test/tests.yate yate/noscript.yate
-	$(NPM_BIN)/yate test/tests.yate > test/tests.yate.js
+# публикация npm
+npm-publish: dist
+	npm pack
+
+test/tests.yate.js: test/tests.yate yate/noscript.yate node_modules
+	$(NPM_BIN)/yate $< > $@
 
 node_modules: package.json
 	npm install
 	touch node_modules
 
-clean-node_modules:
-	rm -rf node_modules
-
-test: node_modules
+test: node_modules yate
 	npm test
 
 gh-pages:
@@ -25,4 +36,4 @@ jsdoc: gh-pages
 jsdoc-publish: gh-pages
 	$(MAKE) -C gh-pages publish
 
-.PHONY: clean-node_modules jsdoc jsdoc-publish yate test
+.PHONY: dist jsdoc jsdoc-publish test yate

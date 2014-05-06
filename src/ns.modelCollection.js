@@ -74,6 +74,7 @@
     /**
      * Разбивает данные через jpath описанный в info.split
      * на составные модели
+     * @private
      */
     ns.ModelCollection.prototype._beforeSetData = function(data) {
         this.clear();
@@ -95,6 +96,7 @@
      *
      * @param { Array } items – массив данных для будущих подмоделей
      * @returns { ns.Model[] } – массив полученных подмоделей
+     * @private
      */
     ns.ModelCollection.prototype._splitModels = function(items) {
         var splitInfo = this.info.split;
@@ -115,6 +117,7 @@
      * Подписывает коллекию на события из подмоделей
      *
      * @param {ns.Model} model
+     * @private
      */
     ns.ModelCollection.prototype._subscribeSplit = function(model) {
         var that = this;
@@ -208,6 +211,7 @@
      * Обязательно при удалении подмодели из коллекции
      *
      * @param {ns.Model} model
+     * @private
      */
     ns.ModelCollection.prototype._unsubscribeSplit = function(model) {
         if (model.key in this._modelsEvents) {

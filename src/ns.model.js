@@ -129,9 +129,9 @@
     /**
      * Ищет метод в объекте по имени или возвращает переданную функцию
      * Нужен для навешивания коллбеков
-     *
      * @param {String | Function} method
      * @returns {Function}
+     * @private
      */
     ns.Model.prototype._prepareCallback = function(method) {
         if (typeof method === 'string') {
@@ -455,6 +455,7 @@
      * @param {string} id Model's ID.
      * @param {object} [params] Model's params
      * @returns {ns.Model|null}
+     * @private
      */
     ns.Model._find = function(id, params) {
         ns.assert((id in _infos), 'ns.Model', "'%s' is not defined", id);

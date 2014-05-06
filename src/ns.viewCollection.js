@@ -63,6 +63,7 @@ ns.ViewCollection.eventsModelCollectionDefault = {
  * в объект {model1: 'handlerDefault1', model2: 'handlerDefault2', ...}
  * @param {array} decls
  * @return {object}
+ * @private
  */
 ns.ViewCollection._expandModelsDecl = function(decls) {
     if (!Array.isArray(decls)) {

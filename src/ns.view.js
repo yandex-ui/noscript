@@ -13,8 +13,6 @@
      * @tutorial ns.view.yate
      * @constructor
      * @mixes no.Events
-     * @tutorial ns.view
-     * @tutorial ns.view.yate
      */
     ns.View = function() {};
     no.extend(ns.View.prototype, no.Events);
@@ -247,12 +245,15 @@
     };
 
     /**
-     * @prorected
+     * @private
      */
     ns.View.prototype._showNode = function() {
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
     };
 
+    /**
+     * @private
+     */
     ns.View.prototype._bindModels = function() {
         var models = this.models;
         var decls = this.info.models;
@@ -275,6 +276,8 @@
 
     /**
      * Вызывает обработчик события модели
+     * @param {function} handler
+     * @private
      */
     ns.View.prototype._invokeModelHandler = function(handler) {
         this._saveModelsVersions();
@@ -571,6 +574,7 @@
      * @param {object} pageLayout Currently processing layout.
      * @param {object} params Params.
      * @returns {object}
+     * @private
      */
     ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
 
@@ -598,6 +602,7 @@
     /**
      * Добавляет вид в соответствующий список "запрашиваемых" видов в случае,
      * если запрос необходим
+     * @private
      */
     ns.View.prototype._tryPushToRequest = function(updated) {
         /**
@@ -630,7 +635,7 @@
 
     /**
      *  Строим дерево для шаблонизатора.
-     *
+     *  @description
      *  В tree.views будет дерево блоков, которые нужно сгенерить,
      *  причем на верхнем уровне будут т.н. toplevel-блоки --
      *  это невалидные блоки и выше их все блоки валидны.
@@ -638,6 +643,7 @@
      *  со всеми своими подблоками.
      *
      *  В tree.models будут все модели, требуемые для этих блоков.
+     *  @private
      */
     ns.View.prototype._getUpdateTree = function(tree, layout, params) {
         if ( !this.isValid() ) {
@@ -688,6 +694,7 @@
      * @param {object} layout Currently processing layout.
      * @param {object} params Params.
      * @returns {object}
+     * @private
      */
     ns.View.prototype._getViewTree = function(layout, params) {
         var tree = this._getTree();
@@ -766,6 +773,7 @@
      * @param {object} layout Currently processing layout.
      * @param {object} params Params.
      * @returns {object}
+     * @private
      */
     ns.View.prototype._getPlaceholderTree = function(layout, params) {
         var tree = this._getTree();

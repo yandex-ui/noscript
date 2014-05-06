@@ -17,6 +17,7 @@
      * update.start();
      * ```
      * @tutorial ns.update.logic
+     * @mixes ns.profile
      */
     ns.Update = function(view, layout, params, options) {
         /**
@@ -47,6 +48,8 @@
          */
         this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
     };
+
+    no.extend(ns.Update.prototype, ns.profile);
 
     /**
      * Current ns.Updates.
@@ -80,6 +83,8 @@
      * @returns {Vow.Promise}
      */
     ns.Update.prototype.start = function(async) {
+        this.startTimer('prepare');
+
         var resultPromise = new Vow.Promise();
         this.promise = resultPromise;
 
@@ -108,8 +113,13 @@
             return new Vow.Promise();
         });
 
+        this.stopTimer('prepare');
+        this.startTimer('request');
         var syncModelsPromise = ns.request.models(models)
             .then(function(models) {
+                that.stopTimer('request');
+                that.startTimer('tree');
+
                 var error = null;
                 models = models || [];
 
@@ -135,6 +145,14 @@
                 // resolve main promise and return promises for async views
                 that.done({
                     async: asyncUpdaterPromises
+                });
+                that.perf({
+                    'prepare': that.getTimer('prepare'),
+                    'request': that.getTimer('request'),
+                    'tree': that.getTimer('tree'),
+                    'template': that.getTimer('template'),
+                    'dom': that.getTimer('dom'),
+                    'events': that.getTimer('events')
                 });
             }, function(models) {
                 // NOTE here we do not even try to handle the error. Or we should do it?
@@ -231,6 +249,9 @@
 
         ns.log.debug('[ns.Update]', 'start()', this.id, 'updateTree', tree);
 
+        this.stopTimer('tree');
+        this.startTimer('template');
+
         var node;
         // если пустое дерево, то ничего не реднерим,
         // но кидаем события и скрываем/открываем блоки
@@ -238,6 +259,9 @@
             node = this.render(tree, this.params, this.layout);
             ns.log.debug('[ns.Update]', 'start()', this.id, 'new node', node.cloneNode(true));
         }
+
+        this.stopTimer('template');
+        this.startTimer('dom');
 
         var viewEvents = {
             'ns-view-async': [],
@@ -253,6 +277,9 @@
             async: async
         }, viewEvents);
 
+        this.stopTimer('dom');
+        this.startTimer('events');
+
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
             var event = this._EVENTS_ORDER[i];
             var views = viewEvents[event];
@@ -260,6 +287,7 @@
                 views[k].trigger(event, params);
             }
         }
+        this.stopTimer('events');
     };
 
     /**
@@ -403,6 +431,17 @@
     };
 
     /**
+     * В метод приходят данные профилировщика.
+     * @description
+     * Этот метод является точкой расширения в приложении.
+     * Например, можно логировать долгую работу ns.Update, когда общее время превыщает предел.
+     * @param {ns.Update~PerformanceTimings} perf
+     */
+    ns.Update.prototype.perf = function(perf) {
+        /* jshint unused: false */
+    };
+
+    /**
      * Global error handler.
      * @param {object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
      * @param {ns.Update} update Update instance so that we can abort it if we want to.
@@ -431,5 +470,16 @@
 
         return models;
     }
+
+    /**
+     * @typedef ns.Update~PerformanceTimings
+     * @type {object}
+     * @property {number} prepare Время подготовки запроса.
+     * @property {number} request Время запроса данных.
+     * @property {number} tree Время подготовки дерева шаблонизации.
+     * @property {number} template Время шаблонизации.
+     * @property {number} dom Время обновления DOM.
+     * @property {number} events Время выполнения событий в видах.
+     */
 
 })();

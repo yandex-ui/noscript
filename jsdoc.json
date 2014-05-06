@@ -9,6 +9,7 @@
     },
     "opts": {
         "private": false,
+        "protected": false,
         "template": "./node_modules/jaguarjs-jsdoc",
         "tutorials": "../doc"
     },

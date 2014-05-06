@@ -8,7 +8,7 @@
         ]
     },
     "opts": {
-        "private": true,
+        "private": false,
         "template": "./node_modules/jaguarjs-jsdoc",
         "tutorials": "../doc"
     },

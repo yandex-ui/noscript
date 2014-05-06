@@ -15,7 +15,7 @@ yate: test/tests.yate.js
 
 # публикация npm
 npm-publish: dist
-	npm pack
+	npm publish
 
 test/tests.yate.js: test/tests.yate yate/noscript.yate node_modules
 	$(NPM_BIN)/yate $< > $@

@@ -261,11 +261,15 @@
             models = [ models ];
         }
 
-        // Вставить можно только объявленную модель
-        // и повторная вставка модели запрещена
-        var insertion = models.filter(function(model) {
-            return this.models.indexOf(model) === -1 && ns.Model.infoLite(model.id);
-        }, this);
+        var insertion = [];
+        var model;
+        for (var i = 0; i < models.length; i++) {
+            model = models[i];
+            // Добавим только те модели, которых ещё нет ни в коллекции, ни в списке добавляемых
+            if (this.models.indexOf(model) < 0 && insertion.indexOf(model) < 0) {
+                insertion.push(model);
+            }
+        }
 
         insertion.forEach(function(model, i) {
             this.models.splice(index + i, 0, model);

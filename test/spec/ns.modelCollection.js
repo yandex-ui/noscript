@@ -342,7 +342,7 @@ describe('ns.ModelCollection', function() {
 
             it('should not insert duplicate models', function() {
                 this.modelEmpty.insert(this.item1);
-                this.modelEmpty.insert([this.item1, this.item2]);
+                this.modelEmpty.insert([this.item1, this.item2, this.item2]);
                 expect(this.modelEmpty.models.length).to.be.equal(2);
                 expect(this.modelEmpty.models[0]).to.eql(this.item1);
                 expect(this.modelEmpty.models[1]).to.eql(this.item2);

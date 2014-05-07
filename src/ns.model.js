@@ -557,6 +557,15 @@
     };
 
     /**
+     * Устанавливает модели в начальное состояние
+     */
+    ns.Model._reset = function() {
+        _cache = {};
+        _ctors = {};
+        _infos = {};
+    };
+
+    /**
      * Returns model's info
      * @param {string} id Model ID.
      * @returns {object}
@@ -887,45 +896,5 @@
 
         return data;
     };
-
-    // ----------------------------------------------------------------------------------------------------------------- //
-
-    if (window['mocha']) {
-        /**
-         * Удаляет определение модели.
-         * Используется только в юнит-тестах.
-         * @param {string} [id] ID модели.
-         */
-        ns.Model.undefine = function(id) {
-            if (id) {
-                delete _cache[id];
-                delete _ctors[id];
-                delete _infos[id];
-            } else {
-                _cache = {};
-                _ctors = {};
-                _infos = {};
-            }
-        };
-
-        ns.Model.privats = function() {
-            return {
-                _ctors: _ctors,
-                _infos: _infos,
-                _cache: _cache,
-                _keySuffix: _keySuffix
-            };
-        };
-
-        ns.Model.clearCaches = function(id) {
-            if (id) {
-                _cache[id] = {};
-            } else {
-                for (var key in _cache) {
-                    _cache[key] = {};
-                }
-            }
-        };
-    }
 
 })();

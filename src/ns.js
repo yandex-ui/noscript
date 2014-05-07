@@ -162,20 +162,17 @@ ns.key = function(prefix, params) {
     return key;
 };
 
-if (window['mocha']) {
+/**
+ * Clean internal data after tests
+ * @private
+ */
+ns.reset = function() {
+    ns.router._reset();
+    ns.layout._reset();
+    ns.Model._reset();
+    ns.View._reset();
+    ns.request._reset();
+    ns.page.current = {};
 
-    /**
-     * Clean internal data after tests
-     * @private
-     */
-    ns.clean = function() {
-        ns.layout.undefine();
-        ns.View.undefine();
-        ns.Model.undefine();
-        ns.request.clean();
-        ns.router.undefine();
-        ns.page.current = {};
-
-        ns.MAIN_VIEW = null;
-    };
-}
+    ns.MAIN_VIEW = null;
+};

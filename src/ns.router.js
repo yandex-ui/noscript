@@ -490,47 +490,37 @@ ns.router._isParamValid = function(pvalue, ptype) {
 };
 
 /**
- * Базовая часть урла, относительно которой строятся урлы. Без слэша на конце.
- * @type {string}
+ * Устанавливает начальное состояние
  */
-ns.router.baseDir = '';
-
-/**
- * Скомпилированные данные.
- * @type {object}
- * @private
- */
-ns.router._routes = null;
-
-/**
- * Маршруты.
- * Этот массив должен быть объявлен в проекте.
- * @type {object}
- */
-ns.router.routes = {};
-
-/**
- * Регулярные выражения для проверки типов параметров.
- * @type {object}
- */
-ns.router.regexps = {
-    'id': '[A-Za-z_][A-Za-z0-9_-]*',
-    'int': '[0-9]+'
-};
-
-if (window['mocha']) {
+ns.router._reset = function() {
     /**
+     * Базовая часть урла, относительно которой строятся урлы. Без слэша на конце.
+     * @type {string}
+     */
+    this.baseDir = '';
+
+    /**
+     * Скомпилированные данные.
+     * @type {object}
      * @private
      */
-    ns.router.undefine = function() {
-        ns.router._routes = null;
-        ns.router.routes = {};
+    this._routes = null;
 
-        ns.router.regexps = {
-            'id': '[A-Za-z_][A-Za-z0-9_-]*',
-            'int': '[0-9]+'
-        };
+    /**
+     * Маршруты.
+     * Этот массив должен быть объявлен в проекте.
+     * @type {object}
+     */
+    this.routes = {};
 
-        ns.router.baseDir = '';
+    /**
+     * Регулярные выражения для проверки типов параметров.
+     * @type {object}
+     */
+    this.regexps = {
+        'id': '[A-Za-z_][A-Za-z0-9_-]*',
+        'int': '[0-9]+'
     };
-}
+};
+
+ns.router._reset();

@@ -82,6 +82,10 @@
         return true;
     };
 
+    ns.request._reset = function() {
+        this.Manager._keys = {};
+    };
+
     ns.request.Manager = {
 
         /**
@@ -215,12 +219,6 @@
             model.prepareRequest(requestId);
         }
     };
-
-    if (window['mocha']) {
-        ns.request.clean = function() {
-            ns.request.Manager._keys = {};
-        };
-    }
 
     var REQUEST_ID = 0;
 

@@ -6,31 +6,10 @@
 Более правильным способом является вынос таких данных в external-функции.
 
 ## Создание View
-За создание DOM-обертки и содержимого отвечает мода `ns-view`. Ее стоит использовать только для управления местом отрисовки дочерних View.
+За создание DOM-обертки и содержимого отвечает мода `ns-view`.
+Ее стоит использовать только для управления местом отрисовки дочерних View.
+
 **Не стоит переопределять эту моду без крайней необходимости!**
-
-Пример использования
-```
-match .my-view1 ns-view-content {
-    <div class="view1-content">
-        // в этом месте отрисуются все дочерние view
-        apply /.views.* ns-view
-    </div>
-}
-
-match .my-view2 ns-view-content {
-    <div class="view2-content">
-        <div class="view2-content__child">
-            // в этом месте отрисуются дочерний view my-child1
-            apply /.views.my-child1 ns-view
-        </div>
-        <div class="view2-content__child">
-            // в этом месте отрисуются дочерний view my-child2
-            apply /.views.my-child2 ns-view
-        </div>
-    </div>
-}
-```
 
 ## Атрибуты обертки View
 
@@ -53,16 +32,35 @@ match .my-view2 ns-view-add-attrs {
 
 ## Содержимое View
 
+### ns-view-content
 `ns-view-content` - самая главная мода, отвечает за содержимое view при нормальной отрисовке.
 
 ```
 match .my-view1 ns-view-content {
     <div class="view1-content">
-        // в этом месте отрисуются все дочерние view
-        apply /.views.* ns-view
+        // в этом месте отрисуются все дочерние view с помощью хелпера ns-view-desc
+        apply . ns-view-desc
     </div>
 }
 ```
+
+Если надо расставить виды по разным местам:
+```
+match .my-view2 ns-view-content {
+    <div class="view2-content">
+        <div class="view2-content__child">
+            // в этом месте отрисуются дочерний вид my-child1
+            apply /.views.my-child1 ns-view
+        </div>
+        <div class="view2-content__child">
+            // в этом месте отрисуются дочерний вид my-child2
+            apply /.views.my-child2 ns-view
+        </div>
+    </div>
+}
+```
+
+### ns-view-async-content
 
 `ns-view-async-content` - мода отвечает за содержимое View в режиме async.
 В большинстве случаев тут стоит рисовать лоадер пока грузятся данные.
@@ -76,6 +74,7 @@ match .my-view1 ns-view-content {
 }
 ```
 
+### ns-view-error-content
 `ns-view-error-content` - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.
 
 ## Элементы ViewСollection
@@ -105,19 +104,46 @@ match .my-view-collection ns-view-content {
 
 ```js
 {
-    async: false, // boolean, view находится в async-режиме
-    errors: { // объект с моделями, для которые не удалось получить данные
-        model3: {} // данные ошибки
+    async: false,
+    box: false,
+    collection: false,
+    errors: {
+        model3: {
+            error: 'http_timeout'
+        }
     },
-    is_models_valid: true, // boolean, флаг валидности моделей
-    key: 'view=app', // string, ключ view
-    models: { // object, объект с данными моделей
-        model1: {} // данные модели1
-        model2: {} // данные модели2
+    is_models_valid: true,
+    key: 'view=app',
+    models: {
+        model1: {}
+        model2: {}
     },
-    page: {}, // object, параметры страницы, идентичен ns.page.current
-    params: {}, // object, параметры view
-    views: {} // object, объект c дочерними view
+    page: {},
+    params: {},
+    placeholder: false,
+    views: {}
 }
 ```
 
+**Публичные свойства**:
+ - `errors`: object. Объект с моделями, для которых не удалось получить данные и сами данные ошибки.
+ - `is_models_valid`: boolean. Флаг валидности моделей вида.
+ - `key`: string. Ключ вида.
+ - `page`: object. Ссылка на объект `ns.page.current`.
+ - `params`: object. Собственные параметры вида.
+ - `views`: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:
+```
+{
+    "views": {
+        "view1Name": view1Tree
+        "view2Name": view2Tree
+    }
+}
+```
+
+**Приватные свойства**:
+ - `async`: boolean. Флаг указывающий, что вид сейчас не готов и у него вызывается `ns-view-async-content`
+ - `box`: boolean. Флаг того, что это бокс.
+ - `collection`: boolean. Флаг того, что это вид-коллекция.
+ - `models`: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функцию `model()`.
+ - `placeholder`: boolean. Флаг того, что этот вид валиден и будут отрисованы только его дети.

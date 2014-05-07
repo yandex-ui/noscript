@@ -671,9 +671,14 @@
      */
     ns.View.prototype._getTree = function() {
         var tree = {
+            async: false,
+            collection: false,
+            box: false,
             key: this.key,
+            is_models_valid: true,
             //  добавляем собственные параметры блока
             params: this.params,
+            placeholder: false,
             // фейковое дерево, чтобы удобно матчится в yate
             tree: {},
             // список дочерник видов
@@ -705,7 +710,6 @@
      */
     ns.View.prototype._getViewTree = function(layout, params) {
         var tree = this._getTree();
-        tree.async = false;
         // всегда собираем данные, в том числе закешированные модели для async-view
         tree.models = this._getModelsData();
         tree.errors = this._getModelsError();
@@ -1338,7 +1342,7 @@
      *
      * @param {string} id
      * @param {object} params
-     * @param {object} info
+     * @param {object} [info]
      * @returns {string}
      */
     ns.View.getKey = function(id, params, info) {

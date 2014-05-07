@@ -311,25 +311,11 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
  * @private
  */
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {
-    var tree = {
-        async: false,
-        // фейковое дерево, чтобы удобно матчится в yate
-        tree: {},
-        // всегда собираем данные, в том числе закешированные модели для async-view
-        models: this._getModelsData(),
-        //  добавляем собственные параметры блока
-        //  NOTE @nop: Отличаются ли эти параметры от page.params?
-        params: this.params,
-        //  FIXME: Не должно ли оно приходить в параметрах Update'а?
-        page: ns.page.current,
-        views: {},
-        key: this.key,
-        collection: true
-    };
-
-    // добавляем название view, чтобы можно было писать
-    // match .view-name ns-view-content
-    tree.tree[this.id] = true;
+    var tree = this._getTree();
+    tree.collection = true;
+    // всегда собираем данные, в том числе закешированные модели для async-view
+    tree.models = this._getModelsData();
+    tree.page = ns.page.current;
 
     //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
     //  помечаем его как асинхронный (false).

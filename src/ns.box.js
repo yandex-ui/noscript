@@ -12,8 +12,6 @@ ns.Box = function(id, params) {
 
     this.views = {};
 
-    //  NOTE: Нет специального метода ns.Box.getKey --
-    //  все ключи вычисляются только через ns.View.getKey.
     this.key = ns.View.getKey(id, params);
 
     this.node = null;
@@ -123,7 +121,12 @@ ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
 ns.Box.prototype._getViewTree = function(layout, params) {
     //  Для бокса это всегда объект (возможно, пустой).
     var tree = {
+        async: false,
         box: true,
+        collection: false,
+        key: this.key,
+        is_models_valid: true,
+        placeholder: false,
         tree: {},
         views: {}
     };

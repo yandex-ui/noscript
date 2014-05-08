@@ -164,7 +164,6 @@ ns.key = function(prefix, params) {
 
 /**
  * Clean internal data after tests
- * @private
  */
 ns.reset = function() {
     ns.router._reset();

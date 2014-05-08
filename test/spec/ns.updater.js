@@ -463,7 +463,6 @@ describe('no.Updater', function() {
                     'main': {
                         'async': false,
                         'models': {},
-                        'page': {},
                         'params': {},
                         'tree': {
                             'main': true

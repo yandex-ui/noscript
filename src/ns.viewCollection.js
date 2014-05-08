@@ -315,7 +315,6 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     tree.collection = true;
     // всегда собираем данные, в том числе закешированные модели для async-view
     tree.models = this._getModelsData();
-    tree.page = ns.page.current;
 
     //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
     //  помечаем его как асинхронный (false).

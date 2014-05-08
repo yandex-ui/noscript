@@ -715,8 +715,6 @@
         tree.errors = this._getModelsError();
         // если view находится в режиме async, то модели проверять не надо
         tree.is_models_valid = this.asyncState || this.isModelsValid();
-        //  FIXME: Не должно ли оно приходить в параметрах Update'а?
-        tree.page = ns.page.current;
 
         //  Если это асинхронный блок и для него нет еще всех моделей,
         //  помечаем его как асинхронный.
@@ -879,8 +877,7 @@
         }
 
         var tree = {
-            models: this._getModelsData(),
-            page: ns.page.current
+            models: this._getModelsData()
         };
 
         if (extra) {

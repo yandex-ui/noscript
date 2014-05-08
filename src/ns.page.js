@@ -124,6 +124,14 @@
     };
 
     /**
+     * Устанавливает начальное состояние
+     * @private
+     */
+    ns.page._reset = function() {
+        this.current = {};
+    };
+
+    /**
      * Module to add checkers and block proceed to another URL.
      * @namespace
      */

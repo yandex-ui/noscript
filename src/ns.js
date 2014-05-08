@@ -172,7 +172,7 @@ ns.reset = function() {
     ns.Model._reset();
     ns.View._reset();
     ns.request._reset();
-    ns.page.current = {};
+    ns.page._reset();
 
     ns.MAIN_VIEW = null;
 };

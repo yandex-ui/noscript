@@ -491,6 +491,7 @@ ns.router._isParamValid = function(pvalue, ptype) {
 
 /**
  * Устанавливает начальное состояние
+ * @private
  */
 ns.router._reset = function() {
     /**

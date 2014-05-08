@@ -82,6 +82,10 @@
         return true;
     };
 
+    /**
+     * Устанавливает начальное состояние
+     * @private
+     */
     ns.request._reset = function() {
         this.Manager._keys = {};
     };

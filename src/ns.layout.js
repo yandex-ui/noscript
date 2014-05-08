@@ -31,6 +31,7 @@
 
     /**
      * Устанавливает layout в начальное состояние
+     * @private
      */
     ns.layout._reset = function() {
         _pages = {};

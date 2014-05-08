@@ -63,39 +63,35 @@ describe('ns.Model', function() {
                 expect(define).to.throw();
             });
 
-            it('should fill _infos', function() {
+            it('should define a model', function() {
+                var getInfo = function() {ns.Model.infoLite('dm1');};
+                expect(getInfo).to.throw();
+
                 ns.Model.define('dm1', {foo: 'bar'});
 
-                expect(ns.Model.privats()._infos['dm1'])
+                expect(ns.Model.infoLite('dm1'))
                     .to.eql({foo: 'bar', isCollection: false});
             });
 
-            it('should fill _ctors with custom one', function() {
+            it('should create a constructor', function() {
                 var ctor = function() {};
-                ns.Model.define('dm1', {
+                var ctorDefined = ns.Model.define('dm1', {
                     ctor: ctor
                 });
 
-                expect(ns.Model.privats()._ctors['dm1']).to.be.equal(ctor);
+                expect(ctorDefined).to.be.equal(ctor);
             });
 
-            it('should fill _ctors with one, contained methods', function() {
+            it('should create a constructor with defined methods', function() {
                 var bar = function() {};
-                ns.Model.define('dm1', { methods: {foo: bar} });
-                var proto = ns.Model.privats()._ctors['dm1'].prototype;
+                var ctor  = ns.Model.define('dm1', { methods: {foo: bar} });
+                var proto = ctor.prototype;
 
                 expect(proto)
                     .to.have.property('foo', bar);
 
                 expect(proto.__proto__)
                     .to.have.keys(Object.keys(ns.Model.prototype));
-            });
-
-            it('should create _cache', function() {
-                ns.Model.define('dm1');
-
-                expect(ns.Model.privats()._cache['dm1'])
-                    .to.eql({});
             });
 
         });
@@ -493,10 +489,6 @@ describe('ns.Model', function() {
                         }
                     }
                 });
-            });
-
-            afterEach(function() {
-                ns.Model.clearCaches();
             });
 
             describe('default version', function() {

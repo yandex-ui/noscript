@@ -10,7 +10,7 @@ beforeEach(function() {
 
 afterEach(function() {
     this.sinon.restore();
-    ns.clean();
+    ns.reset();
 });
 
 if (!Function.prototype.bind) {

@@ -1140,6 +1140,15 @@
     };
 
     /**
+     * Устанавливает виды в начальное состояние
+     * @private
+     */
+    ns.View._reset = function() {
+        _ctors = {};
+        _infos = {};
+    };
+
+    /**
      * Возвращает информацию о View.
      * @param {string} id Название модели.
      * @returns {object}
@@ -1538,27 +1547,5 @@
         }
         return decl;
     };
-
-    if (window['mocha']) {
-        /**
-         * Удаляет определение view.
-         * Используется только в юнит-тестах.
-         * @param {string} [id] ID view.
-         */
-        ns.View.undefine = function(id) {
-            if (id) {
-                delete _ctors[id];
-                delete _infos[id];
-            } else {
-                _ctors = {};
-                _infos = {};
-            }
-        };
-
-        ns.View.privats = {
-            _ctors: _ctors,
-            _infos: _infos
-        };
-    }
 
 })();

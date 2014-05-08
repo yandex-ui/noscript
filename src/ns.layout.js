@@ -30,6 +30,14 @@
     };
 
     /**
+     * Устанавливает layout в начальное состояние
+     * @private
+     */
+    ns.layout._reset = function() {
+        _pages = {};
+    };
+
+    /**
      * Возвращает раскладку страницы с заданным id и params.
      * @param {string} id ID раскладки
      * @param {object} [params] Параметры страницы.
@@ -180,23 +188,6 @@
             key = key.slice(0, -1);
         }
         return key;
-    }
-
-    if (window['mocha']) {
-
-        /**
-         * Удаляет определение layout.
-         * Используется только в юнит-тестах.
-         * @param {string} [id] Layout ID.
-         * @private
-         */
-        ns.layout.undefine = function(id) {
-            if (id) {
-                delete _pages[id];
-            } else {
-                _pages = {};
-            }
-        };
     }
 
 })();

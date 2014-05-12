@@ -4,8 +4,19 @@
 
 external scalar ns-url(scalar)
 
-//  Ключ для получения моделей по имени.
+/**
+ * Ключ для получения данных модели
+ * @example
+ * data = model('name')
+ */
 key model( /.models.*, name() ) { . }
+
+/**
+ * Ключ для получения ошибки модели
+ * @example
+ * error = modelError('name')
+ */
+key modelError( /.errors.*, name() ) { . }
 
 // @private
 match / {

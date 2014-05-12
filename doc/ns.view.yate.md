@@ -97,7 +97,8 @@ match .my-view-collection ns-view-content {
 
 ## Yate-хелперы
 
-* `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому предпочтительнее jpath `/.models.model-name`
+* `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее jpath `/.models.model-name`
+* `modelError('model-name')` - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath `/.errors.model-name`
 * `ns-url` - external-функция для `ns.router.generateUrl`
 
 ## Структура JSON для отрисовки
@@ -126,7 +127,6 @@ match .my-view-collection ns-view-content {
 ```
 
 **Публичные свойства**:
- - `errors`: object. Объект с моделями, для которых не удалось получить данные и сами данные ошибки.
  - `is_models_valid`: boolean. Флаг валидности моделей вида.
  - `key`: string. Ключ вида.
  - `page`: object. Ссылка на объект `ns.page.current`.
@@ -145,5 +145,6 @@ match .my-view-collection ns-view-content {
  - `async`: boolean. Флаг указывающий, что вид сейчас не готов и у него вызывается `ns-view-async-content`
  - `box`: boolean. Флаг того, что это бокс.
  - `collection`: boolean. Флаг того, что это вид-коллекция.
+ - `errors`: object. Объект с моделями, для которых не удалось получить данные и сами данные ошибки. Не стоит использовать его напрямую. Лучше вызывать yate-функцию `modelError()`.
  - `models`: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функцию `model()`.
  - `placeholder`: boolean. Флаг того, что этот вид валиден и будут отрисованы только его дети.

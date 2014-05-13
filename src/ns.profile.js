@@ -20,6 +20,8 @@
             this._profileTimes = {};
         }
 
+        // проверяем, что таймер пустой
+        ns.assert(!this._profileTimes[label], 'ns.profile', "Timer '%s' is in use", label);
         this._profileTimes[label] = Date.now();
     };
 
@@ -33,13 +35,9 @@
             this._profileTimes = {};
         }
 
-        if (this._profileTimes[label]) {
-            this._profileTimes[label] = Date.now() - this._profileTimes[label];
-
-        } else {
-            // если #timeEnd() вызвали раньше, чем #time(), то возвращаем NaN
-            this._profileTimes[label] = NaN;
-        }
+        // проверяем, что таймер непустой
+        ns.assert(this._profileTimes[label], 'ns.profile', "Timer '%s' haven't been started", label);
+        this._profileTimes[label] = Date.now() - this._profileTimes[label];
 
         return this._profileTimes[label];
     };

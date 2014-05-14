@@ -1,5 +1,50 @@
 describe('no.Updater', function() {
 
+    describe('#perf()', function() {
+
+        beforeEach(function(done) {
+
+            this.sinon.spy(ns.Update.prototype, 'perf');
+
+            ns.layout.define('app', {
+                'app': true
+            });
+
+            ns.Model.define('photo');
+            ns.View.define('app', { models: ['photo'] });
+
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respondWith(function(xhr) {
+                xhr.respond(200, { "Content-Type": "application/json" }, '{ "models": [ { "data": {} } ] }');
+            });
+
+            this.view = ns.View.create('app');
+            var layout = ns.layout.page('app', {});
+            new ns.Update(this.view, layout, {})
+                .start()
+                .then(function() {
+                    done();
+                }, function(e) {
+                    done(e || 'failed')
+                });
+        });
+
+        it('должен вызваться perf после завершения обновления', function() {
+            expect(ns.Update.prototype.perf).to.have.been.calledOnce;
+        });
+
+        it('должен вызваться perf c правильными данными после завершения обновления', function() {
+            var arg = ns.Update.prototype.perf.getCall(0).args[0];
+            expect(arg).to.have.property('prepare').that.is.at.least(0);
+            expect(arg).to.have.property('request').that.is.at.least(0);
+            expect(arg).to.have.property('tree').that.is.at.least(0);
+            expect(arg).to.have.property('template').that.is.at.least(0);
+            expect(arg).to.have.property('dom').that.is.at.least(0);
+            expect(arg).to.have.property('events').that.is.at.least(0);
+        });
+
+    });
+
     describe('concurent ns.Update instances', function() {
 
         describe('2 concurent global ns.Update', function() {

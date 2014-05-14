@@ -316,14 +316,6 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     // всегда собираем данные, в том числе закешированные модели для async-view
     tree.models = this._getModelsData();
 
-    //  Если это асинхронный блок и для него на самом деле нет еще всех моделей,
-    //  помечаем его как асинхронный (false).
-    //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
-    //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
-    if ( this.async && !this.isModelsValid() ) {
-        tree.async = true;
-    }
-
     tree.views = this._getDescViewTree(layout, params);
 
     return tree;

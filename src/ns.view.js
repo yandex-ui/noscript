@@ -671,7 +671,9 @@
      */
     ns.View.prototype._getTree = function() {
         var tree = {
-            async: false,
+            // Если вид находится в асинхронном состоянии (ждет моделей),
+            // то ставим ему флаг, чтобы отрисовать ns-view-async-content
+            async: this.asyncState,
             collection: false,
             box: false,
             key: this.key,
@@ -716,12 +718,8 @@
         // если view находится в режиме async, то модели проверять не надо
         tree.is_models_valid = this.asyncState || this.isModelsValid();
 
-        //  Если это асинхронный блок и для него нет еще всех моделей,
-        //  помечаем его как асинхронный.
-        //  Но может случиться так, что асинхронный запрос пришел раньше синхронного,
-        //  тогда этот асинхронный блок будет нарисован вместе с остальными синхронными блоками.
-        if ( this.async && !this.isModelsValid() ) {
-            tree.async = true;
+        // для асинхронного вида не идем вниз по дереву
+        if (tree.async) {
             return tree;
         }
 
@@ -924,12 +922,7 @@
              */
             this.$node = $(node);
 
-            // Возможно, это несколько избыточно, что раз уж у view валидные модели, значит она и сама валидна.
-            if (this.isModelsValid()) {
-                this.status = STATUS.OK;
-            } else {
-                this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
-            }
+            this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;
 
         } else {
             this.status = STATUS.NONE;

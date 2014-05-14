@@ -1,3 +1,6 @@
+var no = no || require('nommon');
+var ns = ns || require('./ns.js');
+
 /**
  * Find best page for url.
  * @namespace

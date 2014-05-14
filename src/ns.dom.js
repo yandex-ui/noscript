@@ -1,3 +1,5 @@
+var ns = ns || require('./ns.js');
+
 /**
  * Replaces oldNode with newNode
  * @param {Element} oldNode

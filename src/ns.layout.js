@@ -1,3 +1,6 @@
+var no = no || require('nommon');
+var ns = ns || require('./ns.js');
+
 (function() {
 
     /**
@@ -189,5 +192,4 @@
         }
         return key;
     }
-
 })();

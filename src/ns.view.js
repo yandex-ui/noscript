@@ -75,7 +75,7 @@
         this._modelsHandlers = {};
 
         this.node = null;
-        this.views = null;
+        this.views = {};
 
         /**
          * Статус View.
@@ -584,19 +584,12 @@
      * @private
      */
     ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
-
         // При необходимости добавим текущий вид в список "запрашиваемых"
         this._tryPushToRequest(updated);
 
-        // Если views еще не определены (первая отрисовка)
-        if (!this.views) {
-            //  FIXME: Почему бы это в конструкторе не делать?
-            //  chestozo: lazy инициализация, всё такое.
-            this.views = {};
-            // Создаем подблоки
-            for (var view_id in pageLayout) {
-                this._addView(view_id, params, pageLayout[view_id].type);
-            }
+        // Создаем подблоки
+        for (var view_id in pageLayout) {
+            this._addView(view_id, params, pageLayout[view_id].type);
         }
 
         this._apply(function(view, id) {
@@ -621,6 +614,7 @@
         if (this.async) {
             var hasValidModels = this.isModelsValid();
             var hasValidStatus = this.isOk();
+
             if (hasValidModels && !hasValidStatus) {
                 // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его синхронно
                 updated.sync.push(this);
@@ -882,7 +876,7 @@
             tree.extra = extra;
         }
 
-        return ns.tmpl(tree, mode);
+        return ns.renderNode(tree, mode);
     };
 
     /**

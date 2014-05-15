@@ -72,7 +72,7 @@ describe('ns.View error handling', function() {
                         }
                     }
                 };
-                expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.equal(true);
+                expect(ns.renderString.calledWithMatch(renderJSON)).to.be.equal(true);
                 finish();
             });
         });
@@ -87,7 +87,7 @@ describe('ns.View error handling', function() {
         });
     });
 
-    describe('async view is redrawn in case model with error for sync view is handled by ns.Update.handleError', function() {
+    describe('async view is redrawn in case of model with error for sync view is handled by ns.Update.handleError', function() {
         var setupServerResponses = function(that, modelResponses) {
             var responses = {};
             for (var model_id in modelResponses) {
@@ -146,11 +146,9 @@ describe('ns.View error handling', function() {
 
             promise
                 .then(function(details) {
-                    Vow.all(details.async)
-                        .done(function() { done(); })
-                        .fail(function() { done(); });
-                }, function() {
-                    done();
+                    Vow.all(details.async).always(function() {
+                        done();
+                    });
                 });
         });
 

@@ -610,6 +610,91 @@ describe('no.Updater', function() {
         });
     });
 
+    describe('Test case for #285', function() {
+
+        beforeEach(function() {
+
+            ns.layout.define('app', {
+                'app': {
+                    'content@': {
+                        'photo': {
+                            'photo-box@': {
+                                'photo-image': true,
+                                'comments&': true,
+                                'ads&': true // NOTE если закомментить эту строку - ошибка перестанет воспроизводиться
+                            }
+                        }
+                    }
+                }
+            });
+
+            /// Models
+            ns.Model.define('photo');
+            ns.Model.define('comments');
+            ns.Model.define('preferences');
+
+            /// Views
+            ns.View.define('app');
+            ns.View.define('photo',       { models: [] });
+            ns.View.define('photo-image', { models: [ 'photo' ] });
+            ns.View.define('comments',    { models: [ 'comments' ] });
+            ns.View.define('ads',         { models: [ 'preferences' ] });
+
+            var wrapModels = function() {
+                var models = Array.prototype.slice.call(arguments, 0);
+                return JSON.stringify({
+                    models: models.map(function(m) {
+                        if (m.error) {
+                            return m;
+                        }
+                        return { data: m };
+                    })
+                });
+            };
+
+            var server_mock_data = {
+                '/models/?_m=photo': wrapModels({ id: 1, url: 'image.png' }),
+                '/models/?_m=comments': wrapModels({ error: 'unknown' }),
+                '/models/?_m=preferences': wrapModels({})
+            };
+
+            var server = this.server = sinon.fakeServer.create();
+            server.autoRespond = true;
+
+            server.respondWith(function(xhr) {
+                var response = server_mock_data[xhr.url];
+                if (response) {
+                    xhr.respond(200, { "Content-Type": "application/json" }, response);
+                } else {
+                    xhr.respond(400);
+                }
+            });
+
+            this.canRetrySpy = sinon.spy(ns.Model.get('comments', {}), 'canRetry');
+
+            this.view = ns.View.create('app');
+            var layout = ns.layout.page('app', {});
+            var updater = new ns.Update(this.view, layout, {});
+            this.promise = updater.start();
+        });
+
+        // Restore XHR.
+        afterEach(function() {
+            this.canRetrySpy.restore();
+            this.server.restore();
+
+            delete this.promise;
+        });
+
+        it('should replace all async nodes', function(finish) {
+            var that = this;
+            setTimeout(function() {
+                expect(that.canRetrySpy.callCount).to.eql(3);
+                finish();
+            }, 300);
+        });
+    });
+
     describe('subviews', function() {
 
         beforeEach(function(done) {

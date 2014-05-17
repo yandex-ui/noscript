@@ -686,7 +686,7 @@ describe('no.Updater', function() {
             delete this.promise;
         });
 
-        it('should replace all async nodes', function(finish) {
+        it('comments model must be requested 3 times (because of 3 retries by default)', function(finish) {
             var that = this;
             setTimeout(function() {
                 expect(that.canRetrySpy.callCount).to.eql(3);

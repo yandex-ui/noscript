@@ -567,6 +567,16 @@
     };
 
     /**
+     * Удаляет экземпляры моделей
+     * @private
+     */
+    ns.Model._clear = function() {
+        for (var id in _infos) {
+            _cache[id] = {};
+        }
+    };
+
+    /**
      * Returns model's info
      * @param {string} id Model ID.
      * @returns {object}

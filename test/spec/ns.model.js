@@ -308,6 +308,24 @@ describe('ns.Model', function() {
 
         });
 
+        describe('_clear', function() {
+
+            beforeEach(function() {
+                var m = ns.Model.get('m0');
+                m.setData({foo: 'bar'});
+                ns.Model._clear();
+            });
+
+            it('should remove instances', function() {
+                expect(ns.Model.getValid('m0')).not.to.be.ok;
+            });
+
+            it('should keep models defined', function() {
+                expect(ns.Model.get('m0')).to.be.ok; // shouldn`t throw
+            });
+
+        });
+
     });
 
     describe('prototype', function() {

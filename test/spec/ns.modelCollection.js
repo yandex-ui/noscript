@@ -76,6 +76,35 @@ describe('ns.ModelCollection', function() {
 
     describe('prototype', function() {
 
+        describe('bindModel', function() {
+
+            beforeEach(function() {
+                ns.Model.define('someCollection', {
+                    isCollection: true
+                });
+                ns.Model.define('someModel');
+
+                var collection = ns.Model.get('someCollection').setData({foo: 'bar'});
+                var someModel = ns.Model.get('someModel').setData({foo: 'bar'});
+                this.callbackEvent0 = sinon.spy();
+
+                collection.bindModel(someModel, 'event0', this.callbackEvent0);
+
+                someModel.trigger('event0');
+                someModel.trigger('event0');
+                someModel.trigger('event1');
+
+                collection.unbindModel(someModel, 'event0', this.callbackEvent0);
+
+                someModel.trigger('event0');
+            });
+
+            it('should run callback only when was binded', function() {
+                expect(this.callbackEvent0.calledTwice).to.be.ok;
+            });
+
+        });
+
         describe('setData', function() {
 
             beforeEach(function() {

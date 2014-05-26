@@ -6,7 +6,7 @@
  * @returns {Vow.Promise}
  */
 ns.http = function(url, params, options) {
-    options = no.extend({ type: 'POST', dataType: 'json' }, options || {});
+    options = no.extend(ns.http.DEFAULTS, options || {});
     options.url = url;
     options.data = params;
 
@@ -25,4 +25,13 @@ ns.http = function(url, params, options) {
         });
 
     return promise;
+};
+
+/**
+ * Параметры по умолчанию для http-запросов.
+ * @type {object}
+ */
+ns.http.DEFAULTS = {
+    dataType: 'json',
+    type: 'POST'
 };

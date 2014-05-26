@@ -1,4 +1,5 @@
 /* borschik:include:node_modules/vow/lib/vow.js */
+/* borschik:include:src/vow.log.js */
 (function(window, document) {
     "use strict";
     /* borschik:include:node_modules/nommon/lib/no.base.js */

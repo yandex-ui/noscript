@@ -30,3 +30,18 @@ match / generate-url {
         })
     </a>
 }
+
+match .test-yate-helper-model ns-view-content {
+    <div class="data">
+        model('a')
+    </div>
+    <div class="data">
+        model('b')
+    </div>
+    <div class="error">
+        modelError('a')
+    </div>
+    <div class="error">
+        modelError('b')
+    </div>
+}

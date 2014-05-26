@@ -254,11 +254,33 @@ describe('ns.View', function() {
             c.setError({ error: 'c invalid' });
 
             var view = ns.View.create('test-view-render_complex', {}, false);
+            view.tmpl();
 
-            expect( view._getModelsData() ).to.be.eql({
-                a: { data: 'a' },
-                b: { error: 'b invalid' },
-                c: { error: 'c invalid' }
+            expect(ns.renderNode).to.be.calledWithMatch({
+                views: {
+                    'test-view-render_complex': {
+                        models: {
+                            a: {
+                                data: {
+                                    data: 'a'
+                                },
+                                status: 'ok'
+                            },
+                            b: {
+                                data: {
+                                    error: 'b invalid'
+                                },
+                                status: 'error'
+                            },
+                            c: {
+                                data: {
+                                    error: 'c invalid'
+                                },
+                                status: 'error'
+                            }
+                        }
+                    }
+                }
             });
         });
     });

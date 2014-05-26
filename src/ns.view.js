@@ -660,30 +660,43 @@
 
     /**
      * Возвращает общее дерево видов.
-     * @returns {object}
-     * @private
+     * Этот метод используют ns.View, ns.ViewCollection и ns.Box
+     * @returns {ns.View~UpdateTree}
      */
-    ns.View.prototype._getTree = function() {
+    ns.View.prototype._getCommonTree = function() {
         var tree = {
-            // Если вид находится в асинхронном состоянии (ждет моделей),
-            // то ставим ему флаг, чтобы отрисовать ns-view-async-content
-            async: this.asyncState,
             collection: false,
             box: false,
             key: this.key,
-            is_models_valid: true,
-            //  добавляем собственные параметры блока
+            models: {},
             params: this.params,
-            placeholder: false,
+
+            // состояние вида, по сути выбираем моду для отрисовку
+            // ok - ns-view-content
+            // loading - ns-view-async-content
+            // error - ns-view-error-content
+            // placeholder - специальная отрисовка
+            state: this.asyncState ? 'loading': 'ok',
+
             // фейковое дерево, чтобы удобно матчится в yate
             tree: {},
-            // список дочерник видов
             views: {}
         };
 
         // добавляем название view, чтобы можно было писать
         // match .view-name ns-view-content
         tree.tree[this.id] = true;
+
+        return tree;
+    };
+
+    /**
+     * Возвращает общее дерево для ns.View и ns.ViewCollection.
+     * @returns {ns.View~UpdateTree}
+     * @private
+     */
+    ns.View.prototype._getTree = function() {
+        var tree = this._getCommonTree();
 
         // даем возможность приложению или плагинам изменить дерево
         var treeToAppend = this.patchTree(tree);
@@ -701,20 +714,23 @@
      * Строим дерево блоков.
      * @param {object} layout Currently processing layout.
      * @param {object} params Params.
-     * @returns {object}
+     * @returns {ns.View~UpdateTree}
      * @private
      */
     ns.View.prototype._getViewTree = function(layout, params) {
         var tree = this._getTree();
+
         // всегда собираем данные, в том числе закешированные модели для async-view
-        tree.models = this._getModelsData();
-        tree.errors = this._getModelsError();
-        // если view находится в режиме async, то модели проверять не надо
-        tree.is_models_valid = this.asyncState || this.isModelsValid();
+        tree.models = this._getModelsForTree();
 
         // для асинхронного вида не идем вниз по дереву
-        if (tree.async) {
+        if (tree.state === 'loading') {
             return tree;
+        }
+
+        // если у вида невалидные модели, то ставим статус 'error'
+        if (!this.isModelsValid()) {
+            tree.state = 'error';
         }
 
         //  Сюда попадают только синхронные блоки.
@@ -754,10 +770,10 @@
     ns.View.prototype.patchTree = no.nop;
 
     /**
-     *
+     * Возвращает деревья для дочерних видов
      * @param {object} layout
      * @param {object} params
-     * @returns {object}
+     * @returns {object.<string, ns.View~UpdateTree>}
      * @private
      */
     ns.View.prototype._getDescViewTree = function(layout, params) {
@@ -774,12 +790,12 @@
      * Возвращает декларацию вида для вставки плейсхолдера
      * @param {object} layout Currently processing layout.
      * @param {object} params Params.
-     * @returns {object}
+     * @returns {ns.View~UpdateTree}
      * @private
      */
     ns.View.prototype._getPlaceholderTree = function(layout, params) {
         var tree = this._getTree();
-        tree.placeholder = true;
+        tree.state = 'placeholder';
         tree.views = this._getDescViewTree(layout, params);
 
         return tree;
@@ -790,38 +806,28 @@
      * @returns {*}
      * @private
      */
-    ns.View.prototype._getModelsData = function() {
-        var r = {};
+    ns.View.prototype._getModelsForTree = function() {
+        var modelsData = {};
 
         var models = this.models;
         for (var id in models) {
-            var data = models[id].getData() || models[id].getError();
+            /** @type ns.Model */
+            var model = models[id];
+            if (model.isValid()) {
+                modelsData[id] = {
+                    data: model.getData(),
+                    status: 'ok'
+                };
 
-            if (data) {
-                r[id] = data;
+            } else {
+                modelsData[id] = {
+                    data: model.getError(),
+                    status: 'error'
+                };
             }
         }
 
-        return r;
-    };
-
-    /**
-     *
-     * @returns {*}
-     * @private
-     */
-    ns.View.prototype._getModelsError = function() {
-        var r = {};
-
-        var models = this.models;
-        for (var id in models) {
-            var error = models[id].getError();
-            if (error) {
-                r[id] = error;
-            }
-        }
-
-        return r;
+        return modelsData;
     };
 
     /**
@@ -868,15 +874,19 @@
                 }
         }
 
-        var tree = {
-            models: this._getModelsData()
-        };
+        var renderTree = this._getTree();
+        renderTree.models = this._getModelsForTree();
 
         if (extra) {
-            tree.extra = extra;
+            renderTree.extra = extra;
         }
 
-        return ns.renderNode(tree, mode);
+        var mainTree = {
+            views: {}
+        };
+        mainTree.views[this.id] = renderTree;
+
+        return ns.renderNode(mainTree, mode);
     };
 
     /**
@@ -1544,5 +1554,18 @@
         }
         return decl;
     };
+
+    /**
+     * Дерево для шаблонизации вида.
+     * @typedef ns.View~UpdateTree
+     * @type {object}
+     * @property {boolean} box - Флаг указывающий, что это бокс.
+     * @property {boolean} collection - Флаг указывающий, что это вид-коллекция.
+     * @property {string} key - Ключ вида.
+     * @property {object.<string, *>} models - Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функции `model('modelName')` и `modelError('modelName')`.
+     * @property {object.<string, *>} params - Собственные параметры вида.
+     * @property {string} state - Текущее состояние вида. ok/error/loading/placeholder
+     * @property {object.<string, ns.View~UpdateTree>} views - Объект с дочерними видами, используется для дальнейшего наложения шаблонов через `ns-view-content`.
+     */
 
 })();

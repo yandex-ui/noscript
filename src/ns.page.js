@@ -13,8 +13,8 @@
     ns.page.current = {};
 
     /**
-     *
-     * @type {null}
+     * Адрес текущей страницы
+     * @type {string}
      */
     ns.page.currentUrl = null;
 
@@ -132,62 +132,6 @@
     };
 
     /**
-     * Module to add checkers and block proceed to another URL.
-     * @namespace
-     */
-    ns.page.block = {
-
-        /**
-         * Array of checkers
-         * @private
-         * @type {Function[]}
-         */
-        checkers: []
-    };
-
-    /**
-     * Add function to check.
-     * @param {Function} fn
-     * @returns {ns.page.block}
-     */
-    ns.page.block.add = function(fn) {
-        ns.page.block.checkers.push(fn);
-
-        return this;
-    };
-
-    /**
-     * Remove function to check.
-     * @param {Function} fn
-     * @returns {ns.page.block}
-     */
-    ns.page.block.remove = function(fn) {
-        var index = ns.page.block.checkers.indexOf(fn);
-        if (index > -1) {
-            ns.page.block.checkers.splice(index, 1);
-        }
-
-        return this;
-    };
-
-    /**
-     * Detect if possible to go to the url.
-     * You can add your own checkers with ns.page.block.add(checkerFn)
-     * @param {string} url URL to go.
-     * @returns {Boolean}
-     */
-    ns.page.block.check = function(url) {
-        var checkers = ns.page.block.checkers;
-        for (var i = 0, j = checkers.length; i < j; i++) {
-            if (checkers[i](url) === false) {
-                return false;
-            }
-        }
-
-        return true;
-    };
-
-    /**
      * Returns default url for NoScript application.
      * Should be redefined.
      */
@@ -200,89 +144,6 @@
      */
     ns.page.getCurrentUrl = function() {
         return window.location.pathname + window.location.search;
-    };
-
-    /**
-     * Object to work with application history.
-     * @namespace
-     */
-    ns.page.history = {};
-
-    /**
-     * Current application url.
-     * @type {string}
-     * @private
-     */
-    ns.page.history._current = null;
-
-    /**
-     * History of application urls.
-     * @type {Array}
-     * @private
-     */
-    ns.page.history._history = [];
-
-    /**
-     * Saves url in history.
-     * @param {string} url
-     */
-    ns.page.history.push = function(url) {
-        var nsHistory = ns.page.history;
-
-        // save previous url to history
-        if (nsHistory._current) {
-
-            // prevent duplicates
-            if (nsHistory._current !== url) {
-                var prevPage = ns.page.history.getPrevious();
-
-                // user pressed back button in browser
-                if (prevPage === url) {
-                    nsHistory._history.pop();
-
-                } else {
-                    nsHistory._history.push(nsHistory._current);
-                }
-            }
-        }
-
-        nsHistory._current = url;
-    };
-
-    /**
-     * Go to previous page and delete it from history.
-     * @returns {Vow.Promise}
-     */
-    ns.page.history.back = function() {
-        var nsHistory = ns.page.history;
-
-        var previousPage = nsHistory.getPrevious();
-        if (previousPage) {
-            // removes last entry
-            nsHistory._history.pop();
-
-        } else {
-            // get default url
-            previousPage = ns.page.getDefaultUrl();
-        }
-
-        // delete current history url
-        nsHistory._current = previousPage;
-
-        return ns.page.go(previousPage);
-    };
-
-    /**
-     * Returns previous page.
-     * @param {number} [n=0] N pages ago
-     * @returns {string}
-     */
-    ns.page.history.getPrevious = function(n) {
-        n = n || 0;
-        var history = ns.page.history._history;
-        var l = history.length;
-        // Предыдущая страница, если есть.
-        return history[l - n - 1];
     };
 
 })();

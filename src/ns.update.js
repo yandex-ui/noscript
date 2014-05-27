@@ -128,44 +128,19 @@
                         error: that.STATUS.EXPIRED,
                         models: models
                     };
-                } else if (models.some(function(m) { return !m.isValid(); })) {
-                    error = {
-                        error: that.STATUS.MODELS,
-                        models: models
-                    };
                 }
 
-                // Try handle error if any.
-                if (error && !ns.Update.handleError(error, that)) {
-                    that.error(error);
-                    return;
-                }
-
-                that._update(async);
-                // resolve main promise and return promises for async views
-                that.done({
-                    async: asyncUpdaterPromises
-                });
-                that.perf({
-                    'prepare': that.getTimer('prepare'),
-                    'request': that.getTimer('request'),
-                    'tree': that.getTimer('tree'),
-                    'template': that.getTimer('template'),
-                    'dom': that.getTimer('dom'),
-                    'events': that.getTimer('events')
-                });
-            }, function(models) {
-                // NOTE here we do not even try to handle the error. Or we should do it?
-                that.error({
+                that._performUpdate(error, async, asyncUpdaterPromises);
+            }, function(err) {
+                that.stopTimer('request');
+                that.startTimer('tree');
+                var error = {
                     error: that.STATUS.MODELS,
-                    models: models
-                });
-            })
-            .fail(function(e) {
-                that.error({
-                    error: e,
-                    models: models
-                });
+                    invalidModels: err.invalid,
+                    validModels: err.valid
+                };
+
+                that._performUpdate(error, async, asyncUpdaterPromises);
             });
 
         // Для каждого async-view запрашиваем его модели.
@@ -176,21 +151,7 @@
             Vow.all([
                 syncModelsPromise,
                 ns.request.models(models)
-            ]).then(function(result) {
-                var models = result[1];
-                //FIXME: we should delete this loop when ns.request will can reject promise
-                // check that all models is valid
-                for (var i = 0, j = models.length; i < j; i++) {
-                    if (!models[i].isValid()) {
-                        asyncUpdaterPromises[asyncViewId].reject({
-                            error: that.STATUS.MODELS,
-                            async_view: view,
-                            models: models
-                        });
-                        return;
-                    }
-                }
-
+            ]).then(function() {
                 var layout;
                 var params;
                 // start new async update with current page params to prevent problems
@@ -211,24 +172,40 @@
                     new ns.Update(that.view, layout, params, {execFlag: ns.U.EXEC.ASYNC}).start(true)
                 );
 
-            }, function(result) {
+            }, function(err) {
                 //FIXME: ns.request.models can't reject promise this time, we should fix it
                 asyncUpdaterPromises[asyncViewId].reject({
                     error: that.STATUS.MODELS,
                     async_view: view,
-                    models: result[1]
-                });
-            })
-            .fail(function(e) {
-                asyncUpdaterPromises[asyncViewId].reject({
-                    error: e,
-                    async_view: view,
-                    models: models
+                    invalidModels: err.invalid,
+                    validModels: err.valid
                 });
             });
         });
 
         return resultPromise;
+    };
+
+    ns.Update.prototype._performUpdate = function(error, async, asyncUpdaterPromises) {
+        // Try handle error if any.
+        if (error && !ns.Update.handleError(error, this)) {
+            this.error(error);
+            return;
+        }
+
+        this._update(async);
+        // resolve main promise and return promises for async views
+        this.done({
+            async: asyncUpdaterPromises
+        });
+        this.perf({
+            'prepare': this.getTimer('prepare'),
+            'request': this.getTimer('request'),
+            'tree': this.getTimer('tree'),
+            'template': this.getTimer('template'),
+            'dom': this.getTimer('dom'),
+            'events': this.getTimer('events')
+        });
     };
 
     /**

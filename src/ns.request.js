@@ -314,7 +314,11 @@
                     if (ns.request.canProcessResponse(r) === false) {
                         // если ответ обработать нельзя, то удаляем модели из запроса и отклоняем промис
                         ns.request.Manager.clean(that.models);
-                        that.promise.reject('CANT_PROCESS')
+                        that.promise.reject({
+                            error: 'CANT_PROCESS',
+                            invalid: that.models,
+                            valid: []
+                        });
 
                     } else {
                         that.extract(requesting, r);
@@ -339,8 +343,31 @@
             // вызываем чистку менеджера
             ns.request.Manager.clean(this.models);
 
-            // и резолвим весь ns.request
-            this.promise.fulfill(this.models);
+            // сортируем модели на валидные и нет
+            var validModels = [];
+            var invalidModels = [];
+
+            for (var i = 0, j = this.models.length; i < j; i++) {
+                var model = this.models[i];
+                if (model.isValid()) {
+                    validModels.push(model);
+                } else {
+                    invalidModels.push(model);
+                }
+            }
+
+            // если есть невалидные модели
+            if (invalidModels.length) {
+                this.promise.reject({
+                    invalid: invalidModels,
+                    valid: validModels
+                });
+
+            } else {
+                // и резолвим весь ns.request
+                this.promise.fulfill(this.models);
+            }
+
         }
     };
 

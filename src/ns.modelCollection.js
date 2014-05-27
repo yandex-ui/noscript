@@ -121,32 +121,42 @@
      */
     ns.ModelCollection.prototype._subscribeSplit = function(model) {
         var that = this;
-        var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
 
-        this._bindModel(model, 'ns-model-changed', events, function(evt, jpath) {
+        this.bindModel(model, 'ns-model-changed', function(evt, jpath) {
             that.onItemChanged(evt, model, jpath);
         });
 
-        this._bindModel(model, 'ns-model-touched', events, function(evt) {
+        this.bindModel(model, 'ns-model-touched', function(evt) {
             that.onItemTouched(evt, model);
         });
 
-        this._bindModel(model, 'ns-model-destroyed', events, function(evt) {
+        this.bindModel(model, 'ns-model-destroyed', function(evt) {
             that.onItemDestroyed(evt, model);
         });
     };
 
     /**
+     * Подписывает callback на событие eventName модели model
      *
      * @param {ns.Model} model
      * @param {string} eventName
-     * @param {object} events
      * @param {function} callback
-     * @private
      */
-    ns.ModelCollection.prototype._bindModel = function(model, eventName, events, callback) {
+    ns.ModelCollection.prototype.bindModel = function(model, eventName, callback) {
+        var events = (this._modelsEvents[model.key] || (this._modelsEvents[model.key] = {}));
+
         model.on(eventName, callback);
         events[eventName] = callback;
+    };
+
+    ns.ModelCollection.prototype.unbindModel = function(model, eventName) {
+        var events = this._modelsEvents[model.key];
+        if (!events || !events[eventName]) {
+            return;
+        }
+
+        model.off(eventName, events[eventName]);
+        delete events[eventName];
     };
 
     /**

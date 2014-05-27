@@ -5,6 +5,11 @@
 external scalar ns-url(scalar)
 
 /**
+ * Мост до ns.router.generateUrl
+ */
+external scalar ns-generate-url(/* layout */scalar, /* params */object)
+
+/**
  * Ключ для получения данных модели
  * @example
  * data = model('name')

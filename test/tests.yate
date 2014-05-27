@@ -22,3 +22,11 @@ match .* ns-view-async-content {
 match / check-yate-is-ready {
     "Ready"
 }
+
+match / generate-url {
+    <a>
+        @href = ns-generate-url('layout', {
+            'param': 1
+        })
+    </a>
+}

@@ -310,23 +310,23 @@
             var that = this;
 
             if (httpRequest) {
-                //TODO: что будет если fail?
                 httpRequest.then(function(r) {
-                    /*
                     if (ns.request.canProcessResponse(r) === false) {
-                        //TODO: clear keys, promise.reject()
+                        // если ответ обработать нельзя, то удаляем модели из запроса и отклоняем промис
+                        ns.request.Manager.clean(that.models);
+                        that.promise.reject('CANT_PROCESS')
 
                     } else {
-                    */
-                    if (ns.request.canProcessResponse(r) !== false) {
-                        //  В r должен быть массив из одного или двух элементов.
-                        if (requesting.length) {
-                            that.extract(requesting, r);
-                        }/* else {
-                            //TODO: clear keys, promise.reject()
-                        }
-                        */
+                        that.extract(requesting, r);
                     }
+
+                }, function(e, xhr) {
+                    ns.log.error('ns.request.http', {
+                        error: e,
+                        xhr: xhr
+                    });
+                    // уходим в извлечение, чтобы пометить запрос завершенным
+                    that.extract(requesting, {});
                 });
             }
 

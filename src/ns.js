@@ -107,20 +107,6 @@ ns.initMainView = function() {
 };
 
 /**
- * Создает транзакцию (cb) и блокирует вызов ns.page.go
- * @param {Function} cb
- */
-ns.transaction = function(cb) {
-    // останавливаем ns.page.go
-    ns.page._stop = true;
-    cb();
-
-    // запускаем ns.page.go
-    ns.page._stop = false;
-    ns.page.go(ns.page._lastUrl);
-};
-
-/**
  * Выполняет проверку, что первый аргумент истиннен.
  * Если это не так - кидает ошибку.
  * @param {?} truthy Любое значение, которое проверяется на истинность.

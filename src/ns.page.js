@@ -19,20 +19,6 @@
     ns.page.currentUrl = null;
 
     /**
-     *
-     * @type {boolean}
-     * @private
-     */
-    ns.page._stop = false;
-
-    /**
-     *
-     * @type {string}
-     * @private
-     */
-    ns.page._lastUrl = '';
-
-    /**
      * Осуществляем переход по ссылке.
      * @param {string} [url=ns.page.getCurrentUrl()]
      * @param {string} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
@@ -43,12 +29,6 @@
             action = 'push';
         } else if (action === true) {
             action = 'replace';
-        }
-
-        if (ns.page._stop) {
-            ns.page._lastUrl = url;
-
-            return Vow.reject('transaction');
         }
 
         url = url || ns.page.getCurrentUrl();

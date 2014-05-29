@@ -17,8 +17,7 @@ ns.http = function(url, params, options) {
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             var error = errorThrown || textStatus || 'unknown error';
-            // TODO: почему не reject?
-            promise.fulfill({
+            promise.reject({
                 error: error,
                 xhr: jqXHR
             });

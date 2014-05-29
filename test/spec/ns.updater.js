@@ -379,7 +379,8 @@ describe('no.Updater', function() {
                     try {
                         expect(data).to.be.eql({
                             error: ns.U.STATUS.MODELS,
-                            models: [ns.Model.get('model')]
+                            invalidModels: [ns.Model.get('model')],
+                            validModels: []
                         });
                         finish();
                     } catch(e) {
@@ -459,7 +460,7 @@ describe('no.Updater', function() {
                     data.async[0].fail(function(result) {
                         try {
                             expect(result).to.have.property('error', ns.U.STATUS.MODELS);
-                            expect(result.models).to.be.eql([ns.Model.get('model')]);
+                            expect(result.invalidModels).to.be.eql([ns.Model.get('model')]);
                             finish();
                         } catch(e) {
                             finish(e);

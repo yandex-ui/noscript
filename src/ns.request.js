@@ -310,23 +310,27 @@
             var that = this;
 
             if (httpRequest) {
-                //TODO: что будет если fail?
                 httpRequest.then(function(r) {
-                    /*
                     if (ns.request.canProcessResponse(r) === false) {
-                        //TODO: clear keys, promise.reject()
+                        // если ответ обработать нельзя, то удаляем модели из запроса и отклоняем промис
+                        ns.request.Manager.clean(that.models);
+                        that.promise.reject({
+                            error: 'CANT_PROCESS',
+                            invalid: that.models,
+                            valid: []
+                        });
 
                     } else {
-                    */
-                    if (ns.request.canProcessResponse(r) !== false) {
-                        //  В r должен быть массив из одного или двух элементов.
-                        if (requesting.length) {
-                            that.extract(requesting, r);
-                        }/* else {
-                            //TODO: clear keys, promise.reject()
-                        }
-                        */
+                        that.extract(requesting, r);
                     }
+
+                }, function(e, xhr) {
+                    ns.log.error('ns.request.http', {
+                        error: e,
+                        xhr: xhr
+                    });
+                    // уходим в извлечение, чтобы пометить запрос завершенным
+                    that.extract(requesting, {});
                 });
             }
 
@@ -339,8 +343,31 @@
             // вызываем чистку менеджера
             ns.request.Manager.clean(this.models);
 
-            // и резолвим весь ns.request
-            this.promise.fulfill(this.models);
+            // сортируем модели на валидные и нет
+            var validModels = [];
+            var invalidModels = [];
+
+            for (var i = 0, j = this.models.length; i < j; i++) {
+                var model = this.models[i];
+                if (model.isValid()) {
+                    validModels.push(model);
+                } else {
+                    invalidModels.push(model);
+                }
+            }
+
+            // если есть невалидные модели
+            if (invalidModels.length) {
+                this.promise.reject({
+                    invalid: invalidModels,
+                    valid: validModels
+                });
+
+            } else {
+                // и резолвим весь ns.request
+                this.promise.fulfill(this.models);
+            }
+
         }
     };
 

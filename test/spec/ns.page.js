@@ -46,7 +46,13 @@ describe('ns.page', function() {
                 ns.router.init();
 
                 this.sinon.stub(ns.page, 'title');
-                this.sinon.stub(ns, 'Update', function() { return { start: function() {} }; });
+                this.sinon.stub(ns, 'Update', function() {
+                    return {
+                        start: function() {
+                            return new Vow.Promise();
+                        }
+                    };
+                });
             });
 
             it('should trigger ns-page-before-load event', function() {

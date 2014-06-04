@@ -13,6 +13,7 @@
 - [ns.layout - раскладка страницы](/doc/ns.layout.md)
 - [ns.Model - модель](/doc/ns.model.md)
  - [Модель-коллекция](/doc/ns.modelCollection.md)
+- [ns.page - переходы по страницам](/doc/ns.page.md)
 - [ns.router - маршрутизатор](/doc/ns.router.md)
 - [ns.Update - построение и обновление страницы](/doc/ns.update.logic.md)
 - [ns.View - вид](/doc/ns.view.md)

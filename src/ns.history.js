@@ -23,7 +23,7 @@
     /**
      *
      * @param {string} url
-     * @param {string} title
+     * @param {string} [title]
      */
     ns.history.pushState = function(url, title) {
         if (isFunction(window.history.pushState)) {
@@ -34,7 +34,7 @@
     /**
      *
      * @param {string} url
-     * @param {string} title
+     * @param {string} [title]
      */
     ns.history.replaceState = function(url, title) {
         if (isFunction(window.history.replaceState)) {

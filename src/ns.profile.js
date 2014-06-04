@@ -43,6 +43,16 @@
     };
 
     /**
+     * Останавливает отсчёт метрики from и начинает отсчёт метрики to
+     * @param {string} from Название останавливаемой метрики
+     * @param {string} to Название запускаемой метрики
+     */
+    ns.profile.switchTimer = function(from, to) {
+        this.stopTimer(from);
+        this.startTimer(to);
+    };
+
+    /**
      * Возвращает значение метрики.
      * @param {string} label Название метрики.
      * @returns {number}
@@ -54,6 +64,14 @@
         // проверяем typeof, чтобы возвращать 0
         var value = this._profileTimes[label];
         return typeof value === 'number' ? value : NaN;
+    };
+
+    /**
+     * Возвращает все значения метрики
+     * @returns {object}
+     */
+    ns.profile.getTimers = function() {
+        return no.extend({}, this._profileTimes);
     };
 
 })();

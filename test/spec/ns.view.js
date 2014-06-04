@@ -536,12 +536,12 @@ describe('ns.View', function() {
         });
 
         it('в дерево отрисовки вида должны попасть добавленный свойства', function() {
-            var renderTree = ns.tmpl.getCall(0).args[0];
+            var renderTree = ns.renderString.getCall(0).args[0];
             renderTree.views.tst.should.have.property('prop', 'foo');
         });
 
         it('в дерево отрисовки вида не должны попасть свойства, перетирающие стандартные', function() {
-            var renderTree = ns.tmpl.getCall(0).args[0];
+            var renderTree = ns.renderString.getCall(0).args[0];
             renderTree.views.tst.should.not.have.property('key', 'foo');
         });
 

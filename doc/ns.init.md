@@ -111,7 +111,7 @@ ns.request.canProcessResponse = function(response) {
 параметров страницы и текущего лейаута:
 
 ```js
-ns.Update.prototype._applyTemplate = function(tree, params, layout) {
+ns.Update.prototype.applyTemplate = function(tree, params, layout) {
     var module = 'main';
 
     if (params.context === 'setup') {

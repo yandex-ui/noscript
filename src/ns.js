@@ -81,7 +81,7 @@ ns.renderString = function(json, mode, module) {
 };
 
 ns.renderNode = function(json, mode, module) {
-    return ns.html2node(this.renderString(json, mode, module));
+    return ns.html2node(ns.renderString(json, mode, module));
 };
 
 /**

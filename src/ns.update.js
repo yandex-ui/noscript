@@ -89,11 +89,16 @@
      * Регистрирует указанное событие, добавляя к нему признаки ns.update
      * @private
      */
-    ns.Update.prototype.log = function() {
-        ns.log.debug.apply(ns.log,
-            ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
-        );
-    };
+    ns.Update.prototype.log = no.nop;
+
+    if (ns.DEBUG) {
+        // Уберём потенциально тяжёлую функцию за флаг DEBUG
+        ns.Update.prototype.log = function() {
+            ns.log.debug.apply(ns.log,
+                ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
+            );
+        };
+    }
 
     /**
      * Запрашивает модели
@@ -150,19 +155,17 @@
             sync: [],
             async: []
         }, this.layout.views, this.params).sync;
-
         this.log('collected incomplete views', views);
 
         var models = views2models(views);
-
         this.log('collected needed models', models);
-
         this.switchTimer('collectModels', 'requestSyncModels');
 
         var modelsPromise = this._requestModels(models);
         modelsPromise.always(function() {
             this.stopTimer('requestSyncModels');
         }, this);
+
         return modelsPromise;
     };
 
@@ -182,17 +185,13 @@
             sync: [],
             async: []
         }, this.layout.views, this.params);
-
         this.log('collected incomplete views', views);
 
         var models = views2models(views.sync);
-
         this.log('collected needed models', models);
-
         this.switchTimer('collectModels', 'requestSyncModels');
 
         var syncPromise = this._requestModels(models);
-
         syncPromise.always(function() {
             this.stopTimer('requestSyncModels');
         }, this);
@@ -269,18 +268,14 @@
             'views': {}
         };
         this.view._getUpdateTree(tree, this.layout.views, this.params);
-
         this.log('created render tree', tree);
-
         this.stopTimer('collectViews');
 
         var html;
         if (!ns.object.isEmpty(tree.views)) {
             this.startTimer('generateHTML');
-            html = this._applyTemplate(tree, this.params, this.layout);
-
+            html = this.applyTemplate(tree, this.params, this.layout);
             this.log('generated html', html);
-
             this.stopTimer('generateHTML');
         }
 
@@ -311,7 +306,6 @@
             toplevel: true,
             async: async
         }, viewEvents);
-
         this.switchTimer('insertNodes', 'triggerEvents');
 
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
@@ -407,7 +401,7 @@
      * @param {object} layout Раскладка страницы.
      * @returns {HTMLElement}
      */
-    ns.Update.prototype._applyTemplate = function(tree, params, layout) {
+    ns.Update.prototype.applyTemplate = function(tree, params, layout) {
         /* jshint unused: false */
         return ns.renderString(tree, null, '');
     };

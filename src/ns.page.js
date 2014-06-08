@@ -122,6 +122,7 @@
      */
     ns.page._reset = function() {
         this.current = {};
+        this.currentUrl = null;
     };
 
     /**

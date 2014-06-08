@@ -77,6 +77,65 @@ describe('ns.page', function() {
 
         });
 
+        describe('ns-page-changed event', function() {
+            beforeEach(function() {
+                ns.View.define('app');
+                ns.View.define('message', { params: { id: null } });
+                ns.layout.define('inbox', {
+                    'app': {}
+                });
+                ns.layout.define('message', {
+                    'message': {}
+                });
+                ns.router.routes = {
+                    route: {
+                        '/inbox': 'inbox',
+                        '/message/{id:int}': 'message'
+                    }
+                };
+                ns.router.init();
+
+                this.sinon.stub(ns.page, 'title');
+                this.sinon.stub(ns, 'Update', function() { return { start: function() { return 'promise stub'; } }; });
+            });
+
+            it('should trigger ns-page-changed first time load', function() {
+                var spy = this.sinon.spy();
+                ns.events.on('ns-page-changed', spy);
+
+                ns.page.go('/inbox');
+
+                expect(spy.calledOnce).to.be.equal(true);
+                expect(spy.firstCall.args[0]).to.be.equal('ns-page-changed');
+                expect(spy.firstCall.args[1]).to.be.eql({ url: null, route: {} });
+                expect(spy.firstCall.args[2]).to.be.equal('promise stub');
+            });
+
+            it('should not trigger ns-page-changed if page url has not changed', function() {
+                var spy = this.sinon.spy();
+                ns.events.on('ns-page-changed', spy);
+
+                ns.page.go('/inbox');
+                ns.page.go('/inbox');
+
+                expect(spy.calledOnce).to.be.equal(true);
+            });
+
+            it('should trigger ns-page-changed if page url changed', function() {
+                var spy = this.sinon.spy();
+                ns.events.on('ns-page-changed', spy);
+
+                ns.page.go('/inbox');
+                ns.page.go('/message/1');
+
+                expect(spy.calledTwice).to.be.equal(true);
+                expect(spy.secondCall.args[0]).to.be.equal('ns-page-changed');
+                expect(spy.secondCall.args[1]).to.eql({ url: '/inbox', route: { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) } });
+                expect(spy.secondCall.args[2]).to.be.equal('promise stub');
+            });
+
+        });
+
     });
 
     describe('getDefaultUrl', function() {

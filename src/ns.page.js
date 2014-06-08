@@ -65,6 +65,11 @@
 
         ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
+        var prevPage = {
+            url: ns.page.currentUrl,
+            route: ns.page.current
+        };
+
         ns.page.current = route;
         // save layout for async-view updates
         ns.page.current.layout = layout;
@@ -81,7 +86,14 @@
         document.title = ns.page.title(url);
 
         var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
-        return update.start();
+        var updatePromise = update.start();
+
+        // сообщаем, что страница поменялась
+        if (prevPage.url !== ns.page.currentUrl) {
+            ns.events.trigger('ns-page-changed', prevPage, updatePromise);
+        }
+
+        return updatePromise;
     };
 
     /**
@@ -109,6 +121,7 @@
      */
     ns.page._reset = function() {
         this.current = {};
+        this.currentUrl = null;
     };
 
     /**

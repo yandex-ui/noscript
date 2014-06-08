@@ -73,7 +73,6 @@
         ns.page.current = route;
         // save layout for async-view updates
         ns.page.current.layout = layout;
-
         ns.page.currentUrl = url;
 
         if (action === 'push') {

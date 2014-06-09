@@ -327,7 +327,7 @@
     ns.Update.prototype.prefetch = function() {
         this.log('started `prefetch` scenario');
         this.promise = this._requestSyncModels();
-        this.promise.then(this.done, this.error, this);
+        this.promise.then(this._fulfill, this._reject, this);
         return this.promise;
     };
 
@@ -341,8 +341,8 @@
     ns.Update.prototype.generateHTML = function() {
         this.log('started `generateHTML` scenario');
         this._requestSyncModels().then(function() {
-            this.done(this._generateHTML());
-        }, this.error, this);
+            this._fulfill(this._generateHTML());
+        }, this._reject, this);
 
         return this.promise;
     };
@@ -370,8 +370,8 @@
         this._requestAllModels().then(function(asyncResult) {
             var node = this._generateHTML();
             this._insertNodes(node);
-            this.done(asyncResult);
-        }, this.error, this);
+            this._fulfill(asyncResult);
+        }, this._reject, this);
 
         return this.promise;
     };
@@ -385,7 +385,7 @@
         var html = this._generateHTML();
 
         this._insertNodes(html, true);
-        this.done({async: []});
+        this._fulfill({async: []});
 
         return this.promise;
     };
@@ -422,7 +422,7 @@
         //TODO: Should we abort ns.request?
 
         // reject promise
-        this.error({
+        this._reject({
             error: ns.U.STATUS.EXPIRED
         });
     };
@@ -431,7 +431,7 @@
      * @private
      * @param {*} result Result data.
      */
-    ns.Update.prototype.done = function(result) {
+    ns.Update.prototype._fulfill = function(result) {
         ns.Update._removeFromQueue(this);
         this.promise.fulfill(result);
         this.perf(this.getTimers());
@@ -442,7 +442,7 @@
      * @private
      * @param {*} result Error data.
      */
-    ns.Update.prototype.error = function(result) {
+    ns.Update.prototype._reject = function(result) {
         ns.Update._removeFromQueue(this);
         this.promise.reject(result);
         this.log('failed to finish scenario');

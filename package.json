@@ -38,7 +38,7 @@
         "dist",
         "src/*.js",
         "yate",
-        "noscript.borschik.js"
+        "build/src.client.js"
     ],
     "scripts": {
         "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start"

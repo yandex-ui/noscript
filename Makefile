@@ -7,8 +7,9 @@ prepare: yate dist
 # сборка для npm
 dist: node_modules
 	mkdir -p dist
-	$(NPM_BIN)/borschik -i noscript.borschik.js -o dist/noscript.js -m no
-	$(NPM_BIN)/borschik -i noscript.borschik.js -o dist/noscript.min.js -m yes
+	$(NPM_BIN)/borschik -i build/src.client.js -o dist/noscript.js -m no
+	$(NPM_BIN)/borschik -i build/src.client.js -o dist/noscript.min.js -m yes
+	$(NPM_BIN)/borschik -i build/src.server.js -o dist/noscript.module.js -m no
 
 # сбока yate для тестов
 yate: test/tests.yate.js

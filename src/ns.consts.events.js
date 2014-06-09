@@ -61,6 +61,15 @@ ns.V.NS_EVENTS = [
     'ns-view-htmldestroy'
 ];
 
+/**
+ * @const
+ * @type {Boolean}
+ */
+ns.IS_TOUCH = Boolean(
+    'ontouchstart' in window ||
+    (window.DocumentTouch && document instanceof DocumentTouch)
+);
+
 //TODO: Pointer events support (MSIE 10)
 
 // @see http://sitr.us/2011/07/28/how-mobile-safari-emulates-mouse-events.html

@@ -17,15 +17,6 @@ if (typeof window === 'undefined') {
 ns.events = no.extend( {}, no.Events );
 
 /**
- * @const
- * @type {Boolean}
- */
-ns.IS_TOUCH = Boolean(
-    'ontouchstart' in window ||
-    (window.DocumentTouch && document instanceof DocumentTouch)
-);
-
-/**
  *
  */
 ns.todo = function() {

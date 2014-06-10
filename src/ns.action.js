@@ -57,7 +57,7 @@
      * @param {object} [params] Params
      * @param {Element} [node]
      * @param {Event} [event]
-     * @returns {*}
+     * @return {*}
      */
     ns.action.run = function(id, params, node, event) {
         var action = _actions[id];
@@ -73,7 +73,7 @@
     /**
      * Получает параметры экшена из ноды
      * @param {Node} node
-     * @returns {object}
+     * @return {object}
      */
     ns.action.getParams = function(node) {
         var paramString = node.getAttribute('data-params');
@@ -174,7 +174,7 @@
     /**
      * Process "click" event
      * @param {jQuery.Event} e
-     * @returns {boolean}
+     * @return {boolean}
      * @private
      */
     ns.action._process = function(e) {

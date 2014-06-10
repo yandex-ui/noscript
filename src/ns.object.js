@@ -7,7 +7,7 @@ ns.object = {};
 /**
  * Клонирует объект.
  * @param {object} obj Объект для клонирования.
- * @returns {object}
+ * @return {object}
  */
 ns.object.clone = function(obj) {
     if (obj && typeof obj === 'object') {
@@ -34,7 +34,7 @@ ns.object.clone = function(obj) {
 /**
  * Определяет, пустой ли объект или нет.
  * @param {object} obj Тестируемый объект.
- * @returns {boolean}
+ * @return {boolean}
  */
 ns.object.isEmpty = function(obj) {
     /* jshint unused: false */

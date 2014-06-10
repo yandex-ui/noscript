@@ -22,7 +22,7 @@
      * Осуществляем переход по ссылке.
      * @param {string} [url=ns.page.getCurrentUrl()]
      * @param {string} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     ns.page.go = function(url, action) {
         if (!action) {
@@ -87,7 +87,7 @@
     /**
      * Redirects to given url.
      * @param {string} url New page url.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     ns.page.redirect = function(url) {
         ns.history.replaceState(url);
@@ -97,7 +97,7 @@
     /**
      * Returns document title.
      * @param {string} url Page URL.
-     * @returns {string}
+     * @return {string}
      */
     ns.page.title = function(url) {
         return 'NoScript app ' + url;

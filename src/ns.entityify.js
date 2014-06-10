@@ -21,7 +21,7 @@
     /**
      * Преобразует специальные символы в HTML сущности.
      * @param {string} s Строка
-     * @returns {string}
+     * @return {string}
      */
     ns.entityify = function(s) {
         return String(s).replace(ENTITYIFY_REGEXP, ENTITYIFY_REPLACER);
@@ -49,7 +49,7 @@
     /**
      * Преобразует HTML-сущности в символы.
      * @param {string} s Строка
-     * @returns {string}
+     * @return {string}
      */
     ns.deentityify = function(s) {
         return String(s).replace(DEENTITYIFY_REGEXP, DEENTITYIFY_REPLACER);

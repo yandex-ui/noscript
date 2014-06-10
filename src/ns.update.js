@@ -80,7 +80,7 @@
     /**
      * Начинает работу updater'а.
      * @param {boolean} [async=false] Флаг асинхронного updater'а.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     ns.Update.prototype.start = function(async) {
         this.startTimer('prepare');
@@ -299,7 +299,7 @@
      * @param {object} tree Дерево видов.
      * @param {object} params Параметры страницы.
      * @param {object} layout Раскладка страницы.
-     * @returns {HTMLElement}
+     * @return {HTMLElement}
      */
     ns.Update.prototype.render = function(tree, params, layout) {
         /* jshint unused: false */
@@ -307,7 +307,7 @@
     };
 
     /**
-     * @returns {Boolean} true in case another update was created after current update.
+     * @return {Boolean} true in case another update was created after current update.
      * @private
      */
     ns.Update.prototype._expired = function() {
@@ -372,7 +372,7 @@
      * @static
      * @private
      * @param {ns.Update} newUpdate New instance of ns.Update.
-     * @returns Boolean
+     * @return Boolean
      */
     ns.Update.prototype.addToQueue = function(newUpdate) {
         var currentRuns = currentUpdates;
@@ -424,7 +424,7 @@
 
     /**
      * Whether this update is a global update (main update) or not.
-     * @returns Boolean.
+     * @return Boolean.
      */
     ns.Update.prototype.isGlobal = function() {
         return this.EXEC_FLAG === ns.U.EXEC.GLOBAL;
@@ -445,7 +445,7 @@
      * Global error handler.
      * @param {object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
      * @param {ns.Update} update Update instance so that we can abort it if we want to.
-     * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
+     * @return Boolean If `true` - update can continue, otherwise update cannot continue.
      */
     ns.Update.handleError = function(error, update) {
         /* jshint unused: false */

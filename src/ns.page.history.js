@@ -49,7 +49,7 @@
 
     /**
      * Go to previous page and delete it from history.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     ns.page.history.back = function() {
         var nsHistory = ns.page.history;
@@ -73,7 +73,7 @@
     /**
      * Returns previous page.
      * @param {number} [n=0] N pages ago
-     * @returns {string}
+     * @return {string}
      */
     ns.page.history.getPrevious = function(n) {
         n = n || 0;

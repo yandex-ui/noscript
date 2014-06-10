@@ -24,7 +24,7 @@
 
     /**
      *
-     * @returns {{}|*}
+     * @return {{}|*}
      */
     ns.ModelCollection.prototype.getData = function() {
         // TODO а точно это нужно? Можно ведь просто всегда взять элементы из collection.models.
@@ -95,7 +95,7 @@
      * Создает модели из разбитых данных
      *
      * @param { Array } items – массив данных для будущих подмоделей
-     * @returns { ns.Model[] } – массив полученных подмоделей
+     * @return { ns.Model[] } – массив полученных подмоделей
      * @private
      */
     ns.ModelCollection.prototype._splitModels = function(items) {
@@ -195,7 +195,7 @@
 
     /**
      * Returns data version (included items version).
-     * @returns {number}
+     * @return {number}
      */
     ns.ModelCollection.prototype.getSelfVersion = function() {
         return this._versionSelf;
@@ -257,7 +257,7 @@
      * @param {ns.Model[] | ns.Model} models – одна или несколько подмоделей для вставки
      * @param {number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
      *
-     * @returns {Boolean} – признак успешности вставки
+     * @return {Boolean} – признак успешности вставки
      */
     ns.ModelCollection.prototype.insert = function(models, index) {
         // переинициализация после #destroy()
@@ -303,7 +303,7 @@
      * Удаляет элементы коллекции.
      *
      * @param {ns.Model | Number | ns.Model[] | Number[]} models – подмодели или индексы подмодели, которую надо удалить
-     * @returns {Boolean} – признак успешности удаления.
+     * @return {Boolean} – признак успешности удаления.
      */
     ns.ModelCollection.prototype.remove = function(models) {
         var modelsRemoved = [];

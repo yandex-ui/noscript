@@ -35,7 +35,7 @@ ns.todo = function() {
 /**
  * Parse query string to object.
  * @param {string} s Query string
- * @returns {object}
+ * @return {object}
  */
 ns.parseQuery = function(s) {
     var o = {};
@@ -74,7 +74,7 @@ ns.parseQuery = function(s) {
  * @param {*} json
  * @param {string} mode
  * @param {string} [module='main']
- * @returns {Element}
+ * @return {Element}
  */
 ns.tmpl = function(json, mode, module) {
     var result = yr.run(module || 'main', json, mode);
@@ -137,7 +137,7 @@ ns.assert.fail = function(contextName, message) {
  * Строит ключ по готовому объекту параметров.
  * @param {string} prefix Префикс ключа.
  * @param {object} params Объект с параметрами составляющими ключ.
- * @returns {string} Строка ключа.
+ * @return {string} Строка ключа.
  */
 ns.key = function(prefix, params) {
     var key = prefix;

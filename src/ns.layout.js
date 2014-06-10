@@ -41,7 +41,7 @@
      * Возвращает раскладку страницы с заданным id и params.
      * @param {string} id ID раскладки
      * @param {object} [params] Параметры страницы.
-     * @returns {object}
+     * @return {object}
      */
     ns.layout.page = function(id, params) {
         var raw = _pages[id];
@@ -65,7 +65,7 @@
      * Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
      * @param {*} layout
      * @param {object} params
-     * @returns {object}
+     * @return {object}
      */
     function compile(layout, params) {
         var t = {};
@@ -135,7 +135,7 @@
      * Наследует layout от parent'а.
      * @param {object} layout
      * @param {object} parent
-     * @returns {object}
+     * @return {object}
      */
     function inherit(layout, parent) {
         var result = ns.object.clone(parent);

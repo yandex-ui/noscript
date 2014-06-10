@@ -18,7 +18,7 @@
      * @description
      * Функция блокировки должна вернуть false, если переход нельзя осуществить.
      * @param {Function} fn
-     * @returns {ns.page.block}
+     * @return {ns.page.block}
      */
     ns.page.block.add = function(fn) {
         ns.page.block._checkers.push(fn);
@@ -29,7 +29,7 @@
     /**
      * Remove function to check.
      * @param {Function} fn
-     * @returns {ns.page.block}
+     * @return {ns.page.block}
      */
     ns.page.block.remove = function(fn) {
         var checkers = ns.page.block._checkers;
@@ -43,7 +43,7 @@
 
     /**
      * Очищает все функции блокировки.
-     * @returns {ns.page.block}
+     * @return {ns.page.block}
      */
     ns.page.block.clear = function() {
         ns.page.block._checkers = [];
@@ -54,7 +54,7 @@
      * Detect if possible to go to the url.
      * You can add your own checkers with ns.page.block.add(checkerFn)
      * @param {string} url URL to go.
-     * @returns {Boolean}
+     * @return {Boolean}
      */
     ns.page.block.check = function(url) {
         var checkers = ns.page.block._checkers;

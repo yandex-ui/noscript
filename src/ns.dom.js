@@ -21,7 +21,7 @@ ns.removeNode = function(node) {
 /**
  * Generates DOM from HTML-string.
  * @param {string} html
- * @returns {Element}
+ * @return {Element}
  */
 ns.html2node = function(html) {
     var div = document.createElement('div');
@@ -36,7 +36,7 @@ ns.html2node = function(html) {
  * @name ns.byClass
  * @param {string} className
  * @param {Element} context
- * @returns {Node[]}
+ * @return {Node[]}
  */
 if ((typeof document !== 'undefined') && document.getElementsByClassName) {
 

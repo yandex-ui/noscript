@@ -24,7 +24,7 @@ ns.Box = function(id, params) {
  *
  * @param {string} id
  * @param {object} params
- * @returns {ns.View}
+ * @return {ns.View}
  * @private
  */
 ns.Box.prototype._getView = function(id, params) {
@@ -37,7 +37,7 @@ ns.Box.prototype._getView = function(id, params) {
  * @param {string} id
  * @param {object} params
  * @param {ns.L} type
- * @returns {ns.View}
+ * @return {ns.View}
  * @private
  */
 ns.Box.prototype._addView = function(id, params, type) {
@@ -56,7 +56,7 @@ ns.Box.prototype._addView = function(id, params, type) {
 /**
  *
  * @param {array} descs
- * @returns {array}
+ * @return {array}
  * @private
  */
 ns.Box.prototype._getDescendants = function(descs) {
@@ -115,7 +115,7 @@ ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
  * Строим дерево блоков.
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.Box.prototype._getViewTree = function(layout, params) {
@@ -240,7 +240,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
 /**
  *
- * @returns {boolean}
+ * @return {boolean}
  * @private
  */
 ns.Box.prototype._show = function() {
@@ -255,7 +255,7 @@ ns.Box.prototype._show = function() {
 
 /**
  * Скрывает view
- * @returns {Boolean}
+ * @return {Boolean}
  * @protected
  */
 ns.Box.prototype._hide = function() {
@@ -288,7 +288,7 @@ ns.Box.prototype.isLoading = no.false;
 
 /**
  * Returns true if box has status NONE
- * @returns {boolean}
+ * @return {boolean}
  */
 ns.Box.prototype.isNone = function() {
     return !this.node;

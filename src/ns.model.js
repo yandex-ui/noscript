@@ -130,7 +130,7 @@
      * Ищет метод в объекте по имени или возвращает переданную функцию
      * Нужен для навешивания коллбеков
      * @param {String | Function} method
-     * @returns {Function}
+     * @return {Function}
      * @private
      */
     ns.Model.prototype._prepareCallback = function(method) {
@@ -161,7 +161,7 @@
 
     /**
      *
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.Model.prototype.isValid = function() {
         return (this.status === this.STATUS.OK);
@@ -169,7 +169,7 @@
 
     /**
      *
-     * @returns {null|*}
+     * @return {null|*}
      */
     ns.Model.prototype.getData = function() {
         return this.data;
@@ -178,7 +178,7 @@
     /**
      * Returns data matched by jpath.
      * @param {string} jpath
-     * @returns {*}
+     * @return {*}
      * @example
      * var foo = model.get('.foo'); // model.data.foo.
      * var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo существует).
@@ -194,7 +194,7 @@
      * Returns data matched by jpath.
      * This methods always returns array of results.
      * @param {string} jpath
-     * @returns {array}
+     * @return {array}
      */
     ns.Model.prototype.select = function(jpath) {
         var data = this.data;
@@ -252,7 +252,7 @@
      * @param {*} data Новые данные.
      * @param {object} [options] Флаги.
      * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
-     * @returns {ns.Model}
+     * @return {ns.Model}
      */
     ns.Model.prototype.setData = function(data, options) {
         // переинициализация после #destroy()
@@ -283,7 +283,7 @@
     /**
      *
      * @param {*} data
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.Model.prototype.hasDataChanged = function(data) {
         return !!data;
@@ -291,7 +291,7 @@
 
     /**
      *
-     * @returns {*}
+     * @return {*}
      */
     ns.Model.prototype.getError = function() {
         return this.error;
@@ -310,7 +310,7 @@
     /**
      *
      * @param {*} data
-     * @returns {*}
+     * @return {*}
      * @private
      */
     ns.Model.prototype._beforeSetData = function(data) {
@@ -320,7 +320,7 @@
     /**
      *
      * @param {*} data
-     * @returns {*}
+     * @return {*}
      */
     ns.Model.prototype.preprocessData = function(data) {
         return data;
@@ -328,7 +328,7 @@
 
     /**
      *
-     * @returns {object}
+     * @return {object}
      */
     ns.Model.prototype.getRequestParams = function() {
         return ns.Model._getKeyParams(this.id, this.params, this.info);
@@ -336,7 +336,7 @@
 
     /**
      * Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.Model.prototype.canRetry = function() {
         //  do-модели нельзя перезапрашивать.
@@ -346,7 +346,7 @@
     /**
      *
      * @param {*} result
-     * @returns {*}
+     * @return {*}
      */
     ns.Model.prototype.extractData = function(result) {
         if (result) {
@@ -357,7 +357,7 @@
     /**
      *
      * @param {*} result
-     * @returns {*}
+     * @return {*}
      */
     ns.Model.prototype.extractError = function(result) {
         if (result) {
@@ -367,7 +367,7 @@
 
     /**
      *
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.Model.prototype.isDo = function() {
         return this.info.isDo;
@@ -375,7 +375,7 @@
 
     /**
      * Returns data version.
-     * @returns {number}
+     * @return {number}
      */
     ns.Model.prototype.getVersion = function() {
         return this._version;
@@ -392,7 +392,7 @@
     /**
      * Подготавливает модель к запросу.
      * @param {number} requestID ID запроса.
-     * @returns {ns.Model}
+     * @return {ns.Model}
      */
     ns.Model.prototype.prepareRequest = function(requestID) {
         this.requestID = requestID;
@@ -415,7 +415,7 @@
      * @static
      * @param {string} id Model's ID.
      * @param {object} [params] Model's params.
-     * @returns {ns.Model}
+     * @return {ns.Model}
      */
     ns.Model.get = function(id, params) {
         var model = this._find(id, params);
@@ -440,7 +440,7 @@
      * Returns valid cached model instance.
      * @param {string} id Model's ID.
      * @param {object} [params] Model's params
-     * @returns {ns.Model|null}
+     * @return {ns.Model|null}
      */
     ns.Model.getValid = function(id, params) {
         var model = this._find(id, params);
@@ -454,7 +454,7 @@
      * Returns cached model instance.
      * @param {string} id Model's ID.
      * @param {object} [params] Model's params
-     * @returns {ns.Model|null}
+     * @return {ns.Model|null}
      * @private
      */
     ns.Model._find = function(id, params) {
@@ -489,7 +489,7 @@
      *
      * @param {string} id
      * @param {object} params
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.Model.isValid = function(id, params) {
         return !!ns.Model.getValid(id, params);
@@ -579,7 +579,7 @@
     /**
      * Returns model's info
      * @param {string} id Model ID.
-     * @returns {object}
+     * @return {object}
      * @throws Throws exception if model is not defined.
      */
     ns.Model.info = function(id) {
@@ -613,7 +613,7 @@
     /**
      * Returns model's info without processing.
      * @param {string} id Model ID.
-     * @returns {object}
+     * @return {object}
      */
     ns.Model.infoLite = function(id) {
         var info = _infos[id];
@@ -627,7 +627,7 @@
      * @param {string} id
      * @param {object} params
      * @param {object} info
-     * @returns {string}
+     * @return {string}
      */
     ns.Model.key = function(id, params, info) {
         info = info || ns.Model.info(id);
@@ -649,7 +649,7 @@
      * @param {string} id
      * @param {object} params
      * @param {object} info
-     * @returns {*}
+     * @return {*}
      * @private
      */
     ns.Model._getKeyParams = function(id, params, info) {
@@ -726,7 +726,7 @@
     /**
      *
      * @param {ns.Model} model
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.Model.isCollection = function(model) {
         return (model.info || ns.Model.infoLite(model.id)).isCollection;
@@ -876,7 +876,7 @@
 
     /**
      * Возвращает кэш по параметрам
-     * @returns {*}
+     * @return {*}
      */
     ns.ModelUniq.prototype.getData = function(params) {
         var that = this;

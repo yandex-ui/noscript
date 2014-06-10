@@ -52,7 +52,7 @@
     /**
      * Проверяет, является ли переданный объект функцией.
      * @param  {Function} fn
-     * @returns {Boolean}
+     * @return {Boolean}
      */
     function isFunction(fn) {
         return 'function' === typeof fn;

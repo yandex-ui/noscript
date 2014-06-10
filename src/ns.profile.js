@@ -28,7 +28,7 @@
     /**
      * Ставит конечную точку отчета для метрики.
      * @param {string} label Название метрики.
-     * @returns {number} Рассчитанное значение метрики.
+     * @return {number} Рассчитанное значение метрики.
      */
     ns.profile.stopTimer = function(label) {
         if (!this._profileTimes) {
@@ -45,7 +45,7 @@
     /**
      * Возвращает значение метрики.
      * @param {string} label Название метрики.
-     * @returns {number}
+     * @return {number}
      */
     ns.profile.getTimer = function(label) {
         if (!this._profileTimes) {

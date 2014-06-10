@@ -2,7 +2,7 @@
  * Find best page for url.
  * @namespace
  * @param {string} url
- * @returns {object}
+ * @return {object}
  * @tutorial ns.router
  */
 ns.router = function(url) {
@@ -96,7 +96,7 @@ ns.router = function(url) {
  * Get params for router from url
  * @param {string} url - current url
  * @param {object} route - compiled route or redirect
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.router._getParamsRouteFromUrl = function(url, route) {
@@ -185,7 +185,7 @@ ns.router.init = function() {
 /**
  * Generate url.
  * @param {string} url Relative url.
- * @returns {string} Valid url that takes into consideration baseDir.
+ * @return {string} Valid url that takes into consideration baseDir.
  */
 ns.router.url = function(url) {
     return (ns.router.baseDir + url) || '/';
@@ -194,7 +194,7 @@ ns.router.url = function(url) {
 /**
  * @param {string} id Page (layout) name.
  * @param {object} params Url generation params.
- * @returns {string} Generated url.
+ * @return {string} Generated url.
  */
 ns.router.generateUrl = function(id, params) {
     var url;
@@ -219,7 +219,7 @@ ns.router.generateUrl = function(id, params) {
  *
  * @param {object} def
  * @param {object} params
- * @returns {string}
+ * @return {string}
  * @private
  */
 ns.router._generateUrl = function(def, params) {
@@ -297,7 +297,7 @@ ns.router._generateUrl = function(def, params) {
 /**
  * Compile route.
  * @param {string} route
- * @returns {object}
+ * @return {object}
  */
 ns.router.compile = function(route) {
     // Удаляем слеши в начале и в конце урла.
@@ -330,7 +330,7 @@ ns.router.compile = function(route) {
 /**
  *
  * @param {string} rawSection
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.router._parseSection = function(rawSection) {
@@ -378,7 +378,7 @@ ns.router._parseSection = function(rawSection) {
 
 /**
  * Парсит декларацию параметра (то, что внутри фигурных скобок).
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.router._parseParam = function(param) {
@@ -421,7 +421,7 @@ ns.router._parseParam = function(param) {
 /**
  *
  * @param {object} section
- * @returns {string}
+ * @return {string}
  * @private
  */
 ns.router._generateSectionRegexp = function(section) {
@@ -443,7 +443,7 @@ ns.router._generateSectionRegexp = function(section) {
 /**
  *
  * @param {object} p
- * @returns {RegExp}
+ * @return {RegExp}
  * @private
  */
 ns.router._generateParamRegexp = function(p) {
@@ -480,7 +480,7 @@ ns.router._generateParamRegexp = function(p) {
  *
  * @param {string} pvalue
  * @param {string} ptype
- * @returns {boolean}
+ * @return {boolean}
  * @private
  */
 ns.router._isParamValid = function(pvalue, ptype) {

@@ -10,7 +10,7 @@
      * @param {object} [params] Параметры моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      * @namespace
      */
     ns.request = function(items, params, options) {
@@ -24,7 +24,7 @@
      * @param {object} [params] Параметры моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     ns.forcedRequest = function(items, params, options) {
         options = options || {};
@@ -37,7 +37,7 @@
      * @param {ns.Model[]} models Массив моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     ns.request.models = function(models, options) {
 
@@ -76,7 +76,7 @@
     /**
      * Метод для проверки ответа данных.
      * Может использоваться, например, при проверки авторизации.
-     * @returns {boolean}
+     * @return {boolean}
      */
     ns.request.canProcessResponse = function() {
         return true;
@@ -108,7 +108,7 @@
          * @param {ns.Model} model Модель.
          * @param {number} requestId ID запроса.
          * @param {Boolean} forced Флаг принудительного запроса.
-         * @returns {Boolean|ns.Model} Если true - модель надо запросить, false - ничег не надо делать, ns.Model - дождаться ресолва промиса возвращенной модели.
+         * @return {Boolean|ns.Model} Если true - модель надо запросить, false - ничег не надо делать, ns.Model - дождаться ресолва промиса возвращенной модели.
          */
         add: function(model, requestId, forced) {
             var REQUEST_STATUS = this.STATUS;
@@ -418,7 +418,7 @@
      * Приводит запрашиваемые модели к формату №3 из ns.request.
      * @param {Array} items Массив названией моделей.
      * @param {object} params Параметры моделей.
-     * @returns {Array}
+     * @return {Array}
      */
     function normalizeItems(items, params) {
         var _items = [];
@@ -435,7 +435,7 @@
     /**
      * Возвращает promise из model
      * @param {ns.Model} model Модель
-     * @returns {Vow.Promise}
+     * @return {Vow.Promise}
      */
     function model2Promise(model) {
         return model.promise;
@@ -445,7 +445,7 @@
      * Приводит аргументы из ns.request к моделям.
      * @param {String|Array|Object} items Массив названий моделей.
      * @param {object} [params] Параметры моделей.
-     * @returns {ns.Model[]}
+     * @return {ns.Model[]}
      */
     function items2models(items, params) {
         // приводим к формату №2

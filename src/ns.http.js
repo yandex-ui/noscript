@@ -3,7 +3,7 @@
  * @param {string} url
  * @param {object} params Request parameters.
  * @param {object=} options Standart jQuery.ajax settings object.
- * @returns {Vow.Promise}
+ * @return {Vow.Promise}
  */
 ns.http = function(url, params, options) {
     options = no.extend(ns.http.DEFAULTS, options || {});

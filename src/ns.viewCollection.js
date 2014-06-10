@@ -16,7 +16,7 @@ no.inherit(ns.ViewCollection, ns.View);
  *
  * @param {string} id
  * @param {object} info
- * @returns {ns.View}
+ * @return {ns.View}
  */
 ns.ViewCollection.define = function(id, info) {
     info = info || {};
@@ -109,7 +109,7 @@ ns.ViewCollection.prototype._invokeModelHandler = function(handler, e, o) {
 
 /**
  *
- * @returns {boolean}
+ * @return {boolean}
  */
 ns.ViewCollection.prototype.isValid = function() {
     return this.isValidSelf() && this.isValidDesc();
@@ -117,7 +117,7 @@ ns.ViewCollection.prototype.isValid = function() {
 
 /**
  *
- * @returns {boolean}
+ * @return {boolean}
  */
 ns.ViewCollection.prototype.isValidDesc = function() {
     for (var key in this.views) {
@@ -131,7 +131,7 @@ ns.ViewCollection.prototype.isValidDesc = function() {
 /**
  * Возвращает true, если все модели валидны.
  * @param {object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
- * @returns {Boolean}
+ * @return {Boolean}
  */
 ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
     var models = this.models;
@@ -162,7 +162,7 @@ ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
  *
  * @param {string} id
  * @param {object} params
- * @returns {*}
+ * @return {*}
  * @private
  */
 ns.ViewCollection.prototype._getView = function(id, params) {
@@ -173,7 +173,7 @@ ns.ViewCollection.prototype._getView = function(id, params) {
 /**
  *
  * @param {string} key
- * @returns {ns.View}
+ * @return {ns.View}
  * @private
  */
 ns.ViewCollection.prototype._getViewByKey = function(key) {
@@ -184,7 +184,7 @@ ns.ViewCollection.prototype._getViewByKey = function(key) {
  *
  * @param {string} id
  * @param {object} params
- * @returns {ns.View}
+ * @return {ns.View}
  * @private
  */
 ns.ViewCollection.prototype._addView = function(id, params) {
@@ -230,7 +230,7 @@ ns.ViewCollection.prototype._getRequestViews = ns.View.prototype._tryPushToReque
  * @param {object} tree
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
@@ -251,7 +251,7 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
  *
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
@@ -307,7 +307,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
  *
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @return {object}
  * @private
  */
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {

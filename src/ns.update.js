@@ -50,11 +50,11 @@
          */
         this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
 
+        this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
+
         if (!ns.Update._addToQueue(this)) {
             this.abort();
         }
-
-        this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
     };
 
     no.extend(ns.Update.prototype, ns.profile);
@@ -256,8 +256,6 @@
     ns.Update.prototype._generateHTML = function() {
         //  TODO: Проверить, что не начался уже более новый апдейт.
 
-        var promise = new Vow.Promise();
-
         // FIXME: вызов этого метода здесь избыточен.
         // Он нужен сейчас только для рекурсивного прохода по видам с целью
         // выставления правильного asyncState.
@@ -281,9 +279,7 @@
             this.stopTimer('generateHTML');
         }
 
-        promise.fulfill(html);
-
-        return promise;
+        return Vow.fulfill(html);
     };
 
     /**
@@ -320,6 +316,8 @@
             }
         }
         this.stopTimer('triggerEvents');
+
+        return Vow.fulfill();
     };
 
     /**
@@ -375,8 +373,9 @@
         this.log('started `render` scenario');
         this._requestAllModels().then(function(asyncResult) {
             this._generateHTML().then(function(html) {
-                this._insertNodes(html);
-                this._fulfill(asyncResult);
+                this._insertNodes(html).then(function() {
+                    this._fulfill(asyncResult);
+                }, this);
             }, this._reject, this);
         }, this._reject, this);
 
@@ -390,8 +389,9 @@
     ns.Update.prototype.rerender = function() {
         this.log('started `_re_render` scenario');
         this._generateHTML().then(function(html) {
-            this._insertNodes(html, true);
-            this._fulfill({async: []});
+            this._insertNodes(html, true).then(function() {
+                this._fulfill({async: []});
+            }, this);
         }, this._reject, this);
 
         return this.promise;
@@ -447,12 +447,12 @@
 
     /**
      * @private
-     * @param {*} result Error data.
+     * @param {*} reason Error data.
      */
-    ns.Update.prototype._reject = function(result) {
+    ns.Update.prototype._reject = function(reason) {
         ns.Update._removeFromQueue(this);
-        this.promise.reject(result);
-        this.log('failed to finish scenario');
+        this.promise.reject(reason);
+        this.log('scenario was rejected with reason', reason);
     };
 
     /**

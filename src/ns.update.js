@@ -54,7 +54,7 @@
             this.abort();
         }
 
-        this.log('created instance with layout', this.layout, 'and params', this.params);
+        this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
     };
 
     no.extend(ns.Update.prototype, ns.profile);
@@ -207,7 +207,7 @@
             asyncPromises.push(asyncPromise);
 
             Vow.all([
-                syncPromise,
+                update.promise,
                 update._requestModels(models)
             ]).then(function() {
 
@@ -256,6 +256,8 @@
     ns.Update.prototype._generateHTML = function() {
         //  TODO: Проверить, что не начался уже более новый апдейт.
 
+        var promise = new Vow.Promise();
+
         // FIXME: вызов этого метода здесь избыточен.
         // Он нужен сейчас только для рекурсивного прохода по видам с целью
         // выставления правильного asyncState.
@@ -279,7 +281,9 @@
             this.stopTimer('generateHTML');
         }
 
-        return html;
+        promise.fulfill(html);
+
+        return promise;
     };
 
     /**
@@ -341,7 +345,9 @@
     ns.Update.prototype.generateHTML = function() {
         this.log('started `generateHTML` scenario');
         this._requestSyncModels().then(function() {
-            this._fulfill(this._generateHTML());
+            this._generateHTML().then(function(html) {
+                this._fulfill(html);
+            }, this._reject, this);
         }, this._reject, this);
 
         return this.promise;
@@ -368,9 +374,10 @@
     ns.Update.prototype.start = ns.Update.prototype.render = function() {
         this.log('started `render` scenario');
         this._requestAllModels().then(function(asyncResult) {
-            var node = this._generateHTML();
-            this._insertNodes(node);
-            this._fulfill(asyncResult);
+            this._generateHTML().then(function(html) {
+                this._insertNodes(html);
+                this._fulfill(asyncResult);
+            }, this._reject, this);
         }, this._reject, this);
 
         return this.promise;
@@ -382,10 +389,10 @@
      */
     ns.Update.prototype.rerender = function() {
         this.log('started `_re_render` scenario');
-        var html = this._generateHTML();
-
-        this._insertNodes(html, true);
-        this._fulfill({async: []});
+        this._generateHTML().then(function(html) {
+            this._insertNodes(html, true);
+            this._fulfill({async: []});
+        }, this._reject, this);
 
         return this.promise;
     };

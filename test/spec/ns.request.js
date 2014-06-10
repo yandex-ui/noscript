@@ -176,6 +176,12 @@ describe('ns.request.js', function() {
             });
 
             it('should resolve promise after response', function(finish) {
+                this.promise.then(function() {
+                    finish();
+                }, function() {
+                    finish('rejected');
+                });
+
                 this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
@@ -185,12 +191,6 @@ describe('ns.request.js', function() {
                         ]
                     })
                 );
-
-                this.promise.then(function() {
-                    finish();
-                }, function() {
-                    finish('rejected');
-                });
             });
         });
 

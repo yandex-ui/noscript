@@ -425,7 +425,7 @@ describe('ns.Updater', function() {
             });
 
             it('should resolve second async promise', function(finish) {
-                this.promise.done(function(result) {
+                this.promise.then(function(result) {
                     result.async[1]
                         .then(function() {
                             finish();
@@ -451,7 +451,7 @@ describe('ns.Updater', function() {
                             ]
                         })
                     );
-                }.bind(this));
+                }, this);
             });
 
         });
@@ -506,7 +506,7 @@ describe('ns.Updater', function() {
                         // start new global update
 
                         ns.page.go('/page2')
-                            .done(function() {
+                            .then(function() {
 
                                 // get response for async-view
                                 that.sinon.server.requests[0].respond(
@@ -523,8 +523,7 @@ describe('ns.Updater', function() {
                                     finish();
                                 }, 100);
 
-                            })
-                            .fail(function() {
+                            }, function() {
                                 finish('ns.Update fails');
                             });
 
@@ -840,16 +839,17 @@ describe('ns.Updater', function() {
             var that = this;
             this.promise
                 .then(function(result) {
+
                     Vow.all(result.async)
-                        .done(function() {
+                        .then(function() {
                             try {
                                 expect($(that.view.node).find('.ns-async')).to.have.length(0);
                                 finish();
                             } catch(e) {
                                 finish(e);
                             }
-                        })
-                        .fail(function() {
+                        }, function() {
+                            console.log(arguments);
                             finish('async ns.Update was rejected');
                         });
                 }, function() {

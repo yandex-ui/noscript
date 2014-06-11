@@ -849,7 +849,6 @@ describe('ns.Updater', function() {
                                 finish(e);
                             }
                         }, function() {
-                            console.log(arguments);
                             finish('async ns.Update was rejected');
                         });
                 }, function() {

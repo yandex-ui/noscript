@@ -249,6 +249,18 @@
     };
 
     /**
+     * Рекурсивно устанавливает видам asyncState
+     */
+    ns.Update.prototype._setAsyncState = function() {
+        // FIXME: вызов этого метода здесь несколько избыточен.
+        // Он нужен сейчас только для рекурсивного прохода по видам с целью
+        // выставления правильного asyncState, хотя кроме этого делает много другого.
+        // Правильный путь - все рекурсивные обходы видов вынести в ns.Update
+        // Сделаем это позже
+        this.view._getRequestViews({sync: [], async: []}, this.layout.views, this.params);
+    };
+
+    /**
      * Генерирует html недостающих видов
      * @private
      * @returns {string}
@@ -256,13 +268,7 @@
     ns.Update.prototype._generateHTML = function() {
         //  TODO: Проверить, что не начался уже более новый апдейт.
 
-        // FIXME: вызов этого метода здесь избыточен.
-        // Он нужен сейчас только для рекурсивного прохода по видам с целью
-        // выставления правильного asyncState.
-        // Правильный путь - все рекурсивные обходы видов вынести в ns.Update
-        // Сделаем это позже
         this.startTimer('collectViews');
-        this.view._getRequestViews({sync: [], async: []}, this.layout.views, this.params);
 
         var tree = {
             'views': {}
@@ -388,6 +394,7 @@
      */
     ns.Update.prototype.rerender = function() {
         this.log('started `_re_render` scenario');
+        this._setAsyncState();
         this._generateHTML().then(function(html) {
             this._insertNodes(html, true).then(function() {
                 this._fulfill({async: []});

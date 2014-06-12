@@ -176,6 +176,12 @@ describe('ns.request.js', function() {
             });
 
             it('should resolve promise after response', function(finish) {
+                this.promise.then(function() {
+                    finish();
+                }, function() {
+                    finish('rejected');
+                });
+
                 this.sinon.server.requests[0].respond(
                     200,
                     {"Content-Type": "application/json"},
@@ -185,12 +191,6 @@ describe('ns.request.js', function() {
                         ]
                     })
                 );
-
-                this.promise.then(function() {
-                    finish();
-                }, function() {
-                    finish('rejected');
-                });
             });
         });
 
@@ -590,7 +590,8 @@ describe('ns.request.js', function() {
 
         it('if model was requested and request was done it does not mean that we model is ok', function(done) {
             var wait = 2;
-            var handleModels = function(models) {
+            var handleModels = function(err) {
+                var models = err.invalid
                 var model1 = models[0];
                 var model2 = models[1];
 
@@ -609,8 +610,8 @@ describe('ns.request.js', function() {
             // Тут какая-то хитрая комбинация запросов должна была быть, чтобы в какой-то момент при запросе модели она бы оказалась
             // уже запрошена и мы бы просто проставили ей руками статус ok.
 
-            ns.request([ 'model1', 'model2' ]).done(handleModels);
-            ns.request('model1').done(handleModels);
+            ns.request([ 'model1', 'model2' ]).then(null, handleModels);
+            ns.request('model1').then(null, handleModels);
         });
 
     });

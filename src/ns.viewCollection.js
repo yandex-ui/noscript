@@ -90,8 +90,6 @@ ns.ViewCollection._expandModelsDecl = function(decls) {
  */
 ns.ViewCollection.prototype._init = function() {
     ns.View.prototype._init.apply(this, arguments);
-
-    this.views = {};
 };
 
 /**

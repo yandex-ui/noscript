@@ -11,7 +11,7 @@
      */
     ns.log.debug = function(str) {
         /* jshint unused: false */
-//        console.log.apply(console, arguments);
+       console.log.apply(console, arguments);
     };
 
     /**

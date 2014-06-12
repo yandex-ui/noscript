@@ -132,3 +132,5 @@ ns.U.EXEC = {
     'ASYNC': 'async',
     'PARALLEL': 'parallel'
 };
+
+ns.DEBUG = false;

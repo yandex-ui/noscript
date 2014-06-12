@@ -1,48 +1,286 @@
-describe('no.Updater', function() {
+describe('ns.Updater', function() {
 
-    describe('#perf()', function() {
+    describe('scenario', function() {
+        beforeEach(function() {
+            ns.layout.define('asyncLayout', {
+                'app': {
+                    'vSync0':   ['vSync1', 'vSync2'],
+                    'vAsync1&': ['vSync3', 'vSync4'],
+                    'vAsync2&': true
+                }
+            });
 
-        beforeEach(function(done) {
+            ns.layout.define('syncLayout', {
+                'app': {
+                    'vSync0': ['vSync1', 'vSync2'],
+                    'vSync3': {},
+                    'vSync4': {}
+                }
+            });
+
+            ns.View.define('app');
+            this.view = ns.View.create('app');
+
+            ns.View.define('vSync0', {models: ['mSync1']});
+            ns.View.define('vSync1');
+            ns.View.define('vSync2', {models: ['mSync2']});
+            ns.View.define('vSync3', {models: ['mSync3']});
+            ns.View.define('vSync4');
+
+            ns.View.define('vAsync1', {models: ['mAsync1']});
+            ns.View.define('vAsync2', {models: ['mAsync2']});
+            
+
+            ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
+            ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
+
+            this.response0 = JSON.stringify({
+                "models": [
+                    {"data": {"sync1": true}},
+                    {"data": {"sync2": true}},
+                    {"data": {"sync3": true}}
+                ]
+            });
+
+            this.response1 = JSON.stringify({
+                "models": [
+                    {"data": {"async1": true}}
+                ]
+            });
+
+            this.response2 = JSON.stringify({
+                "models": [
+                    {"data": {"async2": true}}
+                ]
+            });
 
             this.sinon.spy(ns.Update.prototype, 'perf');
+        });
 
-            ns.layout.define('app', {
-                'app': true
-            });
-
-            ns.Model.define('photo');
-            ns.View.define('app', { models: ['photo'] });
-
-            this.sinon.server.autoRespond = true;
-            this.sinon.server.respondWith(function(xhr) {
-                xhr.respond(200, { "Content-Type": "application/json" }, '{ "models": [ { "data": {} } ] }');
-            });
-
-            this.view = ns.View.create('app');
-            var layout = ns.layout.page('app', {});
-            new ns.Update(this.view, layout, {})
-                .start()
-                .then(function() {
+        describe('prefetch', function() {
+            beforeEach(function(done) {
+                this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
+                this.update.prefetch().then(function() {
                     done();
-                }, function(e) {
-                    done(e || 'failed')
                 });
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+            });
+
+            it('should make all models of sync views valid', function() {
+                expect(ns.Model.get('mSync1').isValid()).to.be.ok;
+                expect(ns.Model.get('mSync2').isValid()).to.be.ok;
+                expect(ns.Model.get('mSync3').isValid()).to.be.ok;
+            });
+
+            it('should leave all models of async views invalid', function() {
+                expect(ns.Model.get('mAsync1').isValid()).not.to.be.ok;
+                expect(ns.Model.get('mAsync2').isValid()).not.to.be.ok;
+            });
+
+            it('should call perf once', function() {
+                expect(ns.Update.prototype.perf).to.have.been.calledOnce;
+            });
+
+            it('should have had profiled stages `collectModels`, `requestSyncModels`', function() {
+                var arg = ns.Update.prototype.perf.getCall(0).args[0];
+                expect(arg).to.have.property('collectModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+            });
         });
 
-        it('должен вызваться perf после завершения обновления', function() {
-            expect(ns.Update.prototype.perf).to.have.been.calledOnce;
+        describe('generateHTML', function() {
+            beforeEach(function(done) {
+                this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
+                this.update.generateHTML()
+                    .then(function(html) {
+                        this.$node = $(ns.html2node(html));
+                        done();
+                    }, this);
+
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+            });
+
+            it('should create correctly nested nodes of sync views', function() {
+                var vSync0node = this.$node.find('.ns-view-vSync0');
+
+                expect(vSync0node.length).to.equal(1);
+                expect(vSync0node.find('.ns-view-vSync1').length).to.equal(1);
+                expect(vSync0node.find('.ns-view-vSync2').length).to.equal(1);
+            });
+
+            it('should create nodes of async views', function() {
+                expect(this.$node.find('.ns-view-vAsync1').length).to.equal(1);
+                expect(this.$node.find('.ns-view-vAsync2').length).to.equal(1);
+            });
+
+            it('should turn nodes of async views into async mode', function() {
+                expect(this.$node.find('.ns-view-vAsync1.ns-async').length).to.equal(1);
+                expect(this.$node.find('.ns-view-vAsync2.ns-async').length).to.equal(1);
+            });
+
+            it('should not create nodes of async views descendants', function() {
+                expect(this.$node.find('.ns-view-vAsync3').length).to.equal(0);
+                expect(this.$node.find('.ns-view-vAsync3').length).to.equal(0);
+            });
+
+            it('should call perf once', function() {
+                expect(ns.Update.prototype.perf).to.have.been.calledOnce;
+            });
+
+            it('should have had profiled stages `collectModels`, `requestSyncModels`, `collectViews`, `generateHTML`', function() {
+                var arg = ns.Update.prototype.perf.getCall(0).args[0];
+                expect(arg).to.have.property('collectModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('collectViews').that.is.at.least(0);
+                expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+            });
         });
 
-        it('должен вызваться perf c правильными данными после завершения обновления', function() {
-            var arg = ns.Update.prototype.perf.getCall(0).args[0];
-            expect(arg).to.have.property('prepare').that.is.at.least(0);
-            expect(arg).to.have.property('request').that.is.at.least(0);
-            expect(arg).to.have.property('tree').that.is.at.least(0);
-            expect(arg).to.have.property('template').that.is.at.least(0);
-            expect(arg).to.have.property('dom').that.is.at.least(0);
-            expect(arg).to.have.property('events').that.is.at.least(0);
+        describe('render (sync layout)', function() {
+            beforeEach(function(done) {
+                this.update = new ns.Update(this.view, ns.layout.page('syncLayout', {}), {});
+                this.update.render()
+                    .then(function() {
+                        done();
+                    });
+
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+            });
+
+            it('should make valid all related models', function() {
+                expect(ns.Model.get('mSync1').isValid()).to.be.ok;
+                expect(ns.Model.get('mSync2').isValid()).to.be.ok;
+                expect(ns.Model.get('mSync3').isValid()).to.be.ok;
+            });
+
+            it('should create correctly nested nodes of views', function() {
+                expect(this.view.$node.find('.ns-view-vSync0').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync0 .ns-view-vSync1').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync0 .ns-view-vSync2').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync3').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync4').length).to.equal(1);
+            });
+
+            it('should call perf once', function() {
+                expect(ns.Update.prototype.perf).to.have.been.calledOnce;
+            });
+
+            it('should have had profiled stages `collectModels`, `requestSyncModels`, `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents`', function() {
+                var arg = ns.Update.prototype.perf.getCall(0).args[0];
+                expect(arg).to.have.property('collectModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('collectViews').that.is.at.least(0);
+                expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+                expect(arg).to.have.property('insertNodes').that.is.at.least(0);
+                expect(arg).to.have.property('triggerEvents').that.is.at.least(0);
+            });
         });
 
+        describe('render (async layout)', function() {
+            beforeEach(function(done) {
+                this.modelsMethod = sinon.spy(ns.request, 'models');
+
+                this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
+                this.update.render().then(function(result) {
+                    result.async[0].then(function() {
+                        result.async[1].then(function() {
+                            done();
+                        }, this);
+                        this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, this.response2);
+                    }, this);
+                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, this.response1);
+                }, this);
+
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+            });
+
+            afterEach(function() {
+                this.modelsMethod.restore();
+            });
+
+            it('should request models of sync views before models of async views', function() {
+                var modelsFirst = ns.request.models.firstCall.args[0];
+                var modelsSecond = ns.request.models.secondCall.args[0];
+                var modelsThird = ns.request.models.thirdCall.args[0];
+
+                expect(modelsFirst[0]).to.equal(ns.Model.get('mSync1'));
+                expect(modelsFirst[1]).to.equal(ns.Model.get('mSync2'));
+                expect(modelsFirst[2]).to.equal(ns.Model.get('mSync3'));
+
+                expect(modelsSecond[0]).to.equal(ns.Model.get('mAsync1'));
+                expect(modelsThird[0]).to.equal(ns.Model.get('mAsync2'));
+            });
+
+            it('should make all models of sync views valid', function() {
+                expect(ns.Model.get('mSync1').isValid()).to.be.ok;
+                expect(ns.Model.get('mSync2').isValid()).to.be.ok;
+                expect(ns.Model.get('mSync3').isValid()).to.be.ok;
+            });
+
+            it('should make all models of async views valid', function() {
+                expect(ns.Model.get('mAsync1').isValid()).to.be.ok;
+                expect(ns.Model.get('mAsync2').isValid()).to.be.ok;
+            });
+
+            it('should create correctly nested nodes of sync views', function() {
+                expect(this.view.$node.find('.ns-view-vSync0').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync0 .ns-view-vSync1').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync0 .ns-view-vSync2').length).to.equal(1);
+            });
+
+            it('should create nodes of async views', function() {
+                expect(this.view.$node.find('.ns-view-vAsync1').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vAsync2').length).to.equal(1);
+            });
+
+            it('should create nodes of async views descendants', function() {
+
+                // FIXME: в ns.View нужно распиливать метод _tryPushToRequest на 2 части:
+                // 1. _updateAsyncState
+                // 2. _tryPushToRequest
+
+                // Пока кажется, что это распилить можно только вынесением рекурсивных
+                // обходов из ns.View в ns.Update.
+                // Аргументы за:
+                // 1. Это необходимо для того, чтобы не вызывать _getRequestViews в сценарии rerender
+                // 2. Это необходимо для нового сценария applyHTML (название скорее всего изменится)
+
+                expect(this.view.$node.find('.ns-view-vSync3').length).to.equal(1);
+                expect(this.view.$node.find('.ns-view-vSync4').length).to.equal(1);
+            });
+
+            it('should call perf three times', function() {
+                expect(ns.Update.prototype.perf).to.have.been.calledThrise;
+            });
+
+            it('should have had profiled stages `collectModels`, `requestSyncModels`, `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents` of first update', function() {
+                var arg = ns.Update.prototype.perf.getCall(0).args[0];
+                expect(arg).to.have.property('collectModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('collectViews').that.is.at.least(0);
+                expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+                expect(arg).to.have.property('insertNodes').that.is.at.least(0);
+                expect(arg).to.have.property('triggerEvents').that.is.at.least(0);
+            });
+
+            it('should have had profiled stages `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents` of second update', function() {
+                var arg = ns.Update.prototype.perf.getCall(1).args[0];
+
+                expect(arg).to.have.property('collectViews').that.is.at.least(0);
+                expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+                expect(arg).to.have.property('insertNodes').that.is.at.least(0);
+                expect(arg).to.have.property('triggerEvents').that.is.at.least(0);
+            });
+
+            it('should have had profiled stages `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents` of third update', function() {
+                var arg = ns.Update.prototype.perf.getCall(2).args[0];
+
+                expect(arg).to.have.property('collectViews').that.is.at.least(0);
+                expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+                expect(arg).to.have.property('insertNodes').that.is.at.least(0);
+                expect(arg).to.have.property('triggerEvents').that.is.at.least(0);
+            });
+        });
     });
 
     describe('concurent ns.Update instances', function() {
@@ -187,7 +425,7 @@ describe('no.Updater', function() {
             });
 
             it('should resolve second async promise', function(finish) {
-                this.promise.done(function(result) {
+                this.promise.then(function(result) {
                     result.async[1]
                         .then(function() {
                             finish();
@@ -213,7 +451,7 @@ describe('no.Updater', function() {
                             ]
                         })
                     );
-                }.bind(this));
+                }, this);
             });
 
         });
@@ -268,7 +506,7 @@ describe('no.Updater', function() {
                         // start new global update
 
                         ns.page.go('/page2')
-                            .done(function() {
+                            .then(function() {
 
                                 // get response for async-view
                                 that.sinon.server.requests[0].respond(
@@ -285,8 +523,7 @@ describe('no.Updater', function() {
                                     finish();
                                 }, 100);
 
-                            })
-                            .fail(function() {
+                            }, function() {
                                 finish('ns.Update fails');
                             });
 
@@ -379,7 +616,8 @@ describe('no.Updater', function() {
                     try {
                         expect(data).to.be.eql({
                             error: ns.U.STATUS.MODELS,
-                            models: [ns.Model.get('model')]
+                            invalidModels: [ns.Model.get('model')],
+                            validModels: []
                         });
                         finish();
                     } catch(e) {
@@ -459,7 +697,7 @@ describe('no.Updater', function() {
                     data.async[0].fail(function(result) {
                         try {
                             expect(result).to.have.property('error', ns.U.STATUS.MODELS);
-                            expect(result.models).to.be.eql([ns.Model.get('model')]);
+                            expect(result.invalidModels).to.be.eql([ns.Model.get('model')]);
                             finish();
                         } catch(e) {
                             finish(e);
@@ -502,7 +740,7 @@ describe('no.Updater', function() {
             });
         });
 
-        it('check arg to ns.tmpl', function() {
+        it('check arg to ns.renderString', function() {
             var renderJSON = {
                 'views': {
                     'main': {
@@ -532,7 +770,7 @@ describe('no.Updater', function() {
                     }
                 }
             };
-            expect(ns.tmpl.calledWithMatch(renderJSON)).to.be.equal(true);
+            expect(ns.renderString.calledWithMatch(renderJSON)).to.be.equal(true);
         });
     });
 
@@ -601,16 +839,16 @@ describe('no.Updater', function() {
             var that = this;
             this.promise
                 .then(function(result) {
+
                     Vow.all(result.async)
-                        .done(function() {
+                        .then(function() {
                             try {
                                 expect($(that.view.node).find('.ns-async')).to.have.length(0);
                                 finish();
                             } catch(e) {
                                 finish(e);
                             }
-                        })
-                        .fail(function() {
+                        }, function() {
                             finish('async ns.Update was rejected');
                         });
                 }, function() {

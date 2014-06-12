@@ -40,6 +40,8 @@
 
         this.id = ++update_id;
 
+        this.promise = new Vow.Promise();
+
         options = options || {};
 
         /**
@@ -47,6 +49,12 @@
          * @type {ns.U.EXEC}
          */
         this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
+
+        this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
+
+        if (!ns.Update._addToQueue(this)) {
+            this.abort();
+        }
     };
 
     no.extend(ns.Update.prototype, ns.profile);
@@ -78,118 +86,133 @@
     ns.Update.prototype._EVENTS_ORDER = ['ns-view-hide', 'ns-view-htmldestroy', 'ns-view-htmlinit', 'ns-view-async', 'ns-view-show', 'ns-view-touch'];
 
     /**
-     * Начинает работу updater'а.
-     * @param {boolean} [async=false] Флаг асинхронного updater'а.
-     * @returns {Vow.Promise}
+     * Регистрирует указанное событие, добавляя к нему признаки ns.update
+     * @private
      */
-    ns.Update.prototype.start = function(async) {
-        this.startTimer('prepare');
+    ns.Update.prototype.log = no.nop;
 
-        var resultPromise = new Vow.Promise();
-        this.promise = resultPromise;
+    if (ns.DEBUG) {
+        // Уберём потенциально тяжёлую функцию за флаг DEBUG
+        ns.Update.prototype.log = function() {
+            ns.log.debug.apply(ns.log,
+                ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
+            );
+        };
+    }
 
-        if (!this.addToQueue(this)) {
-            this.abort();
-            return this.promise;
-        }
+    /**
+     * Запрашивает модели
+     * @private
+     * @param {array} models
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype._requestModels = function(models) {
+        var promise = new Vow.Promise();
 
-        ns.log.debug('[ns.Update]', 'start()', this.id, 'layout', this.layout);
+        this.log('started models request', models);
 
-        var updated = this.view._getRequestViews({
-            sync: [],
-            async: []
-        }, this.layout.views, this.params);
-
-        ns.log.debug('[ns.Update]', 'start()', this.id, 'request views', updated);
-
-        var that = this;
-
-        var models = views2models(updated.sync);
-
-        ns.log.debug('[ns.Update]', 'start()', this.id, 'models', models);
-
-        // create promise for each async view
-        var asyncUpdaterPromises = updated.async.map(function() {
-            return new Vow.Promise();
-        });
-
-        this.stopTimer('prepare');
-        this.startTimer('request');
-        var syncModelsPromise = ns.request.models(models)
+        ns.request.models(models)
             .then(function(models) {
-                that.stopTimer('request');
-                that.startTimer('tree');
-
-                var error = null;
-                models = models || [];
-
-                if (that._expired()) {
-                    error = {
-                        error: that.STATUS.EXPIRED,
+                if (this._expired()) {
+                    promise.reject({
+                        error: this.STATUS.EXPIRED,
                         models: models
-                    };
-                } else if (models.some(function(m) { return !m.isValid(); })) {
-                    error = {
-                        error: that.STATUS.MODELS,
-                        models: models
-                    };
-                }
-
-                // Try handle error if any.
-                if (error && !ns.Update.handleError(error, that)) {
-                    that.error(error);
+                    });
                     return;
                 }
 
-                that._update(async);
-                // resolve main promise and return promises for async views
-                that.done({
-                    async: asyncUpdaterPromises
-                });
-                that.perf({
-                    'prepare': that.getTimer('prepare'),
-                    'request': that.getTimer('request'),
-                    'tree': that.getTimer('tree'),
-                    'template': that.getTimer('template'),
-                    'dom': that.getTimer('dom'),
-                    'events': that.getTimer('events')
-                });
-            }, function(models) {
-                // NOTE here we do not even try to handle the error. Or we should do it?
-                that.error({
-                    error: that.STATUS.MODELS,
-                    models: models
-                });
-            })
-            .fail(function(e) {
-                that.error({
-                    error: e,
-                    models: models
-                });
-            });
+                promise.fulfill(models);
+
+                this.log('received models', models);
+            }, function(err) {
+                var error = {
+                    error: this.STATUS.MODELS,
+                    invalidModels: err.invalid,
+                    validModels: err.valid
+                };
+                if (ns.Update.handleError(error, this)) {
+                    promise.fulfill([].concat(err.invalid, err.valid));
+
+                } else {
+                    promise.reject(error);
+                }
+
+                this.log('failed to receive models', models, err);
+            }, this);
+
+        return promise;
+    };
+
+    /**
+     * Запрашивает модели синхронных видов
+     * @private
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype._requestSyncModels = function() {
+        this.startTimer('collectModels');
+
+        var views = this.view._getRequestViews({
+            sync: [],
+            async: []
+        }, this.layout.views, this.params).sync;
+        this.log('collected incomplete views', views);
+
+        var models = views2models(views);
+        this.log('collected needed models', models);
+        this.switchTimer('collectModels', 'requestSyncModels');
+
+        var modelsPromise = this._requestModels(models);
+        modelsPromise.always(function() {
+            this.stopTimer('requestSyncModels');
+        }, this);
+
+        return modelsPromise;
+    };
+
+    /**
+     * Запрашивает модели всех видов
+     * @private
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype._requestAllModels = function() {
+        this.startTimer('collectModels');
+
+        var update = this;
+
+        var requestPromise = new Vow.Promise();
+
+        var views = this.view._getRequestViews({
+            sync: [],
+            async: []
+        }, this.layout.views, this.params);
+        this.log('collected incomplete views', views);
+
+        var models = views2models(views.sync);
+        this.log('collected needed models', models);
+        this.switchTimer('collectModels', 'requestSyncModels');
+
+        var syncPromise = this._requestModels(models);
+        syncPromise.always(function() {
+            this.stopTimer('requestSyncModels');
+        }, this);
+
+        var asyncPromises = [];
 
         // Для каждого async-view запрашиваем его модели.
         // Когда они приходят, запускаем точно такой же update.
         // Причем ждем отрисовку sync-view, чтобы точно запуститься после него.
-        updated.async.forEach(function(view, asyncViewId) {
-            var models = views2models( [ view ] );
+        views.async.forEach(function(view) {
+            var models = views2models([view]);
+            var asyncPromise = new Vow.Promise();
+            asyncPromises.push(asyncPromise);
+
             Vow.all([
-                syncModelsPromise,
-                ns.request.models(models)
-            ]).then(function(result) {
-                var models = result[1];
-                //FIXME: we should delete this loop when ns.request will can reject promise
-                // check that all models is valid
-                for (var i = 0, j = models.length; i < j; i++) {
-                    if (!models[i].isValid()) {
-                        asyncUpdaterPromises[asyncViewId].reject({
-                            error: that.STATUS.MODELS,
-                            async_view: view,
-                            models: models
-                        });
-                        return;
-                    }
-                }
+                update.promise,
+                update._requestModels(models)
+            ]).then(function() {
+
+                // FIXME: в идеале нужно вынести подготовку и запуск нового update
+                // в сценарий render, т.к. этот метод - только про запрос моделей
 
                 var layout;
                 var params;
@@ -199,69 +222,82 @@
                     var currentPage = ns.page.current;
                     layout = currentPage.layout;
                     params = currentPage.params;
-
                 } else {
                     layout = {};
-                    layout[that.view.id] = that.layout;
-                    params = that.params;
+                    layout[update.view.id] = update.layout;
+                    params = update.params;
                 }
 
-                // pipes ns.Update promise to asyncPromise
-                asyncUpdaterPromises[asyncViewId].sync(
-                    new ns.Update(that.view, layout, params, {execFlag: ns.U.EXEC.ASYNC}).start(true)
+                asyncPromise.sync(
+                    new ns.Update(update.view, layout, params, {execFlag: ns.U.EXEC.ASYNC}).rerender()
                 );
 
-            }, function(result) {
-                //FIXME: ns.request.models can't reject promise this time, we should fix it
-                asyncUpdaterPromises[asyncViewId].reject({
-                    error: that.STATUS.MODELS,
-                    async_view: view,
-                    models: result[1]
-                });
-            })
-            .fail(function(e) {
-                asyncUpdaterPromises[asyncViewId].reject({
-                    error: e,
-                    async_view: view,
-                    models: models
-                });
+            }, function(error) {
+                asyncPromise.reject(error);
             });
         });
 
-        return resultPromise;
+        syncPromise.then(function() {
+            requestPromise.fulfill({
+                async: asyncPromises
+            });
+        }, function(e) {
+            requestPromise.reject(e);
+        });
+
+        return requestPromise;
     };
 
     /**
-     * Обновляет DOM и триггерит нужные события
-     * @param {boolean} [async=false] Флаг асинхронного updater'а.
-     * @private
+     * Рекурсивно устанавливает видам asyncState
      */
-    ns.Update.prototype._update = function(async) {
+    ns.Update.prototype._setAsyncState = function() {
+        // FIXME: вызов этого метода здесь несколько избыточен.
+        // Он нужен сейчас только для рекурсивного прохода по видам с целью
+        // выставления правильного asyncState, хотя кроме этого делает много другого.
+        // Правильный путь - все рекурсивные обходы видов вынести в ns.Update
+        // Сделаем это позже
+        this.view._getRequestViews({sync: [], async: []}, this.layout.views, this.params);
+    };
+
+    /**
+     * Генерирует html недостающих видов
+     * @private
+     * @returns {string}
+     */
+    ns.Update.prototype._generateHTML = function() {
         //  TODO: Проверить, что не начался уже более новый апдейт.
 
-        var params = this.params;
-        var layout = this.layout;
+        this.startTimer('collectViews');
 
         var tree = {
             'views': {}
         };
-        this.view._getUpdateTree(tree, layout.views, params);
+        this.view._getUpdateTree(tree, this.layout.views, this.params);
+        this.log('created render tree', tree);
+        this.stopTimer('collectViews');
 
-        ns.log.debug('[ns.Update]', 'start()', this.id, 'updateTree', tree);
-
-        this.stopTimer('tree');
-        this.startTimer('template');
-
-        var node;
-        // если пустое дерево, то ничего не реднерим,
-        // но кидаем события и скрываем/открываем блоки
+        var html;
         if (!ns.object.isEmpty(tree.views)) {
-            node = this.render(tree, this.params, this.layout);
-            ns.log.debug('[ns.Update]', 'start()', this.id, 'new node', node.cloneNode(true));
+            this.startTimer('generateHTML');
+            html = this.applyTemplate(tree, this.params, this.layout);
+            this.log('generated html', html);
+            this.stopTimer('generateHTML');
         }
 
-        this.stopTimer('template');
-        this.startTimer('dom');
+        return Vow.fulfill(html);
+    };
+
+    /**
+     * Раскладывает html-узлы по видам и триггерит события
+     * @private
+     * @param {string} html
+     * @param {boolean} async
+     * @returns {string}
+     */
+    ns.Update.prototype._insertNodes = function(html, async) {
+        this.startTimer('insertNodes');
+        var node = ns.html2node(html);
 
         var viewEvents = {
             'ns-view-async': [],
@@ -272,22 +308,100 @@
             'ns-view-touch': []
         };
 
-        this.view._updateHTML(node, layout.views, params, {
+        this.view._updateHTML(node, this.layout.views, this.params, {
             toplevel: true,
             async: async
         }, viewEvents);
-
-        this.stopTimer('dom');
-        this.startTimer('events');
+        this.switchTimer('insertNodes', 'triggerEvents');
 
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
             var event = this._EVENTS_ORDER[i];
             var views = viewEvents[event];
             for (var k = views.length - 1; k >= 0; k--) {
-                views[k].trigger(event, params);
+                views[k].trigger(event, this.params);
             }
         }
-        this.stopTimer('events');
+        this.stopTimer('triggerEvents');
+
+        return Vow.fulfill();
+    };
+
+    /**
+     * Сценарий предзапроса моделей.
+     * Запрашивает модели всех невалидных и вновь созданных синхронных видов в layout.
+     * По завершению запроса разрешает promise
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype.prefetch = function() {
+        this.log('started `prefetch` scenario');
+        this.promise = this._requestSyncModels();
+        this.promise.then(this._fulfill, this._reject, this);
+        return this.promise;
+    };
+
+    /**
+     * Сценарий генерации html
+     * Запрашивает модели всех невалидных и вновь созданных синхронных видов в layout
+     * Геренирует html указанных видов 
+     * Результат генерации передаётся строкой при разрешении promise
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype.generateHTML = function() {
+        this.log('started `generateHTML` scenario');
+        this._requestSyncModels().then(function() {
+            this._generateHTML().then(function(html) {
+                this._fulfill(html);
+            }, this._reject, this);
+        }, this._reject, this);
+
+        return this.promise;
+    };
+
+    /**
+     * Сценарий предварительного рендеринга страницы
+     * Итогом его работы являются срендеренные и проинициализированные, но скрытые виды.
+     * Используется для ускорения перехода на целевую страницу
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype.prerender = function() {
+        this.log('started `prerender` scenario');
+        // TODO: здесь концептуально нужно придумать, как разделить стадию insertNodes
+        // на непосредственную вставку узлов и их показ
+        ns.todo();
+        return this.promise;
+    };
+
+    /**
+     * Сценарий полного рендеринга страницы
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype.start = ns.Update.prototype.render = function() {
+        this.log('started `render` scenario');
+        this._requestAllModels().then(function(asyncResult) {
+            this._generateHTML().then(function(html) {
+                this._insertNodes(html).then(function() {
+                    this._fulfill(asyncResult);
+                }, this);
+            }, this._reject, this);
+        }, this._reject, this);
+
+        return this.promise;
+    };
+
+    /**
+     * Сценарий перерисовки страницы без запроса моделей
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype.rerender = function() {
+        this.log('started `_re_render` scenario');
+        this._setAsyncState();
+        this._generateHTML().then(function(html) {
+            this._insertNodes(html, true).then(function() {
+                this._fulfill({async: []});
+            }, this);
+        }, this._reject, this);
+
+        return this.promise;
     };
 
     /**
@@ -301,9 +415,9 @@
      * @param {object} layout Раскладка страницы.
      * @returns {HTMLElement}
      */
-    ns.Update.prototype.render = function(tree, params, layout) {
+    ns.Update.prototype.applyTemplate = function(tree, params, layout) {
         /* jshint unused: false */
-        return ns.tmpl(tree, null, '');
+        return ns.renderString(tree, null, '');
     };
 
     /**
@@ -311,23 +425,18 @@
      * @private
      */
     ns.Update.prototype._expired = function() {
-        return this.stopped || currentUpdates.indexOf(this) === -1;
+        return !this.promise.isResolved() && currentUpdates.indexOf(this) === -1;
     };
 
     /**
-     *
+     * Останавливает процесс обновления
+     * @private
      */
     ns.Update.prototype.abort = function() {
         //TODO: Should we abort ns.request?
 
-        /**
-         * Flag that update was stopped.
-         * @type {boolean}
-         */
-        this.stopped = true;
-
         // reject promise
-        this.error({
+        this._reject({
             error: ns.U.STATUS.EXPIRED
         });
     };
@@ -336,25 +445,88 @@
      * @private
      * @param {*} result Result data.
      */
-    ns.Update.prototype.done = function(result) {
-        this.removeFromQueue();
+    ns.Update.prototype._fulfill = function(result) {
+        ns.Update._removeFromQueue(this);
         this.promise.fulfill(result);
+        this.perf(this.getTimers());
+        this.log('successfully finished scenario');
     };
 
     /**
      * @private
-     * @param {*} result Error data.
+     * @param {*} reason Error data.
      */
-    ns.Update.prototype.error = function(result) {
-        this.removeFromQueue();
-        this.promise.reject(result);
+    ns.Update.prototype._reject = function(reason) {
+        ns.Update._removeFromQueue(this);
+        this.promise.reject(reason);
+        this.log('scenario was rejected with reason', reason);
     };
 
     /**
-     * @private
+     * Whether this update is a global update (main update) or not.
+     * @returns Boolean.
      */
-    ns.Update.prototype.removeFromQueue = function() {
-        var index = currentUpdates.indexOf(this);
+    ns.Update.prototype.isGlobal = function() {
+        return this.EXEC_FLAG === ns.U.EXEC.GLOBAL;
+    };
+
+    /**
+     * В метод приходят данные профилировщика.
+     * @description
+     * Этот метод является точкой расширения в приложении.
+     * Например, можно логировать долгую работу ns.Update, когда общее время превыщает предел.
+     * @param {ns.Update~PerformanceTimings} perf
+     */
+    ns.Update.prototype.perf = function(perf) {
+        /* jshint unused: false */
+    };
+
+    /**
+     * @typedef ns.Update~PerformanceTimings
+     * @type {object}
+     * @property {number} prepare Время подготовки запроса.
+     * @property {number} request Время запроса данных.
+     * @property {number} tree Время подготовки дерева шаблонизации.
+     * @property {number} template Время шаблонизации.
+     * @property {number} dom Время обновления DOM.
+     * @property {number} events Время выполнения событий в видах.
+     */
+
+    /**
+     * Global error handler.
+     * @param {object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
+     * @param {ns.Update} update Update instance so that we can abort it if we want to.
+     * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
+     */
+    ns.Update.handleError = function(error, update) {
+        /* jshint unused: false */
+        return false;
+    };
+
+    function views2models(views) {
+        var added = {};
+        var models = [];
+
+        for (var i = 0, l = views.length; i < l; i++) {
+            var viewModels = views[i].models;
+            for (var model_id in viewModels) {
+                var model = viewModels[model_id];
+                var key = model.key;
+                if ( !added[key] ) {
+                    models.push(model);
+                    added[key] = true;
+                }
+            }
+        }
+
+        return models;
+    }
+
+    /**
+     * Removes ns.Update instance from queue
+     */
+    ns.Update._removeFromQueue = function(updateInstance) {
+        var index = currentUpdates.indexOf(updateInstance);
         if (index > -1) {
             currentUpdates.splice(index, 1);
         }
@@ -370,11 +542,11 @@
      *   - Async updates execute simultaneously.
      *   - Parallel update can't be terminated.
      * @static
-     * @private
+     * 
      * @param {ns.Update} newUpdate New instance of ns.Update.
      * @returns Boolean
      */
-    ns.Update.prototype.addToQueue = function(newUpdate) {
+    ns.Update._addToQueue = function(newUpdate) {
         var currentRuns = currentUpdates;
         var FLAGS = ns.U.EXEC;
         var FLAG_GLOBAL = FLAGS.GLOBAL;
@@ -421,65 +593,5 @@
 
         return true;
     };
-
-    /**
-     * Whether this update is a global update (main update) or not.
-     * @returns Boolean.
-     */
-    ns.Update.prototype.isGlobal = function() {
-        return this.EXEC_FLAG === ns.U.EXEC.GLOBAL;
-    };
-
-    /**
-     * В метод приходят данные профилировщика.
-     * @description
-     * Этот метод является точкой расширения в приложении.
-     * Например, можно логировать долгую работу ns.Update, когда общее время превыщает предел.
-     * @param {ns.Update~PerformanceTimings} perf
-     */
-    ns.Update.prototype.perf = function(perf) {
-        /* jshint unused: false */
-    };
-
-    /**
-     * Global error handler.
-     * @param {object} error Error summary object `{ error: string, models: Array.<ns.Model> }`.
-     * @param {ns.Update} update Update instance so that we can abort it if we want to.
-     * @returns Boolean If `true` - update can continue, otherwise update cannot continue.
-     */
-    ns.Update.handleError = function(error, update) {
-        /* jshint unused: false */
-        return false;
-    };
-
-    function views2models(views) {
-        var added = {};
-        var models = [];
-
-        for (var i = 0, l = views.length; i < l; i++) {
-            var viewModels = views[i].models;
-            for (var model_id in viewModels) {
-                var model = viewModels[model_id];
-                var key = model.key;
-                if ( !added[key] ) {
-                    models.push(model);
-                    added[key] = true;
-                }
-            }
-        }
-
-        return models;
-    }
-
-    /**
-     * @typedef ns.Update~PerformanceTimings
-     * @type {object}
-     * @property {number} prepare Время подготовки запроса.
-     * @property {number} request Время запроса данных.
-     * @property {number} tree Время подготовки дерева шаблонизации.
-     * @property {number} template Время шаблонизации.
-     * @property {number} dom Время обновления DOM.
-     * @property {number} events Время выполнения событий в видах.
-     */
 
 })();

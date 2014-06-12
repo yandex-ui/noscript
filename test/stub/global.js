@@ -3,7 +3,8 @@ beforeEach(function() {
         useFakeServer: true
     });
 
-    this.sinon.spy(ns, 'tmpl');
+    this.sinon.spy(ns, 'renderString');
+    this.sinon.spy(ns, 'renderNode');
     this.sinon.stub(ns.history, 'pushState');
     this.sinon.stub(ns.history, 'replaceState');
 });

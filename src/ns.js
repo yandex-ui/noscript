@@ -76,9 +76,12 @@ ns.parseQuery = function(s) {
  * @param {string} [module='main']
  * @returns {Element}
  */
-ns.tmpl = function(json, mode, module) {
-    var result = yr.run(module || 'main', json, mode);
-    return ns.html2node(result);
+ns.renderString = function(json, mode, module) {
+    return yr.run(module || 'main', json, mode);
+};
+
+ns.renderNode = function(json, mode, module) {
+    return ns.html2node(ns.renderString(json, mode, module));
 };
 
 /**

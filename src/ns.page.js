@@ -21,8 +21,11 @@
     /**
      * Осуществляем переход по ссылке.
      * @param {string} [url=ns.page.getCurrentUrl()]
-     * @param {string} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
+     * @param {string|boolean} [action='push'] Добавить, заменить ('replace') запись, не модифицировать ('preserve') историю браузера.
      * @returns {Vow.Promise}
+     * @fires ns.page#ns-page-after-load
+     * @fires ns.page#ns-page-before-load
+     * @fires ns.page#ns-page-error-load
      */
     ns.page.go = function(url, action) {
         if (!action) {
@@ -63,6 +66,12 @@
 
         var layout = ns.layout.page(route.page, route.params);
 
+        /**
+         * Сейчас будет переход на другую страницу.
+         * @event ns.page#ns-page-before-load
+         * @param routes {array} Маршруты: 0 - предыдущий, 1 - новый.
+         * @param url {string} Новый урл.
+         */
         ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
         ns.page.current = route;
@@ -81,7 +90,7 @@
         document.title = ns.page.title(url);
 
         var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
-        return update.start();
+        return update.start().then(triggerPageAfterLoad, triggerPageErrorLoad);
     };
 
     /**
@@ -125,5 +134,35 @@
     ns.page.getCurrentUrl = function() {
         return window.location.pathname + window.location.search;
     };
+
+    /**
+     * Триггерит событие "Произошла успешная загрузка страницы"
+     * @param {*} val
+     */
+    function triggerPageAfterLoad(val) {
+        /**
+         * Произошла успешная загрузка страницы
+         * @event ns.page#ns-page-after-load
+         */
+        ns.events.trigger('ns-page-after-load', val);
+
+        // proxy fullfill value
+        return val;
+    }
+
+    /**
+     * Триггерит событие "Произошла неуспешная загрузка страницы"
+     * @param {*} err
+     */
+    function triggerPageErrorLoad(err) {
+        /**
+         * Произошла неуспешная загрузка страницы
+         * @event ns.page#ns-page-error-load
+         */
+        ns.events.trigger('ns-page-error-load', err);
+
+        // proxy reject value
+        return Vow.reject(err);
+    }
 
 })();

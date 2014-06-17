@@ -1308,8 +1308,6 @@
                     info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
 
                 } else {
-                    when = when || 'init';
-
                     // событие init тригерится при создании блока, поэтому вешать его надо сразу
                     // событие async тригерится до всего, его тоже надо вешать
                     if (eventName === 'ns-view-init' || eventName === 'ns-view-async') {
@@ -1318,8 +1316,20 @@
                     } else {
                         // к View нельзя получить доступ, поэтому локальными могут быть только встроенные ns-* события
                         if (ns.V.NS_EVENTS.indexOf(eventName) > -1) {
-                            info[when + 'Noevents'].local.push([eventName, handler]);
+                            // все ns-view-* события вешаем на init
+                            info['initNoevents'].local.push([eventName, handler]);
+
                         } else {
+                            /*
+                            Кастомные ("космические") события через общую шину (ns.events) по умолчанию вешаются на show и снимаются на hide.
+
+                            Логика такая:
+                            На странице может быть много экземпляров одного вида и каждый из них отреагирует, если будет init.
+                            Но кастомные события создавались для общения вида с внешним миром, и обычно реагировать должны только видимые виды.
+                            Опять же инициатором такого события (в большинстве случаев) будет действие пользователя, а обработчики DOM-событий вешаются на show.
+                             */
+
+                            when = when || 'show';
                             info[when + 'Noevents'].global.push([eventName, handler]);
                         }
                     }

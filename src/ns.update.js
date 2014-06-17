@@ -91,14 +91,14 @@
      */
     ns.Update.prototype.log = no.nop;
 
-    if (ns.DEBUG) {
-        // Уберём потенциально тяжёлую функцию за флаг DEBUG
-        ns.Update.prototype.log = function() {
-            ns.log.debug.apply(ns.log,
-                ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
-            );
-        };
-    }
+    ns.Update.prototype.log = function() {
+        if (!ns.DEBUG) {
+            return;
+        }
+        ns.log.debug.apply(ns.log,
+            ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
+        );
+    };
 
     /**
      * Запрашивает модели

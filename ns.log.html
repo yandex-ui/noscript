@@ -89,13 +89,13 @@
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
                         
+                            <li data-name="ns.renderString"><a href="ns.html#renderString">renderString</a></li>
+                        
                             <li data-name="ns.replaceNode"><a href="ns.html#replaceNode">replaceNode</a></li>
                         
-                            <li data-name="ns.tmpl"><a href="ns.html#tmpl">tmpl</a></li>
+                            <li data-name="ns.reset"><a href="ns.html#reset">reset</a></li>
                         
                             <li data-name="ns.todo"><a href="ns.html#todo">todo</a></li>
-                        
-                            <li data-name="ns.transaction"><a href="ns.html#transaction">transaction</a></li>
                         
                     </ul>
                 
@@ -374,6 +374,14 @@
 
             <ul class="events itemMembers">
             
+            <span class="subtitle">Events</span>
+            
+                <li data-name="ns.page#event:ns-page-after-load"><a href="ns.page.html#event:ns-page-after-load">ns-page-after-load</a></li>
+            
+                <li data-name="ns.page#event:ns-page-before-load"><a href="ns.page.html#event:ns-page-before-load">ns-page-before-load</a></li>
+            
+                <li data-name="ns.page#event:ns-page-error-load"><a href="ns.page.html#event:ns-page-error-load">ns-page-error-load</a></li>
+            
             </ul>
         </li>
     
@@ -395,6 +403,8 @@
                             <li data-name="ns.page.block.add"><a href="ns.page.block.html#add">add</a></li>
                         
                             <li data-name="ns.page.block.check"><a href="ns.page.block.html#check">check</a></li>
+                        
+                            <li data-name="ns.page.block.clear"><a href="ns.page.block.html#clear">clear</a></li>
                         
                             <li data-name="ns.page.block.remove"><a href="ns.page.block.html#remove">remove</a></li>
                         
@@ -504,17 +514,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.router.baseDir"><a href="ns.router.html#baseDir">baseDir</a></li>
-                        
-                        <li data-name="ns.router.regexps"><a href="ns.router.html#regexps">regexps</a></li>
-                        
-                        <li data-name="ns.router.routes"><a href="ns.router.html#routes">routes</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -532,6 +531,22 @@
                 
             
 
+            
+                <ul class="members itemMembers">
+                
+                <span class="subtitle">Instance members</span>
+                
+                    <li data-name="ns.router#baseDir"><a href="ns.router.html#baseDir">baseDir</a></li>
+                
+                    <li data-name="ns.router#regexps"><a href="ns.router.html#regexps">regexps</a></li>
+                
+                    <li data-name="ns.router#routes"><a href="ns.router.html#routes">routes</a></li>
+                
+                </ul>
+
+                <ul class="methods itemMembers">
+                
+                </ul>
             
 
             <ul class="typedefs itemMembers">
@@ -650,8 +665,6 @@
                         
                             <li data-name="ns.Model.key"><a href="ns.Model.html#key">key</a></li>
                         
-                            <li data-name="ns.Model.undefine"><a href="ns.Model.html#undefine">undefine</a></li>
-                        
                     </ul>
                 
             
@@ -747,6 +760,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
                     <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
                 
@@ -909,12 +924,21 @@
 
             
                 
+                    <ul class="members itemMembers">
+                        <span class="subtitle">Static members</span>
+                        
+                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
+                        
+                    </ul>
+                
 
                 
                     <ul class="methods itemMembers">
                         <span class="subtitle">Static methods</span>
                         
-                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
+                            <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
+                        
+                            <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
                         
                     </ul>
                 
@@ -927,9 +951,9 @@
                 
                     <li data-name="ns.Update#EXEC_FLAG"><a href="ns.Update.html#EXEC_FLAG">EXEC_FLAG</a></li>
                 
-                    <li data-name="ns.Update#STATUS"><a href="ns.Update.html#STATUS">STATUS</a></li>
+                    <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
                 
-                    <li data-name="ns.Update#stopped"><a href="ns.Update.html#stopped">stopped</a></li>
+                    <li data-name="ns.Update#STATUS"><a href="ns.Update.html#STATUS">STATUS</a></li>
                 
                 </ul>
 
@@ -937,18 +961,30 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Update#abort"><a href="ns.Update.html#abort">abort</a></li>
+                    <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
+                
+                    <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
+                
+                    <li data-name="ns.Update#generateHTML"><a href="ns.Update.html#generateHTML">generateHTML</a></li>
                 
                     <li data-name="ns.Update#isGlobal"><a href="ns.Update.html#isGlobal">isGlobal</a></li>
                 
-                    <li data-name="ns.Update#render"><a href="ns.Update.html#render">render</a></li>
+                    <li data-name="ns.Update#perf"><a href="ns.Update.html#perf">perf</a></li>
                 
-                    <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
+                    <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
+                
+                    <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
                 </ul>
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.Update~PerformanceTimings"><a href="ns.Update.html#PerformanceTimings">PerformanceTimings</a></li>
             
             </ul>
 
@@ -986,8 +1022,6 @@
                             <li data-name="ns.View.getKeyAndParams"><a href="ns.View.html#getKeyAndParams">getKeyAndParams</a></li>
                         
                             <li data-name="ns.View.info"><a href="ns.View.html#info">info</a></li>
-                        
-                            <li data-name="ns.View.undefine"><a href="ns.View.html#undefine">undefine</a></li>
                         
                     </ul>
                 
@@ -1929,7 +1963,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue May 06 2014 17:34:52 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

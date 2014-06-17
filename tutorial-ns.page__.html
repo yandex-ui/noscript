@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: ns.viewCollection</title>
+    <title>Tutorial: ns.page</title>
     
     
     
@@ -89,11 +89,11 @@
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
                         
-                            <li data-name="ns.renderString"><a href="ns.html#renderString">renderString</a></li>
-                        
                             <li data-name="ns.replaceNode"><a href="ns.html#replaceNode">replaceNode</a></li>
                         
                             <li data-name="ns.reset"><a href="ns.html#reset">reset</a></li>
+                        
+                            <li data-name="ns.tmpl"><a href="ns.html#tmpl">tmpl</a></li>
                         
                             <li data-name="ns.todo"><a href="ns.html#todo">todo</a></li>
                         
@@ -373,14 +373,6 @@
             </ul>
 
             <ul class="events itemMembers">
-            
-            <span class="subtitle">Events</span>
-            
-                <li data-name="ns.page#event:ns-page-after-load"><a href="ns.page.html#event:ns-page-after-load">ns-page-after-load</a></li>
-            
-                <li data-name="ns.page#event:ns-page-before-load"><a href="ns.page.html#event:ns-page-before-load">ns-page-before-load</a></li>
-            
-                <li data-name="ns.page#event:ns-page-error-load"><a href="ns.page.html#event:ns-page-error-load">ns-page-error-load</a></li>
             
             </ul>
         </li>
@@ -924,21 +916,12 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
                         <span class="subtitle">Static methods</span>
                         
-                            <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
-                        
-                            <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
+                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
                         
                     </ul>
                 
@@ -951,9 +934,9 @@
                 
                     <li data-name="ns.Update#EXEC_FLAG"><a href="ns.Update.html#EXEC_FLAG">EXEC_FLAG</a></li>
                 
-                    <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
-                
                     <li data-name="ns.Update#STATUS"><a href="ns.Update.html#STATUS">STATUS</a></li>
+                
+                    <li data-name="ns.Update#stopped"><a href="ns.Update.html#stopped">stopped</a></li>
                 
                 </ul>
 
@@ -961,21 +944,15 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
-                
-                    <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
-                
-                    <li data-name="ns.Update#generateHTML"><a href="ns.Update.html#generateHTML">generateHTML</a></li>
+                    <li data-name="ns.Update#abort"><a href="ns.Update.html#abort">abort</a></li>
                 
                     <li data-name="ns.Update#isGlobal"><a href="ns.Update.html#isGlobal">isGlobal</a></li>
                 
                     <li data-name="ns.Update#perf"><a href="ns.Update.html#perf">perf</a></li>
                 
-                    <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
+                    <li data-name="ns.Update#render"><a href="ns.Update.html#render">render</a></li>
                 
-                    <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
-                
-                    <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
+                    <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
                 
                 </ul>
             
@@ -1208,7 +1185,7 @@
 
     <div class="main">
         
-            <h1 class="page-title">Tutorial: ns.viewCollection</h1>
+            <h1 class="page-title">Tutorial: ns.page</h1>
         
 
         <section>
@@ -1216,43 +1193,62 @@
 <header>
     
 
-    <h2>ns.viewCollection</h2>
+    <h2>ns.page</h2>
 </header>  
 
 <article>
-    <h1>ns.ViewCollection</h1><p><code>ViewCollection</code> - это коллеция <code>ns.View</code>, привязанная к <code>ns.ModelCollection</code>.
-При изменении коллекции позволяет перерисовывать только изменившиеся элементы.</p>
-<p>По сути, образуется следующая зависимость один-к-одному:</p>
-<pre><code>ViewCollection      ->  ModelCollection
-    view-item-1     ->      model-item-1
-    view-item-2     ->      model-item-2
-                    ...
-    view-item-N     ->      model-item-N
-</code></pre><p><code>ns.ViewCollection</code> может зависит только от одной <code>ns.ModelCollection</code>.</p>
-<p><code>ns.ViewCollection</code> может содержать внутренние виды и иметь собственную html-разметку.</p>
-<h2>Декларация</h2><pre><code class="lang-js">ns.ViewCollection.define('my-view-collection', {
-    models: [ 'my-model-collection' ],
-    split: {
-        view_id: 'my-view-collection-item'
-    }
-});
-</code></pre>
-<p>Опция <code>split.view_id</code> определяет из каких <code>ns.View</code> состоит коллекция.</p>
-<p>Опция <code>models</code>, как и в ns.View определяет зависимость от моделей и подписки на их события.
-По умолчанию ViewCollection делает следующие подписки:</p>
+    <h2>Переходы по страницам (ns.page)</h2><p><code>ns.page</code> - специальный модуль для перехода по страницам внутри ns-приложения.</p>
+<p><code>ns.page.go</code> - главный метод. Разроваричивает адрес через <code>ns.router</code>, выбирает <code>layout</code>, запускает <code>ns.Update</code> и
+производит необходимые операции по смене урла в адресной строке и обновления названия (<code>document.title</code>) страницы.
+Метод возвращает промис от <code>ns.Update</code>, но иногда может вернуть отклоненный промис со статусами:</p>
 <ul>
-<li>обработчиком собственных событий <code>ns-model-changed</code> и <code>ns-model-destroyed</code> любых моделей устанавливается <code>invalidate</code>. Эти события наступают при изменении данных, по которым рисуется собственная html-разметка viewCollection'а, поэтому вид по умолчанию становится невалидным, чтобы перерисоваться.</li>
-<li>обработчиком <code>ns-model-insert</code> и <code>ns-model-remove</code> модели-коллекции устанавливается <code>keepValid</code>. Эти события наступают при изменении состава модели-коллекции, по которой рисуются вложенные виды viewCollection'а. Собственная html-разметка при этом не затрагивается, поэтому вид по умолчанию остаётся валидным.
-События моделей, вложенных в коллекцию игнорируются и подписаться на них через декларацию нельзя.</li>
+<li><code>block</code> - переход был заблокирован через <a href="#nspageblock"><code>ns.page.block</code></a></li>
+<li><code>transaction</code> - переход был заблокирован, потому что сейчас выполняется транзация <code>ns.transaction</code></li>
 </ul>
-<p>Декларация элемента <code>ns.ViewCollection</code> выглядит так:</p>
-<pre><code class="lang-js">ns.View.define('my-view-collection-item', {
-    models: [ 'my-model-collection-item' ]
-});
+<p><code>ns.page.title</code> - точка расширения приложения. Позволяет задавать <a href="./ns.init.md#Заголовок-страницы">заголовки страниц</a>.</p>
+<p>Также модуль предоставляет полезные данные:</p>
+<ul>
+<li><code>ns.page.current</code> - текущие параметры страницы<ul>
+<li><code>ns.page.current.page</code> - название текущего <code>layout</code></li>
+<li><code>ns.page.current.params</code> - текущие параметры</li>
+</ul>
+</li>
+<li><code>ns.page.currentUrl</code> - адрес текущей страницы</li>
+</ul>
+<h2>ns.page.block</h2><p>Этот механизм позволяет блокировать переходы по страницам.
+Например, с помощью него можно блокировать уход с формы, если не были сохранены изменения.</p>
+<pre><code class="lang-js">ns.View.define('my-view', {
+    events: {
+        'ns-view-show': function() {
+            // после показа вида, добавляем функцию блокировки
+            ns.page.block.add( this.checkChanges.find(this) );
+        },
+        'ns-view-hide': function() {
+            // после скрытия вида, очищаем функции
+            ns.page.block.clear();
+        }
+    },
+    methods: {
+        checkChanges: function() {
+            if (this.hasUnsavedChanges()) {
+                // здесь можно показать какое-то сообщение
+
+                // функция блокировки должна вернуть false, если переход нельзя осуществить
+                return false;
+            }
+
+            return true;
+        }
+    }
+ });
 </code></pre>
-<p>Элемент коллекции ведет себя как обычный <code>ns.View</code> и ничего не знает про коллекцию.</p>
-<p>Элементы коллекции помещаются в узел-контейнер, размеченный классом <code>ns-view-container-desc</code>.
-Узел-контейнер <strong>обязательно</strong> должен быть указан. Вне этого контейнера можно делать собcтвенную html-разметку.</p>
+<h2>ns.page.history</h2><p>Этот модуль хранит историю приложения.
+Он нужен, т.к. в History API нельзя получить произвольное состояние на N шагов назад.</p>
+<p>Имеет два метода:</p>
+<ul>
+<li><code>ns.page.history.back</code> - переход &quot;назад&quot;. Этот метод не аналогичен кнопке &quot;Назад&quot; в браузере. Так, при отсутствии истории, этот метод перейдет на дефолтную страницу приложения (<code>ns.page.getDefaultUrl</code>), а не выйдет из него.</li>
+<li><code>ns.page.history.getPrevious(n)</code> - возвращает урл N страниц назад. 0 - предыдующая страница.</li>
+</ul>
 </article>
 
 </section>  
@@ -1267,7 +1263,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Jun 04 2014 18:05:29 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

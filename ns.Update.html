@@ -89,13 +89,13 @@
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
                         
+                            <li data-name="ns.renderString"><a href="ns.html#renderString">renderString</a></li>
+                        
                             <li data-name="ns.replaceNode"><a href="ns.html#replaceNode">replaceNode</a></li>
                         
-                            <li data-name="ns.tmpl"><a href="ns.html#tmpl">tmpl</a></li>
+                            <li data-name="ns.reset"><a href="ns.html#reset">reset</a></li>
                         
                             <li data-name="ns.todo"><a href="ns.html#todo">todo</a></li>
-                        
-                            <li data-name="ns.transaction"><a href="ns.html#transaction">transaction</a></li>
                         
                     </ul>
                 
@@ -374,6 +374,14 @@
 
             <ul class="events itemMembers">
             
+            <span class="subtitle">Events</span>
+            
+                <li data-name="ns.page#event:ns-page-after-load"><a href="ns.page.html#event:ns-page-after-load">ns-page-after-load</a></li>
+            
+                <li data-name="ns.page#event:ns-page-before-load"><a href="ns.page.html#event:ns-page-before-load">ns-page-before-load</a></li>
+            
+                <li data-name="ns.page#event:ns-page-error-load"><a href="ns.page.html#event:ns-page-error-load">ns-page-error-load</a></li>
+            
             </ul>
         </li>
     
@@ -395,6 +403,8 @@
                             <li data-name="ns.page.block.add"><a href="ns.page.block.html#add">add</a></li>
                         
                             <li data-name="ns.page.block.check"><a href="ns.page.block.html#check">check</a></li>
+                        
+                            <li data-name="ns.page.block.clear"><a href="ns.page.block.html#clear">clear</a></li>
                         
                             <li data-name="ns.page.block.remove"><a href="ns.page.block.html#remove">remove</a></li>
                         
@@ -504,17 +514,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.router.baseDir"><a href="ns.router.html#baseDir">baseDir</a></li>
-                        
-                        <li data-name="ns.router.regexps"><a href="ns.router.html#regexps">regexps</a></li>
-                        
-                        <li data-name="ns.router.routes"><a href="ns.router.html#routes">routes</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -532,6 +531,22 @@
                 
             
 
+            
+                <ul class="members itemMembers">
+                
+                <span class="subtitle">Instance members</span>
+                
+                    <li data-name="ns.router#baseDir"><a href="ns.router.html#baseDir">baseDir</a></li>
+                
+                    <li data-name="ns.router#regexps"><a href="ns.router.html#regexps">regexps</a></li>
+                
+                    <li data-name="ns.router#routes"><a href="ns.router.html#routes">routes</a></li>
+                
+                </ul>
+
+                <ul class="methods itemMembers">
+                
+                </ul>
             
 
             <ul class="typedefs itemMembers">
@@ -650,8 +665,6 @@
                         
                             <li data-name="ns.Model.key"><a href="ns.Model.html#key">key</a></li>
                         
-                            <li data-name="ns.Model.undefine"><a href="ns.Model.html#undefine">undefine</a></li>
-                        
                     </ul>
                 
             
@@ -747,6 +760,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
                     <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
                 
@@ -909,12 +924,21 @@
 
             
                 
+                    <ul class="members itemMembers">
+                        <span class="subtitle">Static members</span>
+                        
+                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
+                        
+                    </ul>
+                
 
                 
                     <ul class="methods itemMembers">
                         <span class="subtitle">Static methods</span>
                         
-                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
+                            <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
+                        
+                            <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
                         
                     </ul>
                 
@@ -927,9 +951,9 @@
                 
                     <li data-name="ns.Update#EXEC_FLAG"><a href="ns.Update.html#EXEC_FLAG">EXEC_FLAG</a></li>
                 
-                    <li data-name="ns.Update#STATUS"><a href="ns.Update.html#STATUS">STATUS</a></li>
+                    <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
                 
-                    <li data-name="ns.Update#stopped"><a href="ns.Update.html#stopped">stopped</a></li>
+                    <li data-name="ns.Update#STATUS"><a href="ns.Update.html#STATUS">STATUS</a></li>
                 
                 </ul>
 
@@ -937,18 +961,30 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Update#abort"><a href="ns.Update.html#abort">abort</a></li>
+                    <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
+                
+                    <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
+                
+                    <li data-name="ns.Update#generateHTML"><a href="ns.Update.html#generateHTML">generateHTML</a></li>
                 
                     <li data-name="ns.Update#isGlobal"><a href="ns.Update.html#isGlobal">isGlobal</a></li>
                 
-                    <li data-name="ns.Update#render"><a href="ns.Update.html#render">render</a></li>
+                    <li data-name="ns.Update#perf"><a href="ns.Update.html#perf">perf</a></li>
                 
-                    <li data-name="ns.Update#start"><a href="ns.Update.html#start">start</a></li>
+                    <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
+                
+                    <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
                 </ul>
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.Update~PerformanceTimings"><a href="ns.Update.html#PerformanceTimings">PerformanceTimings</a></li>
             
             </ul>
 
@@ -986,8 +1022,6 @@
                             <li data-name="ns.View.getKeyAndParams"><a href="ns.View.html#getKeyAndParams">getKeyAndParams</a></li>
                         
                             <li data-name="ns.View.info"><a href="ns.View.html#info">info</a></li>
-                        
-                            <li data-name="ns.View.undefine"><a href="ns.View.html#undefine">undefine</a></li>
                         
                     </ul>
                 
@@ -1209,7 +1243,7 @@
     
         
         <div class="tag-source">
-            ns.update.js, line 21
+            ns.update.js, line 22
         </div>
         
     </div>
@@ -1490,6 +1524,12 @@ update.start();
     
     
     
+        <h3 class="subsection-title">Mixes In</h3>
+        
+        <ul>
+            <li><a href="ns.profile.html">ns.profile</a></li>
+        </ul>
+    
     
     
     
@@ -1504,6 +1544,51 @@ update.start();
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="handleError"><span class="type-signature static">static</span>ns.Update.handleError</h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Global error handler.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="EXEC_FLAG">EXEC_FLAG<span class="type-signature type ns.u.exec"><a href="ns.U.html#EXEC">ns.U.EXEC</a></span> </h4>
     </div>
     
@@ -1513,6 +1598,51 @@ update.start();
     
     <div class="description">
         <p>Execution flag</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="start">start</h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Сценарий полного рендеринга страницы</p>
     </div>
     
     
@@ -1593,51 +1723,6 @@ update.start();
     
 </dd>
 
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="stopped">stopped<span class="type-signature type boolean">boolean</span> </h4>
-    </div>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Flag that update was stopped.</p>
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
         </dl>
     
     
@@ -1648,14 +1733,14 @@ update.start();
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="handleError">
+        <h4 class="name" id="_addToQueue">
             
-            <span class="type-signature static">static</span>ns.Update.handleError<span class="signature">(error, update)</span>
+            <span class="type-signature static">static</span>ns.Update._addToQueue<span class="signature">(newUpdate)</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.update.js, line 411
+            ns.update.js, line 549
         </div>
         
     </div>
@@ -1666,7 +1751,14 @@ update.start();
     
     
     <div class="description">
-        <p>Global error handler.</p>
+        <p>ns.Update can be global, async or parallel.
+Cases:</p>
+<ul>
+<li>Global update can be terminated by another global Update only.</li>
+<li>Global Update terminated all Updates except parallel.</li>
+<li>Async updates execute simultaneously.</li>
+<li>Parallel update can't be terminated.</li>
+</ul>
     </div>
     
 
@@ -1697,30 +1789,7 @@ update.start();
 	
         <tr>
             
-                <td class="name"><code>error</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                <p>Error summary object <code>{ error: string, models: Array.&lt;ns.Model&gt; }</code>.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>update</code></td>
+                <td class="name"><code>newUpdate</code></td>
             
             
             <td class="type">
@@ -1736,7 +1805,7 @@ update.start();
             
             <td class="description last">
                 
-                <p>Update instance so that we can abort it if we want to.</p></td>
+                <p>New instance of ns.Update.</p></td>
         </tr>
 	
 	
@@ -1783,10 +1852,6 @@ update.start();
     
 
 
-<h5>Returns:</h5>
-If <code>true</code> - update can continue, otherwise update cannot continue.
-<br />
-
     
     
     
@@ -1796,81 +1861,14 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="abort">
+        <h4 class="name" id="_removeFromQueue">
             
-            abort<span class="signature">()</span>
+            <span class="type-signature static">static</span>ns.Update._removeFromQueue<span class="signature">()</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.update.js, line 292
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="isGlobal">
-            
-            isGlobal<span class="signature">()</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.update.js, line 401
+            ns.update.js, line 528
         </div>
         
     </div>
@@ -1881,7 +1879,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
     
     <div class="description">
-        <p>Whether this update is a global update (main update) or not.</p>
+        <p>Removes ns.Update instance from queue</p>
     </div>
     
 
@@ -1928,8 +1926,74 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
     
     
+</dd>
 
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_setAsyncState">
+            
+            _setAsyncState<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.update.js, line 254
+        </div>
+        
+    </div>
 
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Рекурсивно устанавливает видам asyncState</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
     
     
     
@@ -1939,14 +2003,14 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="render">
+        <h4 class="name" id="applyTemplate">
             
-            render<span class="signature">(tree, params, layout)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
+            applyTemplate<span class="signature">(tree, params, layout)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.update.js, line 276
+            ns.update.js, line 418
         </div>
         
     </div>
@@ -2108,14 +2172,14 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="start">
+        <h4 class="name" id="generateHTML">
             
-            start<span class="signature">(<span class="optional">async</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+            generateHTML<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.promise}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.update.js, line 82
+            ns.update.js, line 349
         </div>
         
     </div>
@@ -2126,7 +2190,163 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
     
     <div class="description">
-        <p>Начинает работу updater'а.</p>
+        <p>Сценарий генерации html
+Запрашивает модели всех невалидных и вновь созданных синхронных видов в layout
+Геренирует html указанных видов 
+Результат генерации передаётся строкой при разрешении promise</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="isGlobal">
+            
+            isGlobal<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.update.js, line 469
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Whether this update is a global update (main update) or not.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="perf">
+            
+            perf<span class="signature">(perf)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.update.js, line 480
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Этот метод является точкой расширения в приложении.
+Например, можно логировать долгую работу ns.Update, когда общее время превыщает предел.</p>
     </div>
     
 
@@ -2147,8 +2367,6 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
 		<th>Type</th>
 		
 		
-		<th>Default</th>
-		
 		
 		<th class="last">Description</th>
 	</tr>
@@ -2159,41 +2377,255 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
 	
         <tr>
             
-                <td class="name"><code>async</code></td>
+                <td class="name"><code>perf</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">boolean</span>
+<span class="param-type"><a href="ns.Update.html#PerformanceTimings">ns.Update~PerformanceTimings</a></span>
 
 
             
             </td>
             
             
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
             
             <td class="description last">
                 
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Флаг асинхронного updater'а.</p></td>
+                </td>
         </tr>
 	
 	
 	</tbody>
 </table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="prefetch">
+            
+            prefetch<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.update.js, line 335
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Сценарий предзапроса моделей.
+Запрашивает модели всех невалидных и вновь созданных синхронных видов в layout.
+По завершению запроса разрешает promise</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="prerender">
+            
+            prerender<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.update.js, line 366
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Сценарий предварительного рендеринга страницы
+Итогом его работы являются срендеренные и проинициализированные, но скрытые виды.
+Используется для ускорения перехода на целевую страницу</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="rerender">
+            
+            rerender<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.update.js, line 395
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Сценарий перерисовки страницы без запроса моделей</p>
+    </div>
+    
+
+    
+    
+    
+    
     
     
     
@@ -2244,6 +2676,217 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
     
     
+        <h3 class="subsection-title">Type Definitions</h3>
+        
+        <dl>
+                
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="PerformanceTimings">PerformanceTimings<span class="type-signature type object">object</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+        <h5 class="subsection-title">Properties:</h5>
+        
+        <dl>
+
+<table class="props">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>prepare</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Время подготовки запроса.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Время запроса данных.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>tree</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Время подготовки дерева шаблонизации.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>template</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Время шаблонизации.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>dom</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Время обновления DOM.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Время выполнения событий в видах.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table></dl>
+        
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+            </dl>
+    
     
     
 </article>
@@ -2263,7 +2906,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue May 06 2014 17:34:52 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

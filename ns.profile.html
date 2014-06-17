@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: ns.viewCollection</title>
+    <title>Mixin: profile</title>
     
     
     
@@ -1208,54 +1208,669 @@
 
     <div class="main">
         
-            <h1 class="page-title">Tutorial: ns.viewCollection</h1>
+            <h1 class="page-title" data-filename="ns.profile.html">Mixin: profile</h1>
         
 
-        <section>
+        
+
+
+
+<section>
     
 <header>
+    <h2>
+        <span class="ancestors"><a href="ns.html">ns</a>.</span>
     
-
-    <h2>ns.viewCollection</h2>
+    profile
+    </h2>
+    
 </header>  
 
 <article>
-    <h1>ns.ViewCollection</h1><p><code>ViewCollection</code> - это коллеция <code>ns.View</code>, привязанная к <code>ns.ModelCollection</code>.
-При изменении коллекции позволяет перерисовывать только изменившиеся элементы.</p>
-<p>По сути, образуется следующая зависимость один-к-одному:</p>
-<pre><code>ViewCollection      ->  ModelCollection
-    view-item-1     ->      model-item-1
-    view-item-2     ->      model-item-2
-                    ...
-    view-item-N     ->      model-item-N
-</code></pre><p><code>ns.ViewCollection</code> может зависит только от одной <code>ns.ModelCollection</code>.</p>
-<p><code>ns.ViewCollection</code> может содержать внутренние виды и иметь собственную html-разметку.</p>
-<h2>Декларация</h2><pre><code class="lang-js">ns.ViewCollection.define('my-view-collection', {
-    models: [ 'my-model-collection' ],
-    split: {
-        view_id: 'my-view-collection-item'
-    }
-});
-</code></pre>
-<p>Опция <code>split.view_id</code> определяет из каких <code>ns.View</code> состоит коллекция.</p>
-<p>Опция <code>models</code>, как и в ns.View определяет зависимость от моделей и подписки на их события.
-По умолчанию ViewCollection делает следующие подписки:</p>
-<ul>
-<li>обработчиком собственных событий <code>ns-model-changed</code> и <code>ns-model-destroyed</code> любых моделей устанавливается <code>invalidate</code>. Эти события наступают при изменении данных, по которым рисуется собственная html-разметка viewCollection'а, поэтому вид по умолчанию становится невалидным, чтобы перерисоваться.</li>
-<li>обработчиком <code>ns-model-insert</code> и <code>ns-model-remove</code> модели-коллекции устанавливается <code>keepValid</code>. Эти события наступают при изменении состава модели-коллекции, по которой рисуются вложенные виды viewCollection'а. Собственная html-разметка при этом не затрагивается, поэтому вид по умолчанию остаётся валидным.
-События моделей, вложенных в коллекцию игнорируются и подписаться на них через декларацию нельзя.</li>
-</ul>
-<p>Декларация элемента <code>ns.ViewCollection</code> выглядит так:</p>
-<pre><code class="lang-js">ns.View.define('my-view-collection-item', {
-    models: [ 'my-model-collection-item' ]
-});
-</code></pre>
-<p>Элемент коллекции ведет себя как обычный <code>ns.View</code> и ничего не знает про коллекцию.</p>
-<p>Элементы коллекции помещаются в узел-контейнер, размеченный классом <code>ns-view-container-desc</code>.
-Узел-контейнер <strong>обязательно</strong> должен быть указан. Вне этого контейнера можно делать собcтвенную html-разметку.</p>
+    <div class="container-overview">
+    
+    
+    
+        
+            <div class="description"><p>Этот mixin надо подмешивать в прототип класса.</p>
+<pre><code class="lang-js">no.extend(ns.Update.prototype, no.profile);
+</code></pre></div>
+        
+        
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+        
+        
+    
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
+        
+        <dl>
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getTimer">
+            
+            <span class="type-signature static">static</span>ns.profile.getTimer<span class="signature">(label)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{number}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.profile.js, line 60
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает значение метрики.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название метрики.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getTimers">
+            
+            <span class="type-signature static">static</span>ns.profile.getTimers<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.profile.js, line 73
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает все значения метрики</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="startTimer">
+            
+            <span class="type-signature static">static</span>ns.profile.startTimer<span class="signature">(label)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.profile.js, line 18
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ставит начальную точку отчета для метрики.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название метрики.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="stopTimer">
+            
+            <span class="type-signature static">static</span>ns.profile.stopTimer<span class="signature">(label)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{number}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.profile.js, line 33
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ставит конечную точку отчета для метрики.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название метрики.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+<h5>Returns:</h5>
+значение метрики.
+<br />
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="switchTimer">
+            
+            <span class="type-signature static">static</span>ns.profile.switchTimer<span class="signature">(from, to)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.profile.js, line 50
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Останавливает отсчёт метрики from и начинает отсчёт метрики to</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название останавливаемой метрики</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название запускаемой метрики</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        </dl>
+    
+    
+    
+    
+    
 </article>
 
 </section>  
+
+
+
 
 
         

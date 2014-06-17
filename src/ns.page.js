@@ -162,7 +162,7 @@
         ns.events.trigger('ns-page-error-load', err);
 
         // proxy reject value
-        return err;
+        return Vow.reject(err);
     }
 
 })();

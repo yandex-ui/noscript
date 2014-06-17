@@ -27,7 +27,7 @@ describe('ns.View bind events', function() {
                 'mousedown@show': no.nop,
                 'click@show .bar-show': no.nop,
 
-                'my-global-init-event-short': no.nop,
+                'my-global-show-event-short': no.nop,
 
                 'my-global-init-event@init': no.nop,
 
@@ -47,6 +47,9 @@ describe('ns.View bind events', function() {
 
         this.sinon.stub(this.view.$node, 'on', no.nop);
         this.sinon.stub(this.view.$node, 'off', no.nop);
+
+        this.sinon.spy(ns.events, 'off');
+        this.sinon.spy(ns.events, 'on');
 
         var that = this;
         this.findOnSpy = this.sinon.spy();
@@ -146,6 +149,18 @@ describe('ns.View bind events', function() {
 
             });
 
+            describe('custom ns.events', function() {
+
+                it('should bind one event handler', function() {
+                    expect(ns.events.on).to.have.callCount(1);
+                });
+
+                it('should bind handler for "my-global-init-event@init"', function() {
+                    expect(ns.events.on).have.been.calledWith('my-global-init-event');
+                });
+
+            });
+
         });
 
         describe('unbind', function() {
@@ -200,6 +215,18 @@ describe('ns.View bind events', function() {
 
                 it('should unbind non-delegated scroll event', function() {
                     expect(this.findOffSpy.calledWith(this.eventNS)).to.be.equal(true);
+                });
+
+            });
+
+            describe('custom ns.events', function() {
+
+                it('should unbind one event handler', function() {
+                    expect(ns.events.off).to.have.callCount(1);
+                });
+
+                it('should unbind handler for "my-global-init-event@init"', function() {
+                    expect(ns.events.off).have.been.calledWith('my-global-init-event');
                 });
 
             });
@@ -285,6 +312,23 @@ describe('ns.View bind events', function() {
                 });
 
             });
+
+            describe('custom ns.events', function() {
+
+                it('should bind two event handlers', function() {
+                    expect(ns.events.on).to.have.callCount(2);
+                });
+
+                it('should bind handler for "my-global-show-event-short"', function() {
+                    expect(ns.events.on).have.been.calledWith('my-global-show-event-short');
+                });
+
+                it('should bind handler for "my-global-show-event@show"', function() {
+                    expect(ns.events.on).have.been.calledWith('my-global-show-event');
+                });
+
+            });
+
         });
 
         describe('unbind', function() {
@@ -339,6 +383,22 @@ describe('ns.View bind events', function() {
 
                 it('should unbind non-delegated scroll event', function() {
                     expect(this.findOffSpy.calledWith(this.eventNS)).to.be.equal(true);
+                });
+
+            });
+
+            describe('custom ns.events', function() {
+
+                it('should unbind two event handlers', function() {
+                    expect(ns.events.off).to.have.callCount(2);
+                });
+
+                it('should unbind handler for "my-global-show-event-short"', function() {
+                    expect(ns.events.off).have.been.calledWith('my-global-show-event-short');
+                });
+
+                it('should unbind handler for "my-global-show-event@show"', function() {
+                    expect(ns.events.off).have.been.calledWith('my-global-show-event');
                 });
 
             });

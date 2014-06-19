@@ -820,7 +820,7 @@
     ns.ModelUniq.prototype.uniq = function(params, cached) {
         var that = this;
         var name = this.uniqName;
-        var copy = JSON.parse(JSON.stringify(params)); // deep clone
+        var copy = no.extend({}, params);
         if (!this.uniqCached) { this.uniqCached = {}; }
 
         // создаём ту же структуру, что и в оригинальных параметрах

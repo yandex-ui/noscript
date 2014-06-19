@@ -26,7 +26,7 @@ ns.View.define('my-view', {
     events: {
         'ns-view-show': function() {
             // после показа вида, добавляем функцию блокировки
-            ns.page.block.add( this.checkChanges.find(this) );
+            ns.page.block.add( this.checkChanges.bind(this) );
         },
         'ns-view-hide': function() {
             // после скрытия вида, очищаем функции

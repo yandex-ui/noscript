@@ -34,7 +34,10 @@ ns.View.define('my-view', {
         }
     },
     methods: {
-        checkChanges: function() {
+        /**
+         * @param {string} url ссылка, по которой выполняется переход
+         */
+        checkChanges: function(url) {
             if (this.hasUnsavedChanges()) {
                 // здесь можно показать какое-то сообщение
                  

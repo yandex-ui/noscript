@@ -2,7 +2,7 @@
 var expect = require('../../node_modules/karma-sinon-chai/node_modules/chai/lib/chai.js').expect;
 var sinon = require('../../node_modules/karma-sinon-chai/node_modules/sinon/lib/sinon.js');
 var nock = require('nock');
-var env = require('jsdom').env;
+var jsdom = require('jsdom');
 
 // Templating engine
 var yr = require('../../node_modules/yate/lib/runtime.js');
@@ -33,14 +33,8 @@ beforeEach(function() {
     this.sinon.spy(ns, 'renderString');
     this.sinon.spy(ns, 'renderNode');
 
-    this.execInDom = function(html, func) {
-        env(html, function (errors, window) {
-            if (errors) {
-                throw errors;
-            }
-
-            func.call(this, window, require('jquery')(window));
-        }.bind(this));
+    this.createDocument = function(html) {
+        return jsdom.jsdom(html, jsdom.level(2, "core"), {features: {QuerySelector: true}});
     };
 });
 
@@ -105,7 +99,7 @@ describe('app rendering in node.js', function() {
             this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
             this.update.generateHTML()
                 .then(function(html) {
-                    this.html = html;
+                    this.document = this.createDocument(html);
                     done();
                 }, this);
         });
@@ -114,35 +108,27 @@ describe('app rendering in node.js', function() {
             this.nockScope.done();
         });
 
-        it('should create correctly nested nodes of sync views', function() {
-            this.execInDom(this.html, function (window, $) {
-                var vSync0node = $('.ns-view-vSync0');
+        it.only('should create correctly nested nodes of sync views', function() {
+            var vSync0node = this.document.querySelector('.ns-view-vSync0');
 
-                expect(vSync0node.length).to.equal(1);
-                expect(vSync0node.find('.ns-view-vSync1').length).to.equal(1);
-                expect(vSync0node.find('.ns-view-vSync2').length).to.equal(1);
-            });
+            expect(vSync0node).to.be.ok;
+            expect(vSync0node.querySelector('.ns-view-vSync1')).to.be.ok;
+            expect(vSync0node.querySelector('.ns-view-vSync2')).to.be.ok;
         });
 
         it('should create nodes of async views', function() {
-            this.execInDom(this.html, function (window, $) {
-                expect($('.ns-view-vAsync1').length).to.equal(1);
-                expect($('.ns-view-vAsync2').length).to.equal(1);
-            });
+            expect(this.document.querySelector('.ns-view-vAsync1')).to.be.ok;
+            expect(this.document.querySelector('.ns-view-vAsync2')).to.be.ok;
         });
 
         it('should turn nodes of async views into async mode', function() {
-            this.execInDom(this.html, function (window, $) {
-                expect($('.ns-view-vAsync1.ns-async').length).to.equal(1);
-                expect($('.ns-view-vAsync2.ns-async').length).to.equal(1);
-            });
+            expect(this.document.querySelector('.ns-view-vAsync1.ns-async')).to.be.ok;
+            expect(this.document.querySelector('.ns-view-vAsync2.ns-async')).to.be.ok;
         });
 
         it('should not create nodes of async views descendants', function() {
-            this.execInDom(this.html, function (window, $) {
-                expect($('.ns-view-vAsync3').length).to.equal(0);
-                expect($('.ns-view-vAsync3').length).to.equal(0);
-            });
+            expect(this.document.querySelector('.ns-view-vSync3')).not.to.be.ok;
+            expect(this.document.querySelector('.ns-view-vSync4')).not.to.be.ok;
         });
     });
 

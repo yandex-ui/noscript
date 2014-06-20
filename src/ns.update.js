@@ -150,7 +150,6 @@
      */
     ns.Update.prototype._requestSyncModels = function() {
         this.startTimer('collectModels');
-
         var views = this.view._getRequestViews({
             sync: [],
             async: []
@@ -261,6 +260,16 @@
     };
 
     /**
+     * Рекурсивно на основе layout
+     *  1. создаёт экземпляры видов
+     *  2. устанавливает видам asyncState
+     */
+    ns.Update.prototype._applyLayout = function() {
+        // FIXME: методы продублированы специально с заделом на будущий рефакторинг
+        this.view._getRequestViews({sync: [], async: []}, this.layout.views, this.params);
+    };
+
+    /**
      * Генерирует html недостающих видов
      * @private
      * @returns {string}
@@ -276,7 +285,7 @@
         this.view._getUpdateTree(tree, this.layout.views, this.params);
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
-
+        
         var html;
         if (!ns.object.isEmpty(tree.views)) {
             this.startTimer('generateHTML');
@@ -400,6 +409,21 @@
                 this._fulfill({async: []});
             }, this);
         }, this._reject, this);
+
+        return this.promise;
+    };
+
+    /**
+     * Сценарий воссоздания приложения из заранее сформированного html
+     * @param {string} html
+     * @returns {Vow.promise}
+     */
+    ns.Update.prototype.reconstruct = function(html) {
+        this.log('started `reconstruct` scenario');
+        this._applyLayout();
+        this._insertNodes(html, true).then(function() {
+            this._fulfill({async: []});
+        }, this);
 
         return this.promise;
     };

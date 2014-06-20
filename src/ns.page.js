@@ -75,7 +75,7 @@
         return ns.page.followRoute(route)
             .then(function() {
 
-                ns.page._fillCurrent(route, url);
+                ns.page._setCurrent(route, url);
                 ns.page._fillHistory(url, action);
                 ns.page.title();
 
@@ -109,7 +109,7 @@
      * @param {string} url Новый урл.
      * @private
      */
-    ns.page._fillCurrent = function(route, url) {
+    ns.page._setCurrent = function(route, url) {
         ns.page.current = route;
         ns.page.currentUrl = url;
     };

@@ -79,8 +79,7 @@
         this.data = null;
         this.error = null;
 
-        this.status = status || this.STATUS.NONE;
-        this.retries = 0;
+        this._softReset(status);
 
         /**
          * Data version.
@@ -88,6 +87,17 @@
          * @protected
          */
         this._version = 0;
+    };
+
+    /**
+     * Магкий сброс. Устанавливает только статус и сбрасывает retries.
+     * Не удаляет данные и не сбрасывает версию.
+     * @param {ns.M.STATUS} [status=ns.M.STATUS.NONE]
+     * @private
+     */
+    ns.Model.prototype._softReset = function(status) {
+        this.status = status || this.STATUS.NONE;
+        this.retries = 0;
     };
 
     /**
@@ -147,7 +157,7 @@
      * Инвалидирует модель.
      */
     ns.Model.prototype.invalidate = function() {
-        this._reset(this.STATUS.INVALID);
+        this._softReset(this.STATUS.INVALID);
     };
 
     /**

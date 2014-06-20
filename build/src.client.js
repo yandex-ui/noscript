@@ -13,7 +13,7 @@
     /* borschik:include:../src/ns.dom.js */
     /* borschik:include:../src/ns.entityify.js */
     /* borschik:include:../src/ns.history.js */
-    /* borschik:include:../src/ns.http.js */
+    /* borschik:include:../src/ns.http.client.js */
     /* borschik:include:../src/ns.object.js */
     /* borschik:include:../src/ns.profile.js */
 

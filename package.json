@@ -44,6 +44,6 @@
         "build/src.client.js"
     ],
     "scripts": {
-        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start"
+        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start && ./node_modules/mocha/bin/mocha test/node/tests.module.js"
     }
 }

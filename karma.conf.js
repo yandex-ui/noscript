@@ -18,7 +18,7 @@ module.exports = function(config) {
       "node_modules/jquery/dist/jquery.min.js",
       "node_modules/yate/lib/runtime.js",
 
-      'noscript.borschik.js',
+      'build/src.client.js',
 
       'yate/noscript-yate-externals.js',
 
@@ -39,7 +39,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        '*.borschik.js': ['borschik']
+        'build/*.js': ['borschik']
     },
 
 

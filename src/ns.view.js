@@ -28,14 +28,14 @@
      * @type {jQuery}
      * @private
      */
-    ns.View.prototype._$document = $(document);
+    ns.View.prototype._$document = ('undefined' === typeof document) ? null : $(document);
 
     /**
      * Закешированный $(window)
      * @type {jQuery}
      * @private
      */
-    ns.View.prototype._$window = $(window);
+    ns.View.prototype._$window = ('undefined' === typeof window) ? null : $(window);
 
     /**
      * Инициализирует экземпляр вида

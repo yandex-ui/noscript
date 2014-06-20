@@ -134,3 +134,14 @@ ns.U.EXEC = {
 };
 
 ns.DEBUG = false;
+
+/**
+ * Параметры по умолчанию для http-запросов.
+ * @type {object}
+ */
+ns.H = {
+    DEFAULTS: {
+        dataType: 'json',
+        type: 'POST'
+    }
+};

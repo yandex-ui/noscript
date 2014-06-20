@@ -42,7 +42,7 @@
     ns.request.models = function(models, options) {
 
         // Загрузка порционных данных. В этом случае грузим не саму модель, а порцию данных.
-        models = $.map(models, function(model) {
+        models = models.map(function(model) {
             return model.getRequest ? model.getRequest() : model;
         });
 
@@ -287,7 +287,7 @@
             ns.request.addRequestParams(params);
             // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
             // мог зарезолвится без завершения http-запроса
-            httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params, {type: 'POST'});
+            httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params);
 
             all = all.concat( requesting.map(model2Promise) );
 

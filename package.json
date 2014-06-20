@@ -19,6 +19,7 @@
     "devDependencies": {
         "borschik": "0.4.x",
         "jquery": "1.11.0",
+        "jsdom": "*",
         "jscs": "1.0.11",
         "jshint": "2.5.x",
         "karma": "0.12.x",
@@ -27,6 +28,8 @@
         "karma-phantomjs-launcher": "~0.1.0",
         "karma-sinon-chai": "0.1.x",
         "mocha": "^1.18.2",
+        "nock": "0.36.2",
+        "request": "2.36.x",
         "yate": "*"
     },
     "optionalDependencies": {},
@@ -38,9 +41,9 @@
         "dist",
         "src/*.js",
         "yate",
-        "noscript.borschik.js"
+        "build/src.client.js"
     ],
     "scripts": {
-        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start"
+        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start && ./node_modules/mocha/bin/mocha test/node/tests.module.js"
     }
 }

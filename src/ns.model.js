@@ -763,7 +763,7 @@
             var uniq = this.params[this.uniqName];
             if (!this.uniqCached) { this.uniqCached = {}; }
 
-            $.each(uniq, function(i, v) { that.uniqCached[v] = true; });
+            uniq.forEach(function(i, v) { that.uniqCached[v] = true; });
         };
 
         if (Array.isArray(onchangedCallbacks)) {
@@ -820,7 +820,7 @@
     ns.ModelUniq.prototype.uniq = function(params, cached) {
         var that = this;
         var name = this.uniqName;
-        var copy = $.extend({}, params, true);
+        var copy = no.extend({}, params);
         if (!this.uniqCached) { this.uniqCached = {}; }
 
         // создаём ту же структуру, что и в оригинальных параметрах
@@ -830,7 +830,7 @@
             }
         }
 
-        copy[name] = $.map([].concat(copy[name]), function(v) {
+        copy[name] = [].concat(copy[name]).map(function(v) {
             if (that.uniqCached[v]) {
                 if (cached) {
                     cached[name].push(v);
@@ -893,7 +893,7 @@
 
             for (var i = 0, j = uniqs.length; i < j; i++) {
                 // если требуемое значение есть в кэше
-                if ($.inArray(uniqs[i], arrKey) > -1) {
+                if (arrKey.indexOf(uniqs[i]) > -1) {
                     // извлекаем значение из кэша по ключу
                     var value = that.uniqFromJSON(model.data, uniqs[i]);
                     if (value) {

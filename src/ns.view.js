@@ -12,10 +12,10 @@
      * @tutorial ns.view
      * @tutorial ns.view.yate
      * @constructor
-     * @mixes no.Events
+     * @mixes ns.Events
      */
     ns.View = function() {};
-    no.extend(ns.View.prototype, no.Events);
+    no.extend(ns.View.prototype, ns.Events);
 
     /**
      * @see ns.V.STATUS
@@ -1076,7 +1076,7 @@
     /**
      * Определяет новый View.
      * @description
-     * no.events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
+     * ns.Events представляет из себя объект {"eventDecl1": "handler1", "eventDecl2": "handler2"}.
      * "eventDecl" записывается в виде "eventName [ selector ]".
      * "selector" опционален, если его нет, то события регистрируется на ноду View.
      * "handler" может быть строка (тогда она заменится на метод прототипа) или функция.

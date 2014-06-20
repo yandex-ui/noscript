@@ -11,12 +11,6 @@ if (typeof window === 'undefined') {
 }
 
 /**
- * Global events bus.
- * @mixin {no.Events}
- */
-ns.events = no.extend( {}, no.Events );
-
-/**
  *
  */
 ns.todo = function() {

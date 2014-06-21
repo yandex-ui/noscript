@@ -4,14 +4,14 @@
      * @classdesc Базовый класс для моделей. Конструктор пустой, чтобы легче было наследоваться.
      * Вся инициализация делается в _init(), который вызывает фабрикой ns.Model.get().
      * @constructor
-     * @mixes no.Events
+     * @mixes ns.Events
      * @tutorial ns.model
      * @fires ns.Model#ns-model-init
      */
     ns.Model = function() {};
 
-    //  Добавляем методы из no.Events: on(), off(), trigger().
-    no.extend(ns.Model.prototype, no.Events);
+    //  Добавляем методы из ns.Events: on(), off(), trigger().
+    no.extend(ns.Model.prototype, ns.Events);
 
     var _ctors = {};
     var _infos = {};

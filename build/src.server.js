@@ -6,6 +6,7 @@ var no = require('nommon');
 /* borschik:include:../src/ns.js */
 /* borschik:include:../src/ns.consts.js */
 /* borschik:include:../src/ns.entityify.js */
+/* borschik:include:../src/ns.events.js */
 /* borschik:include:../src/ns.http.server.js */
 /* borschik:include:../src/ns.object.js */
 /* borschik:include:../src/ns.profile.js */

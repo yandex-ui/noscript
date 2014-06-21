@@ -679,6 +679,23 @@ describe('ns.Model', function() {
             });
         });
 
+        describe('#invalidate', function() {
+
+            beforeEach(function() {
+                ns.Model.define('model');
+                this.model = ns.Model.get('model').setData('1');
+                this.model.invalidate();
+            });
+
+            it('должен установить статус в невалидный', function() {
+                expect(this.model.isValid()).to.be.equal(false);
+            });
+
+            it('не должен удалить данные', function() {
+                expect(this.model.getData()).to.be.equal('1');
+            });
+
+        });
     });
 
     describe('События', function() {

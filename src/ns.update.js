@@ -300,13 +300,12 @@
     /**
      * Раскладывает html-узлы по видам и триггерит события
      * @private
-     * @param {string} html
+     * @param {HTMLElement} node
      * @param {boolean} async
      * @returns {string}
      */
-    ns.Update.prototype._insertNodes = function(html, async) {
+    ns.Update.prototype._insertNodes = function(node, async) {
         this.startTimer('insertNodes');
-        var node = ns.html2node(html);
 
         var viewEvents = {
             'ns-view-async': [],
@@ -388,7 +387,7 @@
         this.log('started `render` scenario');
         this._requestAllModels().then(function(asyncResult) {
             this._generateHTML().then(function(html) {
-                this._insertNodes(html).then(function() {
+                this._insertNodes(ns.html2node(html)).then(function() {
                     this._fulfill(asyncResult);
                 }, this);
             }, this._reject, this);
@@ -405,7 +404,7 @@
         this.log('started `_re_render` scenario');
         this._setAsyncState();
         this._generateHTML().then(function(html) {
-            this._insertNodes(html, true).then(function() {
+            this._insertNodes(ns.html2node(html), true).then(function() {
                 this._fulfill({async: []});
             }, this);
         }, this._reject, this);
@@ -414,14 +413,14 @@
     };
 
     /**
-     * Сценарий воссоздания приложения из заранее сформированного html
-     * @param {string} html
+     * Сценарий воссоздания приложения из заранее сформированнного dom-дерева страницы
+     * @param {HTMLElement} node
      * @returns {Vow.promise}
      */
-    ns.Update.prototype.reconstruct = function(html) {
+    ns.Update.prototype.reconstruct = function(node) {
         this.log('started `reconstruct` scenario');
         this._applyLayout();
-        this._insertNodes(html, true).then(function() {
+        this._insertNodes(node).then(function() {
             this._fulfill({async: []});
         }, this);
 

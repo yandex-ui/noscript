@@ -302,7 +302,7 @@ describe('ns.Updater', function() {
                         this.createTestApp();
 
                         this.clientUpdate = new ns.Update(this.view, ns.layout.page('syncLayout', {}), {});
-                        this.clientUpdate.reconstruct(html)
+                        this.clientUpdate.reconstruct(ns.html2node(html))
                             .then(function() {
                                 done();
                             });
@@ -356,7 +356,7 @@ describe('ns.Updater', function() {
 
                         // Firstly let's reconstruct our app, prerendered on a server
                         this.clientUpdate = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
-                        this.clientUpdate.reconstruct(html)
+                        this.clientUpdate.reconstruct(ns.html2node(html))
                             .then(function() {
                                 
                                 // And secondly, let's run a regular update, that conceivably

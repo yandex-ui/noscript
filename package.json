@@ -6,7 +6,7 @@
     },
     "name": "noscript",
     "description": "JavaScript MVC framework",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "homepage": "https://github.com/yandex-ui/noscript",
     "repository": {
         "type": "git",
@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "nommon": "0.0.23",
-        "vow": "0.3.12"
+        "vow": "0.3.13"
     },
     "devDependencies": {
         "borschik": "0.4.x",

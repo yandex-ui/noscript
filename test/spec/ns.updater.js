@@ -1,60 +1,69 @@
 describe('ns.Updater', function() {
 
+    var createTestApp = function() {
+        ns.layout.define('asyncLayout', {
+            'app': {
+                'vSync0':   ['vSync1', 'vSync2'],
+                'vAsync1&': ['vSync3', 'vSync4'],
+                'vAsync2&': true
+            }
+        });
+
+        ns.layout.define('syncLayout', {
+            'app': {
+                'vSync0': ['vSync1', 'vSync2'],
+                'vSync3': {},
+                'vSync4': {}
+            }
+        });
+
+        ns.View.define('app');
+        this.view = ns.View.create('app');
+
+        ns.View.define('vSync0', {models: ['mSync1']});
+        ns.View.define('vSync1');
+        ns.View.define('vSync2', {models: ['mSync2']});
+        ns.View.define('vSync3', {models: ['mSync3']});
+        ns.View.define('vSync4');
+
+        ns.View.define('vAsync1', {models: ['mAsync1']});
+        ns.View.define('vAsync2', {models: ['mAsync2']});
+        
+
+        ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
+        ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
+
+        this.response0 = JSON.stringify({
+            "models": [
+                {"data": {"sync1": true}},
+                {"data": {"sync2": true}},
+                {"data": {"sync3": true}}
+            ]
+        });
+
+        this.response1 = JSON.stringify({
+            "models": [
+                {"data": {"async1": true}}
+            ]
+        });
+
+        this.response2 = JSON.stringify({
+            "models": [
+                {"data": {"async2": true}}
+            ]
+        });
+    };
+
     describe('scenario', function() {
         beforeEach(function() {
-            ns.layout.define('asyncLayout', {
-                'app': {
-                    'vSync0':   ['vSync1', 'vSync2'],
-                    'vAsync1&': ['vSync3', 'vSync4'],
-                    'vAsync2&': true
-                }
-            });
-
-            ns.layout.define('syncLayout', {
-                'app': {
-                    'vSync0': ['vSync1', 'vSync2'],
-                    'vSync3': {},
-                    'vSync4': {}
-                }
-            });
-
-            ns.View.define('app');
-            this.view = ns.View.create('app');
-
-            ns.View.define('vSync0', {models: ['mSync1']});
-            ns.View.define('vSync1');
-            ns.View.define('vSync2', {models: ['mSync2']});
-            ns.View.define('vSync3', {models: ['mSync3']});
-            ns.View.define('vSync4');
-
-            ns.View.define('vAsync1', {models: ['mAsync1']});
-            ns.View.define('vAsync2', {models: ['mAsync2']});
-            
-
-            ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
-            ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
-
-            this.response0 = JSON.stringify({
-                "models": [
-                    {"data": {"sync1": true}},
-                    {"data": {"sync2": true}},
-                    {"data": {"sync3": true}}
-                ]
-            });
-
-            this.response1 = JSON.stringify({
-                "models": [
-                    {"data": {"async1": true}}
-                ]
-            });
-
-            this.response2 = JSON.stringify({
-                "models": [
-                    {"data": {"async2": true}}
-                ]
-            });
+            this.createTestApp = createTestApp;
+            this.createTestApp();
 
             this.sinon.spy(ns.Update.prototype, 'perf');
+        });
+
+        afterEach(function() {
+            delete this.view;
         });
 
         describe('prefetch', function() {
@@ -136,7 +145,7 @@ describe('ns.Updater', function() {
             });
         });
 
-        describe('render (sync layout)', function() {
+        describe('render sync layout', function() {
             beforeEach(function(done) {
                 this.update = new ns.Update(this.view, ns.layout.page('syncLayout', {}), {});
                 this.update.render()
@@ -176,7 +185,7 @@ describe('ns.Updater', function() {
             });
         });
 
-        describe('render (async layout)', function() {
+        describe('render async layout', function() {
             beforeEach(function(done) {
                 this.modelsMethod = sinon.spy(ns.request, 'models');
 
@@ -281,6 +290,119 @@ describe('ns.Updater', function() {
                 expect(arg).to.have.property('triggerEvents').that.is.at.least(0);
             });
         });
+
+        describe('reconstruct sync layout', function() {
+            beforeEach(function(done) {
+
+                this.serverUpdate = new ns.Update(this.view, ns.layout.page('syncLayout', {}), {});
+                this.serverUpdate.generateHTML()
+                    .then(function(html) {
+
+                        ns.reset();
+                        this.createTestApp();
+
+                        this.clientUpdate = new ns.Update(this.view, ns.layout.page('syncLayout', {}), {});
+                        this.clientUpdate.reconstruct(ns.html2node(html))
+                            .then(function() {
+                                done();
+                            });
+                    }, this);
+
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+            });
+
+            afterEach(function() {
+                delete this.view;
+            });
+
+            it('should create correct views structure', function() {
+
+                var firstViewsLevel = this.view.views;
+
+                expect(firstViewsLevel.vSync0).to.be.ok;
+                expect(firstViewsLevel.vSync3).to.be.ok;
+                expect(firstViewsLevel.vSync4).to.be.ok;
+
+                var secondViewsLevel = firstViewsLevel.vSync0.views;
+
+                expect(secondViewsLevel.vSync1).to.be.ok;
+                expect(secondViewsLevel.vSync2).to.be.ok;
+            });
+
+        });
+
+        describe('reconstruct async layout', function() {
+            beforeEach(function(done) {
+                // Here we are in a server
+                this.serverUpdate = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
+                // Creating html
+                this.serverUpdate.generateHTML()
+                    .then(function(html) {
+
+                        var data1 = ns.Model.get('mSync1').getData();
+                        var data2 = ns.Model.get('mSync2').getData();
+                        var data3 = ns.Model.get('mSync3').getData();
+
+                        // This is a way to emulate switch of environment
+                        ns.reset();
+
+                        // Here we are already in a browser
+                        this.createTestApp();
+
+                        // Let's imagine, that we've transfered models data from server
+                        ns.Model.get('mSync1').setData(data1);
+                        ns.Model.get('mSync2').setData(data2);
+                        ns.Model.get('mSync3').setData(data3);
+
+                        // Firstly let's reconstruct our app, prerendered on a server
+                        this.clientUpdate = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
+                        this.clientUpdate.reconstruct(ns.html2node(html))
+                            .then(function() {
+                                
+                                // And secondly, let's run a regular update, that conceivably
+                                // will be run by some kind of ns.page.go
+                                this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
+                                this.update.render().then(function(result) {
+                                    result.async[0].then(function() {
+                                        result.async[1].then(function() {
+                                            done();
+                                        }, this);
+                                        this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, this.response2);
+                                    }, this);
+                                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, this.response1);
+                                }, this);
+
+                            }, this);
+                    }, this);
+
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+            });
+
+            afterEach(function() {
+                delete this.view;
+            });
+
+            it('should create correct views structure', function() {
+                var firstViewsLevel = this.view.views;
+
+                expect(firstViewsLevel.vSync0).to.be.ok;
+                expect(firstViewsLevel.vAsync1).to.be.ok;
+                expect(firstViewsLevel.vAsync2).to.be.ok;
+
+                expect(firstViewsLevel.vSync0.views.vSync1).to.be.ok;
+                expect(firstViewsLevel.vSync0.views.vSync2).to.be.ok;
+
+                expect(firstViewsLevel.vAsync1.views.vSync3).to.be.ok;
+                expect(firstViewsLevel.vAsync1.views.vSync4).to.be.ok;
+            });
+
+            it('should make valid models of async views', function() {
+                // expect(ns.Model.getValid('mAsync1')).to.be.ok;
+                // expect(ns.Model.getValid('mAsync2')).to.be.ok;
+            });
+
+        });
+
     });
 
     describe('concurent ns.Update instances', function() {

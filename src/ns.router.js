@@ -2,7 +2,7 @@
  * Find best page for url.
  * @namespace
  * @param {string} url
- * @returns {object}
+ * @returns {ns.router~route}
  * @tutorial ns.router
  */
 ns.router = function(url) {
@@ -525,3 +525,10 @@ ns.router._reset = function() {
 };
 
 ns.router._reset();
+
+/**
+ * @typedef ns.router~route
+ * @type {object}
+ * @property {string} page Название layout.
+ * @property {object} params Параметры паршрута.
+ */

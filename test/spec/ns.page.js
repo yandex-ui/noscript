@@ -54,38 +54,62 @@ describe('ns.page', function() {
                     this.sinon.stub(ns, 'Update', function() {
                         return {
                             start: function() {
-                                return new Vow.Promise();
+                                return Vow.fulfill();
                             }
                         };
                     });
+
+                    this.spy = this.sinon.spy();
+                    ns.events.on('ns-page-before-load', this.spy);
                 });
 
-                it('should trigger ns-page-before-load event', function() {
-                    var spy = this.sinon.spy();
-                    ns.events.on('ns-page-before-load', spy);
-                    ns.page.go('/inbox');
-
-                    expect(spy.calledOnce).to.be.equal(true);
-                    expect(spy.firstCall.args[0]).to.be.equal('ns-page-before-load');
-                    expect(spy.firstCall.args[1]).to.be.eql([ {}, { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) } ]);
-                    expect(spy.firstCall.args[2]).to.be.equal('/inbox');
+                afterEach(function() {
+                    ns.events.off('ns-page-before-load');
                 });
 
-                it('should trigger ns-page-before-load with old and new pages', function() {
-                    var spy = this.sinon.spy();
-                    ns.events.on('ns-page-before-load', spy);
-                    ns.page.go('/inbox');
-                    ns.page.go('/message/1');
-
-                    expect(spy.calledTwice).to.be.equal(true);
-                    expect(spy.secondCall.args[0]).to.be.equal('ns-page-before-load');
-                    expect(spy.secondCall.args[1]).to.be.eql([
-                        { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) },
-                        { page: 'message', params: { id: '1' }, layout: ns.layout.page('message', { id: '1' }) }
-                    ]);
-                    expect(spy.secondCall.args[2]).to.be.equal('/message/1');
+                it('should trigger ns-page-before-load event', function(done) {
+                    var that = this;
+                    ns.page.go('/inbox').then(function() {
+                        expect(that.spy).to.have.callCount(1);
+                        done();
+                    }, function() {
+                        done('reject')
+                    });
                 });
 
+                it('should trigger ns-page-before-load event with valid arguments', function(done) {
+                    var that = this;
+                    ns.page.go('/inbox').then(function() {
+                        expect(that.spy).have.been.calledWith(
+                            'ns-page-before-load',
+                            [ {}, { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) } ],
+                            '/inbox'
+                        );
+
+                        done();
+                    }, function() {
+                        done('reject')
+                    });
+                });
+
+                it('should trigger ns-page-before-load with old and new pages', function(done) {
+                    var that = this;
+                    ns.page.go('/inbox').then(function() {
+                        ns.page.go('/message/1').then(function() {
+                            expect(that.spy).have.been.calledWith(
+                                'ns-page-before-load',
+                                [
+                                    { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) },
+                                    { page: 'message', params: { id: '1' }, layout: ns.layout.page('message', { id: '1' }) }
+                                ],
+                                '/message/1'
+                            );
+
+                            done();
+
+                        });
+                    });
+                });
 
             });
 

@@ -64,8 +64,6 @@
             return new Vow.Promise();
         }
 
-        var layout = ns.layout.page(route.page, route.params);
-
         /**
          * Сейчас будет переход на другую страницу.
          * @event ns.page#ns-page-before-load
@@ -74,23 +72,64 @@
          */
         ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
-        ns.page.current = route;
+        return ns.page.followRoute(route)
+            .then(function() {
+
+                ns.page._setCurrent(route, url);
+                ns.page._fillHistory(url, action);
+                ns.page.title();
+
+                return ns.page.startUpdate(route);
+            }, triggerPageErrorLoad);
+    };
+
+    ns.page.followRoute = function(route) {
+        /* jshint unused: false */
+        return Vow.fulfill();
+    };
+
+    /**
+     * Запускает процесс отрисовки страницы.
+     * @param {ns.router~route} route Маршрут для перехода.
+     * @returns {Vow.Promise}
+     */
+    ns.page.startUpdate = function(route) {
+        var layout = ns.layout.page(route.page, route.params);
+
         // save layout for async-view updates
         ns.page.current.layout = layout;
-        ns.page.currentUrl = url;
 
+        var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
+        return update.start().then(triggerPageAfterLoad, triggerPageErrorLoad);
+    };
+
+    /**
+     * Заполняет ns.page.current перед запуском ns.Update
+     * @param {ns.router~route} route Маршрут.
+     * @param {string} url Новый урл.
+     * @private
+     */
+    ns.page._setCurrent = function(route, url) {
+        ns.page.current = route;
+        ns.page.currentUrl = url;
+    };
+
+    /**
+     * Заполняет историю переходов перез запуском ns.Update
+     * @param {string} url Новый урл.
+     * @param {string} action Действие (push/replace)
+     * @private
+     */
+    ns.page._fillHistory = function(url, action) {
         if (action === 'push') {
             // записываем в историю все переходы
             ns.history.pushState(url);
+
         } else if (action === 'replace') {
             ns.history.replaceState(url);
         }
 
         ns.page.history.push(url);
-        document.title = ns.page.title(url);
-
-        var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
-        return update.start().then(triggerPageAfterLoad, triggerPageErrorLoad);
     };
 
     /**
@@ -104,12 +143,11 @@
     };
 
     /**
-     * Returns document title.
-     * @param {string} url Page URL.
+     * Sets document title.
      * @returns {string}
      */
-    ns.page.title = function(url) {
-        return 'NoScript app ' + url;
+    ns.page.title = function() {
+        document.title = 'NoScript app ' + ns.page.currentUrl.url;
     };
 
     /**

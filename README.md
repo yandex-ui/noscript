@@ -8,6 +8,7 @@
 - [Общее описание сущностей](/doc/entities.md)
 - [Инициализация и настройка фреймворка](/doc/ns.init.md)
 - [JSDoc](https://yandex-ui.github.io/noscript/)
+- [Философия работы noscript](/doc/philosophy.md)
 
 Описания компонентов:
 - [ns.layout - раскладка страницы](/doc/ns.layout.md)

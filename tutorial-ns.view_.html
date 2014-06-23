@@ -50,6 +50,10 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.events"><a href="ns.html#events">events</a></li>
+                        
+                        <li data-name="ns.H"><a href="ns.html#H">H</a></li>
+                        
                         <li data-name="ns.IS_TOUCH"><a href="ns.html#IS_TOUCH">IS_TOUCH</a></li>
                         
                         <li data-name="ns.L"><a href="ns.html#L">L</a></li>
@@ -76,6 +80,8 @@
                             <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
                         
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
+                        
+                            <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
@@ -360,6 +366,8 @@
                         
                             <li data-name="ns.page.redirect"><a href="ns.page.html#redirect">redirect</a></li>
                         
+                            <li data-name="ns.page.startUpdate"><a href="ns.page.html#startUpdate">startUpdate</a></li>
+                        
                             <li data-name="ns.page.title"><a href="ns.page.html#title">title</a></li>
                         
                     </ul>
@@ -550,6 +558,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.router~route"><a href="ns.router.html#route">route</a></li>
             
             </ul>
 
@@ -924,13 +936,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -939,6 +944,8 @@
                             <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
                         
                             <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
+                        
+                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
                         
                     </ul>
                 
@@ -961,6 +968,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
+                
                     <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
                 
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
@@ -974,6 +983,8 @@
                     <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
                 
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
                 
                     <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
@@ -1052,6 +1063,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
+                
                     <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
@@ -1092,6 +1105,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
@@ -1150,6 +1167,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
@@ -1252,12 +1271,10 @@
 <li><a href="#async">async</a></li>
 </ul>
 <h2>Декларация</h2><p>Определение нового вида происходит через статическую функцию <code>ns.View.define</code></p>
-<pre><code class="lang-js">ns.View.define('viewName', viewDeclObject[, baseView])
-</code></pre>
-<p>Объект-декларация состоит из следующих свойств.</p>
+<pre class="prettyprint source"><code>ns.View.define('viewName', viewDeclObject[, baseView])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
 <h3>ctor</h3><p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самого вида, т.о. в конструкторе еще не доступеы некоторые свойства.</p>
 <p>Полностью готовый экземпляр бросает событие <code>ns-view-init</code>.</p>
-<pre><code>/**
+<pre class="prettyprint source"><code>/**
  * @classdesc prj.vMyView
  * @augments ns.View
  */
@@ -1269,38 +1286,29 @@ ns.View.define('my-view', {
         this._state = 'initial';
         this.CONST = 100;
     }
-});
-</code></pre><h3><code>events</code></h3><p><code>events</code> - объект с декларацией подписок на события, как DOM, так и noscript.</p>
+});</code></pre><h3><code>events</code></h3><p><code>events</code> - объект с декларацией подписок на события, как DOM, так и noscript.</p>
 <p>Любая подписка имеет вид:</p>
-<pre><code class="lang-json">{
-    &quot;на что подписаться@когда&quot;: &quot;обработчик&quot;
-}
-</code></pre>
-<p>Обработчиков может быть названием метода из прототипа или функция. Все обработчики вызываются в контексте вида.</p>
+<pre class="prettyprint source"><code>{
+    "на что подписаться@когда": "обработчик"
+}</code></pre><p>Обработчиков может быть названием метода из прототипа или функция. Все обработчики вызываются в контексте вида.</p>
 <p>События с суффиксом <code>@show</code> вешаются во время показа вида (событие <code>ns-view-show</code>) и снимаются во время скрытия (событие <code>ns-view-hide</code>).
 Аналогично, суффикс <code>@init</code> означает, что событие будет активировано на <code>ns-view-htmlinit</code> и деактивировано на <code>ns-view-htmldestroy</code>.</p>
 <h4>DOM-события</h4><p>DOM-события от события noscript различаются согласно массиву <code>ns.V.DOM_EVENTS</code>. Все, что не входит в этот массив, является &quot;космическим&quot; событием noscript.</p>
 <p>DOM-события навешиваются через механизм делегирования.</p>
 <p>Примеры деклараций:</p>
-<pre><code class="lang-js">{
+<pre class="prettyprint source"><code>{
     // событие click на корневой ноде вида
-    &quot;click&quot;: &quot;onClick&quot;,
+    "click": "onClick",
     // событие click на нодах к классом selector внутри вида
-    &quot;click .selector&quot;: &quot;onSelectorClick&quot;,
-    &quot;click@init .selector&quot;: &quot;onInitSelectorClick&quot;
-}
-</code></pre>
-<h4>&quot;Космические&quot; события noscript</h4><p>Декларируются как и остальные события</p>
-<pre><code class="lang-js">{
-    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
-    &quot;my-custom-init@init&quot;: &quot;onCustomInit&quot;
-}
-</code></pre>
-<p>Если не указано когда вешать обработчик, то оно будет навешан при показе вида и снят при скрытии.</p>
+    "click .selector": "onSelectorClick",
+    "click@init .selector": "onInitSelectorClick"
+}</code></pre><h4>&quot;Космические&quot; события noscript</h4><p>Декларируются как и остальные события</p>
+<pre class="prettyprint source"><code>{
+    "my-custom-event": "onCustomEvent",
+    "my-custom-init@init": "onCustomInit"
+}</code></pre><p>Если не указано когда вешать обработчик, то оно будет навешан при показе вида и снят при скрытии.</p>
 <p>&quot;Косимческие&quot; события работают через единую шину <code>ns.events</code></p>
-<pre><code class="lang-js">ns.events.trigger('my-custom-event');
-</code></pre>
-<h4>Встроенные события</h4><p>Список событий:</p>
+<pre class="prettyprint source"><code>ns.events.trigger('my-custom-event');</code></pre><h4>Встроенные события</h4><p>Список событий:</p>
 <ul>
 <li><code>ns-view-hide</code> - вида был скрыт и больше не виден на странице</li>
 <li><code>ns-view-htmldestroy</code> - старая нода у вида была уничтожена</li>
@@ -1323,7 +1331,7 @@ ns.View.define('my-view', {
 <li>view был перерисован: <code>ns-view-hide -> ns-view-htmldestroy -> ns-view-htmlinit -> ns-view-show -> ns-view-touch</code> (<code>ns-view-hide</code> тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на <code>ns-view-show/ns-view-hide</code> и при обновлении ноды, они должны быть переинициализированы)</li>
 </ul>
 <h3>methods</h3><p><code>methods</code> - объект с методами вида. По сути является прототипом объекта.</p>
-<pre><code>/**
+<pre class="prettyprint source"><code>/**
  * @classdesc prj.vMyView
  * @augments ns.View
  */
@@ -1333,8 +1341,7 @@ ns.View.define('my-view', {
         BAR: 100
         foo: function(){}
     }
-});
-</code></pre><h3>models</h3><p><code>models</code> позволяет указать модели, от которых зависит вид. Зависимость означает, что</p>
+});</code></pre><h3>models</h3><p><code>models</code> позволяет указать модели, от которых зависит вид. Зависимость означает, что</p>
 <ol>
 <li>параметры вида будут собраны на основе параметров связанных моделей</li>
 <li>в шаблонах будут доступны вида данные связанных моделей</li>
@@ -1349,36 +1356,28 @@ ns.View.define('my-view', {
 и не подписывается на событие <code>ns-model-touched</code>.</li>
 </ul>
 <p>Если обработчики явно не указаны, то в качестве обработчика стандартных событий устанавливается метод <code>invalidate</code>.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   models: ['album', 'photo']
-});
-</code></pre>
-<p>В приведённом примере вид будет инвалидироваться при любом стандартном событии модели.</p>
+});</code></pre><p>В приведённом примере вид будет инвалидироваться при любом стандартном событии модели.</p>
 <p>Инвалидировать вид можно так же по любым другим событиям модели. Для этого в декларации нужно явно указать событие и обработчик.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   models: {album: {
     'ns-model-boof': 'invalidate'
   }}
-});
-</code></pre>
-<p>Для того, чтобы предотвратить инвалидацию вида по конекретному событию, в качестве обработчика нужно явно указать метод <code>keepValid</code>.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+});</code></pre><p>Для того, чтобы предотвратить инвалидацию вида по конекретному событию, в качестве обработчика нужно явно указать метод <code>keepValid</code>.</p>
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   models: {album: {
     `ns-model-changed`: 'keepValid'
   }}
-});
-</code></pre>
-<p>В приведённом примере при наступлении события ns-model-changed вид будет оставаться валидным и не будет перерисован при последующих update'ах. При любом другом стандартном событии модели он будет проинвалидирован.</p>
+});</code></pre><p>В приведённом примере при наступлении события ns-model-changed вид будет оставаться валидным и не будет перерисован при последующих update'ах. При любом другом стандартном событии модели он будет проинвалидирован.</p>
 <p>Для того, чтобы предотвратить инвалидацию вида по любому событию, <code>keepValid</code> нужно установить значением поля модели.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   models: {album: 'keepValid'}
-});
-</code></pre>
-<p>В приведённом примере события модели <code>album</code> не будут влиять на валидность вида.</p>
+});</code></pre><p>В приведённом примере события модели <code>album</code> не будут влиять на валидность вида.</p>
 <p><code>'invalidate' и 'keepValid'</code> - это имена реальных методов. Вместо них можно указать имя любого другого метода вида.</p>
 <p>Если нужно в качестве обработчика события использовать произвольный метод, и при этом инвалидировать вид, достаточно внутри метода вызвать <code>this.invalidate();</code>.</p>
 <p>Для краткости вместо методов <code>invalidate</code> и <code>keepValid</code> можно указывать их краткую форму: <code>true</code> и <code>false</code> соответственно. 2 варианта деклараций в следующем примере работают одинаково.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   models: {
     photo: 'invalidate',
     album: 'keepValid'
@@ -1390,42 +1389,32 @@ ns.View.define('super-view', {
     photo: true,
     album: false
   }
-});
-</code></pre>
-<p>Для большей краткости зависимости от моделей можно указывать в виде массива. Это будет эквивалентно указанию в качестве обработчика их событий метода <code>invalidate</code>.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+});</code></pre><p>Для большей краткости зависимости от моделей можно указывать в виде массива. Это будет эквивалентно указанию в качестве обработчика их событий метода <code>invalidate</code>.</p>
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   models: ['photo', 'album']
-});
-</code></pre>
-<h3>Параметры</h3><p>Параметры нужны для построения ключа.</p>
+});</code></pre><h3>Параметры</h3><p>Параметры нужны для построения ключа.</p>
 <p>По умолчанию, если <code>params</code> не указан, то параметры собираются из параметров всех моделей в порядке их объявления.
 Добавлять или удалять из собранных параметров моделей можно с помощью объектов <code>params+</code> и <code>params-</code></p>
 <p>Если <code>params</code> явно заданы — нельзя использовать <code>params+</code> / <code>params-</code>.</p>
 <p>Если ключ view нельзя построить бросается <strong>исключение</strong>.</p>
 <h4>params+</h4><p>Добавляет в результирующий набор дополнительные параметры:</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
-  &quot;models&quot;: [ 'album', 'photo' ],
-  &quot;params+&quot;: { page: 23 }
-});
-</code></pre>
-<h4>params-</h4><p>Удаляет из результирующего набора указанные параметры:</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
-  &quot;models&quot;: [ 'album', 'photo' ],
-  &quot;params-&quot;: [ 'album-id' ]
-});
-</code></pre>
-<h4>params</h4><p><code>params</code> может быть массивов объектов или функцией.
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
+  "models": [ 'album', 'photo' ],
+  "params+": { page: 23 }
+});</code></pre><h4>params-</h4><p>Удаляет из результирующего набора указанные параметры:</p>
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
+  "models": [ 'album', 'photo' ],
+  "params-": [ 'album-id' ]
+});</code></pre><h4>params</h4><p><code>params</code> может быть массивов объектов или функцией.
 Также можно указать объект - это короткая запись массива с одним элементом.</p>
 <p>Каждый объект представляет собой группу параметров.
 Это позволяет строить ключ по-разному в зависимости от набора.</p>
-<pre><code class="lang-js">ns.View.define('super-view', {
+<pre class="prettyprint source"><code>ns.View.define('super-view', {
   params: [
-    { &quot;context&quot;: &quot;album&quot;, &quot;album-id&quot;: null },
-    { &quot;context&quot;: null }
+    { "context": "album", "album-id": null },
+    { "context": null }
   ]
-});
-</code></pre>
-<p>Как строится ключ:</p>
+});</code></pre><p>Как строится ключ:</p>
 <ul>
 <li>каждое свойство объекта — это обязательный параметр</li>
 <li>если значение свойства <code>null</code> — параметр обязателен, но значение его может быть любым</li>
@@ -1436,26 +1425,23 @@ ns.View.define('super-view', {
 <p>Т.о. при использовании <code>params</code> все параметры являются обязательными.
 Чтобы сделать их необязательными, используйте <code>params+</code>.</p>
 <p>Если указана функция, то она строит ключ сама на основе переданных параметров.</p>
-<pre><code class="lang-js">ns.View.define('view', {
+<pre class="prettyprint source"><code>ns.View.define('view', {
   // ns.key - готовая функция для склеивания параметров в строку
   params: ns.key
-})
-</code></pre>
-<h3>rewriteParamsOnInit</h3><p>При декларации вида можно объявить специальную функцию для обработки параметров.
+})</code></pre><h3>rewriteParamsOnInit</h3><p>При декларации вида можно объявить специальную функцию для обработки параметров.
 Аргументом функции приходят параметры страницы, а функция должна вернуть обработанные параметры.</p>
 <p>Примеры использования:</p>
 <ul>
 <li>вид зависит не от параметров страницы, а от названия <code>layout</code></li>
 <li>в параметры необходимо добавить какое-то фиксированное значение</li>
 </ul>
-<pre><code>ns.View.define('my-view', {
+<pre class="prettyprint source"><code>ns.View.define('my-view', {
     rewriteParamsOnInit: function(params) {
         return {
             layout: ns.page.current.page 
         }
     }
-});
-</code></pre><h2>Валидность</h2><p>Валидность view считается по двум факторам:</p>
+});</code></pre><h2>Валидность</h2><p>Валидность view считается по двум факторам:</p>
 <ul>
 <li>собственный статус <code>ns.V.STATUS</code></li>
 <li>статус привязанных моделей</li>
@@ -1487,7 +1473,7 @@ ns.View.define('super-view', {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:19 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

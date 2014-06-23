@@ -50,6 +50,10 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.events"><a href="ns.html#events">events</a></li>
+                        
+                        <li data-name="ns.H"><a href="ns.html#H">H</a></li>
+                        
                         <li data-name="ns.IS_TOUCH"><a href="ns.html#IS_TOUCH">IS_TOUCH</a></li>
                         
                         <li data-name="ns.L"><a href="ns.html#L">L</a></li>
@@ -76,6 +80,8 @@
                             <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
                         
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
+                        
+                            <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
@@ -360,6 +366,8 @@
                         
                             <li data-name="ns.page.redirect"><a href="ns.page.html#redirect">redirect</a></li>
                         
+                            <li data-name="ns.page.startUpdate"><a href="ns.page.html#startUpdate">startUpdate</a></li>
+                        
                             <li data-name="ns.page.title"><a href="ns.page.html#title">title</a></li>
                         
                     </ul>
@@ -550,6 +558,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.router~route"><a href="ns.router.html#route">route</a></li>
             
             </ul>
 
@@ -924,13 +936,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -939,6 +944,8 @@
                             <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
                         
                             <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
+                        
+                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
                         
                     </ul>
                 
@@ -961,6 +968,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
+                
                     <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
                 
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
@@ -974,6 +983,8 @@
                     <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
                 
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
                 
                     <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
@@ -1052,6 +1063,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
+                
                     <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
@@ -1092,6 +1105,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
@@ -1150,6 +1167,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
@@ -1223,21 +1242,18 @@
     <h1>ns.ViewCollection</h1><p><code>ViewCollection</code> - это коллеция <code>ns.View</code>, привязанная к <code>ns.ModelCollection</code>.
 При изменении коллекции позволяет перерисовывать только изменившиеся элементы.</p>
 <p>По сути, образуется следующая зависимость один-к-одному:</p>
-<pre><code>ViewCollection      ->  ModelCollection
+<pre class="prettyprint source"><code>ViewCollection      ->  ModelCollection
     view-item-1     ->      model-item-1
     view-item-2     ->      model-item-2
                     ...
-    view-item-N     ->      model-item-N
-</code></pre><p><code>ns.ViewCollection</code> может зависит только от одной <code>ns.ModelCollection</code>.</p>
+    view-item-N     ->      model-item-N</code></pre><p><code>ns.ViewCollection</code> может зависит только от одной <code>ns.ModelCollection</code>.</p>
 <p><code>ns.ViewCollection</code> может содержать внутренние виды и иметь собственную html-разметку.</p>
-<h2>Декларация</h2><pre><code class="lang-js">ns.ViewCollection.define('my-view-collection', {
+<h2>Декларация</h2><pre class="prettyprint source"><code>ns.ViewCollection.define('my-view-collection', {
     models: [ 'my-model-collection' ],
     split: {
         view_id: 'my-view-collection-item'
     }
-});
-</code></pre>
-<p>Опция <code>split.view_id</code> определяет из каких <code>ns.View</code> состоит коллекция.</p>
+});</code></pre><p>Опция <code>split.view_id</code> определяет из каких <code>ns.View</code> состоит коллекция.</p>
 <p>Опция <code>models</code>, как и в ns.View определяет зависимость от моделей и подписки на их события.
 По умолчанию ViewCollection делает следующие подписки:</p>
 <ul>
@@ -1246,11 +1262,9 @@
 События моделей, вложенных в коллекцию игнорируются и подписаться на них через декларацию нельзя.</li>
 </ul>
 <p>Декларация элемента <code>ns.ViewCollection</code> выглядит так:</p>
-<pre><code class="lang-js">ns.View.define('my-view-collection-item', {
+<pre class="prettyprint source"><code>ns.View.define('my-view-collection-item', {
     models: [ 'my-model-collection-item' ]
-});
-</code></pre>
-<p>Элемент коллекции ведет себя как обычный <code>ns.View</code> и ничего не знает про коллекцию.</p>
+});</code></pre><p>Элемент коллекции ведет себя как обычный <code>ns.View</code> и ничего не знает про коллекцию.</p>
 <p>Элементы коллекции помещаются в узел-контейнер, размеченный классом <code>ns-view-container-desc</code>.
 Узел-контейнер <strong>обязательно</strong> должен быть указан. Вне этого контейнера можно делать собcтвенную html-разметку.</p>
 </article>
@@ -1267,7 +1281,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:19 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

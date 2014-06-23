@@ -50,6 +50,10 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.events"><a href="ns.html#events">events</a></li>
+                        
+                        <li data-name="ns.H"><a href="ns.html#H">H</a></li>
+                        
                         <li data-name="ns.IS_TOUCH"><a href="ns.html#IS_TOUCH">IS_TOUCH</a></li>
                         
                         <li data-name="ns.L"><a href="ns.html#L">L</a></li>
@@ -76,6 +80,8 @@
                             <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
                         
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
+                        
+                            <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
@@ -360,6 +366,8 @@
                         
                             <li data-name="ns.page.redirect"><a href="ns.page.html#redirect">redirect</a></li>
                         
+                            <li data-name="ns.page.startUpdate"><a href="ns.page.html#startUpdate">startUpdate</a></li>
+                        
                             <li data-name="ns.page.title"><a href="ns.page.html#title">title</a></li>
                         
                     </ul>
@@ -550,6 +558,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.router~route"><a href="ns.router.html#route">route</a></li>
             
             </ul>
 
@@ -924,13 +936,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -939,6 +944,8 @@
                             <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
                         
                             <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
+                        
+                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
                         
                     </ul>
                 
@@ -961,6 +968,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
+                
                     <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
                 
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
@@ -974,6 +983,8 @@
                     <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
                 
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
                 
                     <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
@@ -1052,6 +1063,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
+                
                     <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
@@ -1092,6 +1105,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
@@ -1150,6 +1167,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
@@ -1221,18 +1240,17 @@
 
 <article>
     <h2>Раскладка страницы (ns.Layout)</h2><p>Раскладка служит для декларативного описания структуры видов на странице. При определении раскладки указывается её id и декларация.</p>
-<pre><code>    ns.layout.define('main', {
+<pre class="prettyprint source"><code>    ns.layout.define('main', {
         app: {
             view1: true,
             view2: {
                 view21: true
             }
         }
-    });
-</code></pre><p>В примере создаётся раскладка страницы, состоящей из четырёх видов. Корневой вид <code>app</code> содержит в себе <code>view1</code> и <code>view2</code>, а <code>view2</code> содержит в себе <code>view21</code>.</p>
+    });</code></pre><p>В примере создаётся раскладка страницы, состоящей из четырёх видов. Корневой вид <code>app</code> содержит в себе <code>view1</code> и <code>view2</code>, а <code>view2</code> содержит в себе <code>view21</code>.</p>
 <p>Каждый узел декларации соответствует виду. Ключ указывает на класс вида, в значении содержится декларация вложенных видов.</p>
 <p>Способы описания структуры видов</p>
-<pre><code>    ns.layout.define('main', {
+<pre class="prettyprint source"><code>    ns.layout.define('main', {
         app: {
 
             // Для описания вида без вложенностей значение устанавливается в true
@@ -1267,18 +1285,16 @@
                 }
             }
         }
-    });
-</code></pre><p>Кроме описания структуры видов раскладка так же позволяет декларировать специальные атрибуты видов.</p>
+    });</code></pre><p>Кроме описания структуры видов раскладка так же позволяет декларировать специальные атрибуты видов.</p>
 <h3>Бокс</h3><p>Бокс - это специальный вид-контейнер. Он не имеет собственного html-содержимого и представлен в DOM только одним узлом, содержащим непосредственно в себе все вложенности. Бокс позволяет решать следующие задачи.</p>
 <p>Кеширование экземпляров вида</p>
-<pre><code>    ns.layout.define('main', {
+<pre class="prettyprint source"><code>    ns.layout.define('main', {
         app: {
             box@: 'view1'
         }
-    });
-</code></pre><p>В примере <code>box</code> будет содержать один вложенный вид <code>view1</code>. Если <code>view1</code> зависит от параметров, то при изменении параметров предыдущие html-узлы будут скрываться, но оставаться в DOM-дереве, а новые - добавляться в <code>box</code> и показываться. При возврате к одному из предыдущих наборов параметров будет показан ранее сгенерированный соответствующий ему html-узел.</p>
+    });</code></pre><p>В примере <code>box</code> будет содержать один вложенный вид <code>view1</code>. Если <code>view1</code> зависит от параметров, то при изменении параметров предыдущие html-узлы будут скрываться, но оставаться в DOM-дереве, а новые - добавляться в <code>box</code> и показываться. При возврате к одному из предыдущих наборов параметров будет показан ранее сгенерированный соответствующий ему html-узел.</p>
 <p>Создание динамической раскладки</p>
-<pre><code>    ns.layout.define('main', {
+<pre class="prettyprint source"><code>    ns.layout.define('main', {
         app: {
             view1: true,
             view2@: function(params) {
@@ -1296,35 +1312,31 @@
                 }
             }
         }
-    });
-</code></pre><p>В примере вид в зависимости от параметров может отсутствовать, содержать единственный вид <code>view41</code>, или содержать <code>view42</code> и <code>view43</code>, содержащие в свою очередь соответственно <code>view421</code> и <code>view431</code>. Для создания такой структуры <code>view2</code> обязательно должен быть боксом. Обычный view, содержащий вложенные виды, при их исчезновении после обновления может работать некорректно.</p>
+    });</code></pre><p>В примере вид в зависимости от параметров может отсутствовать, содержать единственный вид <code>view41</code>, или содержать <code>view42</code> и <code>view43</code>, содержащие в свою очередь соответственно <code>view421</code> и <code>view431</code>. Для создания такой структуры <code>view2</code> обязательно должен быть боксом. Обычный view, содержащий вложенные виды, при их исчезновении после обновления может работать некорректно.</p>
 <h3>Асинхронные виды</h3><p>Асинхронный вид позволяет на время загрузки его моделей рисовать его в виде заглушки. Updater запросит модели асинхронных видов отдельными запросами и отрисует страницу до получения этих данных. Загрузив модели, Updater сделает повторный проход только по асинхронным видам и обновит их.</p>
-<pre><code>    ns.layout.define('main', {
+<pre class="prettyprint source"><code>    ns.layout.define('main', {
         app: {
             viewLight: true,
             viewHard&: true
         }
-    });
-</code></pre><pre><code>    ns.View.define('viewLight', {
+    });</code></pre><pre class="prettyprint source"><code>    ns.View.define('viewLight', {
         models: ['modelLight']
     })
     ns.View.define('viewHard', {
         models: ['modelHard']
-    })
-</code></pre><pre><code>    match .view[id=&quot;viewLight&quot;] ns-view {
+    })</code></pre><pre class="prettyprint source"><code>    match .view[id="viewLight"] ns-view {
         // основное html-содержимое вида viewLight
     }
 
 
-    match .view[id=&quot;viewHard&quot;] ns-view-async {
+    match .view[id="viewHard"] ns-view-async {
         // html-содержимое заглушки для вида viewHard
     }
-    match .view[id=&quot;viewHard&quot;] ns-view {
+    match .view[id="viewHard"] ns-view {
         // основное html-содержимое вида viewHard
-    }
-</code></pre><p>Предположим, что modelLight запросить легко, а запрос modelHard требует заметного времени. При обновлении Updater запросит модели отдельно: сначала modelLight, а затем modelHard. Получив данные для modelLight, Updater отрисует страницу. Вид viewHard при этом отрисуется в виде заглушки (с использованием шаблона ns-view-async). После получения данных для modelHard Updater сделает ещё один такт обновления и вместо заглушки отрисует основное содержимое viewHard.</p>
+    }</code></pre><p>Предположим, что modelLight запросить легко, а запрос modelHard требует заметного времени. При обновлении Updater запросит модели отдельно: сначала modelLight, а затем modelHard. Получив данные для modelLight, Updater отрисует страницу. Вид viewHard при этом отрисуется в виде заглушки (с использованием шаблона ns-view-async). После получения данных для modelHard Updater сделает ещё один такт обновления и вместо заглушки отрисует основное содержимое viewHard.</p>
 <h2>Наследование</h2><p>Один layout может наследовать от другого. Наследование реализуется следующим образом</p>
-<pre><code class="lang-js">// объявляет общий layout для всех страниц
+<pre class="prettyprint source"><code>// объявляет общий layout для всех страниц
 ns.layout.define('common', {
     'app': {
         // каждая страница в проекте состоит из шапки, левой колонки и правой колонки
@@ -1358,8 +1370,7 @@ ns.layout.define('profile', {
     'app right-box@': {
         'profile': {}
     }
-}, 'common');
-</code></pre>
+}, 'common');</code></pre>
 </article>
 
 </section>  
@@ -1374,7 +1385,7 @@ ns.layout.define('profile', {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:18 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

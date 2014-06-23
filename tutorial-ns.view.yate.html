@@ -50,6 +50,10 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.events"><a href="ns.html#events">events</a></li>
+                        
+                        <li data-name="ns.H"><a href="ns.html#H">H</a></li>
+                        
                         <li data-name="ns.IS_TOUCH"><a href="ns.html#IS_TOUCH">IS_TOUCH</a></li>
                         
                         <li data-name="ns.L"><a href="ns.html#L">L</a></li>
@@ -76,6 +80,8 @@
                             <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
                         
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
+                        
+                            <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
@@ -360,6 +366,8 @@
                         
                             <li data-name="ns.page.redirect"><a href="ns.page.html#redirect">redirect</a></li>
                         
+                            <li data-name="ns.page.startUpdate"><a href="ns.page.html#startUpdate">startUpdate</a></li>
+                        
                             <li data-name="ns.page.title"><a href="ns.page.html#title">title</a></li>
                         
                     </ul>
@@ -550,6 +558,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.router~route"><a href="ns.router.html#route">route</a></li>
             
             </ul>
 
@@ -924,13 +936,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -939,6 +944,8 @@
                             <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
                         
                             <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
+                        
+                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
                         
                     </ul>
                 
@@ -961,6 +968,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
+                
                     <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
                 
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
@@ -974,6 +983,8 @@
                     <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
                 
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
                 
                     <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
@@ -1052,6 +1063,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
+                
                     <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
@@ -1092,6 +1105,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
@@ -1150,6 +1167,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
@@ -1229,105 +1248,94 @@
 <h2>Атрибуты обертки View</h2><ul>
 <li><code>ns-view-add-attrs</code> - с помощью этой моды можно дописать собственные атрибуты в DOM-обертку. Например,</li>
 </ul>
-<pre><code>match .my-view2 ns-view-add-attrs {
+<pre class="prettyprint source"><code>match .my-view2 ns-view-add-attrs {
     @data-id = 'my-id'
-}
-</code></pre><ul>
+}</code></pre><ul>
 <li><code>ns-view-add-class</code> - с помощью этой моды можно дописать собственные классы в DOM-обертку. Например,</li>
 </ul>
-<pre><code>match .my-view2 ns-view-add-attrs {
+<pre class="prettyprint source"><code>match .my-view2 ns-view-add-attrs {
     // пробел в начале обязателен
-    &quot; my-class&quot;
-}
-</code></pre><h2>Содержимое View</h2><h3>ns-view-content</h3><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
-<pre><code>match .my-view1 ns-view-content {
-    <div class=&quot;view1-content&quot;>
+    " my-class"
+}</code></pre><h2>Содержимое View</h2><h3>ns-view-content</h3><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
+<pre class="prettyprint source"><code>match .my-view1 ns-view-content {
+    <div class="view1-content">
         // в этом месте отрисуются все дочерние view с помощью хелпера ns-view-desc
         apply . ns-view-desc
     </div>
-}
-</code></pre><p>Если надо расставить виды по разным местам:</p>
-<pre><code>match .my-view2 ns-view-content {
-    <div class=&quot;view2-content&quot;>
-        <div class=&quot;view2-content__child&quot;>
+}</code></pre><p>Если надо расставить виды по разным местам:</p>
+<pre class="prettyprint source"><code>match .my-view2 ns-view-content {
+    <div class="view2-content">
+        <div class="view2-content__child">
             // в этом месте отрисуются дочерний вид my-child1
             apply /.views.my-child1 ns-view
         </div>
-        <div class=&quot;view2-content__child&quot;>
+        <div class="view2-content__child">
             // в этом месте отрисуются дочерний вид my-child2
             apply /.views.my-child2 ns-view
         </div>
     </div>
-}
-</code></pre><h3>ns-view-async-content</h3><p><code>ns-view-async-content</code> - мода отвечает за содержимое View в режиме async.
+}</code></pre><h3>ns-view-async-content</h3><p><code>ns-view-async-content</code> - мода отвечает за содержимое View в режиме async.
 В большинстве случаев тут стоит рисовать лоадер пока грузятся данные.
 В async-режиме у view не бывает дочерних элементов. Они появляются в нормальной отрисовке, когда используется <code>ns-view-content</code></p>
-<pre><code>match .my-view1 ns-view-content {
-    <div class=&quot;view1-content&quot;>
-        <img src=&quot;loader.gif&quot;/>
+<pre class="prettyprint source"><code>match .my-view1 ns-view-content {
+    <div class="view1-content">
+        <img src="loader.gif"/>
     </div>
-}
-</code></pre><h3>ns-view-error-content</h3><p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.</p>
+}</code></pre><h3>ns-view-error-content</h3><p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.</p>
 <h2>Элементы ViewСollection</h2><p>В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: <code>ns-view-content</code> и <code>ns-view-async-content</code>.
 Для управления местом вставки элементов коллекции есть мода <code>ns-view-desc</code>.
 Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.</p>
-<pre><code>match .my-view-collection ns-view-content {
-    <div class=&quot;my-view-collection__wrapper&quot;>
-        <div class=&quot;my-view-collection__text&quot;>My View Collection</div>
-        <div class=&quot;my-view-collection__items&quot;>
+<pre class="prettyprint source"><code>match .my-view-collection ns-view-content {
+    <div class="my-view-collection__wrapper">
+        <div class="my-view-collection__text">My View Collection</div>
+        <div class="my-view-collection__items">
             // сюда будут отрисованы элементы коллекции
             apply . ns-view-desc
         </div>
     </div>
-}
-</code></pre><h2>Yate-хелперы</h2><ul>
+}</code></pre><h2>Yate-хелперы</h2><ul>
 <li><code>model('model-name')</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.model-name</code></li>
 <li><code>modelError('model-name')</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.errors.model-name</code></li>
 <li><code>ns-url</code> - external-функция для <code>ns.router.generateUrl</code></li>
 </ul>
-<h2>Структура JSON для отрисовки</h2><pre><code class="lang-js">{
-    async: false,
+<h2>Структура JSON для отрисовки</h2><pre class="prettyprint source"><code>{
     box: false,
     collection: false,
-    errors: {
-        model3: {
-            error: 'http_timeout'
-        }
-    },
-    is_models_valid: true,
     key: 'view=app',
     models: {
-        model1: {}
-        model2: {}
+        model1: {
+            'data': {},
+            'status': 'ok'
+        },
+        model2: {
+            'data': {},
+            'status': 'ok'
+        },
+        model3: {
+            data: 'http_timeout',
+            'status': 'error'
+        }
     },
-    page: {},
     params: {},
-    placeholder: false,
+    state: 'ok',
     views: {}
-}
-</code></pre>
-<p><strong>Публичные свойства</strong>:</p>
+}</code></pre><p><strong>Публичные свойства</strong>:</p>
 <ul>
-<li><code>is_models_valid</code>: boolean. Флаг валидности моделей вида.</li>
 <li><code>key</code>: string. Ключ вида.</li>
-<li><code>page</code>: object. Ссылка на объект <code>ns.page.current</code>.</li>
 <li><code>params</code>: object. Собственные параметры вида.</li>
-<li><code>views</code>: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:<pre><code>{
- &quot;views&quot;: {
-     &quot;view1Name&quot;: view1Tree
-     &quot;view2Name&quot;: view2Tree
+<li><code>views</code>: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:<pre class="prettyprint source"><code>{
+ "views": {
+     "view1Name": view1Tree
+     "view2Name": view2Tree
  }
-}
-</code></pre></li>
+}</code></pre></li>
 </ul>
 <p><strong>Приватные свойства</strong>:</p>
 <ul>
-<li><code>async</code>: boolean. Флаг указывающий, что вид сейчас не готов и у него вызывается <code>ns-view-async-content</code></li>
 <li><code>box</code>: boolean. Флаг того, что это бокс.</li>
 <li><code>collection</code>: boolean. Флаг того, что это вид-коллекция.</li>
-<li><code>errors</code>: object. Объект с моделями, для которых не удалось получить данные и сами данные ошибки. Не стоит использовать его напрямую. Лучше вызывать yate-функцию <code>modelError()</code>.</li>
-<li><code>models</code>: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функцию <code>model()</code>.</li>
-<li><code>placeholder</code>: boolean. Флаг того, что этот вид валиден и будут отрисованы только его дети.</li>
+<li><code>models</code>: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функции <code>model()</code> и <code>modelError()</code>.</li>
+<li><code>state</code>: Текущее состояние вида. ok/error/loading/placeholder</li>
 </ul>
 </article>
 
@@ -1343,7 +1351,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:19 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

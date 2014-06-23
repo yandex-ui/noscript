@@ -50,6 +50,10 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.events"><a href="ns.html#events">events</a></li>
+                        
+                        <li data-name="ns.H"><a href="ns.html#H">H</a></li>
+                        
                         <li data-name="ns.IS_TOUCH"><a href="ns.html#IS_TOUCH">IS_TOUCH</a></li>
                         
                         <li data-name="ns.L"><a href="ns.html#L">L</a></li>
@@ -76,6 +80,8 @@
                             <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
                         
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
+                        
+                            <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
                         
@@ -360,6 +366,8 @@
                         
                             <li data-name="ns.page.redirect"><a href="ns.page.html#redirect">redirect</a></li>
                         
+                            <li data-name="ns.page.startUpdate"><a href="ns.page.html#startUpdate">startUpdate</a></li>
+                        
                             <li data-name="ns.page.title"><a href="ns.page.html#title">title</a></li>
                         
                     </ul>
@@ -550,6 +558,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.router~route"><a href="ns.router.html#route">route</a></li>
             
             </ul>
 
@@ -924,13 +936,6 @@
 
             
                 
-                    <ul class="members itemMembers">
-                        <span class="subtitle">Static members</span>
-                        
-                        <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
-                        
-                    </ul>
-                
 
                 
                     <ul class="methods itemMembers">
@@ -939,6 +944,8 @@
                             <li data-name="ns.Update._addToQueue"><a href="ns.Update.html#_addToQueue">_addToQueue</a></li>
                         
                             <li data-name="ns.Update._removeFromQueue"><a href="ns.Update.html#_removeFromQueue">_removeFromQueue</a></li>
+                        
+                            <li data-name="ns.Update.handleError"><a href="ns.Update.html#handleError">handleError</a></li>
                         
                     </ul>
                 
@@ -961,6 +968,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
+                
                     <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
                 
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
@@ -974,6 +983,8 @@
                     <li data-name="ns.Update#prefetch"><a href="ns.Update.html#prefetch">prefetch</a></li>
                 
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
+                
+                    <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
                 
                     <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
@@ -1052,6 +1063,8 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
+                
                     <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
@@ -1092,6 +1105,10 @@
             
 
             <ul class="typedefs itemMembers">
+            
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
@@ -1150,6 +1167,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
@@ -1395,7 +1414,7 @@
     
         
         <div class="tag-source">
-            ns.page.js, line 134
+            ns.page.js, line 172
         </div>
         
     </div>
@@ -1466,7 +1485,7 @@
     
         
         <div class="tag-source">
-            ns.page.js, line 127
+            ns.page.js, line 165
         </div>
         
     </div>
@@ -1722,7 +1741,7 @@ Should be redefined.</p>
     
         
         <div class="tag-source">
-            ns.page.js, line 101
+            ns.page.js, line 140
         </div>
         
     </div>
@@ -1836,14 +1855,14 @@ Should be redefined.</p>
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="title">
+        <h4 class="name" id="startUpdate">
             
-            <span class="type-signature static">static</span>ns.page.title<span class="signature">(url)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
+            <span class="type-signature static">static</span>ns.page.startUpdate<span class="signature">(route)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.page.js, line 111
+            ns.page.js, line 96
         </div>
         
     </div>
@@ -1854,7 +1873,7 @@ Should be redefined.</p>
     
     
     <div class="description">
-        <p>Returns document title.</p>
+        <p>Запускает процесс отрисовки страницы.</p>
     </div>
     
 
@@ -1885,13 +1904,13 @@ Should be redefined.</p>
 	
         <tr>
             
-                <td class="name"><code>url</code></td>
+                <td class="name"><code>route</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="ns.router.html#route">ns.router~route</a></span>
 
 
             
@@ -1901,12 +1920,88 @@ Should be redefined.</p>
             
             <td class="description last">
                 
-                <p>Page URL.</p></td>
+                <p>Маршрут для перехода.</p></td>
         </tr>
 	
 	
 	</tbody>
 </table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="title">
+            
+            <span class="type-signature static">static</span>ns.page.title<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.page.js, line 149
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets document title.</p>
+    </div>
+    
+
+    
+    
+    
+    
     
     
     
@@ -1972,7 +2067,7 @@ Should be redefined.</p>
     
         
         <div class="tag-source">
-            ns.page.js, line 143
+            ns.page.js, line 181
         </div>
         
     </div>
@@ -2043,7 +2138,7 @@ Should be redefined.</p>
     
         
         <div class="tag-source">
-            ns.page.js, line 69
+            ns.page.js, line 67
         </div>
         
     </div>
@@ -2182,7 +2277,7 @@ Should be redefined.</p>
     
         
         <div class="tag-source">
-            ns.page.js, line 158
+            ns.page.js, line 196
         </div>
         
     </div>
@@ -2261,7 +2356,7 @@ Should be redefined.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Jun 17 2014 18:34:53 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:18 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

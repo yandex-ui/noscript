@@ -14,14 +14,18 @@ external scalar ns-generate-url(/* layout */scalar, /* params */object)
  * @example
  * data = model('name')
  */
-key model( /.models.*, name() ) { . }
+key model( /.models.*[ .status == 'ok' ], name() ) {
+    .data
+}
 
 /**
  * Ключ для получения ошибки модели
  * @example
  * error = modelError('name')
  */
-key modelError( /.errors.*, name() ) { . }
+key modelError( /.models.*[ .status == 'error' ], name() ) {
+    .data
+}
 
 // @private
 match / {
@@ -42,22 +46,24 @@ match .* ns-view {
 // @private
 match .* ns-build-view {
     <div class="ns-view-{ name() }" data-key="{ /.key }">
-        if /.placeholder {
+        state = scalar(/.state)
+
+        if state == 'placeholder' {
             @class += ' ns-view-placeholder'
             apply . ns-view-desc
-        } else {
 
+        } else {
             @class += apply . ns-view-add-class
             apply . ns-view-add-attrs
-            if /.async {
-                apply . ns-view-async-content
-            } else {
-                if !/.is_models_valid {
-                    apply . ns-view-error-content
 
-                } else {
-                    apply . ns-view-content
-                }
+            if state == 'loading' {
+                apply . ns-view-async-content
+
+            } else if state == 'error' {
+                apply . ns-view-error-content
+
+            } else {
+                apply . ns-view-content
             }
         }
     </div>

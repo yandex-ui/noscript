@@ -105,31 +105,31 @@ match .my-view-collection ns-view-content {
 
 ```js
 {
-    async: false,
     box: false,
     collection: false,
-    errors: {
-        model3: {
-            error: 'http_timeout'
-        }
-    },
-    is_models_valid: true,
     key: 'view=app',
     models: {
-        model1: {}
-        model2: {}
+        model1: {
+            'data': {},
+            'status': 'ok'
+        },
+        model2: {
+            'data': {},
+            'status': 'ok'
+        },
+        model3: {
+            data: 'http_timeout',
+            'status': 'error'
+        }
     },
-    page: {},
     params: {},
-    placeholder: false,
+    state: 'ok',
     views: {}
 }
 ```
 
 **Публичные свойства**:
- - `is_models_valid`: boolean. Флаг валидности моделей вида.
  - `key`: string. Ключ вида.
- - `page`: object. Ссылка на объект `ns.page.current`.
  - `params`: object. Собственные параметры вида.
  - `views`: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:
 ```
@@ -142,9 +142,7 @@ match .my-view-collection ns-view-content {
 ```
 
 **Приватные свойства**:
- - `async`: boolean. Флаг указывающий, что вид сейчас не готов и у него вызывается `ns-view-async-content`
  - `box`: boolean. Флаг того, что это бокс.
  - `collection`: boolean. Флаг того, что это вид-коллекция.
- - `errors`: object. Объект с моделями, для которых не удалось получить данные и сами данные ошибки. Не стоит использовать его напрямую. Лучше вызывать yate-функцию `modelError()`.
- - `models`: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функцию `model()`.
- - `placeholder`: boolean. Флаг того, что этот вид валиден и будут отрисованы только его дети.
+ - `models`: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функции `model()` и `modelError()`.
+ - `state`: Текущее состояние вида. ok/error/loading/placeholder

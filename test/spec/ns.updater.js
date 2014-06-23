@@ -744,7 +744,6 @@ describe('ns.Updater', function() {
             var renderJSON = {
                 'views': {
                     'main': {
-                        'async': false,
                         'models': {},
                         'params': {},
                         'tree': {

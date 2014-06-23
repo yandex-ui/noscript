@@ -11,7 +11,6 @@ var no = require('nommon');
 /* borschik:include:../src/ns.object.js */
 /* borschik:include:../src/ns.profile.js */
 
-/* borschik:include:../src/ns.box.js */
 /* borschik:include:../src/ns.model.js */
 /* borschik:include:../src/ns.modelCollection.js */
 /* borschik:include:../src/ns.layout.js */
@@ -22,5 +21,8 @@ var no = require('nommon');
 /* borschik:include:../src/ns.update.js */
 /* borschik:include:../src/ns.view.js */
 /* borschik:include:../src/ns.viewCollection.js */
+
+// ns.box должен подключаться после ns.view, т.к. берет методы из него
+/* borschik:include:../src/ns.box.js */
 
 module.exports = ns;

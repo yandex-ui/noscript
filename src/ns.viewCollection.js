@@ -228,7 +228,7 @@ ns.ViewCollection.prototype._getRequestViews = ns.View.prototype._tryPushToReque
  * @param {object} tree
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @returns {ns.View~UpdateTree}
  * @private
  */
 ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
@@ -249,7 +249,7 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
  *
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @returns {object.<string, ns.View~UpdateTree>}
  * @private
  */
 ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
@@ -305,14 +305,14 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
  *
  * @param {object} layout
  * @param {object} params
- * @returns {object}
+ * @returns {ns.View~UpdateTree}
  * @private
  */
 ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     var tree = this._getTree();
     tree.collection = true;
     // всегда собираем данные, в том числе закешированные модели для async-view
-    tree.models = this._getModelsData();
+    tree.models = this._getModelsForTree();
 
     tree.views = this._getDescViewTree(layout, params);
 

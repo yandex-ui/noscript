@@ -57,15 +57,16 @@ describe('ns.View error handling', function() {
                 var renderJSON = {
                     'views': {
                         'app': {
-                            'is_models_valid': true,
+                            'state': 'ok',
                             'models': {},
-                            'errors': {},
                             'views': {
                                 'letter': {
-                                    'is_models_valid': false,
-                                    'models': {},
-                                    'errors': {
-                                        'letter': 'letter not found'
+                                    'state': 'error',
+                                    'models': {
+                                        'letter': {
+                                            'status': 'error',
+                                            'data': 'letter not found'
+                                        }
                                     }
                                 }
                             }

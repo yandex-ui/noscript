@@ -20,6 +20,8 @@ ns.Box = function(id, params) {
     this._visible = false;
 };
 
+ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
+
 /**
  *
  * @param {string} id
@@ -119,19 +121,8 @@ ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
  * @private
  */
 ns.Box.prototype._getViewTree = function(layout, params) {
-    //  Для бокса это всегда объект (возможно, пустой).
-    var tree = {
-        async: false,
-        box: true,
-        collection: false,
-        key: this.key,
-        is_models_valid: true,
-        placeholder: false,
-        tree: {},
-        views: {}
-    };
-
-    tree.tree[this.id] = true;
+    var tree = this._getCommonTree();
+    tree.box = true;
 
     var views = this.views;
     for (var id in layout) {

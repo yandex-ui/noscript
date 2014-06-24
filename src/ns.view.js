@@ -813,17 +813,17 @@
         for (var id in models) {
             /** @type ns.Model */
             var model = models[id];
+            modelsData[id] = {};
             if (model.isValid()) {
-                modelsData[id] = {
-                    data: model.getData(),
-                    status: 'ok'
-                };
-
+                // successful model status
+                modelsData[id].status = 'ok';
+                // structure for convenient matching
+                modelsData[id][id] = model.getData();
             } else {
-                modelsData[id] = {
-                    data: model.getError(),
-                    status: 'error'
-                };
+                // insuccessful model status
+                modelsData[id].status = 'error';
+                // structure for convenient matching
+                modelsData[id][id] = model.getError();
             }
         }
 

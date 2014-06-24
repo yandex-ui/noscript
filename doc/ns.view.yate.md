@@ -97,8 +97,8 @@ match .my-view-collection ns-view-content {
 
 ## Yate-хелперы
 
-* `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее jpath `/.models.model-name`
-* `modelError('model-name')` - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath `/.errors.model-name`
+* `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath `/.models.model-name.model-name`
+* `modelError('model-name')` - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath `/.models.model-name.model-name`
 * `ns-url` - external-функция для `ns.router.generateUrl`
 
 ## Структура JSON для отрисовки
@@ -110,15 +110,15 @@ match .my-view-collection ns-view-content {
     key: 'view=app',
     models: {
         model1: {
-            'data': {},
+            'model1': {},
             'status': 'ok'
         },
         model2: {
-            'data': {},
+            'model2': {},
             'status': 'ok'
         },
         model3: {
-            data: 'http_timeout',
+            'model3': 'http_timeout',
             'status': 'error'
         }
     },
@@ -144,5 +144,5 @@ match .my-view-collection ns-view-content {
 **Приватные свойства**:
  - `box`: boolean. Флаг того, что это бокс.
  - `collection`: boolean. Флаг того, что это вид-коллекция.
- - `models`: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функции `model()` и `modelError()`.
+ - `models`: object. Объект с данными моделей. Не предназначен для прямого использования. Для получения моделей всегда используйте yate-хелперы `model()` и `modelError()`.
  - `state`: Текущее состояние вида. ok/error/loading/placeholder

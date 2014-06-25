@@ -261,19 +261,19 @@ describe('ns.View', function() {
                     'test-view-render_complex': {
                         models: {
                             a: {
-                                data: {
+                                a: {
                                     data: 'a'
                                 },
                                 status: 'ok'
                             },
                             b: {
-                                data: {
+                                b: {
                                     error: 'b invalid'
                                 },
                                 status: 'error'
                             },
                             c: {
-                                data: {
+                                c: {
                                     error: 'c invalid'
                                 },
                                 status: 'error'

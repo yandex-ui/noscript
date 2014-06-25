@@ -65,7 +65,7 @@ describe('ns.View error handling', function() {
                                     'models': {
                                         'letter': {
                                             'status': 'error',
-                                            'data': 'letter not found'
+                                            'letter': 'letter not found'
                                         }
                                     }
                                 }
@@ -73,7 +73,7 @@ describe('ns.View error handling', function() {
                         }
                     }
                 };
-                expect(ns.renderString.calledWithMatch(renderJSON)).to.be.equal(true);
+                expect(ns.renderString.calledWithMatch(renderJSON)).to.be.ok;
                 finish();
             });
         });

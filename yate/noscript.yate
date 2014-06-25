@@ -15,7 +15,7 @@ external scalar ns-generate-url(/* layout */scalar, /* params */object)
  * data = model('name')
  */
 key model( /.models.*[ .status == 'ok' ], name() ) {
-    .data
+    .*[ name() != 'status' ]
 }
 
 /**
@@ -24,7 +24,7 @@ key model( /.models.*[ .status == 'ok' ], name() ) {
  * error = modelError('name')
  */
 key modelError( /.models.*[ .status == 'error' ], name() ) {
-    .data
+    .*[ name() != 'status' ]
 }
 
 // @private

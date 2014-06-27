@@ -1340,7 +1340,9 @@
                 var modelInfo = ns.Model.info(model_id);
                 ns.assert(modelInfo, ns.View, 'Model %s is not defined!', model_id);
 
-                no.extend( params, modelInfo.params );
+                if (typeof modelInfo.params === 'object') {
+                    no.extend( params, modelInfo.params );
+                }
             }
 
             //  Массив с параметрами, которые надо исключить из ключа.

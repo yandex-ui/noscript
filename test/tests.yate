@@ -53,3 +53,11 @@ match .view-test-matcher ns-view-content {
         /.key
     </div>
 }
+
+match .vc-mixed-item1 ns-view-content {
+    <div>vc-mixed-item1</div>
+}
+
+match .vc-mixed-item2 ns-view-content {
+    <div>vc-mixed-item2</div>
+}

@@ -807,6 +807,7 @@
      */
     ns.View.prototype._getPlaceholderTree = function(layout, params) {
         var tree = this._getTree();
+        tree.collection = true;
         tree.state = 'placeholder';
         tree.views = this._getDescViewTree(layout, params);
 

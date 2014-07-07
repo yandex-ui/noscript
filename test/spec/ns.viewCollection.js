@@ -61,6 +61,101 @@ describe('ns.ViewCollection', function() {
 
     });
 
+    describe('Разнородная коллекция', function() {
+
+        beforeEach(function(finish) {
+            ns.Model.define('mc-item1', {
+                params: { id: null }
+            });
+
+            ns.Model.define('mc-item2', {
+                params: { id: null }
+            });
+
+            ns.Model.define('mc-item3', {
+                params: { id: null }
+            });
+
+            ns.Model.define('mc-mixed', {
+                split: {
+                    items: '.item',
+                    params: { id: '.id' },
+                    model_id: function(itemData) {
+                        return 'mc-item' + itemData.type;
+                    }
+                }
+            });
+
+            ns.Model.get('mc-mixed').setData({
+                item: [
+                    {type: 1, id: 1},
+                    {type: 2, id: 2},
+                    {type: 3, id: 3}
+                ]
+            });
+
+            this.viewSplitter = this.sinon.spy(function(model) {
+                if (model.id === 'mc-item3') {
+                    return false;
+                }
+                return 'vc-item' + model.get('.type');
+            });
+
+            ns.ViewCollection.define('vc-mixed', {
+                models: ['mc-mixed'],
+                split: {
+                    view_id: this.viewSplitter
+                }
+            });
+
+            ns.View.define('vc-item1', {
+                models: ['mc-item1']
+            });
+
+            ns.View.define('vc-item2', {
+                models: ['mc-item2']
+            });
+
+            ns.layout.define('vc-mixed', {
+                'vc-mixed': {}
+            });
+            var layout = ns.layout.page('vc-mixed', {});
+
+            this.view = ns.View.create('vc-mixed');
+
+            new ns.Update(this.view, layout, {})
+                .start()
+                .then(function() {
+                    finish();
+                }, function(e) {
+                    finish(e)
+                });
+        });
+
+        afterEach(function() {
+            delete this.view;
+            delete this.viewSplitter;
+        });
+
+        it('должен вызвать функцию из view_id для каждого элемента', function() {
+            // по 2 раза для каждого элемента
+            expect(this.viewSplitter).to.have.callCount(6);
+        });
+
+        it('должен создать элемент vc-item1', function() {
+            expect(this.view.node.getElementsByClassName('ns-view-vc-item1')).to.have.length(1);
+        });
+
+        it('должен создать элемент vc-item2', function() {
+            expect(this.view.node.getElementsByClassName('ns-view-vc-item2')).to.have.length(1);
+        });
+
+        it('не должен создать элемент vc-item3', function() {
+            expect(this.view.node.getElementsByClassName('ns-view-vc-item3')).to.have.length(0);
+        });
+
+    });
+
     describe('redraw ViewCollection within parent view', function() {
 
         beforeEach(function(finish) {
@@ -283,8 +378,10 @@ describe('ns.ViewCollection', function() {
                 var layout = ns.layout.page('app', {});
                 new ns.Update(this.APP, layout, {})
                     .start()
-                    .done(function() {
+                    .then(function() {
                         finish();
+                    }, function(e) {
+                        finish(e);
                     });
             });
 
@@ -311,8 +408,10 @@ describe('ns.ViewCollection', function() {
                 var layout = ns.layout.page('app', {});
                 new ns.Update(this.APP, layout, {})
                     .start()
-                    .done(function() {
+                    .then(function() {
                         finish();
+                    }, function(e) {
+                        finish(e);
                     });
             });
 

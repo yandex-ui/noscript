@@ -2,6 +2,9 @@
  * @fileOverview Common yate templates for noscript
  */
 
+/**
+ * Мост к ns.router.url
+ */
 external scalar ns-url(scalar)
 
 /**

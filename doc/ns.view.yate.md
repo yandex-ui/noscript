@@ -99,7 +99,8 @@ match .my-view-collection ns-view-content {
 
 * `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath `/.models.model-name.model-name`
 * `modelError('model-name')` - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath `/.models.model-name.model-name`
-* `ns-url` - external-функция для `ns.router.generateUrl`
+* `ns-url` - external-функция для `ns.router.url`
+* `ns-generate-url` - external-функция для `ns.router.generateUrl`
 
 ## Структура JSON для отрисовки
 

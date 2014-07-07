@@ -45,3 +45,11 @@ match .test-yate-helper-model ns-view-content {
         modelError('b')
     </div>
 }
+
+match .view-test-matcher ns-view-content {
+    <div>test-view-matcher content</div>
+    <div>
+        "test-view-matcher key "
+        /.key
+    </div>
+}

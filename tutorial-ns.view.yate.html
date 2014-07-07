@@ -77,8 +77,6 @@
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
                         
-                            <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
-                        
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
@@ -480,6 +478,8 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.request.forcedRequest"><a href="ns.request.html#forcedRequest">forcedRequest</a></li>
+                        
                         <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
                         
                         <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
@@ -747,7 +747,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.Model#event:ns-model-changed"><a href="ns.Model.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.Model#event:ns-model-init"><a href="ns.Model.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.Model#event:ns-model-touched"><a href="ns.Model.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -842,7 +846,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -923,7 +931,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelUniq#event:ns-model-changed"><a href="ns.ModelUniq.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelUniq#event:ns-model-init"><a href="ns.ModelUniq.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelUniq#event:ns-model-touched"><a href="ns.ModelUniq.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -1053,7 +1065,11 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
+                
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+                
+                    <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1158,7 +1174,11 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+                
+                    <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1255,21 +1275,21 @@
 </ul>
 <pre class="prettyprint source"><code>match .my-view2 ns-view-add-attrs {
     // пробел в начале обязателен
-    " my-class"
+    &quot; my-class&quot;
 }</code></pre><h2>Содержимое View</h2><h3>ns-view-content</h3><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
 <pre class="prettyprint source"><code>match .my-view1 ns-view-content {
-    <div class="view1-content">
+    <div class=&quot;view1-content&quot;>
         // в этом месте отрисуются все дочерние view с помощью хелпера ns-view-desc
         apply . ns-view-desc
     </div>
 }</code></pre><p>Если надо расставить виды по разным местам:</p>
 <pre class="prettyprint source"><code>match .my-view2 ns-view-content {
-    <div class="view2-content">
-        <div class="view2-content__child">
+    <div class=&quot;view2-content&quot;>
+        <div class=&quot;view2-content__child&quot;>
             // в этом месте отрисуются дочерний вид my-child1
             apply /.views.my-child1 ns-view
         </div>
-        <div class="view2-content__child">
+        <div class=&quot;view2-content__child&quot;>
             // в этом месте отрисуются дочерний вид my-child2
             apply /.views.my-child2 ns-view
         </div>
@@ -1278,41 +1298,41 @@
 В большинстве случаев тут стоит рисовать лоадер пока грузятся данные.
 В async-режиме у view не бывает дочерних элементов. Они появляются в нормальной отрисовке, когда используется <code>ns-view-content</code></p>
 <pre class="prettyprint source"><code>match .my-view1 ns-view-content {
-    <div class="view1-content">
-        <img src="loader.gif"/>
+    <div class=&quot;view1-content&quot;>
+        <img src=&quot;loader.gif&quot;/>
     </div>
 }</code></pre><h3>ns-view-error-content</h3><p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.</p>
 <h2>Элементы ViewСollection</h2><p>В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: <code>ns-view-content</code> и <code>ns-view-async-content</code>.
 Для управления местом вставки элементов коллекции есть мода <code>ns-view-desc</code>.
 Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.</p>
 <pre class="prettyprint source"><code>match .my-view-collection ns-view-content {
-    <div class="my-view-collection__wrapper">
-        <div class="my-view-collection__text">My View Collection</div>
-        <div class="my-view-collection__items">
+    <div class=&quot;my-view-collection__wrapper&quot;>
+        <div class=&quot;my-view-collection__text&quot;>My View Collection</div>
+        <div class=&quot;my-view-collection__items&quot;>
             // сюда будут отрисованы элементы коллекции
             apply . ns-view-desc
         </div>
     </div>
 }</code></pre><h2>Yate-хелперы</h2><ul>
-<li><code>model('model-name')</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.model-name</code></li>
-<li><code>modelError('model-name')</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.errors.model-name</code></li>
+<li><code>model('model-name')</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath <code>/.models.model-name.model-name</code></li>
+<li><code>modelError('model-name')</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.model-name.model-name</code></li>
 <li><code>ns-url</code> - external-функция для <code>ns.router.generateUrl</code></li>
 </ul>
-<h2>Структура JSON для отрисовки</h2><pre class="prettyprint source"><code>{
+<h2>Структура JSON для отрисовки</h2><pre class="prettyprint source lang-js"><code>{
     box: false,
     collection: false,
     key: 'view=app',
     models: {
         model1: {
-            'data': {},
+            'model1': {},
             'status': 'ok'
         },
         model2: {
-            'data': {},
+            'model2': {},
             'status': 'ok'
         },
         model3: {
-            data: 'http_timeout',
+            'model3': 'http_timeout',
             'status': 'error'
         }
     },
@@ -1324,9 +1344,9 @@
 <li><code>key</code>: string. Ключ вида.</li>
 <li><code>params</code>: object. Собственные параметры вида.</li>
 <li><code>views</code>: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:<pre class="prettyprint source"><code>{
- "views": {
-     "view1Name": view1Tree
-     "view2Name": view2Tree
+ &quot;views&quot;: {
+     &quot;view1Name&quot;: view1Tree
+     &quot;view2Name&quot;: view2Tree
  }
 }</code></pre></li>
 </ul>
@@ -1334,7 +1354,7 @@
 <ul>
 <li><code>box</code>: boolean. Флаг того, что это бокс.</li>
 <li><code>collection</code>: boolean. Флаг того, что это вид-коллекция.</li>
-<li><code>models</code>: object. Объект с данными моделей. Не стоит использовать его напрямую. Лучше вызывать yate-функции <code>model()</code> и <code>modelError()</code>.</li>
+<li><code>models</code>: object. Объект с данными моделей. Не предназначен для прямого использования. Для получения моделей всегда используйте yate-хелперы <code>model()</code> и <code>modelError()</code>.</li>
 <li><code>state</code>: Текущее состояние вида. ok/error/loading/placeholder</li>
 </ul>
 </article>
@@ -1351,7 +1371,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:19 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:57 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

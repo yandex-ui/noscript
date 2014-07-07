@@ -77,8 +77,6 @@
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
                         
-                            <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
-                        
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
@@ -480,6 +478,8 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.request.forcedRequest"><a href="ns.request.html#forcedRequest">forcedRequest</a></li>
+                        
                         <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
                         
                         <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
@@ -747,7 +747,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.Model#event:ns-model-changed"><a href="ns.Model.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.Model#event:ns-model-init"><a href="ns.Model.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.Model#event:ns-model-touched"><a href="ns.Model.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -842,7 +846,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -923,7 +931,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelUniq#event:ns-model-changed"><a href="ns.ModelUniq.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelUniq#event:ns-model-init"><a href="ns.ModelUniq.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelUniq#event:ns-model-touched"><a href="ns.ModelUniq.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -1053,7 +1065,11 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
+                
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+                
+                    <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1158,7 +1174,11 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+                
+                    <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1262,10 +1282,10 @@
 <li><a href="#События">События</a></li>
 </ul>
 <h2>Декларация</h2><p>Определение новой модели происходит через статическую функцию <code>ns.Model.define</code></p>
-<pre class="prettyprint source"><code>ns.Model.define('modelName', modelDeclObject[, baseModel])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
+<pre class="prettyprint source lang-js"><code>ns.Model.define('modelName', modelDeclObject[, baseModel])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
 <h3>ctor</h3><p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самой модели, т.о. в конструкторе еще не доступны некоторые свойства.</p>
 <p>Полностью готовый экземпляр бросает событие <code>ns-model-init</code>.</p>
-<pre class="prettyprint source"><code>/**
+<pre class="prettyprint source lang-js"><code>/**
  * @classdesc prj.mMyModel
  * @augments ns.Model
  */
@@ -1279,15 +1299,15 @@ ns.Model.define('my-model', {
     }
 });</code></pre><h3><code>events</code></h3><p><code>events</code> - объект с декларацией подписок на события noscript.</p>
 <p>Любая подписка имеет вид:</p>
-<pre class="prettyprint source"><code>{
-    "на что подписаться": "обработчик"
+<pre class="prettyprint source lang-json"><code>{
+    &quot;на что подписаться&quot;: &quot;обработчик&quot;
 }</code></pre><p>Обработчиком может быть название метода из прототипа или функция.</p>
 <p>Пример:</p>
-<pre class="prettyprint source"><code>{
-    "my-custom-event": "onCustomEvent",
-    "my-custom-show@show": "onCustomShow"
+<pre class="prettyprint source lang-js"><code>{
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
+    &quot;my-custom-show@show&quot;: &quot;onCustomShow&quot;
 }</code></pre><h3>methods</h3><p><code>methods</code> - объект с методами. По сути является прототипом объекта.</p>
-<pre class="prettyprint source"><code>/**
+<pre class="prettyprint source lang-js"><code>/**
  * @classdesc prj.mMyModel
  * @augments ns.Model
  */
@@ -1298,7 +1318,7 @@ ns.Model.define('my-model', {
         foo: function(){}
     }
 });</code></pre><h3>params</h3><p>Параметры нужны для как для построения ключа, так и для запроса моделей с сервера.</p>
-<pre class="prettyprint source"><code>ns.Model.define('my-model', {
+<pre class="prettyprint source lang-js"><code>ns.Model.define('my-model', {
     params: {
         //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
         'author-login': null,
@@ -1315,30 +1335,30 @@ ns.Model.define('my-model', {
 <h2>Работа с данными</h2><p><strong>Методы для получения данных</strong>:</p>
 <ul>
 <li><code>#getData()</code> - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.</li>
-<li><code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.<pre class="prettyprint source"><code>{
- "foo": "1",
- "bar": [
-     { "id": 1 }
+<li><code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.<pre class="prettyprint source lang-js"><code>{
+ &quot;foo&quot;: &quot;1&quot;,
+ &quot;bar&quot;: [
+     { &quot;id&quot;: 1 }
  ]
 }
-this.get('.foo') -> "1"
-this.get('.bar.id') -> ["1"]</code></pre></li>
-<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre class="prettyprint source"><code>{
- "foo": "1",
- "bar": [
-     { "id": 1 }
+this.get('.foo') -> &quot;1&quot;
+this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
+<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre class="prettyprint source lang-js"><code>{
+ &quot;foo&quot;: &quot;1&quot;,
+ &quot;bar&quot;: [
+     { &quot;id&quot;: 1 }
  ]
 }
-this.get('.foo') -> ["1"]
-this.get('.bar.id') -> ["1"]</code></pre></li>
+this.get('.foo') -> [&quot;1&quot;]
+this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
 </ul>
 <p><strong>Методы для изменения данных</strong>:</p>
 <ul>
-<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.<pre class="prettyprint source"><code>this.set('.foo', 2);</code></pre></li>
+<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.<pre class="prettyprint source lang-js"><code>this.set('.foo', 2);</code></pre></li>
 <li><code>#setData(data)</code> - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.</li>
 </ul>
 <h2>Пре- и постобработка данных</h2><h3>extractData</h3><p>Метод извлекает данные из ответа сервера. По умолчанию берется поле <code>data</code> из ответа. Если метод не возвращает данные, то считается, что модель загружена с ошибкой.</p>
-<pre class="prettyprint source"><code>ns.Model.define('my-model', {
+<pre class="prettyprint source lang-js"><code>ns.Model.define('my-model', {
     methods: {
         extractData: function(serverResponse) {
             if (serverResponse) {
@@ -1348,7 +1368,7 @@ this.get('.bar.id') -> ["1"]</code></pre></li>
     }
 });</code></pre><h3>extractError</h3><p>Метода извлекает данные об ошибке сервера. По умолчанию берется поле <code>error</code> из ответа.</p>
 <p>Метод вызывается, когда <code>#extractData()</code> не вернул данные.</p>
-<pre class="prettyprint source"><code>ns.Model.define('my-model', {
+<pre class="prettyprint source lang-js"><code>ns.Model.define('my-model', {
     methods: {
         extractError: function(serverResponse) {
             if (serverResponse) {
@@ -1358,7 +1378,7 @@ this.get('.bar.id') -> ["1"]</code></pre></li>
     }
 });</code></pre><h3>hasDataChanged</h3><p>Этот метод может контроллировать изменились ли данные на самом деле, чтобы не вызывать лишних события и перерисовок.
 Аргументом метода являются новые данные, а старые можно получить способами описанными выше, например <code>#getData</code>. Должен вернуть <code>boolean</code>.</p>
-<pre class="prettyprint source"><code>ns.Model.define('my-model', {
+<pre class="prettyprint source lang-js"><code>ns.Model.define('my-model', {
     methods: {
         hasDataChanged: function(newData) {
             var oldData = this.getData;
@@ -1368,7 +1388,7 @@ this.get('.bar.id') -> ["1"]</code></pre></li>
     }
 });</code></pre><h3>preprocessData</h3><p>Этот метод позволяет обработать полученные данные.
 Аргументом метода являются новые данные, должен вернуть обработанные данные.</p>
-<pre class="prettyprint source"><code>ns.Model.define('my-model', {
+<pre class="prettyprint source lang-js"><code>ns.Model.define('my-model', {
     methods: {
         _index: null,
         preprocessData: function(newData) {
@@ -1401,7 +1421,7 @@ this.get('.bar.id') -> ["1"]</code></pre></li>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:19 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:57 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

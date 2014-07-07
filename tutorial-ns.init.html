@@ -77,8 +77,6 @@
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
                         
-                            <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
-                        
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
@@ -480,6 +478,8 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.request.forcedRequest"><a href="ns.request.html#forcedRequest">forcedRequest</a></li>
+                        
                         <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
                         
                         <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
@@ -747,7 +747,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.Model#event:ns-model-changed"><a href="ns.Model.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.Model#event:ns-model-init"><a href="ns.Model.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.Model#event:ns-model-touched"><a href="ns.Model.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -842,7 +846,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -923,7 +931,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelUniq#event:ns-model-changed"><a href="ns.ModelUniq.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelUniq#event:ns-model-init"><a href="ns.ModelUniq.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelUniq#event:ns-model-touched"><a href="ns.ModelUniq.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -1053,7 +1065,11 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
+                
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+                
+                    <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1158,7 +1174,11 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+                
+                    <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1241,7 +1261,7 @@
 <article>
     <h2>Инициализация приложения</h2><p>При использовании конфигурации по умолчанию вся инициализация сводится к вызову
 функции <code>ns.init</code> и запуску первого апдейта:</p>
-<pre class="prettyprint source"><code>$(function() {
+<pre class="prettyprint source lang-js"><code>$(function() {
     ns.init();
     ns.page.go();
 });</code></pre><p><code>ns.init</code> включает экшены, обрабатывает предварительно заданный роутинг и ищет
@@ -1250,9 +1270,9 @@
 <h3>Конфигурация</h3><h4>Базовый путь в URL</h4><p>До инициализации можно задать префиксный путь для всех ссылок. Это может
 пригодиться, когда ваше приложение находится не по корневому пути
 <code>app.example.com</code>, а, например, <code>app.example.com/checkout</code>:</p>
-<pre class="prettyprint source"><code>ns.router.baseDir = '/checkout';</code></pre><h4>Заголовок страницы</h4><p>Noscript позволяет задавать заголовок страницы, зависящий от текущего URL,
+<pre class="prettyprint source lang-js"><code>ns.router.baseDir = '/checkout';</code></pre><h4>Заголовок страницы</h4><p>Noscript позволяет задавать заголовок страницы, зависящий от текущего URL,
 при переходах внутри приложения. Переопределите функцию <code>ns.page.title</code>:</p>
-<pre class="prettyprint source"><code>ns.page.title = function(url) {
+<pre class="prettyprint source lang-js"><code>ns.page.title = function(url) {
     if ('/settings' == url) {
         return 'App - Account Settings'
     }
@@ -1260,16 +1280,16 @@
     return 'App';
 };</code></pre><p><em>Примечание</em>: При необходимости, для получения параметров страницы
 из полученного URL можно воспользоваться функцией <code>ns.router</code>:</p>
-<pre class="prettyprint source"><code>ns.page.title = function(url) {
+<pre class="prettyprint source lang-js"><code>ns.page.title = function(url) {
     var params = ns.router(url).params;
     // ...
 };</code></pre><h4>URL запроса моделей</h4><p>По умолчанию фреймворк группирует запросы моделей, нужных для отрисовки
 интерфейса и запрашивает их по URL <code>/models/</code> <em>вне зависимости
 от <code>ns.router.baseDir</code></em>. Переопределите константу <code>ns.request.URL</code> для задания
 собственного пути:</p>
-<pre class="prettyprint source"><code>ns.request.URL = '/models/v1/json/';</code></pre><h4>Дополнительные параметры при запросе моделей</h4><p>При необходимости пробросить дополнительные параметры при запросе моделей,
+<pre class="prettyprint source lang-js"><code>ns.request.URL = '/models/v1/json/';</code></pre><h4>Дополнительные параметры при запросе моделей</h4><p>При необходимости пробросить дополнительные параметры при запросе моделей,
 добавьте их в объект <code>ns.request.requestParams</code>:</p>
-<pre class="prettyprint source"><code>ns.request.requestParams.token = getAuthToken();
+<pre class="prettyprint source lang-js"><code>ns.request.requestParams.token = getAuthToken();
 ns.request.requestParams.version = '0.1.1';</code></pre><p>Это приведет к отправке запросов вида:</p>
 <pre class="prettyprint source"><code>Request URL: http://example.com/models/?_m=todos
 
@@ -1282,7 +1302,7 @@ Form Data:
   version: 0.1.1</code></pre><h4>Условная обработка ответа моделей</h4><p>Определение функции <code>ns.request.canProcessResponse</code> позволяет динамически
 заблокировать обработку ответа моделей, например, при несовпадении авторизации
 или рассинхронизации клиента с бекендом:</p>
-<pre class="prettyprint source"><code>ns.request.canProcessResponse = function(response) {
+<pre class="prettyprint source lang-js"><code>ns.request.canProcessResponse = function(response) {
     // На бекенде выехала новая версия, а текущий клиент засиделся.
     if (response.version != APP.version) {
         location.reload();
@@ -1293,7 +1313,7 @@ Form Data:
 };</code></pre><h4>Переопределение модуля Yate-шаблонов</h4><p>По умолчанию для генерации разметки из шаблонов используется модуль <code>main</code>,
 однако сохраняется возможность его динамического определения в зависимости от
 параметров страницы и текущего лейаута:</p>
-<pre class="prettyprint source"><code>ns.Update.prototype.applyTemplate = function(tree, params, layout) {
+<pre class="prettyprint source lang-js"><code>ns.Update.prototype.applyTemplate = function(tree, params, layout) {
     var module = 'main';
 
     if (params.context === 'setup') {
@@ -1316,7 +1336,7 @@ Form Data:
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:18 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:57 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

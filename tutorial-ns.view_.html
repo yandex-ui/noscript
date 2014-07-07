@@ -77,8 +77,6 @@
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
                         
-                            <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
-                        
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
@@ -480,6 +478,8 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.request.forcedRequest"><a href="ns.request.html#forcedRequest">forcedRequest</a></li>
+                        
                         <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
                         
                         <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
@@ -747,7 +747,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.Model#event:ns-model-changed"><a href="ns.Model.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.Model#event:ns-model-init"><a href="ns.Model.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.Model#event:ns-model-touched"><a href="ns.Model.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -842,7 +846,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -923,7 +931,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelUniq#event:ns-model-changed"><a href="ns.ModelUniq.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelUniq#event:ns-model-init"><a href="ns.ModelUniq.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelUniq#event:ns-model-touched"><a href="ns.ModelUniq.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -1053,7 +1065,11 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
+                
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+                
+                    <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1158,7 +1174,11 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+                
+                    <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1271,7 +1291,7 @@
 <li><a href="#async">async</a></li>
 </ul>
 <h2>Декларация</h2><p>Определение нового вида происходит через статическую функцию <code>ns.View.define</code></p>
-<pre class="prettyprint source"><code>ns.View.define('viewName', viewDeclObject[, baseView])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
+<pre class="prettyprint source lang-js"><code>ns.View.define('viewName', viewDeclObject[, baseView])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
 <h3>ctor</h3><p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самого вида, т.о. в конструкторе еще не доступеы некоторые свойства.</p>
 <p>Полностью готовый экземпляр бросает событие <code>ns-view-init</code>.</p>
 <pre class="prettyprint source"><code>/**
@@ -1288,27 +1308,27 @@ ns.View.define('my-view', {
     }
 });</code></pre><h3><code>events</code></h3><p><code>events</code> - объект с декларацией подписок на события, как DOM, так и noscript.</p>
 <p>Любая подписка имеет вид:</p>
-<pre class="prettyprint source"><code>{
-    "на что подписаться@когда": "обработчик"
+<pre class="prettyprint source lang-json"><code>{
+    &quot;на что подписаться@когда&quot;: &quot;обработчик&quot;
 }</code></pre><p>Обработчиков может быть названием метода из прототипа или функция. Все обработчики вызываются в контексте вида.</p>
 <p>События с суффиксом <code>@show</code> вешаются во время показа вида (событие <code>ns-view-show</code>) и снимаются во время скрытия (событие <code>ns-view-hide</code>).
 Аналогично, суффикс <code>@init</code> означает, что событие будет активировано на <code>ns-view-htmlinit</code> и деактивировано на <code>ns-view-htmldestroy</code>.</p>
 <h4>DOM-события</h4><p>DOM-события от события noscript различаются согласно массиву <code>ns.V.DOM_EVENTS</code>. Все, что не входит в этот массив, является &quot;космическим&quot; событием noscript.</p>
 <p>DOM-события навешиваются через механизм делегирования.</p>
 <p>Примеры деклараций:</p>
-<pre class="prettyprint source"><code>{
+<pre class="prettyprint source lang-js"><code>{
     // событие click на корневой ноде вида
-    "click": "onClick",
+    &quot;click&quot;: &quot;onClick&quot;,
     // событие click на нодах к классом selector внутри вида
-    "click .selector": "onSelectorClick",
-    "click@init .selector": "onInitSelectorClick"
+    &quot;click .selector&quot;: &quot;onSelectorClick&quot;,
+    &quot;click@init .selector&quot;: &quot;onInitSelectorClick&quot;
 }</code></pre><h4>&quot;Космические&quot; события noscript</h4><p>Декларируются как и остальные события</p>
-<pre class="prettyprint source"><code>{
-    "my-custom-event": "onCustomEvent",
-    "my-custom-init@init": "onCustomInit"
+<pre class="prettyprint source lang-js"><code>{
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
+    &quot;my-custom-init@init&quot;: &quot;onCustomInit&quot;
 }</code></pre><p>Если не указано когда вешать обработчик, то оно будет навешан при показе вида и снят при скрытии.</p>
 <p>&quot;Косимческие&quot; события работают через единую шину <code>ns.events</code></p>
-<pre class="prettyprint source"><code>ns.events.trigger('my-custom-event');</code></pre><h4>Встроенные события</h4><p>Список событий:</p>
+<pre class="prettyprint source lang-js"><code>ns.events.trigger('my-custom-event');</code></pre><h4>Встроенные события</h4><p>Список событий:</p>
 <ul>
 <li><code>ns-view-hide</code> - вида был скрыт и больше не виден на странице</li>
 <li><code>ns-view-htmldestroy</code> - старая нода у вида была уничтожена</li>
@@ -1344,7 +1364,7 @@ ns.View.define('my-view', {
 });</code></pre><h3>models</h3><p><code>models</code> позволяет указать модели, от которых зависит вид. Зависимость означает, что</p>
 <ol>
 <li>параметры вида будут собраны на основе параметров связанных моделей</li>
-<li>в шаблонах будут доступны вида данные связанных моделей</li>
+<li>в шаблонах вида будут доступны данные связанных моделей</li>
 <li>некоторые методы вида будут подписаны на события связанных моделей</li>
 </ol>
 <p>По умолчанию вид подписывается на следующие стандартные события модели:</p>
@@ -1356,28 +1376,28 @@ ns.View.define('my-view', {
 и не подписывается на событие <code>ns-model-touched</code>.</li>
 </ul>
 <p>Если обработчики явно не указаны, то в качестве обработчика стандартных событий устанавливается метод <code>invalidate</code>.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: ['album', 'photo']
 });</code></pre><p>В приведённом примере вид будет инвалидироваться при любом стандартном событии модели.</p>
 <p>Инвалидировать вид можно так же по любым другим событиям модели. Для этого в декларации нужно явно указать событие и обработчик.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: {album: {
     'ns-model-boof': 'invalidate'
   }}
 });</code></pre><p>Для того, чтобы предотвратить инвалидацию вида по конекретному событию, в качестве обработчика нужно явно указать метод <code>keepValid</code>.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: {album: {
     `ns-model-changed`: 'keepValid'
   }}
 });</code></pre><p>В приведённом примере при наступлении события ns-model-changed вид будет оставаться валидным и не будет перерисован при последующих update'ах. При любом другом стандартном событии модели он будет проинвалидирован.</p>
 <p>Для того, чтобы предотвратить инвалидацию вида по любому событию, <code>keepValid</code> нужно установить значением поля модели.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: {album: 'keepValid'}
 });</code></pre><p>В приведённом примере события модели <code>album</code> не будут влиять на валидность вида.</p>
 <p><code>'invalidate' и 'keepValid'</code> - это имена реальных методов. Вместо них можно указать имя любого другого метода вида.</p>
 <p>Если нужно в качестве обработчика события использовать произвольный метод, и при этом инвалидировать вид, достаточно внутри метода вызвать <code>this.invalidate();</code>.</p>
 <p>Для краткости вместо методов <code>invalidate</code> и <code>keepValid</code> можно указывать их краткую форму: <code>true</code> и <code>false</code> соответственно. 2 варианта деклараций в следующем примере работают одинаково.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: {
     photo: 'invalidate',
     album: 'keepValid'
@@ -1390,7 +1410,7 @@ ns.View.define('super-view', {
     album: false
   }
 });</code></pre><p>Для большей краткости зависимости от моделей можно указывать в виде массива. Это будет эквивалентно указанию в качестве обработчика их событий метода <code>invalidate</code>.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: ['photo', 'album']
 });</code></pre><h3>Параметры</h3><p>Параметры нужны для построения ключа.</p>
 <p>По умолчанию, если <code>params</code> не указан, то параметры собираются из параметров всех моделей в порядке их объявления.
@@ -1398,21 +1418,21 @@ ns.View.define('super-view', {
 <p>Если <code>params</code> явно заданы — нельзя использовать <code>params+</code> / <code>params-</code>.</p>
 <p>Если ключ view нельзя построить бросается <strong>исключение</strong>.</p>
 <h4>params+</h4><p>Добавляет в результирующий набор дополнительные параметры:</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
-  "models": [ 'album', 'photo' ],
-  "params+": { page: 23 }
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
+  &quot;models&quot;: [ 'album', 'photo' ],
+  &quot;params+&quot;: { page: 23 }
 });</code></pre><h4>params-</h4><p>Удаляет из результирующего набора указанные параметры:</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
-  "models": [ 'album', 'photo' ],
-  "params-": [ 'album-id' ]
-});</code></pre><h4>params</h4><p><code>params</code> может быть массивов объектов или функцией.
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
+  &quot;models&quot;: [ 'album', 'photo' ],
+  &quot;params-&quot;: [ 'album-id' ]
+});</code></pre><h4>params</h4><p><code>params</code> может быть массивом объектов или функцией.
 Также можно указать объект - это короткая запись массива с одним элементом.</p>
 <p>Каждый объект представляет собой группу параметров.
 Это позволяет строить ключ по-разному в зависимости от набора.</p>
-<pre class="prettyprint source"><code>ns.View.define('super-view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   params: [
-    { "context": "album", "album-id": null },
-    { "context": null }
+    { &quot;context&quot;: &quot;album&quot;, &quot;album-id&quot;: null },
+    { &quot;context&quot;: null }
   ]
 });</code></pre><p>Как строится ключ:</p>
 <ul>
@@ -1425,7 +1445,7 @@ ns.View.define('super-view', {
 <p>Т.о. при использовании <code>params</code> все параметры являются обязательными.
 Чтобы сделать их необязательными, используйте <code>params+</code>.</p>
 <p>Если указана функция, то она строит ключ сама на основе переданных параметров.</p>
-<pre class="prettyprint source"><code>ns.View.define('view', {
+<pre class="prettyprint source lang-js"><code>ns.View.define('view', {
   // ns.key - готовая функция для склеивания параметров в строку
   params: ns.key
 })</code></pre><h3>rewriteParamsOnInit</h3><p>При декларации вида можно объявить специальную функцию для обработки параметров.
@@ -1438,7 +1458,7 @@ ns.View.define('super-view', {
 <pre class="prettyprint source"><code>ns.View.define('my-view', {
     rewriteParamsOnInit: function(params) {
         return {
-            layout: ns.page.current.page 
+            layout: ns.page.current.page
         }
     }
 });</code></pre><h2>Валидность</h2><p>Валидность view считается по двум факторам:</p>
@@ -1447,7 +1467,7 @@ ns.View.define('super-view', {
 <li>статус привязанных моделей</li>
 </ul>
 <p>При отрисовке вид запоминает все версии моделей и в дальшейшем сравнимает их. Если версия изменилась, то вид будет перерисован.</p>
-<p>Также у вида есть собственный статус <code>this.static</code> значением, которого может быть тип ns.V.STATUS. Если статус не <code>ns.V.STATUS.OK</code>, то вид будет перерисован.</p>
+<p>Также у вида есть собственный статус <code>this.static</code>, значением которого может быть тип ns.V.STATUS. Если статус не <code>ns.V.STATUS.OK</code>, то вид будет перерисован.</p>
 <p>Инвалидировать вид можно методом <code>this.invalidate()</code>.</p>
 <p>Вид безусловно подписывается на все изменения моделей и автоматически инвалидирует себя при изменениях.</p>
 <h2>Взаимодействие</h2><p>В noscript нет какого-либо способа получить созданный экземпляр вида.
@@ -1473,7 +1493,7 @@ ns.View.define('super-view', {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:19 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:57 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

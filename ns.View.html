@@ -77,8 +77,6 @@
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
                         
-                            <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
-                        
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
@@ -480,6 +478,8 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.request.forcedRequest"><a href="ns.request.html#forcedRequest">forcedRequest</a></li>
+                        
                         <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
                         
                         <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
@@ -747,7 +747,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.Model#event:ns-model-changed"><a href="ns.Model.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.Model#event:ns-model-init"><a href="ns.Model.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.Model#event:ns-model-touched"><a href="ns.Model.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -842,7 +846,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -923,7 +931,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelUniq#event:ns-model-changed"><a href="ns.ModelUniq.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelUniq#event:ns-model-init"><a href="ns.ModelUniq.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelUniq#event:ns-model-touched"><a href="ns.ModelUniq.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -1053,7 +1065,11 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
+                
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+                
+                    <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1158,7 +1174,11 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+                
+                    <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1628,6 +1648,51 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="key">key<span class="type-signature type string">string</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Уникальный ключ вида</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="node">node<span class="type-signature type htmlelement">HTMLElement</span> </h4>
     </div>
     
@@ -1637,6 +1702,51 @@
     
     <div class="description">
         <p>View node</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="params">params<span class="type-signature type object">object</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Собственные параметры вида, с которыми он был создан</p>
     </div>
     
     
@@ -1734,7 +1844,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1454
+            ns.view.js, line 1466
         </div>
         
     </div>
@@ -1936,7 +2046,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1108
+            ns.view.js, line 1120
         </div>
         
     </div>
@@ -2303,7 +2413,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1361
+            ns.view.js, line 1373
         </div>
         
     </div>
@@ -2483,7 +2593,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1370
+            ns.view.js, line 1382
         </div>
         
     </div>
@@ -2560,7 +2670,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1154
+            ns.view.js, line 1166
         </div>
         
     </div>
@@ -2693,7 +2803,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 666
+            ns.view.js, line 678
         </div>
         
     </div>
@@ -2770,7 +2880,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 182
+            ns.view.js, line 194
         </div>
         
     </div>
@@ -2898,7 +3008,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 161
+            ns.view.js, line 173
         </div>
         
     </div>
@@ -3021,7 +3131,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 171
+            ns.view.js, line 183
         </div>
         
     </div>
@@ -3144,7 +3254,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1071
+            ns.view.js, line 1083
         </div>
         
     </div>
@@ -3215,7 +3325,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 914
+            ns.view.js, line 926
         </div>
         
     </div>
@@ -3331,7 +3441,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 225
+            ns.view.js, line 237
         </div>
         
     </div>
@@ -3459,7 +3569,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 838
+            ns.view.js, line 850
         </div>
         
     </div>
@@ -3580,7 +3690,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 847
+            ns.view.js, line 859
         </div>
         
     </div>
@@ -3701,7 +3811,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 483
+            ns.view.js, line 495
         </div>
         
     </div>
@@ -3772,7 +3882,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 503
+            ns.view.js, line 515
         </div>
         
     </div>
@@ -3844,7 +3954,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 544
+            ns.view.js, line 556
         </div>
         
     </div>
@@ -3972,7 +4082,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 535
+            ns.view.js, line 547
         </div>
         
     </div>
@@ -4048,7 +4158,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 511
+            ns.view.js, line 523
         </div>
         
     </div>
@@ -4124,7 +4234,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 495
+            ns.view.js, line 507
         </div>
         
     </div>
@@ -4196,7 +4306,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 519
+            ns.view.js, line 531
         </div>
         
     </div>
@@ -4272,7 +4382,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1081
+            ns.view.js, line 1093
         </div>
         
     </div>
@@ -4343,7 +4453,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 770
+            ns.view.js, line 782
         </div>
         
     </div>
@@ -4457,7 +4567,7 @@ View.
         
 
     
-    <pre class="prettyprint"><code><pre class="prettyprint source"><code>ns.View.prototype.patchTree = function(tree) {
+    <pre class="prettyprint"><code><pre class="prettyprint source lang-js"><code>ns.View.prototype.patchTree = function(tree) {
     // добавляем в дерево ссылки на экземпляры вида и моделей
     return {
         instance: {
@@ -4482,7 +4592,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 865
+            ns.view.js, line 877
         </div>
         
     </div>
@@ -4618,7 +4728,7 @@ View.
         
 
     
-    <pre class="prettyprint"><code><pre class="prettyprint source"><code>block.tmpl()
+    <pre class="prettyprint"><code><pre class="prettyprint source lang-js"><code>block.tmpl()
 block.tmpl('mode')
 block.tmpl({ ... })
 block.tmpl('mode', { ... })</code></pre></code></pre>
@@ -4888,7 +4998,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:18 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:57 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

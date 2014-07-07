@@ -77,8 +77,6 @@
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
                         
-                            <li data-name="ns.forcedRequest"><a href="ns.html#forcedRequest">forcedRequest</a></li>
-                        
                             <li data-name="ns.html2node"><a href="ns.html#html2node">html2node</a></li>
                         
                             <li data-name="ns.http"><a href="ns.html#http">http</a></li>
@@ -480,6 +478,8 @@
                     <ul class="members itemMembers">
                         <span class="subtitle">Static members</span>
                         
+                        <li data-name="ns.request.forcedRequest"><a href="ns.request.html#forcedRequest">forcedRequest</a></li>
+                        
                         <li data-name="ns.request.requestParams"><a href="ns.request.html#requestParams">requestParams</a></li>
                         
                         <li data-name="ns.request.URL"><a href="ns.request.html#URL">URL</a></li>
@@ -747,7 +747,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.Model#event:ns-model-changed"><a href="ns.Model.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.Model#event:ns-model-init"><a href="ns.Model.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.Model#event:ns-model-touched"><a href="ns.Model.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -842,7 +846,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -923,7 +931,11 @@
             
             <span class="subtitle">Events</span>
             
+                <li data-name="ns.ModelUniq#event:ns-model-changed"><a href="ns.ModelUniq.html#event:ns-model-changed">ns-model-changed</a></li>
+            
                 <li data-name="ns.ModelUniq#event:ns-model-init"><a href="ns.ModelUniq.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelUniq#event:ns-model-touched"><a href="ns.ModelUniq.html#event:ns-model-touched">ns-model-touched</a></li>
             
             </ul>
         </li>
@@ -1053,7 +1065,11 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
+                
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
+                
+                    <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1158,7 +1174,11 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
+                
+                    <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1577,7 +1597,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 351
+            ns.model.js, line 366
         </div>
         
     </div>
@@ -1653,7 +1673,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 242
+            ns.modelCollection.js, line 244
         </div>
         
     </div>
@@ -1800,7 +1820,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 419
+            ns.model.js, line 439
         </div>
         
     </div>
@@ -1914,7 +1934,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 361
+            ns.model.js, line 376
         </div>
         
     </div>
@@ -2033,7 +2053,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 372
+            ns.model.js, line 387
         </div>
         
     </div>
@@ -2356,7 +2376,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 306
+            ns.model.js, line 321
         </div>
         
     </div>
@@ -2430,7 +2450,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 343
+            ns.model.js, line 358
         </div>
         
     </div>
@@ -2502,7 +2522,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 200
+            ns.modelCollection.js, line 202
         </div>
         
     </div>
@@ -2580,7 +2600,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 390
+            ns.model.js, line 405
         </div>
         
     </div>
@@ -2658,7 +2678,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 298
+            ns.model.js, line 313
         </div>
         
     </div>
@@ -2775,7 +2795,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 262
+            ns.modelCollection.js, line 264
         </div>
         
     </div>
@@ -3013,7 +3033,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 382
+            ns.model.js, line 397
         </div>
         
     </div>
@@ -3317,7 +3337,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 192
+            ns.modelCollection.js, line 194
         </div>
         
     </div>
@@ -3326,6 +3346,10 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
 </dt>
 <dd>
     
+    
+    <div class="description">
+        <p>Метод вызывается, когда уничтожается элемент коллекции.</p>
+    </div>
     
 
     
@@ -3371,7 +3395,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                </td>
+                <p>Название события. &quot;ns-model-destroyed&quot;</p></td>
         </tr>
 	
 	
@@ -3394,7 +3418,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                </td>
+                <p>Экземпляр уничтоженной модели</p></td>
         </tr>
 	
 	
@@ -3447,12 +3471,12 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     <div class="nameContainer">
         <h4 class="name" id="onItemTouched">
             
-            onItemTouched<span class="signature">()</span>
+            onItemTouched<span class="signature">(evt, model)</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 181
+            ns.modelCollection.js, line 183
         </div>
         
     </div>
@@ -3462,11 +3486,83 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
 <dd>
     
     
+    <div class="description">
+        <p>Метод вызывается, когда у элемента коллекции меняется версия.</p>
+    </div>
+    
 
     
     
     
     
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>evt</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название события. &quot;ns-model-touched&quot;</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>model</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ns.Model.html">ns.Model</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Экземпляр модели, которая изменилась</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -3521,7 +3617,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 407
+            ns.model.js, line 427
         </div>
         
     </div>
@@ -3644,7 +3740,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 335
+            ns.model.js, line 350
         </div>
         
     </div>
@@ -3761,7 +3857,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 308
+            ns.modelCollection.js, line 310
         </div>
         
     </div>
@@ -4021,7 +4117,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 224
+            ns.model.js, line 225
         </div>
         
     </div>
@@ -4237,6 +4333,11 @@ This methods always returns array of results.</p>
 
     
     
+    <h5>Fires:</h5>
+    <ul>
+        <li><a href="ns.Model.html#event:ns-model-changed">ns.Model#event:ns-model-changed</a></li>
+    </ul>
+    
 
     
 
@@ -4262,7 +4363,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 267
+            ns.model.js, line 274
         </div>
         
     </div>
@@ -4450,6 +4551,11 @@ This methods always returns array of results.</p>
 
     
     
+    <h5>Fires:</h5>
+    <ul>
+        <li><a href="ns.Model.html#event:ns-model-changed">ns.Model#event:ns-model-changed</a></li>
+    </ul>
+    
 
     
 
@@ -4480,7 +4586,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 314
+            ns.model.js, line 329
         </div>
         
     </div>
@@ -4592,7 +4698,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 207
+            ns.modelCollection.js, line 209
         </div>
         
     </div>
@@ -4661,6 +4767,124 @@ This methods always returns array of results.</p>
         <h3 class="subsection-title">Events</h3>
         
         <dl>
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="event:ns-model-changed">
+            
+                <span class="inherited"><a href="ns.Model.html#event:ns-model-changed">inherited</a></span>
+            
+            ns-model-changed
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.model.js, line 242
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Сообщение о том, что модель изменилась.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>evt</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Название события</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
             
 <dt>
     <div class="nameContainer inherited">
@@ -4733,6 +4957,79 @@ This methods always returns array of results.</p>
     
 </dd>
 
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="event:ns-model-touched">
+            
+                <span class="inherited"><a href="ns.Model.html#event:ns-model-touched">inherited</a></span>
+            
+            ns-model-touched
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.model.js, line 415
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Событие сообщает об инкрементации версии модели.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
         </dl>
     
 </article>
@@ -4752,7 +5049,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha8</a> on Mon Jun 23 2014 16:33:18 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:56 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

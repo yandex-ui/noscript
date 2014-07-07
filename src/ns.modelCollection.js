@@ -108,8 +108,18 @@
             }
 
             // идентификатор подмодели берется из info.model_id
-            // коллецкия может содержать модели только одного вида
-            return ns.Model.get(splitInfo.model_id, params).setData(item);
+            var modelId;
+            if (typeof splitInfo.model_id === 'function') {
+                // если model_id - функция, то передаем туда данные и параметры,
+                // а она должна вернуть id модели
+                modelId = splitInfo.model_id(item, params);
+            } else {
+                modelId = splitInfo.model_id;
+            }
+
+            if (modelId) {
+                return ns.Model.get(modelId, params).setData(item);
+            }
         });
     };
 
@@ -290,9 +300,13 @@
         var insertion = [];
         var model;
         for (var i = 0; i < models.length; i++) {
+            // В массиве может быть пустое место, если model_id - функция,
+            // которая может выкидывать элементы из коллекции.
+            // Поэтому надо писать if (model && ...)
+
             model = models[i];
             // Добавим только те модели, которых ещё нет ни в коллекции, ни в списке добавляемых
-            if (this.models.indexOf(model) < 0 && insertion.indexOf(model) < 0) {
+            if (model && this.models.indexOf(model) < 0 && insertion.indexOf(model) < 0) {
                 insertion.push(model);
             }
         }

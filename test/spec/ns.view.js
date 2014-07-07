@@ -526,6 +526,36 @@ describe('ns.View', function() {
 
         });
 
+        describe('Ключ не зависит от порядка ключе в параметрах', function() {
+
+            beforeEach(function() {
+                ns.View.define('view', {
+                    params: function(params) {
+                        return params;
+                    }
+                });
+            });
+
+            it('прямой порядок', function() {
+                var params1 = {
+                    p1: 1,
+                    p2: 2
+                };
+
+                expect(ns.View.getKey('view', params1)).to.be.equal('view=view&p1=1&p2=2');
+            });
+
+            it('обратный порядок', function() {
+                var params2 = {
+                    p2: 2,
+                    p1: 1
+                };
+
+                expect(ns.View.getKey('view', params2)).to.be.equal('view=view&p1=1&p2=2');
+            });
+
+        });
+
     });
 
     describe('#patchTree()', function() {

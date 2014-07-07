@@ -220,6 +220,7 @@
      * @param {*} value Новое значение.
      * @param {object} [options] Флаги.
      * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
+     * @fires ns.Model#ns-model-changed
      */
     ns.Model.prototype.set = function(jpath, value, options) {
         var data = this.data;
@@ -238,7 +239,12 @@
             return;
         }
 
-        //  Сообщение о том, что вообще вся модель изменилась.
+        /**
+         * Сообщение о том, что модель изменилась.
+         * @event ns.Model#ns-model-changed
+         * @param {string} evt Название события
+         * @params {string} jpath JPath, по которому изменились данные. Если пустой, то изменилась вся модель.
+         */
         this.trigger('ns-model-changed', jpath);
 
         //  Кидаем сообщения о том, что изменились части модели.
@@ -263,6 +269,7 @@
      * @param {object} [options] Флаги.
      * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
      * @returns {ns.Model}
+     * @fires ns.Model#ns-model-changed
      */
     ns.Model.prototype.setData = function(data, options) {
         // переинициализация после #destroy()
@@ -270,6 +277,14 @@
 
         if (data && this.hasDataChanged(data)) {
 
+            /**
+             * Данные модели.
+             * @description
+             * Это свойство нельзя использовать напрямую,
+             * т.к. там могут быть неактуальные или неправильные данные
+             * @private
+             * @type {*}
+             */
             this.data = this._beforeSetData(this.preprocessData(data));
 
             this.status = this.STATUS.OK;
@@ -392,10 +407,15 @@
     };
 
     /**
-     *
+     * Инкрементирует версию модели.
+     * @fires ns.Model#ns-model-touched
      */
     ns.Model.prototype.touch = function() {
         this._version++;
+        /**
+         * Событие сообщает об инкрементации версии модели.
+         * @event ns.Model#ns-model-touched
+         */
         this.trigger('ns-model-touched');
     };
 
@@ -477,6 +497,7 @@
     /**
      * Completely destroy model and delete it from cache.
      * @param {ns.Model} model
+     * @fires ns.Model#ns-model-destroyed
      */
     ns.Model.destroy = function(model) {
         // do-models are not cached
@@ -489,7 +510,10 @@
 
         var cached = _cache[id][key];
         if (cached) {
-            // notify subscribers about disappearance
+            /**
+             * Сообщает об уничтожении модели
+             * @events ns.Model#ns-model-destroyed
+             */
             model.trigger('ns-model-destroyed');
             model.destroy();
         }

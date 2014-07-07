@@ -11,7 +11,7 @@ if (typeof window === 'undefined') {
 }
 
 /**
- *
+ * Удобная функция для расстановки TODO, кидает исключение при вызове.
  */
 ns.todo = function() {
     throw new Error('Unimplemented');

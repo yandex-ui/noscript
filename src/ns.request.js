@@ -25,6 +25,8 @@
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
      * @returns {Vow.Promise}
+     * @memberOf ns.request
+     * @name forcedRequest
      */
     ns.forcedRequest = function(items, params, options) {
         options = options || {};

@@ -38,6 +38,18 @@
     ns.View.prototype._$window = ('undefined' === typeof window) ? null : $(window);
 
     /**
+     * Уникальный ключ вида
+     * @type {string}
+     */
+    ns.View.prototype.key = null;
+
+    /**
+     * Собственные параметры вида, с которыми он был создан
+     * @type {object}
+     */
+    ns.View.prototype.params = null;
+
+    /**
      * Инициализирует экземпляр вида
      * @param {string} id
      * @param {object} params

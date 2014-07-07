@@ -8,7 +8,7 @@
     ns.history = {};
 
     /**
-     *
+     * Ицициализирует события реакции на изменение адреса.
      */
     ns.history.init = function() {
         $(window).on('popstate', function(e) {
@@ -21,7 +21,7 @@
     };
 
     /**
-     *
+     * Добавляет урл в историю браузера.
      * @param {string} url
      * @param {string} [title]
      */
@@ -32,7 +32,7 @@
     };
 
     /**
-     *
+     * Заменяет урл в истории браузера.
      * @param {string} url
      * @param {string} [title]
      */
@@ -43,7 +43,7 @@
     };
 
     /**
-     *
+     * Метод реакции на изменение адреса.
      */
     ns.history.onpopstate = function() {
         ns.page.go('', true);

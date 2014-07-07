@@ -176,18 +176,20 @@
     };
 
     /**
-     *
+     * Метод вызывается, когда у элемента коллекции меняется версия.
+     * @param {string} evt Название события. "ns-model-touched"
+     * @param {ns.Model} model Экземпляр модели, которая изменилась
      */
-    ns.ModelCollection.prototype.onItemTouched = function() {
+    ns.ModelCollection.prototype.onItemTouched = function(evt, model) {
         // У коллекции есть собственная версия (this._versionSelf) и версия элементов коллекции (this._version).
         // Когда меняется элемент коллекции - версия самой коллекции не меняется.
         this._version++;
     };
 
     /**
-     *
-     * @param {string} evt
-     * @param {ns.Model} model
+     * Метод вызывается, когда уничтожается элемент коллекции.
+     * @param {string} evt Название события. "ns-model-destroyed"
+     * @param {ns.Model} model Экземпляр уничтоженной модели
      */
     ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
         this.remove(model);

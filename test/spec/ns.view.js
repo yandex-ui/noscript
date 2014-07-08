@@ -65,6 +65,57 @@ describe('ns.View', function() {
 
     });
 
+    describe('#_bindModels', function(done) {
+        it('В обработчик изменения модели отправляем новую функцию', function(done) {
+
+            ns.Model.define('test-model');
+            var model = ns.Model.get('test-model');
+
+            ns.View.define(
+                'test-view',
+                {
+                    models: {
+                        'test-model': {
+                            'ns-model-changed': function(){
+                                done()
+                            }
+                        }
+                    }
+                }
+            );
+
+            var view = ns.View.create('test-view', {});
+            view._bindModels();
+            model.setData({a : 2});
+        });
+
+        it('В обработчик изменения модели отправляем метод вьюхи', function(done) {
+
+            ns.Model.define('test-model');
+            var model = ns.Model.get('test-model');
+
+            ns.View.define(
+                'test-view',
+                {
+                    models: {
+                        'test-model': {
+                            'ns-model-changed': 'modelChanged'
+                        }
+                    },
+                    methods: {
+                        'modelChanged': function(){
+                            done()
+                        }
+                    }
+                }
+            );
+
+            var view = ns.View.create('test-view', {});
+            view._bindModels();
+            model.setData({a : 2});
+        });
+    });
+
     describe('Наследование от другого view', function() {
 
         beforeEach(function() {

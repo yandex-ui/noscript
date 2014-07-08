@@ -275,7 +275,7 @@
             var decl = decls[idModel];
             for (var eventName in decl) {
                 var handlerName = decl[eventName];
-                var handler = this[handlerName];
+                var handler = this[handlerName] || decl[eventName];
                 if ('function' === typeof handler) {
                     this._bindModel(model, eventName,
                         this._invokeModelHandler.bind(this, handler)
@@ -1053,8 +1053,8 @@
             this._saveModelsVersions();
         }
 
-        // Если view валидный и не в async-режиме, то вызывается show и touch 
-        // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch 
+        // Если view валидный и не в async-режиме, то вызывается show и touch
+        // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch
 
         // Условие звучит так "(Если мы в синхнронном ns.Update и view стал валиден) или (view был не валиден и стал валиден)"
         // Второе условие относится как к перерисованным view, так и к async-view, которые полностью отрисовались
@@ -1537,7 +1537,7 @@
 
                 if (undefined === declFull[eventName]) {
                     // если обработчик события явно не задан,
-                    // используем общий обработчик или, если такого нет, обработчик по умолчанию 
+                    // используем общий обработчик или, если такого нет, обработчик по умолчанию
                     declFull[eventName] = methodCommon || methodDefault;
                 } else {
                     // если обработчик явно задан, используем его,

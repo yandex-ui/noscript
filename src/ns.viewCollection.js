@@ -254,7 +254,7 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
  */
 ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
     var result = {};
-    result[this.info.split.view_id] = [];
+    result['ns-view-collection-container'] = [];
 
     // Какие элементы коллекции рендерить, мы можем понять только по модели
     // Поэтому, полезем внутрь, только если есть все данные
@@ -263,12 +263,18 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
         var MC = this.models[this.info.modelCollectionId];
 
         // Проходом по элементам MC определим, какие виды нужно срендерить
-        for (var i = 0, view, p, decl; i < MC.models.length; i++) {
-            p    = no.extend({}, params, MC.models[i].params);
-            view = this._getView(this.info.split.view_id, p);
+        for (var i = 0, view, decl; i < MC.models.length; i++) {
+            var viewItem = this._getViewItem(MC.models[i], params);
+
+            // если нет viewId, то это значит, что элемент коллекции был отфильтрован
+            if (!viewItem.id) {
+                continue;
+            }
+
+            view = this._getView(viewItem.id, viewItem.params);
 
             if (!view) {
-                view = this._addView(this.info.split.view_id, p);
+                view = this._addView(viewItem.id, viewItem.params);
             }
 
             decl = null;
@@ -293,7 +299,33 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
             }
 
             if (decl) {
-                result[this.info.split.view_id].push(decl);
+                /*
+                 тут создаем специальное дерево, чтобы рендерить разнородные элементы как и обычные виды
+
+                 {
+                    'views': {
+                        // массив разнородных элементов коллекции
+                        'ns-view-collection': [
+                            {
+                                'view-item-type1': { ... дерево ... }
+                            },
+                            {
+                                'view-item-type2': { ... дерево ... }
+                            },
+                            {
+                                'view-item-type2': { ... дерево ... }
+                            },
+                            {
+                                'view-item-type1': { ... дерево ... }
+                            }
+                        ]
+                    }
+                 }
+
+                 */
+                var viewItemTree = {};
+                viewItemTree[view.id] = decl;
+                result['ns-view-collection-container'].push(viewItemTree);
             }
         }
     }
@@ -436,10 +468,14 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
         for (var i = 0, prev; i < MC.models.length; i++) {
-            var p = no.extend({}, params, MC.models[i].params);
+            var viewItem = this._getViewItem(MC.models[i], params);
             // Получим view для вложенной модели
             // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
-            var view = this._getView(this.info.split.view_id, p);
+            var view = this._getView(viewItem.id, viewItem.params);
+
+            if (!view) {
+                continue;
+            }
 
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {
@@ -505,4 +541,27 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             }
         }.bind(this));
     }
+};
+
+/**
+ *
+ * @private
+ */
+ns.ViewCollection.prototype._getViewItem = function(modelItem, updateParams) {
+    var viewItemParams = no.extend({}, updateParams, modelItem.params);
+
+    var viewId;
+    var infoViewId = this.info.split.view_id;
+    if (typeof infoViewId === 'function') {
+        // если view_id - функция, то передаем туда модель и параметры,
+        // а она должна вернуть id вида
+        viewId = infoViewId(modelItem, viewItemParams);
+    } else {
+        viewId = infoViewId;
+    }
+
+    return {
+        id: viewId,
+        params: viewItemParams
+    };
 };

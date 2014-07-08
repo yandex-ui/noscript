@@ -32,7 +32,7 @@ match .my-view2 ns-view-add-attrs {
 
 ## Содержимое View
 
-### ns-view-content
+### ns-view-content и ns-view-desc
 `ns-view-content` - самая главная мода, отвечает за содержимое view при нормальной отрисовке.
 
 ```
@@ -80,16 +80,19 @@ match .my-view1 ns-view-content {
 ## Элементы ViewСollection
 
 В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: `ns-view-content` и `ns-view-async-content`.
-Для управления местом вставки элементов коллекции есть мода `ns-view-desc`.
+Для управления местом вставки элементов коллекции есть мода `ns-view-collection`.
 Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.
+
+Если вы используете эту моду, то родительскую ноду для элементов коллекции надо пометить специальных классом `ns-view-container-desc`
 
 ```
 match .my-view-collection ns-view-content {
     <div class="my-view-collection__wrapper">
         <div class="my-view-collection__text">My View Collection</div>
-        <div class="my-view-collection__items">
+        <div class="my-view-collection__items ns-view-container-desc">
             // сюда будут отрисованы элементы коллекции
-            apply . ns-view-desc
+            // не забывайте добавлять класс для родителя элементов коллекции
+            apply . ns-view-collection
         </div>
     </div>
 }

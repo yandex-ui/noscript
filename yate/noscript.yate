@@ -53,7 +53,11 @@ match .* ns-build-view {
 
         if state == 'placeholder' {
             @class += ' ns-view-placeholder'
-            apply . ns-view-desc
+            if (/.collection) {
+                apply . ns-view-collection
+            } else {
+                apply . ns-view-desc
+            }
 
         } else {
             @class += apply . ns-view-add-class
@@ -89,7 +93,7 @@ match .* ns-view-content {
         // special node child-container for view-collection
         // so view-collection can has its own html markup
         <div class="ns-view-container-desc">
-            apply . ns-view-desc
+            apply . ns-view-collection
         </div>
     } else {
         apply . ns-view-desc
@@ -98,6 +102,10 @@ match .* ns-view-content {
 
 match .* ns-view-desc {
     apply /.views.* ns-view
+}
+
+match .* ns-view-collection {
+    apply /.views.ns-view-collection-container.* ns-view
 }
 
 // Содержимое view при async-инициализации

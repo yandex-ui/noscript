@@ -635,4 +635,71 @@ describe('ns.ModelCollection', function() {
 
     });
 
+    describe('Разнородная коллекция', function() {
+
+        beforeEach(function() {
+            this.spy = this.sinon.spy(function(itemData) {
+                if (itemData.type === 2) {
+                    return 'mc-item2';
+
+                } else if (itemData.type === 3) {
+                    return false;
+                }
+                return 'mc-item1';
+            });
+
+            ns.Model.define('mc-item1', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.Model.define('mc-item2', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.Model.define('mc-mixed', {
+                split: {
+                    items: '.item',
+                    params: {
+                        id: '.id'
+                    },
+                    model_id: this.spy
+                }
+            });
+
+            this.model = ns.Model.get('mc-mixed').setData({
+                item: [
+                    {type: 1},
+                    {type: 2},
+                    {type: 3}
+                ]
+            })
+        });
+
+        afterEach(function() {
+            delete this.model;
+            delete this.spy;
+        });
+
+        it('должен вызвать функцию из model_id для каждого элемента', function() {
+            expect(this.spy).to.have.callCount(3);
+        });
+
+        it('должен разбить коллекцию на 2 элемента', function() {
+            expect(this.model.models).to.have.length(2);
+        });
+
+        it('1-й элемент коллекции должен быть mc-item1', function() {
+            expect(this.model.models[0].id).to.be.equal('mc-item1');
+        });
+
+        it('2-й элемент коллекции должен быть mc-item2', function() {
+            expect(this.model.models[1].id).to.be.equal('mc-item2');
+        });
+
+    });
+
 });

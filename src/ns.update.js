@@ -385,12 +385,24 @@
      */
     ns.Update.prototype.start = ns.Update.prototype.render = function() {
         this.log('started `render` scenario');
+        /*
+        TODO: надо всю эту колбасу переписать на promise-way и
+        проверить, что обрабатывается исключение из каждой стадии
+
+        this._requestAllModels()
+            .then(this._generateHTML)
+            .then(this._insertNodes)
+            .then(this._fulfill, this._reject)
+         */
         this._requestAllModels().then(function(asyncResult) {
             this._generateHTML().then(function(html) {
                 this._insertNodes(ns.html2node(html)).then(function() {
                     this._fulfill(asyncResult);
                 }, this);
-            }, this._reject, this);
+            }, this._reject, this)
+            // Если insertNodes кинет exception, то он ловится вот тут.
+            // Иначе ns.Update повиснет и ничего не кинет
+            .then(null, this._reject, this);
         }, this._reject, this);
 
         return this.promise;

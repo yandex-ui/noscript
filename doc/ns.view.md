@@ -213,6 +213,31 @@ ns.View.define('super-view', {
 
 Для краткости вместо методов `invalidate` и `keepValid` можно указывать их краткую форму: `true` и `false` соответственно. 2 варианта деклараций в следующем примере работают одинаково.
 
+Пример использования произвольных обработчиков:
+
+
+```js
+ns.View.define('supre-view', {
+  models: {
+    album: {
+      'ns-model-changed': 'methodOfView'
+    },
+    methods: {
+      'methodOfView': function(){ }
+    }
+  }
+});
+```
+
+```js
+ns.View.define('supre-view', {
+  models: {
+    album: {
+      'ns-model-changed': function() { }
+    }
+  }
+});
+```
 
 ```js
 ns.View.define('super-view', {

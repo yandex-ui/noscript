@@ -173,6 +173,7 @@
         // this.trigger('ns-model-changed.items[3].some.inner.prop'); // (ЭТОГО СЕЙЧАС НЕТ).
 
         /**
+         * Сообщает об изменении элементов коллекции.
          * @event ns.ModelCollection#ns-model-changed
          * @param {object} info Объект с информацией об изменениях.
          * @param {ns.Model} info.model Измененный элемент коллекции.
@@ -307,6 +308,7 @@
             this.status = this.STATUS.OK;
 
             /**
+             * Сообщает о вставке новых элементов коллекции.
              * @event ns.ModelCollection#ns-model-insert
              * @param {array} insertion Массов вставленных элементов.
              */
@@ -354,6 +356,7 @@
         if (modelsRemoved.length) {
 
             /**
+             * Сообщает об удалении элементов коллекции.
              * @event ns.ModelCollection#ns-model-remove
              * @param {array} modelsRemoved Массив удаленных моделей.
              */

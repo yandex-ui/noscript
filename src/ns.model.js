@@ -536,7 +536,7 @@
      * @param {Function} [info.ctor] Конструтор.
      * @param {object} [info.methods] Методы прототипа.
      * @param {object} [info.params] Параметры модели, участвующие в формировании уникального ключа.
-     * @param {ns.Model} [base=ns.Model] Базовый класс для наследования
+     * @param {ns.Model|String} [base=ns.Model] Базовый класс для наследования или название ранее объявленной модели.
      * @examples
      * //  Простая модель, без параметров.
      * ns.Model.define('profile');
@@ -564,19 +564,26 @@
             info.isCollection = !!info.split;
         }
 
-        if (!base) {
+        var baseClass = base;
+        if (typeof base === 'string') {
+            // если указана строка, то берем декларацию ns.Model
+            baseClass = _ctors[base];
+            ns.assert(baseClass, 'ns.Model', "Can't find '%s' to extend '%s'", base, id);
+
+        } else if (!base) {
+            // если не указан, то определяем базовый класс из info
             if (info.uniq) {
-                base = ns.ModelUniq;
+                baseClass = ns.ModelUniq;
             } else if (info.isCollection) {
-                base = ns.ModelCollection;
+                baseClass = ns.ModelCollection;
             } else {
-                base = ns.Model;
+                baseClass = ns.Model;
             }
         }
 
         var ctor = info.ctor || function() {};
         // Нужно унаследоваться от base и добавить в прототип info.methods.
-        ctor = no.inherit(ctor, base, info.methods);
+        ctor = no.inherit(ctor, baseClass, info.methods);
 
         // часть дополнительной обработки производится в ns.Model.info
         // т.о. получаем lazy-определение

@@ -100,44 +100,79 @@ describe('ns.Model', function() {
 
             beforeEach(function() {
 
-                var parent = ns.Model.define('parent', {
+                this.parent = ns.Model.define('parent', {
                     methods: {
                         superMethod: function() {}
                     }
                 });
 
-                ns.Model.define('child', {
-                    methods: {
-                        oneMore: function() {}
-                    }
-                }, parent);
-
-                this.model = ns.Model.get('child', {});
             });
 
             afterEach(function() {
-                delete this.model;
+                delete this.parent;
             });
 
-            it('наследуемая model должен быть ns.Model', function() {
-                expect(this.model instanceof ns.Model).to.be.equal(true);
+            describe('через конструктор родителя', function() {
+
+                beforeEach(function() {
+                    ns.Model.define('child', {
+                        methods: {
+                            oneMore: function() {}
+                        }
+                    }, this.parent);
+
+                    this.model = ns.Model.get('child', {});
+                });
+
+                afterEach(function() {
+                    delete this.model;
+                });
+
+                checkChildModel();
+
             });
 
-            it('методы наследуются от базовой модели', function() {
-                expect(this.model.superMethod).to.be.a('function');
+            describe('через название родителя', function() {
+
+                beforeEach(function() {
+
+                    ns.Model.define('child', {
+                        methods: {
+                            oneMore: function() {}
+                        }
+                    }, 'parent');
+
+                    this.model = ns.Model.get('child', {});
+                });
+
+                afterEach(function() {
+                    delete this.model;
+                });
+
+                checkChildModel();
             });
 
-            it('методы от базового model не ушли в ns.Model', function() {
-                expect(ns.Model.prototype.superMethod).to.be.an('undefined');
-            });
+            function checkChildModel() {
+                it('наследуемая model должен быть ns.Model', function() {
+                    expect(this.model instanceof ns.Model).to.be.equal(true);
+                });
 
-            it('методы ns.Model на месте', function() {
-                expect(this.model.isValid).to.be.a('function');
-            });
+                it('методы наследуются от базовой модели', function() {
+                    expect(this.model.superMethod).to.be.a('function');
+                });
 
-            it('методы из info.methods тоже не потерялись', function() {
-                expect(this.model.oneMore).to.be.a('function');
-            });
+                it('методы от базового model не ушли в ns.Model', function() {
+                    expect(ns.Model.prototype.superMethod).to.be.an('undefined');
+                });
+
+                it('методы ns.Model на месте', function() {
+                    expect(this.model.isValid).to.be.a('function');
+                });
+
+                it('методы из info.methods тоже не потерялись', function() {
+                    expect(this.model.oneMore).to.be.a('function');
+                });
+            }
         });
 
         describe('ns.Model.getValid():', function() {

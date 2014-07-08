@@ -160,25 +160,31 @@
     };
 
     /**
-     *
-     * @param {string} evt
-     * @param {ns.Model} model
-     * @param {string} jpath
+     * Метод реакции на изменения элементов коллекции.
+     * @description Основной смысл этого метода в том, чтобы его можно было переопределить
+     * и триггерить изменение коллекции только для части изменений элементов коллекции.
+     * @param {string} evt Событие 'ns-model-changed' от элемента коллекции
+     * @param {ns.Model} model Измененный элемент коллекции.
+     * @param {string} jpath JPath, по которому произошли изменения.
+     * @fires ns.ModelCollection#ns-model-changed
      */
     ns.ModelCollection.prototype.onItemChanged = function(evt, model, jpath) {
-        // Основной смысл этого метода в том, чтобы его можно было переопределить
-        // и триггерить изменение коллекции только для части изменений элементов коллекции.
-
         // TODO тут можно триггерить много чего, но мы пока этого не делаем:
         // this.trigger('ns-model-changed.items[3].some.inner.prop'); // (ЭТОГО СЕЙЧАС НЕТ).
 
+        /**
+         * @event ns.ModelCollection#ns-model-changed
+         * @param {object} info Объект с информацией об изменениях.
+         * @param {ns.Model} info.model Измененный элемент коллекции.
+         * @param {string} info.jpath JPath, по которому произошли изменения.
+         */
         this.trigger('ns-model-changed', { 'model': model, 'jpath': jpath });
     };
 
     /**
      * Метод вызывается, когда у элемента коллекции меняется версия.
-     * @param {string} evt Название события. "ns-model-touched"
-     * @param {ns.Model} model Экземпляр модели, которая изменилась
+     * @param {string} evt Событие 'ns-model-touched' от элемента коллекции
+     * @param {ns.Model} model Измененный элемент коллекции.
      */
     ns.ModelCollection.prototype.onItemTouched = function(evt, model) {
         /* jshint unused: false */
@@ -189,8 +195,8 @@
 
     /**
      * Метод вызывается, когда уничтожается элемент коллекции.
-     * @param {string} evt Название события. "ns-model-destroyed"
-     * @param {ns.Model} model Экземпляр уничтоженной модели
+     * @param {string} evt Событие 'ns-model-destroyed' от элемента коллекции.
+     * @param {ns.Model} model Уничтоженный элемент коллекции.
      */
     ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
         this.remove(model);
@@ -251,6 +257,11 @@
         }
 
         // Это нужно и для начальной инициализации моделей.
+
+        /**
+         * Массив с моделями - элементами коллекции.
+         * @type {ns.Model[]}
+         */
         this.models = [];
     };
 
@@ -261,6 +272,7 @@
      * @param {number} [index] – индекс позиции, на которую вставить подмодели. Если не передано - вставка в конец.
      *
      * @returns {Boolean} – признак успешности вставки
+     * @fires ns.ModelCollection#ns-model-insert
      */
     ns.ModelCollection.prototype.insert = function(models, index) {
         // переинициализация после #destroy()
@@ -294,6 +306,10 @@
             // если вставка данных состоялась, считаем модель валидной
             this.status = this.STATUS.OK;
 
+            /**
+             * @event ns.ModelCollection#ns-model-insert
+             * @param {array} insertion Массов вставленных элементов.
+             */
             this.trigger('ns-model-insert', insertion);
 
             return true;
@@ -307,6 +323,7 @@
      *
      * @param {ns.Model | Number | ns.Model[] | Number[]} models – подмодели или индексы подмодели, которую надо удалить
      * @returns {Boolean} – признак успешности удаления.
+     * @fires ns.ModelCollection#ns-model-remove
      */
     ns.ModelCollection.prototype.remove = function(models) {
         var modelsRemoved = [];
@@ -335,6 +352,11 @@
         }.bind(this));
 
         if (modelsRemoved.length) {
+
+            /**
+             * @event ns.ModelCollection#ns-model-remove
+             * @param {array} modelsRemoved Массив удаленных моделей.
+             */
             this.trigger('ns-model-remove', modelsRemoved);
             return true;
         }

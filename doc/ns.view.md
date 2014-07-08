@@ -221,10 +221,10 @@ ns.View.define('supre-view', {
   models: {
     album: {
       'ns-model-changed': 'methodOfView'
-    },
-    methods: {
-      'methodOfView': function(){ }
     }
+  },
+  methods: {
+    'methodOfView': function(){ }
   }
 });
 ```

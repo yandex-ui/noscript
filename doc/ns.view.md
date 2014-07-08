@@ -174,9 +174,11 @@ ns.View.define('super-view', {
 
 ```js
 ns.View.define('super-view', {
-  models: {album: {
-    'ns-model-boof': 'invalidate'
-  }}
+  models: {
+    album: {
+      'ns-model-boof': 'invalidate'
+    }
+  }
 });
 ```
 
@@ -184,9 +186,11 @@ ns.View.define('super-view', {
 
 ```js
 ns.View.define('super-view', {
-  models: {album: {
-    `ns-model-changed`: 'keepValid'
-  }}
+  models: {
+    album: {
+      'ns-model-changed': 'keepValid'
+    }
+  }
 });
 ```
 

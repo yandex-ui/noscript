@@ -771,6 +771,8 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
                 </ul>
 
                 <ul class="methods itemMembers">
@@ -849,6 +851,10 @@
                 <li data-name="ns.ModelCollection#event:ns-model-changed"><a href="ns.ModelCollection.html#event:ns-model-changed">ns-model-changed</a></li>
             
                 <li data-name="ns.ModelCollection#event:ns-model-init"><a href="ns.ModelCollection.html#event:ns-model-init">ns-model-init</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-insert"><a href="ns.ModelCollection.html#event:ns-model-insert">ns-model-insert</a></li>
+            
+                <li data-name="ns.ModelCollection#event:ns-model-remove"><a href="ns.ModelCollection.html#event:ns-model-remove">ns-model-remove</a></li>
             
                 <li data-name="ns.ModelCollection#event:ns-model-touched"><a href="ns.ModelCollection.html#event:ns-model-touched">ns-model-touched</a></li>
             
@@ -1416,6 +1422,51 @@
     
 </dd>
 
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="models">models<span class="type-signature type array.<ns.model>">Array.&lt;<a href="ns.Model.html">ns.Model</a>></span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Массив с моделями - элементами коллекции.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
         </dl>
     
     
@@ -1673,7 +1724,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 244
+            ns.modelCollection.js, line 251
         </div>
         
     </div>
@@ -2522,7 +2573,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 202
+            ns.modelCollection.js, line 209
         </div>
         
     </div>
@@ -2795,7 +2846,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 264
+            ns.modelCollection.js, line 277
         </div>
         
     </div>
@@ -2925,6 +2976,11 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
 </dl>
 
     
+    
+    <h5>Fires:</h5>
+    <ul>
+        <li><a href="ns.ModelCollection.html#event:ns-model-insert">ns.ModelCollection#event:ns-model-insert</a></li>
+    </ul>
     
 
     
@@ -3179,7 +3235,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 168
+            ns.modelCollection.js, line 171
         </div>
         
     </div>
@@ -3188,6 +3244,11 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
 </dt>
 <dd>
     
+    
+    <div class="description">
+        <p>Основной смысл этого метода в том, чтобы его можно было переопределить
+и триггерить изменение коллекции только для части изменений элементов коллекции.</p>
+    </div>
     
 
     
@@ -3233,7 +3294,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                </td>
+                <p>Событие 'ns-model-changed' от элемента коллекции</p></td>
         </tr>
 	
 	
@@ -3256,7 +3317,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                </td>
+                <p>Измененный элемент коллекции.</p></td>
         </tr>
 	
 	
@@ -3279,7 +3340,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                </td>
+                <p>JPath, по которому произошли изменения.</p></td>
         </tr>
 	
 	
@@ -3314,6 +3375,11 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
 
     
     
+    <h5>Fires:</h5>
+    <ul>
+        <li><a href="ns.ModelCollection.html#event:ns-model-changed">ns.ModelCollection#event:ns-model-changed</a></li>
+    </ul>
+    
 
     
 
@@ -3337,7 +3403,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 194
+            ns.modelCollection.js, line 201
         </div>
         
     </div>
@@ -3395,7 +3461,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                <p>Название события. &quot;ns-model-destroyed&quot;</p></td>
+                <p>Событие 'ns-model-destroyed' от элемента коллекции.</p></td>
         </tr>
 	
 	
@@ -3418,7 +3484,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                <p>Экземпляр уничтоженной модели</p></td>
+                <p>Уничтоженный элемент коллекции.</p></td>
         </tr>
 	
 	
@@ -3476,7 +3542,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 183
+            ns.modelCollection.js, line 189
         </div>
         
     </div>
@@ -3534,7 +3600,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                <p>Название события. &quot;ns-model-touched&quot;</p></td>
+                <p>Событие 'ns-model-touched' от элемента коллекции</p></td>
         </tr>
 	
 	
@@ -3557,7 +3623,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
             
             <td class="description last">
                 
-                <p>Экземпляр модели, которая изменилась</p></td>
+                <p>Измененный элемент коллекции.</p></td>
         </tr>
 	
 	
@@ -3857,7 +3923,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 310
+            ns.modelCollection.js, line 328
         </div>
         
     </div>
@@ -3958,6 +4024,11 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
 </dl>
 
     
+    
+    <h5>Fires:</h5>
+    <ul>
+        <li><a href="ns.ModelCollection.html#event:ns-model-remove">ns.ModelCollection#event:ns-model-remove</a></li>
+    </ul>
     
 
     
@@ -4698,7 +4769,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 209
+            ns.modelCollection.js, line 216
         </div>
         
     </div>
@@ -4769,17 +4840,15 @@ This methods always returns array of results.</p>
         <dl>
             
 <dt>
-    <div class="nameContainer inherited">
+    <div class="nameContainer">
         <h4 class="name" id="event:ns-model-changed">
-            
-                <span class="inherited"><a href="ns.Model.html#event:ns-model-changed">inherited</a></span>
             
             ns-model-changed
         </h4>
     
         
         <div class="tag-source">
-            ns.model.js, line 242
+            ns.modelCollection.js, line 175
         </div>
         
     </div>
@@ -4788,10 +4857,6 @@ This methods always returns array of results.</p>
 </dt>
 <dd>
     
-    
-    <div class="description">
-        <p>Сообщение о том, что модель изменилась.</p>
-    </div>
     
 
     
@@ -4821,7 +4886,69 @@ This methods always returns array of results.</p>
 	
         <tr>
             
-                <td class="name"><code>evt</code></td>
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Объект с информацией об изменениях.</p>
+                
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>model</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ns.Model.html">ns.Model</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Измененный элемент коллекции.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>jpath</code></td>
             
             
             <td class="type">
@@ -4837,7 +4964,13 @@ This methods always returns array of results.</p>
             
             <td class="description last">
                 
-                <p>Название события</p></td>
+                <p>JPath, по которому произошли изменения.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+            </td>
         </tr>
 	
 	
@@ -4916,6 +5049,230 @@ This methods always returns array of results.</p>
     
     
     
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="event:ns-model-insert">
+            
+            ns-model-insert
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.modelCollection.js, line 309
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>insertion</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Массов вставленных элементов.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="event:ns-model-remove">
+            
+            ns-model-remove
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.modelCollection.js, line 356
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>modelsRemoved</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Массив удаленных моделей.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -5049,7 +5406,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Jul 07 2014 15:46:56 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 13:51:51 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

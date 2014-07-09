@@ -226,6 +226,48 @@ describe('ns.ModelCollection', function() {
             });
         });
 
+        describe('setData в ns-view-init', function() {
+
+            beforeEach(function() {
+                ns.Model.define('some-model', {
+                    params: { id: null }
+                });
+
+                ns.Model.define('some-collection', {
+                    split: {
+                        items: '/',
+                        params: {
+                            id: '.id'
+                        },
+                        model_id: 'some-model'
+                    },
+                    events: {
+                        'ns-model-init': 'init'
+                    },
+                    methods: {
+                        isValid: no.true,
+                        init: function() {
+                            this.setData([
+                                { id: 1, name: 'test' },
+                                { id: 2, name: 'test' }
+                            ]);
+                        }
+                    }
+                });
+
+                this.model = ns.Model.get('some-collection');
+            });
+
+            afterEach(function() {
+                delete this.model;
+            });
+
+            it('должен создать коллекции из двух элементов', function() {
+                expect(this.model.models).to.have.length(2);
+            });
+
+        });
+
         describe('insert', function() {
 
             beforeEach(function() {

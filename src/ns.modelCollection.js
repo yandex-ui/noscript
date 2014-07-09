@@ -16,10 +16,14 @@
      * @private
      */
     ns.ModelCollection.prototype._init = function() {
-        ns.Model.prototype._init.apply(this, arguments);
-
-        // Хэшик с событиями, навешанными на элементы коллекции.
+        /**
+         * Хэшик с событиями, навешанными на элементы коллекции.
+         * @type {object}
+         * @private
+         */
         this._modelsEvents = {};
+
+        ns.Model.prototype._init.apply(this, arguments);
     };
 
     /**

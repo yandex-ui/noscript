@@ -605,7 +605,8 @@
         }
 
         this._apply(function(view, id) {
-            view._getRequestViews(updated, pageLayout[id].views, params);
+            var viewPageLayout = pageLayout[id] || {};
+            view._getRequestViews(updated, viewPageLayout.views, params);
         });
 
         return updated;
@@ -663,7 +664,8 @@
             tree.views[this.id] = this._getViewTree(layout, params);
         } else {
             this._apply(function(view, id) {
-                view._getUpdateTree(tree, layout[id].views, params);
+                var viewLayout = layout[id] || {};
+                view._getUpdateTree(tree, viewLayout.views, params);
             });
         }
 
@@ -1070,7 +1072,8 @@
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view, id) {
-                view._updateHTML(viewNode, layout[id].views, params, options_next, events);
+                var viewLayout = layout[id] || {};
+                view._updateHTML(viewNode, viewLayout.views, params, options_next, events);
             });
         }
     };

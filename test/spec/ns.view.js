@@ -683,6 +683,70 @@ describe('ns.View', function() {
 
     });
 
+    describe('#tmpl для уже созданного вида (локальный update)', function() {
+
+        // вот это на самом деле сайд-эффект от #tmpl
+        // написал тесты, чтобы проверить его работоспособность
+
+        beforeEach(function(done) {
+
+            this.spyParentOntouch = this.sinon.spy();
+            this.spyChildOntouch = this.sinon.spy();
+
+            ns.View.define('my-parent-view', {
+                events: {
+                    'ns-view-touch': this.spyParentOntouch
+                }
+            });
+
+            ns.View.define('my-child-view', {
+                events: {
+                    'ns-view-touch': this.spyChildOntouch
+                }
+            });
+
+            ns.layout.define('test', {
+                'my-parent-view': {
+                   'my-child-view': {}
+                }
+            });
+
+            this.view = ns.View.create('my-parent-view');
+
+            new ns.Update(this.view, ns.layout.page('test'), {})
+                .render()
+                .then(function() {
+
+                    this.spyParentOntouch.reset();
+                    this.spyChildOntouch.reset();
+
+                    this.view
+                        .tmpl()
+                        .then(function() {
+                            done();
+                        }, function(e) {
+                            done(e);
+                        });
+                }, function(e) {
+                    done(e);
+                }, this);
+
+        });
+
+        afterEach(function() {
+            delete this.view;
+        });
+
+        it('должен вызвать ns-view-touch у родителя', function() {
+            expect(this.spyParentOntouch).to.have.callCount(1);
+        });
+
+        it('должен вызвать ns-view-touch у ребенка', function() {
+            expect(this.spyChildOntouch).to.have.callCount(1);
+        });
+
+    });
+
     describe('updateHTML', function() {
 
         describe('redraw async view with child depens on same model', function() {

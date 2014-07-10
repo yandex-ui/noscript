@@ -482,7 +482,7 @@ describe('ns.request.js', function() {
                 });
             });
 
-            it('resolve second request', function() {
+            it('resolve second request', function(finish) {
                 this.request2.then(function() {
                     finish();
                 }, function() {
@@ -552,7 +552,7 @@ describe('ns.request.js', function() {
                 });
             });
 
-            it('should resolve second promise after second response', function() {
+            it('should resolve second promise after second response', function(finish) {
                 this.promises[1].fulfill({
                     models: [
                         {data: 'second response2'}

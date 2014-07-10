@@ -109,7 +109,7 @@
     ns.Update.prototype._requestModels = function(models) {
         var promise = new Vow.Promise();
 
-        this.log('started models request', models);
+        this.log('started models request', $.extend(true, {}, models));
 
         ns.request.models(models)
             .then(function(models) {
@@ -123,7 +123,7 @@
 
                 promise.fulfill(models);
 
-                this.log('received models', models);
+                this.log('received models', $.extend(true, {}, models));
             }, function(err) {
                 var error = {
                     error: this.STATUS.MODELS,
@@ -137,7 +137,7 @@
                     promise.reject(error);
                 }
 
-                this.log('failed to receive models', models, err);
+                this.log('failed to receive models', $.extend(true, {}, models), err);
             }, this);
 
         return promise;
@@ -154,10 +154,10 @@
             sync: [],
             async: []
         }, this.layout.views, this.params).sync;
-        this.log('collected incomplete views', views);
+        this.log('collected incomplete views', $.extend(true, {}, views));
 
         var models = views2models(views);
-        this.log('collected needed models', models);
+        this.log('collected needed models', $.extend(true, {}, models));
         this.switchTimer('collectModels', 'requestSyncModels');
 
         var modelsPromise = this._requestModels(models);
@@ -184,10 +184,10 @@
             sync: [],
             async: []
         }, this.layout.views, this.params);
-        this.log('collected incomplete views', views);
+        this.log('collected incomplete views', $.extend(true, {}, views));
 
         var models = views2models(views.sync);
-        this.log('collected needed models', models);
+        this.log('collected needed models', $.extend(true, {}, models));
         this.switchTimer('collectModels', 'requestSyncModels');
 
         var syncPromise = this._requestModels(models);
@@ -209,7 +209,6 @@
                 update.promise,
                 update._requestModels(models)
             ]).then(function() {
-
                 // FIXME: в идеале нужно вынести подготовку и запуск нового update
                 // в сценарий render, т.к. этот метод - только про запрос моделей
 
@@ -226,6 +225,8 @@
                     layout[update.view.id] = update.layout;
                     params = update.params;
                 }
+
+                this.log('starting `_re_render` scenario for view ' + view.id);
 
                 asyncPromise.sync(
                     new ns.Update(update.view, layout, params, {execFlag: ns.U.EXEC.ASYNC}).rerender()
@@ -283,14 +284,14 @@
             'views': {}
         };
         this.view._getUpdateTree(tree, this.layout.views, this.params);
-        this.log('created render tree', tree);
+        this.log('created render tree', $.extend(true, {}, tree));
         this.stopTimer('collectViews');
         
         var html;
         if (!ns.object.isEmpty(tree.views)) {
             this.startTimer('generateHTML');
             html = this.applyTemplate(tree, this.params, this.layout);
-            this.log('generated html', html);
+            this.log('generated html', {html: html});
             this.stopTimer('generateHTML');
         }
 

@@ -1155,4 +1155,60 @@ describe('ns.Updater', function() {
         });
 
     });
+
+    describe('Очереди, приоритеты, прерывания', function() {
+
+        describe('2 ASYNC, потом 1 GLOBAL', function() {
+
+            beforeEach(function() {
+                ns.View.define('app');
+                ns.layout.define('app', { app: {} });
+
+                var layout = ns.layout.page('app');
+                var view = ns.View.create('app');
+
+                // запускаем 2 async
+                this.asyncPromise1 = new ns.Update(view, layout, {}, { execFlag: ns.U.EXEC.ASYNC }).render();
+                this.asyncPromise2 = new ns.Update(view, layout, {}, { execFlag: ns.U.EXEC.ASYNC }).render();
+
+                // потому запускаем 1 async, он должен убить 2 предыдующих
+                this.syncPromise = new ns.Update(view, layout, {}).render();
+            });
+
+            it('должен оборвать 1-й ASYNC', function(done) {
+                this.asyncPromise1
+                    .then(function() {
+                        done('fulfilled')
+                    }, function(reason) {
+                        expect(reason).to.have.property('error').and.equal(ns.U.STATUS.EXPIRED);
+                        done();
+                    })
+                    .then(null, function(err) {
+                        done(err);
+                    });
+            });
+
+            it('должен оборвать 2-й ASYNC', function(done) {
+                this.asyncPromise2
+                    .then(function() {
+                        done('fulfilled')
+                    }, function(reason) {
+                        expect(reason).to.have.property('error').and.equal(ns.U.STATUS.EXPIRED)
+                        done();
+                    }).then(null, function(err) {
+                        done(err);
+                    });
+            });
+
+            it('должен зарезолвить SYNC', function(done) {
+                this.syncPromise.then(function() {
+                    done();
+                }, function() {
+                    done('rejected');
+                });
+            });
+
+        });
+
+    });
 });

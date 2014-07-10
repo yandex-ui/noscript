@@ -595,8 +595,10 @@
         // if newUpdate is global we should terminate all non-parallel updates
         if (newRunExecutionFlag === FLAG_GLOBAL) {
             var survivedRuns = [];
-            //прекращаем текущие runs
-            for (i = 0, j = currentRuns.length; i < j; i++) {
+
+            // прекращаем текущие runs
+            // ищем с конца, потому что раны могут удаляться
+            for (i = currentRuns.length - 1; i >= 0; i--) {
                 /**
                  * @type {ns.Update}
                  */

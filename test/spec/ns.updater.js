@@ -937,10 +937,8 @@ describe('ns.Updater', function() {
                 '/models/?_m=comments': '{ "models": [ { "data": {} } ] }'
             };
 
-            var server = this.server = sinon.fakeServer.create();
-            server.autoRespond = true;
-
-            server.respondWith(function(xhr) {
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respondWith(function(xhr) {
                 var response = server_mock_data[xhr.url];
                 if (response) {
                     xhr.respond(200, { "Content-Type": "application/json" }, response);
@@ -975,7 +973,7 @@ describe('ns.Updater', function() {
                         }, function() {
                             finish('async ns.Update was rejected');
                         });
-                }, function() {
+                }, function(err) {
                     finish('main ns.Update was rejected');
                 });
         });

@@ -283,21 +283,59 @@
         return this.promise;
     };
 
+    /**
+     * Делаем запрос за моделями.
+     * @param {ns.Model[]} loading Список моделей, которые уже грузятся.
+     * @param {ns.Model[]} requesting Список моделей, которые надо запросить.
+     */
     Request.prototype.request = function(loading, requesting) {
         var all = [];
         // promise от http-запроса
         var httpRequest;
 
         if (requesting.length) {
-            //  Запрашиваем модели, которые нужно запросить.
-            var params = models2params(requesting);
-            var modelsNames = requesting.map(models2name);
-            ns.request.addRequestParams(params);
-            // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
-            // мог зарезолвится без завершения http-запроса
-            httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params);
 
-            all = all.concat( requesting.map(model2Promise) );
+            var regularRequests = [];
+            var customRequests = [];
+
+            requesting.forEach(function(model) {
+                // если у модели есть метод request, это значит, что она запросит себя сама
+                if (typeof model.request === 'function') {
+
+                    // Вызываем #request, он должен вернуть Vow.Promise.
+                    // После завершения говорим об этом менеджеру, чтобы убрать запрос из очереди.
+                    var modelRequestPromise = model.request().then(function() {
+                        ns.request.Manager.done(model);
+                    }, function() {
+                        ns.request.Manager.done(model);
+                    });
+
+                    // это промис надо прописать модели,
+                    // чтобы повторные запросы тоже отрезолвились
+                    // @see ns.Model#prepareRequest
+                    model.promise = modelRequestPromise;
+
+                    // добавляем ко всем промисам, чтобы дождаться
+                    customRequests.push(modelRequestPromise);
+                } else {
+                    regularRequests.push(model);
+                }
+            });
+
+            all = all.concat(customRequests);
+
+            if (regularRequests.length) {
+
+                //  Запрашиваем модели, которые нужно запросить.
+                var params = models2params(regularRequests);
+                var modelsNames = regularRequests.map(models2name);
+                ns.request.addRequestParams(params);
+                // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
+                // мог зарезолвится без завершения http-запроса
+                httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params);
+
+                all = all.concat(regularRequests.map(model2Promise));
+            }
 
         }/* else {
             //TODO: надо перепроверить поведение, если нет запросов

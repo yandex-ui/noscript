@@ -671,7 +671,7 @@ describe('ns.Updater', function() {
 
             ns.Model.define('model', {
                 methods: {
-                    canRetry: function() {
+                    canRequest: function() {
                         // NOTE тут такой хитрый метод, чтобы первый раз выполнился запрос, но в случае ошибки - запрос не выполнялся.
                         return !this.getError();
                     }

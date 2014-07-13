@@ -16,7 +16,7 @@ ns.Model.isCollection(model)
 // Instance API
 model.getRequestParams()
 model.prepareRequest(requestId)
-model.canRetry()
+model.canRequest()
 model.extractData(result)
 model.extractError(result)
 model.preprocessData(data)

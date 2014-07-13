@@ -334,26 +334,26 @@ describe('ns.request.js', function() {
             describe('common', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = this.sinon.spy(function() {
+                    this.model.canRequest = this.sinon.spy(function() {
                         return false;
                     });
 
                     this.promise = ns.request.models([this.model]);
                 });
 
-                it('should call model.canRetry', function() {
-                    expect(this.model.canRetry.calledOnce).to.be.equal(true);
+                it('should call model.canRequest', function() {
+                    expect(this.model.canRequest.calledOnce).to.be.equal(true);
                 });
 
-                it('should call model.canRetry with no args', function() {
-                    expect(this.model.canRetry.calledWithExactly()).to.be.equal(true);
+                it('should call model.canRequest with no args', function() {
+                    expect(this.model.canRequest.calledWithExactly()).to.be.equal(true);
                 });
             });
 
             describe('cant retry', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = function() {
+                    this.model.canRequest = function() {
                         return false;
                     };
                     this.promise = ns.request.models([this.model]);
@@ -380,7 +380,7 @@ describe('ns.request.js', function() {
             describe('can retry', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = function() {
+                    this.model.canRequest = function() {
                         return true;
                     };
                     this.promise = ns.request.models([this.model]);

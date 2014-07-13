@@ -140,7 +140,7 @@
                     }
 
                 } else if (request.status === REQUEST_STATUS.FAILED) {
-                    if (request.model.canRetry()) {
+                    if (request.model.canRequest()) {
                         this._createRequest(model, requestId);
                         return true;
 
@@ -178,7 +178,7 @@
                 }
 
                 // модель не валидна, но запрашивать её нельзя - ничего не делаем
-                if (!model.canRetry()) {
+                if (!model.canRequest()) {
                     return false;
                 }
 

@@ -346,43 +346,66 @@
      * @fires ns.ModelCollection#ns-model-remove
      */
     ns.ModelCollection.prototype.remove = function(models) {
-        var modelsRemoved = [];
-
         if (!Array.isArray(models)) {
             models = [ models ];
         }
 
-        models.forEach(function(modelOrIndex) {
-            var index;
+        // преобразуем индексы в экземпляры,
+        // потому с индексами работать небезопасно из-за их смещения после удаления
+        var itemsToRemove = this._modelsIndexToInstance(models);
+        var removedItems = [];
 
-            if (isNaN(modelOrIndex)) {
-                index = this.models.indexOf(modelOrIndex);
-            } else {
-                index = modelOrIndex;
+        // пробегаем по элементам, которые надо удалить, и ищем их в коллекции
+        for (var i = 0, j = itemsToRemove.length; i < j; i++) {
+            var itemToRemove = itemsToRemove[i];
+            var itemToRemoveIndex = this.models.indexOf(itemToRemove);
+
+            // если модель есть в списке на удаление
+            if (itemToRemoveIndex > -1) {
+                // отписываем ее
+                this._unsubscribeSplit(itemToRemove);
+                removedItems.push(itemToRemove);
+                this.models.splice(itemToRemoveIndex, 1);
+
             }
+        }
 
-            if (index >= 0) {
-                var model = this.models[index];
-
-                this._unsubscribeSplit(model);
-                modelsRemoved.push(model);
-                this.models.splice(index, 1);
-            }
-
-        }.bind(this));
-
-        if (modelsRemoved.length) {
+        if (removedItems.length) {
 
             /**
              * Сообщает об удалении элементов коллекции.
              * @event ns.ModelCollection#ns-model-remove
              * @param {array} modelsRemoved Массив удаленных моделей.
              */
-            this.trigger('ns-model-remove', modelsRemoved);
+            this.trigger('ns-model-remove', removedItems);
             return true;
         }
 
         return false;
+    };
+
+    /**
+     * Преобразует индексы моделей в их экземпляры.
+     * @param {ns.Model[]|Number[]} models Элементы коллекции или их индексы.
+     * @returns {ns.Model[]}
+     * @private
+     */
+    ns.ModelCollection.prototype._modelsIndexToInstance = function(models) {
+        var items = [];
+
+        for (var i = 0, j = models.length; i < j; i++) {
+            var index = models[i];
+            if (typeof index === 'number') {
+                var item = this.models[index];
+                if (this.models[index]) {
+                    items.push(item);
+                }
+            } else {
+                items.push(index);
+            }
+        }
+
+        return items;
     };
 
 })();

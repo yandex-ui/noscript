@@ -510,6 +510,48 @@ describe('ns.ModelCollection', function() {
                 expect(this.removeCallback.callCount).to.be.equal(3);
             });
 
+            describe('удаление элементов из середины', function() {
+
+                beforeEach(function() {
+
+                    ns.Model.define('items', {
+                        split: {
+                            model_id: 'item',
+                            items: '/',
+                            params: {
+                                'id': '.id'
+                            }
+                        }
+                    });
+
+                    ns.Model.define('item', {params: {id: null}});
+
+                    /**
+                     * @type ns.ModelCollection
+                     */
+                    this.items = ns.Model.get('items');
+                    this.items.setData([{id: 0}, {id:1}, {id:2}, {id:3}, {id:4}]);
+                    this.items.remove([1,3]);
+                });
+
+                it('должен оставить в коллекции 3 элемента', function() {
+                    expect(this.items.models).to.have.length(3);
+                });
+
+                it('должен оставить 0-й элемент', function() {
+                    expect(this.items.models[0]).to.be.equal(ns.Model.get('item', {id: 0}))
+                });
+
+                it('должен оставить 2-й элемент', function() {
+                    expect(this.items.models[1]).to.be.equal(ns.Model.get('item', {id: 2}))
+                });
+
+                it('должен оставить 4-й элемент', function() {
+                    expect(this.items.models[2]).to.be.equal(ns.Model.get('item', {id: 4}))
+                });
+
+            });
+
         });
 
         describe('clear', function() {

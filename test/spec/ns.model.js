@@ -790,4 +790,78 @@ describe('ns.Model', function() {
         });
 
     });
+
+    describe('ns.model.canRequest()', function() {
+
+        beforeEach(function() {
+            ns.Model.define('test-model');
+            ns.Model.define('test-model-local', {
+                methods: {
+                    canRequest: function() {
+                        return false;
+                    }
+                }
+            });
+        });
+
+        describe('normal model', function() {
+
+            beforeEach(function() {
+                this.model = ns.Model.get('test-model');
+                sinon.spy(this.model, 'canRequest');
+            });
+
+            afterEach(function() {
+                this.model.canRequest.restore();
+            });
+
+            it('request model in error status', function() {
+                this.model.setError({ name: 'fail' });
+                ns.request('test-model');
+
+                expect(this.model.canRequest).to.have.callCount(1);
+                expect(this.sinon.server.requests).to.have.length(1);
+            });
+
+        });
+
+        describe('local model', function() {
+
+            beforeEach(function() {
+                this.model = ns.Model.get('test-model-local');
+                sinon.spy(this.model, 'canRequest');
+            });
+
+            afterEach(function() {
+                this.model.canRequest.restore();
+            });
+
+            it('do not request valid model', function() {
+                this.model.setData({ id: 7 });
+                ns.request('test-model-local');
+
+                expect(this.model.canRequest).to.have.callCount(0);
+                expect(this.sinon.server.requests).to.have.length(0);
+            });
+
+            it('do not request valid model', function() {
+                this.model.setData({ id: 7 });
+                this.model.invalidate();
+                ns.request('test-model-local');
+
+                expect(this.model.canRequest).to.have.callCount(1);
+                expect(this.sinon.server.requests).to.have.length(0);
+            });
+
+            it('do not request model in error status', function() {
+                this.model.setError({ name: 'fail' });
+                ns.request('test-model-local');
+
+                expect(this.model.canRequest).to.have.callCount(1);
+                expect(this.sinon.server.requests).to.have.length(0);
+            });
+
+        });
+
+    });
 });

@@ -138,7 +138,7 @@ describe('ns.request.js', function() {
         });
     });
 
-    describe('no.request.models()', function(){
+    describe('ns.request.models()', function() {
 
         beforeEach(function() {
             ns.Model.define('test-model');
@@ -208,9 +208,8 @@ describe('ns.request.js', function() {
                 });
 
                 it('should resolve promise immediately for model', function(finish) {
-                    var result = false;
                     ns.request('test-model').then(function() {
-                        finish()
+                        finish();
                     }, function() {
                         finish('rejected');
                     });
@@ -233,7 +232,7 @@ describe('ns.request.js', function() {
 
                 it('should resolve promise after response', function(finish) {
                     this.requestPromise.then(function() {
-                        finish()
+                        finish();
                     }, function() {
                         finish('rejected');
                     });
@@ -260,18 +259,18 @@ describe('ns.request.js', function() {
             });
 
             it('should not create http request for model', function() {
-                no.request('test-model');
+                ns.request('test-model');
                 expect(this.sinon.server.requests.length).to.be.equal(0);
             });
 
             it('should resolve promise immediately for model', function() {
                 var result = false;
-                no.request('test-model').then(function() {
+                ns.request('test-model').then(function() {
                     result = true;
                 });
-
                 expect(result).to.be.equal(true);
             });
+
         });
 
         describe('STATUS_LOADING', function() {
@@ -335,26 +334,26 @@ describe('ns.request.js', function() {
             describe('common', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = this.sinon.spy(function() {
+                    this.model.canRequest = this.sinon.spy(function() {
                         return false;
                     });
 
                     this.promise = ns.request.models([this.model]);
                 });
 
-                it('should call model.canRetry', function() {
-                    expect(this.model.canRetry.calledOnce).to.be.equal(true);
+                it('should call model.canRequest', function() {
+                    expect(this.model.canRequest.calledOnce).to.be.equal(true);
                 });
 
-                it('should call model.canRetry with no args', function() {
-                    expect(this.model.canRetry.calledWithExactly()).to.be.equal(true);
+                it('should call model.canRequest with no args', function() {
+                    expect(this.model.canRequest.calledWithExactly()).to.be.equal(true);
                 });
             });
 
             describe('cant retry', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = function() {
+                    this.model.canRequest = function() {
                         return false;
                     };
                     this.promise = ns.request.models([this.model]);
@@ -381,7 +380,7 @@ describe('ns.request.js', function() {
             describe('can retry', function() {
 
                 beforeEach(function() {
-                    this.model.canRetry = function() {
+                    this.model.canRequest = function() {
                         return true;
                     };
                     this.promise = ns.request.models([this.model]);
@@ -441,7 +440,6 @@ describe('ns.request.js', function() {
 
     });
 
-
     describe('requests combinations', function() {
         // ключ + forced. первый не парсится второй, все ресолвит
 
@@ -478,7 +476,7 @@ describe('ns.request.js', function() {
                 this.request1.then(function() {
                     finish();
                 }, function() {
-                    finish('reject')
+                    finish('reject');
                 });
             });
 
@@ -486,7 +484,7 @@ describe('ns.request.js', function() {
                 this.request2.then(function() {
                     finish();
                 }, function() {
-                    finish('reject')
+                    finish('reject');
                 });
             });
         });
@@ -555,7 +553,7 @@ describe('ns.request.js', function() {
             it('should resolve second promise after second response', function(finish) {
                 this.promises[1].fulfill({
                     models: [
-                        {data: 'second response2'}
+                        { data: 'second response2' }
                     ]
                 });
 
@@ -591,7 +589,7 @@ describe('ns.request.js', function() {
         it('if model was requested and request was done it does not mean that we model is ok', function(done) {
             var wait = 2;
             var handleModels = function(err) {
-                var models = err.invalid
+                var models = err.invalid;
                 var model1 = models[0];
                 var model2 = models[1];
 

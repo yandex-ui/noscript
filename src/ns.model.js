@@ -360,10 +360,10 @@
     };
 
     /**
-     * Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.
+     * Возвращает, можно ли запрашивать / перезапрашивать модель.
      * @returns {boolean}
      */
-    ns.Model.prototype.canRetry = function() {
+    ns.Model.prototype.canRequest = function() {
         //  do-модели нельзя перезапрашивать.
         return ( !this.isDo() && this.retries < 3 );
     };

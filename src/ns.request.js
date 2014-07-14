@@ -140,7 +140,7 @@
                     }
 
                 } else if (request.status === REQUEST_STATUS.FAILED) {
-                    if (request.model.canRetry()) {
+                    if (request.model.canRequest()) {
                         this._createRequest(model, requestId);
                         return true;
 
@@ -161,6 +161,7 @@
                 }
 
             } else {
+
                 if (model.isValid()) {
 
                     // модель валидна, но запрос форсирован и это не этот же запрос
@@ -174,11 +175,16 @@
                     // если модель валидна и запрос не форсирован - ничего не деалем
                     return false;
 
-                } else {
-                    // модель не валидна или запрос форсирован - надо запросить
-                    this._createRequest(model, requestId);
-                    return true;
                 }
+
+                // модель не валидна, но запрашивать её нельзя - ничего не делаем
+                if (!model.canRequest()) {
+                    return false;
+                }
+
+                // модель не валидна и её можно запросить - надо запросить
+                this._createRequest(model, requestId);
+                return true;
             }
         },
 

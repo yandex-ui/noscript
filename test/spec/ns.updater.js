@@ -28,7 +28,7 @@ describe('ns.Updater', function() {
 
         ns.View.define('vAsync1', {models: ['mAsync1']});
         ns.View.define('vAsync2', {models: ['mAsync2']});
-        
+
 
         ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
         ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
@@ -358,7 +358,7 @@ describe('ns.Updater', function() {
                         this.clientUpdate = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
                         this.clientUpdate.reconstruct(ns.html2node(html))
                             .then(function() {
-                                
+
                                 // And secondly, let's run a regular update, that conceivably
                                 // will be run by some kind of ns.page.go
                                 this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
@@ -671,7 +671,10 @@ describe('ns.Updater', function() {
 
             ns.Model.define('model', {
                 methods: {
-                    canRetry: no.false
+                    canRequest: function() {
+                        // NOTE тут такой хитрый метод, чтобы первый раз выполнился запрос, но в случае ошибки - запрос не выполнялся.
+                        return !this.getError();
+                    }
                 }
             });
 

@@ -6,7 +6,8 @@
  * @returns {Vow.Promise}
  */
 ns.http = function(url, params, options) {
-    options = no.extend(ns.H.DEFAULTS, options || {});
+    // в пустой объект записывать дефолты, затем передданные опции
+    options = no.extend({}, ns.H.DEFAULTS, options);
     options.url = url;
     options.data = params;
 

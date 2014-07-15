@@ -112,7 +112,8 @@ describe('ns.ViewСollection ns-view-* events', function() {
                     events: eventsDecl,
                     models: model ? [model] : [],
                     split: {
-                        view_id: view + '-item'
+                        byModel: model,
+                        intoViews: view + '-item'
                     }
                 });
 

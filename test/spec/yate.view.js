@@ -63,7 +63,8 @@ describe('рендеринг ns.ViewCollection через yate', function() {
         ns.ViewCollection.define('vc-mixed', {
             models: ['mc-mixed'],
             split: {
-                view_id: function(model) {
+                byModel: 'mc-mixed',
+                intoViews: function(model) {
                     return 'vc-mixed-item' + model.get('.type');
                 }
             }

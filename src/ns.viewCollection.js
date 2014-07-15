@@ -22,28 +22,15 @@ ns.ViewCollection.define = function(id, info) {
     info = info || {};
     var ctor = ns.View.define.call(this, id, info, this);
 
-    // check for modelCollection
-    for (var model_id in info.models) {
-        // get lite info to prevent info processing
-        if (ns.Model.infoLite(model_id).isCollection) {
-            // Пока можно подписывать viewCollection только на одну modelCollection
-            if (info.modelCollectionId && model_id !== info.modelCollectionId) {
-                throw new Error("[ns.ViewCollection] '" + id + "' must depends on single ns.ModelCollection only");
+    ns.assert(info.split, 'ns.ViewCollection', "'%s'  must defines 'split' section", id);
+    ns.assert(info.split.intoViews, 'ns.ViewCollection', "'%s'  must defines 'split.intoViews' section", id);
+    ns.assert(info.split.byModel, 'ns.ViewCollection', "'%s'  must defines 'split.byModel' section", id);
 
-            } else {
-                info.modelCollectionId = model_id;
-                info.isCollection = true;
-            }
-        }
-    }
+    var isValidModelCollection = (info.split.byModel in info.models) && ns.Model.infoLite(info.split.byModel).isCollection;
+    ns.assert(isValidModelCollection, 'ns.ViewCollection', "'%s'  must depends on ns.ModelCollection", id);
 
-    if (!info.modelCollectionId) {
-        throw new Error("[ns.ViewCollection] '" + id + "' must depends on ns.ModelCollection");
-    }
-
-    if (!info.split || !info.split['view_id']) {
-        throw new Error("[ns.ViewCollection] '" + id + "' must defines split.view_id");
-    }
+    info.isCollection = true;
+    info.modelCollectionId = info.split.byModel;
 
     return ctor;
 };
@@ -551,9 +538,9 @@ ns.ViewCollection.prototype._getViewItem = function(modelItem, updateParams) {
     var viewItemParams = no.extend({}, updateParams, modelItem.params);
 
     var viewId;
-    var infoViewId = this.info.split.view_id;
+    var infoViewId = this.info.split.intoViews;
     if (typeof infoViewId === 'function') {
-        // если view_id - функция, то передаем туда модель и параметры,
+        // если intoViews - функция, то передаем туда модель и параметры,
         // а она должна вернуть id вида
         viewId = infoViewId(modelItem, viewItemParams);
     } else {

@@ -41,7 +41,8 @@ describe('ns.ViewCollection. Подписка на события моделей
             ns.ViewCollection.define('list', {
                 models: ['collection'],
                 split: {
-                    view_id: 'line'
+                    byModel: 'collection',
+                    intoViews: 'line'
                 }
             });
 
@@ -93,7 +94,8 @@ describe('ns.ViewCollection. Подписка на события моделей
                     }
                 },
                 split: {
-                    view_id: 'line'
+                    byModel: 'collection',
+                    intoViews: 'line'
                 },
                 methods: {
                     onInsert: this.onInsert = sinon.spy(),

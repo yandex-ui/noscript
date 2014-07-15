@@ -531,24 +531,44 @@ describe('ns.ModelCollection', function() {
                      */
                     this.items = ns.Model.get('items');
                     this.items.setData([{id: 0}, {id:1}, {id:2}, {id:3}, {id:4}]);
-                    this.items.remove([1,3]);
                 });
 
-                it('должен оставить в коллекции 3 элемента', function() {
-                    expect(this.items.models).to.have.length(3);
+                describe('в прямом порядке', function() {
+
+                    beforeEach(function() {
+                        this.items.remove([1,3]);
+                    });
+
+                    checkDeletionFromCollection();
                 });
 
-                it('должен оставить 0-й элемент', function() {
-                    expect(this.items.models[0]).to.be.equal(ns.Model.get('item', {id: 0}))
+                describe('в обратном порядке', function() {
+
+                    beforeEach(function() {
+                        this.items.remove([3,1]);
+                    });
+
+                    checkDeletionFromCollection();
+
                 });
 
-                it('должен оставить 2-й элемент', function() {
-                    expect(this.items.models[1]).to.be.equal(ns.Model.get('item', {id: 2}))
-                });
+                function checkDeletionFromCollection() {
+                    it('должен оставить в коллекции 3 элемента', function() {
+                        expect(this.items.models).to.have.length(3);
+                    });
 
-                it('должен оставить 4-й элемент', function() {
-                    expect(this.items.models[2]).to.be.equal(ns.Model.get('item', {id: 4}))
-                });
+                    it('должен оставить 0-й элемент', function() {
+                        expect(this.items.models[0]).to.be.equal(ns.Model.get('item', {id: 0}))
+                    });
+
+                    it('должен оставить 2-й элемент', function() {
+                        expect(this.items.models[1]).to.be.equal(ns.Model.get('item', {id: 2}))
+                    });
+
+                    it('должен оставить 4-й элемент', function() {
+                        expect(this.items.models[2]).to.be.equal(ns.Model.get('item', {id: 4}))
+                    });
+                }
 
             });
 

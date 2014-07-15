@@ -16,6 +16,8 @@
         "nommon": "0.0.23",
         "vow": "0.3.13"
     },
+    "main": "./dist/noscript.module.js",
+    "browser": "./dist/noscript.min.js",
     "devDependencies": {
         "borschik": "0.4.x",
         "jquery": "1.11.0",

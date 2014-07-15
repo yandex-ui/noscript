@@ -26,15 +26,9 @@ describe('ns.ModelCollection', function() {
                 'event2': function() {
                     methodCallback();
                 },
-                'ns-model-changed': function() {
-                    changedCallback.apply(this, arguments);
-                },
-                'ns-model-insert': function() {
-                    insertCallback();
-                },
-                'ns-model-remove': function() {
-                    removeCallback();
-                }
+                'ns-model-changed': changedCallback,
+                'ns-model-insert': insertCallback,
+                'ns-model-remove': removeCallback
             },
 
             methods: {
@@ -519,7 +513,6 @@ describe('ns.ModelCollection', function() {
 
                 this.model = ns.Model.get('mc0', { id: Math.random() });
 
-                this.model.trigger = this.sinon.spy();
                 this.model.setData(this.data, { silent: true });
 
                 this.item1 = this.model.models[0];
@@ -546,6 +539,17 @@ describe('ns.ModelCollection', function() {
                 this.model.clear();
                 this.item1.trigger('event1');
                 expect(this.methodNameCallback.callCount).to.be.equal(0);
+            });
+
+            it('должен бросить собитие ns-model-removed', function() {
+                this.model.clear();
+                expect(this.removeCallback).to.have.callCount(1);
+            });
+
+            it('должен бросить собитие ns-model-removed cо всеми удаленными моделями', function() {
+                var MCItems = this.model.models;
+                this.model.clear();
+                expect(this.removeCallback).to.be.calledWith('ns-model-remove', MCItems);
             });
 
         });

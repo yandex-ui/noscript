@@ -694,7 +694,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Model#canRetry"><a href="ns.Model.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.Model#canRequest"><a href="ns.Model.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.Model#destroy"><a href="ns.Model.html#destroy">destroy</a></li>
                 
@@ -781,7 +781,7 @@
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
-                    <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelCollection#canRequest"><a href="ns.ModelCollection.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelCollection#clear"><a href="ns.ModelCollection.html#clear">clear</a></li>
                 
@@ -882,7 +882,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.ModelUniq#canRetry"><a href="ns.ModelUniq.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelUniq#canRequest"><a href="ns.ModelUniq.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelUniq#destroy"><a href="ns.ModelUniq.html#destroy">destroy</a></li>
                 
@@ -1063,10 +1063,6 @@
                 
                     <li data-name="ns.View#$node"><a href="ns.View.html#$node">$node</a></li>
                 
-                    <li data-name="ns.View#_modelsHandlers"><a href="ns.View.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.View#_modelsVersions"><a href="ns.View.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.View#async"><a href="ns.View.html#async">async</a></li>
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
@@ -1172,10 +1168,6 @@
                 
                     <li data-name="ns.ViewCollection#$node"><a href="ns.ViewCollection.html#$node">$node</a></li>
                 
-                    <li data-name="ns.ViewCollection#_modelsHandlers"><a href="ns.ViewCollection.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsVersions"><a href="ns.ViewCollection.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.ViewCollection#async"><a href="ns.ViewCollection.html#async">async</a></li>
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
@@ -1277,6 +1269,10 @@
 </ul>
 </li>
 <li><a href="#Получение-экземпляра-модели">Получение экземпляра модели</a></li>
+<li><a href="#Запрос-данных-модели-с-сервера">Запрос данных модели с сервера</a><ul>
+<li><a href="#Локальные-модели">Локальные модели</a></li>
+</ul>
+</li>
 <li><a href="#Работа-с-данными">Работа с данными</a></li>
 <li><a href="#Пре--и-постобработка-данных">Постобработка данных</a><ul>
 <li><a href="#extractdata">extractData</a></li>
@@ -1286,6 +1282,7 @@
 </ul>
 </li>
 <li><a href="#События">События</a></li>
+<li><a href="#Запрос">Запрос</a></li>
 </ul>
 <h2>Декларация</h2><p>Определение новой модели происходит через статическую функцию <code>ns.Model.define</code></p>
 <pre class="prettyprint source lang-js"><code>ns.Model.define('modelName', modelDeclObject[, baseModel])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
@@ -1338,7 +1335,26 @@ ns.Model.define('my-model', {
 <li><code>ns.Model.get('modelName', params)</code> - строит ключ из <code>params</code> и возвращает соответствующую модель. Если такого экземпляра нет, то он будет создан.</li>
 <li><code>ns.Model.getValid('modelName', params)</code> - тоже самое что и <code>ns.Model.get</code>. Только экземпляр еще проверяется на валидность. Если валидный экземпляр не найден, то возвращается <code>null</code>.</li>
 </ul>
-<h2>Работа с данными</h2><p><strong>Методы для получения данных</strong>:</p>
+<h2>Запрос данных модели с сервера</h2><p>Данные модели:</p>
+<ul>
+<li>могут прийти с севера (модель можно явно запросить с помощью метода <code>ns.request()</code> или неявно, создав и выполнив <code>ns.Update</code> на странице)</li>
+<li>могут быть установлены вручную (см. <a href="#Работа-с-данными">Работа с данными</a>)</li>
+</ul>
+<p>В случае запроса модели с сервера модель перезапрашивается если:</p>
+<ul>
+<li>она не валидна (<code>isValid()</code> возвращает <code>false</code>)</li>
+<li>её можно запросить ещё раз (<code>canRequest()</code> возвращает <code>true</code>)</li>
+</ul>
+<h3>Локальные модели</h3><p>Локальная модель - модель, которая никогда не запрашивается на сервере.
+Данные такой модели устанавливают вручную.
+Чтобы модель стала локальной нужно переопределить метод <code>canRequest()</code>, к примеру, так:</p>
+<pre class="prettyprint source lang-js"><code>ns.Model.define('local-model', {
+    methods: {
+        canRequest: function() {
+            return false;
+        }
+    }
+});</code></pre><h2>Работа с данными</h2><p><strong>Методы для получения данных</strong>:</p>
 <ul>
 <li><code>#getData()</code> - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.</li>
 <li><code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.<pre class="prettyprint source lang-js"><code>{
@@ -1413,6 +1429,23 @@ this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
 <li><code>ns-model-init</code> - модель создана и проинициализованна</li>
 <li><code>ns-model-touched</code> - у модели изменилась версия. Такое событие будет как результатом изменения данных через <code>#set</code> или <code>#setData</code>, так и прямым вызовом метода <code>#touch()</code></li>
 </ul>
+<h2>Запрос</h2><p>По умолчанию все модели запрашиваются по урлу <code>ns.request.URL</code>.
+Если запрашиваются несколько моделей, то они группируются в один запрос.</p>
+<p>Это поведение можно изменить с помощью метода <code>request()</code> у модели, который должен вернуть <code>Vow.Promise</code>.
+В этом случае, вся логика запроса находится в этом методе, в том числе модель сама должна вызвать методы <code>setData()</code> или <code>setError()</code>.
+Такие запросы не группируются, но подчиняются общим правилам <code>ns.request</code>, т.е. будут работать перезапросы и пока не завершится первый запрос, нельзя сделать дублирующий.</p>
+<pre class="prettyprint source lang-js"><code>ns.Model.define('model', {
+    methods: {
+        request: function() {
+            return ns.http('https://api.twitter.com', {}, {type: 'GET'})
+                .then(function(data) {
+                    this.setData(data);
+                }, function(error) {
+                    this.setError(error);
+                }, this);
+        }
+    }
+});</code></pre>
 </article>
 
 </section>  
@@ -1427,7 +1460,7 @@ this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 14:15:59 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

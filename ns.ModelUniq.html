@@ -694,7 +694,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Model#canRetry"><a href="ns.Model.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.Model#canRequest"><a href="ns.Model.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.Model#destroy"><a href="ns.Model.html#destroy">destroy</a></li>
                 
@@ -781,7 +781,7 @@
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
-                    <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelCollection#canRequest"><a href="ns.ModelCollection.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelCollection#clear"><a href="ns.ModelCollection.html#clear">clear</a></li>
                 
@@ -882,7 +882,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.ModelUniq#canRetry"><a href="ns.ModelUniq.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelUniq#canRequest"><a href="ns.ModelUniq.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelUniq#destroy"><a href="ns.ModelUniq.html#destroy">destroy</a></li>
                 
@@ -1063,10 +1063,6 @@
                 
                     <li data-name="ns.View#$node"><a href="ns.View.html#$node">$node</a></li>
                 
-                    <li data-name="ns.View#_modelsHandlers"><a href="ns.View.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.View#_modelsVersions"><a href="ns.View.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.View#async"><a href="ns.View.html#async">async</a></li>
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
@@ -1171,10 +1167,6 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ViewCollection#$node"><a href="ns.ViewCollection.html#$node">$node</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsHandlers"><a href="ns.ViewCollection.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsVersions"><a href="ns.ViewCollection.html#_modelsVersions">_modelsVersions</a></li>
                 
                     <li data-name="ns.ViewCollection#async"><a href="ns.ViewCollection.html#async">async</a></li>
                 
@@ -1286,7 +1278,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 781
+            ns.model.js, line 788
         </div>
         
     </div>
@@ -1426,11 +1418,11 @@
             
 <dt>
     <div class="nameContainer inherited">
-        <h4 class="name" id="canRetry">
+        <h4 class="name" id="canRequest">
             
-                <span class="inherited"><a href="ns.Model.html#canRetry">inherited</a></span>
+                <span class="inherited"><a href="ns.Model.html#canRequest">inherited</a></span>
             
-            canRetry<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+            canRequest<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
         </h4>
     
         
@@ -1446,7 +1438,7 @@
     
     
     <div class="description">
-        <p>Возвращает, можно ли перезапрашивать эту модель, если предыдущий запрос не удался.</p>
+        <p>Возвращает, можно ли запрашивать / перезапрашивать модель.</p>
     </div>
     
 
@@ -2068,7 +2060,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 915
+            ns.model.js, line 922
         </div>
         
     </div>
@@ -2636,7 +2628,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 816
+            ns.model.js, line 823
         </div>
         
     </div>
@@ -3734,7 +3726,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 854
+            ns.model.js, line 861
         </div>
         
     </div>
@@ -4153,7 +4145,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 14:15:59 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

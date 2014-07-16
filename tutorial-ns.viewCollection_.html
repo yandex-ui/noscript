@@ -694,7 +694,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Model#canRetry"><a href="ns.Model.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.Model#canRequest"><a href="ns.Model.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.Model#destroy"><a href="ns.Model.html#destroy">destroy</a></li>
                 
@@ -781,7 +781,7 @@
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
-                    <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelCollection#canRequest"><a href="ns.ModelCollection.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelCollection#clear"><a href="ns.ModelCollection.html#clear">clear</a></li>
                 
@@ -882,7 +882,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.ModelUniq#canRetry"><a href="ns.ModelUniq.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelUniq#canRequest"><a href="ns.ModelUniq.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelUniq#destroy"><a href="ns.ModelUniq.html#destroy">destroy</a></li>
                 
@@ -1063,10 +1063,6 @@
                 
                     <li data-name="ns.View#$node"><a href="ns.View.html#$node">$node</a></li>
                 
-                    <li data-name="ns.View#_modelsHandlers"><a href="ns.View.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.View#_modelsVersions"><a href="ns.View.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.View#async"><a href="ns.View.html#async">async</a></li>
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
@@ -1172,10 +1168,6 @@
                 
                     <li data-name="ns.ViewCollection#$node"><a href="ns.ViewCollection.html#$node">$node</a></li>
                 
-                    <li data-name="ns.ViewCollection#_modelsHandlers"><a href="ns.ViewCollection.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsVersions"><a href="ns.ViewCollection.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.ViewCollection#async"><a href="ns.ViewCollection.html#async">async</a></li>
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
@@ -1277,9 +1269,11 @@
 <h2>Декларация</h2><pre class="prettyprint source lang-js"><code>ns.ViewCollection.define('my-view-collection', {
     models: [ 'my-model-collection' ],
     split: {
-        view_id: 'my-view-collection-item'
+        byModel: 'my-model-collection',
+        intoViews: 'my-view-collection-item'
     }
-});</code></pre><p>Опция <code>split.view_id</code> определяет из каких <code>ns.View</code> состоит коллекция.</p>
+});</code></pre><p>Опция <code>split.intoViews</code> определяет из каких <code>ns.View</code> состоит коллекция.</p>
+<p>Опция <code>split.byModel</code> определяет по какой модели коллекции строить виды.</p>
 <p>Опция <code>models</code>, как и в ns.View определяет зависимость от моделей и подписки на их события.
 По умолчанию ViewCollection делает следующие подписки:</p>
 <ul>
@@ -1293,6 +1287,28 @@
 });</code></pre><p>Элемент коллекции ведет себя как обычный <code>ns.View</code> и ничего не знает про коллекцию.</p>
 <p>Элементы коллекции помещаются в узел-контейнер, размеченный классом <code>ns-view-container-desc</code>.
 Узел-контейнер <strong>обязательно</strong> должен быть указан. Вне этого контейнера можно делать собcтвенную html-разметку.</p>
+<h2>Фильтрация и разнородная коллекция</h2><p>Если для <code>split.intoViews</code> указать функцию вместо строки, то это даст как возможность фильтровать виды, так и составлять коллекцию из разных элементов.
+Функция должна возвращать ID вида или <code>false</code>.</p>
+<pre class="prettyprint source lang-js"><code>ns.View.define('my-view-collection', {
+    models: [ 'my-model-collection' ],
+    split: {
+        byModel: 'my-model-collection',
+        intoViews: function(model) {
+            // эти элементы мы фильтруем и не включаем в коллекцию
+            if (model.get('.type') === 3) {
+                return false;
+            }
+
+            if (model.get('.type') === 1) {
+                // этот элемент станет видом 'view-item-type-1'
+                return 'view-item-type-1';
+            }
+
+            // этот элемент станет видом 'view-item'
+            return 'view-item';
+        }
+    }
+});</code></pre>
 </article>
 
 </section>  
@@ -1307,7 +1323,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 14:16:00 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

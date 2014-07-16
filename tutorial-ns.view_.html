@@ -694,7 +694,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Model#canRetry"><a href="ns.Model.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.Model#canRequest"><a href="ns.Model.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.Model#destroy"><a href="ns.Model.html#destroy">destroy</a></li>
                 
@@ -781,7 +781,7 @@
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
-                    <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelCollection#canRequest"><a href="ns.ModelCollection.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelCollection#clear"><a href="ns.ModelCollection.html#clear">clear</a></li>
                 
@@ -882,7 +882,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.ModelUniq#canRetry"><a href="ns.ModelUniq.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelUniq#canRequest"><a href="ns.ModelUniq.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelUniq#destroy"><a href="ns.ModelUniq.html#destroy">destroy</a></li>
                 
@@ -1063,10 +1063,6 @@
                 
                     <li data-name="ns.View#$node"><a href="ns.View.html#$node">$node</a></li>
                 
-                    <li data-name="ns.View#_modelsHandlers"><a href="ns.View.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.View#_modelsVersions"><a href="ns.View.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.View#async"><a href="ns.View.html#async">async</a></li>
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
@@ -1171,10 +1167,6 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ViewCollection#$node"><a href="ns.ViewCollection.html#$node">$node</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsHandlers"><a href="ns.ViewCollection.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsVersions"><a href="ns.ViewCollection.html#_modelsVersions">_modelsVersions</a></li>
                 
                     <li data-name="ns.ViewCollection#async"><a href="ns.ViewCollection.html#async">async</a></li>
                 
@@ -1284,9 +1276,9 @@
 <li><a href="#methods">methods</a></li>
 <li><a href="#models">models</a></li>
 <li><a href="#Параметры">Параметры</a><ul>
-<li><a href="#params+">params+</a></li>
+<li><a href="#params">params+</a></li>
 <li><a href="#params-">params-</a></li>
-<li><a href="#params">params</a></li>
+<li><a href="#params-1">params</a></li>
 <li><a href="#rewriteParamsOnInit">rewriteParamsOnInit</a></li>
 </ul>
 </li>
@@ -1325,10 +1317,24 @@ ns.View.define('my-view', {
 <pre class="prettyprint source lang-js"><code>{
     // событие click на корневой ноде вида
     &quot;click&quot;: &quot;onClick&quot;,
+
     // событие click на нодах к классом selector внутри вида
     &quot;click .selector&quot;: &quot;onSelectorClick&quot;,
-    &quot;click@init .selector&quot;: &quot;onInitSelectorClick&quot;
-}</code></pre><h4>&quot;Космические&quot; события noscript</h4><p>Декларируются как и остальные события</p>
+
+    // событие click на нодах к классом selector внутри вида, 
+    // из-за @init обработчик навешивается на ns-view-htmlinit и снимается при ns-view-htmldestroy
+    &quot;click@init .selector&quot;: &quot;onInitSelectorClick&quot;,
+
+    // обработчик события scroll на window
+    &quot;scroll window&quot;: 'onScroll'
+}</code></pre><p>Правила для DOM-событий:</p>
+<ol>
+<li>Все (кроме <code>scroll</code>) события работают через механизм <a href="http://www.nczonline.net/blog/2009/06/30/event-delegation-in-javascript/">event delegation</a>.</li>
+<li>По умолчанию все обработчики навешиваются на <code>ns-view-show</code> и снимаются на <code>ns-view-hide</code></li>
+<li>Событие <code>scroll</code> не всплывает, поэтому навешивается напрямую на ноду, указанную в селекторе.</li>
+<li>В качестве селектора можно указать <code>window</code> или <code>document</code>, в этом случае событие будет навешано на соответствующий глобальный объект.   </li>
+</ol>
+<h4>&quot;Космические&quot; события noscript</h4><p>Декларируются как и остальные события</p>
 <pre class="prettyprint source lang-js"><code>{
     &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
     &quot;my-custom-init@init&quot;: &quot;onCustomInit&quot;
@@ -1387,14 +1393,18 @@ ns.View.define('my-view', {
 });</code></pre><p>В приведённом примере вид будет инвалидироваться при любом стандартном событии модели.</p>
 <p>Инвалидировать вид можно так же по любым другим событиям модели. Для этого в декларации нужно явно указать событие и обработчик.</p>
 <pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
-  models: {album: {
-    'ns-model-boof': 'invalidate'
-  }}
+  models: {
+    album: {
+      'ns-model-boof': 'invalidate'
+    }
+  }
 });</code></pre><p>Для того, чтобы предотвратить инвалидацию вида по конекретному событию, в качестве обработчика нужно явно указать метод <code>keepValid</code>.</p>
 <pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
-  models: {album: {
-    `ns-model-changed`: 'keepValid'
-  }}
+  models: {
+    album: {
+      'ns-model-changed': 'keepValid'
+    }
+  }
 });</code></pre><p>В приведённом примере при наступлении события ns-model-changed вид будет оставаться валидным и не будет перерисован при последующих update'ах. При любом другом стандартном событии модели он будет проинвалидирован.</p>
 <p>Для того, чтобы предотвратить инвалидацию вида по любому событию, <code>keepValid</code> нужно установить значением поля модели.</p>
 <pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
@@ -1403,7 +1413,23 @@ ns.View.define('my-view', {
 <p><code>'invalidate' и 'keepValid'</code> - это имена реальных методов. Вместо них можно указать имя любого другого метода вида.</p>
 <p>Если нужно в качестве обработчика события использовать произвольный метод, и при этом инвалидировать вид, достаточно внутри метода вызвать <code>this.invalidate();</code>.</p>
 <p>Для краткости вместо методов <code>invalidate</code> и <code>keepValid</code> можно указывать их краткую форму: <code>true</code> и <code>false</code> соответственно. 2 варианта деклараций в следующем примере работают одинаково.</p>
-<pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
+<p>Пример использования произвольных обработчиков:</p>
+<pre class="prettyprint source lang-js"><code>ns.View.define('supre-view', {
+  models: {
+    album: {
+      'ns-model-changed': 'methodOfView'
+    }
+  },
+  methods: {
+    'methodOfView': function(){ }
+  }
+});</code></pre><pre class="prettyprint source lang-js"><code>ns.View.define('supre-view', {
+  models: {
+    album: {
+      'ns-model-changed': function() { }
+    }
+  }
+});</code></pre><pre class="prettyprint source lang-js"><code>ns.View.define('super-view', {
   models: {
     photo: 'invalidate',
     album: 'keepValid'
@@ -1499,7 +1525,7 @@ ns.View.define('super-view', {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 14:16:00 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

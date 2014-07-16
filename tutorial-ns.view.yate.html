@@ -694,7 +694,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.Model#canRetry"><a href="ns.Model.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.Model#canRequest"><a href="ns.Model.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.Model#destroy"><a href="ns.Model.html#destroy">destroy</a></li>
                 
@@ -781,7 +781,7 @@
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
-                    <li data-name="ns.ModelCollection#canRetry"><a href="ns.ModelCollection.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelCollection#canRequest"><a href="ns.ModelCollection.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelCollection#clear"><a href="ns.ModelCollection.html#clear">clear</a></li>
                 
@@ -882,7 +882,7 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
-                    <li data-name="ns.ModelUniq#canRetry"><a href="ns.ModelUniq.html#canRetry">canRetry</a></li>
+                    <li data-name="ns.ModelUniq#canRequest"><a href="ns.ModelUniq.html#canRequest">canRequest</a></li>
                 
                     <li data-name="ns.ModelUniq#destroy"><a href="ns.ModelUniq.html#destroy">destroy</a></li>
                 
@@ -1063,10 +1063,6 @@
                 
                     <li data-name="ns.View#$node"><a href="ns.View.html#$node">$node</a></li>
                 
-                    <li data-name="ns.View#_modelsHandlers"><a href="ns.View.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.View#_modelsVersions"><a href="ns.View.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.View#async"><a href="ns.View.html#async">async</a></li>
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
@@ -1172,10 +1168,6 @@
                 
                     <li data-name="ns.ViewCollection#$node"><a href="ns.ViewCollection.html#$node">$node</a></li>
                 
-                    <li data-name="ns.ViewCollection#_modelsHandlers"><a href="ns.ViewCollection.html#_modelsHandlers">_modelsHandlers</a></li>
-                
-                    <li data-name="ns.ViewCollection#_modelsVersions"><a href="ns.ViewCollection.html#_modelsVersions">_modelsVersions</a></li>
-                
                     <li data-name="ns.ViewCollection#async"><a href="ns.ViewCollection.html#async">async</a></li>
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
@@ -1279,10 +1271,10 @@
 }</code></pre><ul>
 <li><code>ns-view-add-class</code> - с помощью этой моды можно дописать собственные классы в DOM-обертку. Например,</li>
 </ul>
-<pre class="prettyprint source"><code>match .my-view2 ns-view-add-attrs {
+<pre class="prettyprint source"><code>match .my-view2 ns-view-add-class {
     // пробел в начале обязателен
     &quot; my-class&quot;
-}</code></pre><h2>Содержимое View</h2><h3>ns-view-content</h3><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
+}</code></pre><h2>Содержимое View</h2><h3>ns-view-content и ns-view-desc</h3><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
 <pre class="prettyprint source"><code>match .my-view1 ns-view-content {
     <div class=&quot;view1-content&quot;>
         // в этом месте отрисуются все дочерние view с помощью хелпера ns-view-desc
@@ -1309,14 +1301,16 @@
     </div>
 }</code></pre><h3>ns-view-error-content</h3><p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.</p>
 <h2>Элементы ViewСollection</h2><p>В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: <code>ns-view-content</code> и <code>ns-view-async-content</code>.
-Для управления местом вставки элементов коллекции есть мода <code>ns-view-desc</code>.
+Для управления местом вставки элементов коллекции есть мода <code>ns-view-collection</code>.
 Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.</p>
+<p>Если вы используете эту моду, то родительскую ноду для элементов коллекции надо пометить специальных классом <code>ns-view-container-desc</code></p>
 <pre class="prettyprint source"><code>match .my-view-collection ns-view-content {
     <div class=&quot;my-view-collection__wrapper&quot;>
         <div class=&quot;my-view-collection__text&quot;>My View Collection</div>
-        <div class=&quot;my-view-collection__items&quot;>
+        <div class=&quot;my-view-collection__items ns-view-container-desc&quot;>
             // сюда будут отрисованы элементы коллекции
-            apply . ns-view-desc
+            // не забывайте добавлять класс для родителя элементов коллекции
+            apply . ns-view-collection
         </div>
     </div>
 }</code></pre><h2>Yate-хелперы</h2><ul>
@@ -1378,7 +1372,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 14:16:00 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

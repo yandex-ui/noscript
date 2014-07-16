@@ -27,9 +27,10 @@ ns.parseQuery = function(s) {
 
     s.split('&').forEach(function(chunk) {
         var p = chunk.split('=');
-        var name = p[0];
+        var name = p.shift();
         if (name) {
-            var value = p[1];
+            // В значении параметра может быть знак равенства
+            var value = p.join('=');
 
             // &c=
             if (typeof value === 'undefined') {

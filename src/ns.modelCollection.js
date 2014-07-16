@@ -262,22 +262,29 @@
     /**
      * Очищает коллекцию от моделей.
      * Не путать с remove.
+     * @fires ns.ModelCollection#ns-model-remove
      */
     ns.ModelCollection.prototype.clear = function() {
-        if (this.models) {
-            var that = this;
-            this.models.forEach(function(model) {
-                that._unsubscribeSplit(model);
-            });
-        }
+        var models = this.models;
 
         // Это нужно и для начальной инициализации моделей.
+        // Сначала удаляем все элементы, потом отписываем и бросаем событие
 
         /**
          * Массив с моделями - элементами коллекции.
          * @type {ns.Model[]}
          */
         this.models = [];
+
+        if (models && models.length) {
+            var that = this;
+            models.forEach(function(model) {
+                that._unsubscribeSplit(model);
+            });
+
+            // бросаем событие об удалении всех элементов
+            this.trigger('ns-model-remove', models);
+        }
     };
 
     /**

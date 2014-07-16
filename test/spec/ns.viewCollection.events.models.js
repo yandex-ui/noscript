@@ -96,10 +96,10 @@ describe('ns.ViewCollection. Подписка на события моделей
                     view_id: 'line'
                 },
                 methods: {
-                    onInsert: this.onInsert = sinon.spy(),
-                    onRemove: this.onRemove = sinon.spy(),
-                    onChanged: this.onChanged = sinon.spy(),
-                    onDestroyed: this.onDestroyed = sinon.spy()
+                    onInsert: this.onInsert = this.sinon.spy(),
+                    onRemove: this.onRemove = this.sinon.spy(),
+                    onChanged: this.onChanged = this.sinon.spy(),
+                    onDestroyed: this.onDestroyed = this.sinon.spy()
                 }
             });
 
@@ -124,7 +124,10 @@ describe('ns.ViewCollection. Подписка на события моделей
             	ns.Model.destroy(this.collection);
 
                 expect(this.onInsert.callCount).to.equal(1);
-                expect(this.onRemove.callCount).to.equal(1);
+                // ns-model-remove кидается два раза
+                // один раз от this.collection.remove(itemOld);
+                // второй раз при destroy this.collection
+                expect(this.onRemove.callCount).to.equal(2);
                 expect(this.onChanged.callCount).to.equal(1);
                 expect(this.onDestroyed.callCount).to.equal(1);
             });

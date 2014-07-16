@@ -73,7 +73,8 @@
 ```js
 	ns.ViewCollection.define('letters', {
 		split: {
-			view_id: 'letter'
+		    byModel: 'letters',
+			intoViews: 'letter'
 		},
 		models: ['letters']
 	});

@@ -45,7 +45,8 @@ ns.Model.define('letter', {
 ns.View.define('letters', {
 	models: ['letters'],
 	split: {
-		view_id: 'letter'
+	    byModel: 'letters'
+		intoViews: 'letter'
 	}
 });
 

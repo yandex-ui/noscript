@@ -16,7 +16,7 @@ describe('ns.ViewCollection', function() {
             expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
         });
 
-        it('should throw exception if I define viewCollection without ModelCollection', function() {
+        it('should throw exception if I define viewCollection without "split" section', function() {
             try {
                 ns.ViewCollection.define('collection', {
                     models: [ 'model' ]
@@ -26,32 +26,53 @@ describe('ns.ViewCollection', function() {
             expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
         });
 
-        it('should throw exception if I define viewCollection with several ModelCollections', function() {
-            try {
-                ns.ViewCollection.define('collection', {
-                    models: [ 'model-collection1', 'model-collection2' ]
-                });
-            } catch(e) {}
-
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
-        });
-
-        it('should throw exception if I define viewCollection with single ModelCollection but without split.view_id', function() {
-            try {
-                ns.ViewCollection.define('collection', {
-                    models: [ 'model-collection1' ]
-                });
-            } catch(e) {}
-
-            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
-        });
-
-        it('should not throw exception if I define viewCollection with single ModelCollection and split.view_id', function() {
+        it('should throw exception if I define viewCollection with ModelCollection but without split.intoViews', function() {
             try {
                 ns.ViewCollection.define('collection', {
                     models: [ 'model-collection1' ],
                     split: {
-                        view_id: 'collection-item'
+                        byModel: 'model-collection1'
+                    }
+                });
+            } catch(e) {}
+
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
+        });
+
+        it('should throw exception if I define viewCollection with ModelCollection but without split.byModel', function() {
+            try {
+                ns.ViewCollection.define('collection', {
+                    models: [ 'model-collection1' ],
+                    split: {
+                        intoViews: 'collection-item'
+                    }
+                });
+            } catch(e) {}
+
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
+        });
+
+        it('should throw exception if I define viewCollection with ModelCollection and invalid split.byModel', function() {
+            try {
+                ns.ViewCollection.define('collection', {
+                    models: [ 'model-collection1' ],
+                    split: {
+                        byModel: 'there-is-no-such-model-in-declaration',
+                        intoViews: 'collection-item'
+                    }
+                });
+            } catch(e) {}
+
+            expect(ns.ViewCollection.define.getCall(0).threw()).to.be.equal(true);
+        });
+
+        it('should not throw exception if I define viewCollection with ModelCollection and valid "split" section', function() {
+            try {
+                ns.ViewCollection.define('collection', {
+                    models: [ 'model-collection1' ],
+                    split: {
+                        byModel: 'model-collection1',
+                        intoViews: 'collection-item'
                     }
                 });
             } catch(e) {}
@@ -104,7 +125,8 @@ describe('ns.ViewCollection', function() {
             ns.ViewCollection.define('vc-mixed', {
                 models: ['mc-mixed'],
                 split: {
-                    view_id: this.viewSplitter
+                    byModel: 'mc-mixed',
+                    intoViews: this.viewSplitter
                 }
             });
 
@@ -137,7 +159,7 @@ describe('ns.ViewCollection', function() {
             delete this.viewSplitter;
         });
 
-        it('должен вызвать функцию из view_id для каждого элемента', function() {
+        it('должен вызвать функцию из intoViews для каждого элемента', function() {
             // по 2 раза для каждого элемента
             expect(this.viewSplitter).to.have.callCount(6);
         });
@@ -186,7 +208,8 @@ describe('ns.ViewCollection', function() {
             ns.ViewCollection.define('v-collection', {
                 models: [ 'm-collection' ],
                 split: {
-                    view_id: 'v-collection-item'
+                    byModel: 'm-collection',
+                    intoViews: 'v-collection-item'
                 }
             });
             ns.View.define('v-collection-item', {
@@ -284,7 +307,8 @@ describe('ns.ViewCollection', function() {
             ns.ViewCollection.define('v-collection', {
                 models: [ 'm-collection' ],
                 split: {
-                    view_id: 'v-collection-item'
+                    byModel: 'm-collection',
+                    intoViews: 'v-collection-item'
                 }
             });
             ns.View.define('v-collection-item', {
@@ -529,7 +553,8 @@ describe('ns.ViewCollection', function() {
             ns.ViewCollection.define('vCollection', {
                 models: [ 'mCollection' ],
                 split: {
-                    view_id: 'vItem'
+                    byModel: 'mCollection',
+                    intoViews: 'vItem'
                 }
             });
             ns.View.define('vItem', {
@@ -597,7 +622,8 @@ describe('ns.ViewCollection', function() {
             ns.ViewCollection.define('v-collection-2', {
                 models: [ 'm-collection-2' ],
                 split: {
-                    view_id: 'v-collection-2'
+                    byModel: 'm-collection-2',
+                    intoViews: 'v-collection-2'
                 },
                 events: {
                     'ns-view-init': 'oninit'
@@ -725,7 +751,8 @@ describe('ns.ViewCollection', function() {
                 ns.ViewCollection.define('view-collection', {
                     models: ['model-collection', 'model'],
                     split: {
-                        view_id: 'view'
+                        byModel: 'model-collection',
+                        intoViews: 'view'
                     }
                 });
 

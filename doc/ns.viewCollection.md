@@ -22,12 +22,15 @@ ViewCollection      ->  ModelCollection
 ns.ViewCollection.define('my-view-collection', {
     models: [ 'my-model-collection' ],
     split: {
-        view_id: 'my-view-collection-item'
+        byModel: 'my-model-collection',
+        intoViews: 'my-view-collection-item'
     }
 });
 ```
 
-Опция `split.view_id` определяет из каких `ns.View` состоит коллекция.
+Опция `split.intoViews` определяет из каких `ns.View` состоит коллекция.
+
+Опция `split.byModel` определяет по какой модели коллекции строить виды.
 
 Опция `models`, как и в ns.View определяет зависимость от моделей и подписки на их события.
 По умолчанию ViewCollection делает следующие подписки:
@@ -48,14 +51,15 @@ ns.View.define('my-view-collection-item', {
 Узел-контейнер **обязательно** должен быть указан. Вне этого контейнера можно делать собcтвенную html-разметку.
 
 ## Фильтрация и разнородная коллекция
-Если для `split.view_id` указать функцию вместо строки, то это даст как возможность фильтровать виды, так и составлять коллекцию из разных элементов.
+Если для `split.intoViews` указать функцию вместо строки, то это даст как возможность фильтровать виды, так и составлять коллекцию из разных элементов.
 Функция должна возвращать ID вида или `false`.
 
 ```js
 ns.View.define('my-view-collection', {
     models: [ 'my-model-collection' ],
     split: {
-        view_id: function(model) {
+        byModel: 'my-model-collection',
+        intoViews: function(model) {
             // эти элементы мы фильтруем и не включаем в коллекцию
             if (model.get('.type') === 3) {
                 return false;

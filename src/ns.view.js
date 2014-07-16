@@ -1006,49 +1006,47 @@
 
         var viewNode;
         //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
-        if ( !this.isValid() ) {
+        if ( viewWasInvalid ) {
             //  Ищем новую ноду блока.
             viewNode = this._extractNode(node);
             ns.assert(viewNode, 'ns.View', "Can't find node for '%s'", this.id);
 
-            if ( !this.isOk() ) {
-                //  Обновляем весь блок.
-                //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
-                //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
-                //  автоматически попадут на нужное место.
+            //  Обновляем весь блок.
+            //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
+            //  Для таких блоков нужно вставить их ноду в DOM, а все его подблоки
+            //  автоматически попадут на нужное место.
 
-                if (updateOptions.toplevel) {
-                    //  Старая нода показывает место, где должен быть блок.
-                    //  Если старой ноды нет, то это блок, который вставляется в бокс.
+            if (updateOptions.toplevel) {
+                //  Старая нода показывает место, где должен быть блок.
+                //  Если старой ноды нет, то это блок, который вставляется в бокс.
 
-                    if (this.node) {
-                        ns.replaceNode(this.node, viewNode);
-                        options_next.parent_added = true;
-                    }
-                    //  Все подблоки ниже уже не toplevel.
-                    options_next.toplevel = false;
-                }
-                //  вызываем htmldestory только если нода была заменена
-                if (this.node && !this.isLoading()) {
-                    this._hide(events['ns-view-hide']);
-                    this._htmldestroy(events['ns-view-htmldestroy']);
-                }
-
-                //  новая нода должна в любом случае попасть в DOM
-                if (this.node && !updateOptions.parent_added && !options_next.parent_added) {
+                if (this.node) {
                     ns.replaceNode(this.node, viewNode);
+                    options_next.parent_added = true;
                 }
+                //  Все подблоки ниже уже не toplevel.
+                options_next.toplevel = false;
+            }
+            //  вызываем htmldestory только если нода была заменена
+            if (this.node && !this.isLoading()) {
+                this._hide(events['ns-view-hide']);
+                this._htmldestroy(events['ns-view-htmldestroy']);
+            }
 
-                //  Запоминаем новую ноду.
-                this._setNode(viewNode);
+            //  новая нода должна в любом случае попасть в DOM
+            if (this.node && !updateOptions.parent_added && !options_next.parent_added) {
+                ns.replaceNode(this.node, viewNode);
+            }
 
-                if ( this.isOk() ) {
-                    this._htmlinit(events['ns-view-htmlinit']);
+            //  Запоминаем новую ноду.
+            this._setNode(viewNode);
 
-                } else if (this.isLoading()) {
-                    // В асинхронном запросе вызываем async для view, которые являются заглушкой.
-                    events['ns-view-async'].push(this);
-                }
+            if ( this.isOk() ) {
+                this._htmlinit(events['ns-view-htmlinit']);
+
+            } else if (this.isLoading()) {
+                // В асинхронном запросе вызываем async для view, которые являются заглушкой.
+                events['ns-view-async'].push(this);
             }
 
             this._saveModelsVersions();

@@ -22,12 +22,12 @@ ns.ViewCollection.define = function(id, info) {
     info = info || {};
     var ctor = ns.View.define.call(this, id, info, this);
 
-    ns.assert(info.split, 'ns.ViewCollection', "'%s'  must defines 'split' section", id);
-    ns.assert(info.split.intoViews, 'ns.ViewCollection', "'%s'  must defines 'split.intoViews' section", id);
-    ns.assert(info.split.byModel, 'ns.ViewCollection', "'%s'  must defines 'split.byModel' section", id);
+    ns.assert(info.split, 'ns.ViewCollection', "'%s'  must define 'split' section", id);
+    ns.assert(info.split.intoViews, 'ns.ViewCollection', "'%s'  must define 'split.intoViews' section", id);
+    ns.assert(info.split.byModel, 'ns.ViewCollection', "'%s'  must define 'split.byModel' section", id);
 
     var isValidModelCollection = (info.split.byModel in info.models) && ns.Model.infoLite(info.split.byModel).isCollection;
-    ns.assert(isValidModelCollection, 'ns.ViewCollection', "'%s'  must depends on ns.ModelCollection", id);
+    ns.assert(isValidModelCollection, 'ns.ViewCollection', "'%s'  must depend on ns.ModelCollection", id);
 
     info.isCollection = true;
     info.modelCollectionId = info.split.byModel;

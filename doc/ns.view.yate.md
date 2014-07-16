@@ -24,7 +24,7 @@ match .my-view2 ns-view-add-attrs {
 * `ns-view-add-class` - с помощью этой моды можно дописать собственные классы в DOM-обертку. Например,
 
 ```
-match .my-view2 ns-view-add-attrs {
+match .my-view2 ns-view-add-class {
     // пробел в начале обязателен
     " my-class"
 }

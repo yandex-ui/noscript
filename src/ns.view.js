@@ -50,6 +50,25 @@
     ns.View.prototype.params = null;
 
     /**
+     * Собственная нода вида
+     * @type {HTMLElement}
+     */
+    ns.View.prototype.node = null;
+
+    /**
+     * Собственная нода вида
+     * @type {jQuery}
+     */
+    ns.View.prototype.$node = null;
+
+    /**
+     * Дочерние виды
+     * @type {object.<string, ns.View>}
+     * @private
+     */
+    ns.View.prototype.views = null;
+
+    /**
      * Инициализирует экземпляр вида
      * @param {string} id
      * @param {object} params
@@ -75,18 +94,17 @@
         /**
          * Save models version to track changes.
          * @type {object}
-         * @protected
+         * @private
          */
         this._modelsVersions = {};
 
         /**
          * Обработчики событий моделей
          * @type {object}
-         * @protected
+         * @private
          */
         this._modelsHandlers = {};
 
-        this.node = null;
         this.views = {};
 
         /**
@@ -927,16 +945,7 @@
     ns.View.prototype._setNode = function(node) {
         var STATUS = this.STATUS;
         if (node) {
-            /**
-             * View node
-             * @type {HTMLElement}
-             */
             this.node = node;
-
-            /**
-             * jQuerified view node
-             * @type {jQuery}
-             */
             this.$node = $(node);
 
             this.status = this.asyncState ? STATUS.LOADING : STATUS.OK;

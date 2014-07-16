@@ -19,9 +19,9 @@
   - [methods](#methods)
   - [models](#models)
   - [Параметры](#Параметры)
-    - [params+](#params+)
+    - [params+](#params )
     - [params-](#params-)
-    - [params](#params)
+    - [params](#params-1)
     - [rewriteParamsOnInit](#rewriteParamsOnInit)
 - [Валидность и перерисовки](#Валидность)
 - [Взаимодействие с видом](#Взаимодействие)
@@ -84,11 +84,24 @@ DOM-события навешиваются через механизм деле
 {
     // событие click на корневой ноде вида
     "click": "onClick",
+    
     // событие click на нодах к классом selector внутри вида
     "click .selector": "onSelectorClick",
-    "click@init .selector": "onInitSelectorClick"
+    
+    // событие click на нодах к классом selector внутри вида, 
+    // из-за @init обработчик навешивается на ns-view-htmlinit и снимается при ns-view-htmldestroy
+    "click@init .selector": "onInitSelectorClick",
+    
+    // обработчик события scroll на window
+    "scroll window": 'onScroll'
 }
 ```
+
+Правила для DOM-событий:
+ 1. Все (кроме `scroll`) события работают через механизм [event delegation](http://www.nczonline.net/blog/2009/06/30/event-delegation-in-javascript/).
+ 2. По умолчанию все обработчики навешиваются на `ns-view-show` и снимаются на `ns-view-hide`
+ 2. Событие `scroll` не всплывает, поэтому навешивается напрямую на ноду, указанную в селекторе.
+ 3. В качестве селектора можно указать `window` или `document`, в этом случае событие будет навешано на соответствующий глобальный объект.   
 
 #### "Космические" события noscript
 

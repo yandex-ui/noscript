@@ -781,6 +781,41 @@ describe('ns.View', function() {
             });
         });
 
+        describe('перерисовка при изменении версии модели', function() {
+
+            beforeEach(function() {
+
+                ns.Model.define('model');
+                ns.Model.get('model').setData('1');
+
+                ns.View.define('app');
+                ns.View.define('view', {models: ['model']});
+                ns.layout.define('app', {app: {view: {} } });
+
+                this.view = ns.View.create('app');
+
+                return draw(this.view);
+            });
+
+            it('должен перерисовать вид после model.touch()', function() {
+                var that = this;
+                var beforeRedrawInnerHTML = this.view.node.innerHTML;
+
+                // меняем версию модели, вид должен перерисоваться
+                ns.Model.get('model').touch();
+
+                return draw(this.view)
+                    .then(function() {
+                        expect(that.view.node.innerHTML).to.not.be.equal(beforeRedrawInnerHTML);
+                    });
+            });
+
+            function draw(view) {
+                return new ns.Update(view, ns.layout.page('app'), {}).render();
+            }
+
+        });
+
     });
 
     describe('ns.View update after model destruction', function() {

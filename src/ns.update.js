@@ -171,12 +171,14 @@
     /**
      * Запрашивает модели всех видов
      * @private
-     * @returns {Vow.promise}
+     * @returns {Vow.Promise}
      */
     ns.Update.prototype._requestAllModels = function() {
-        this.startTimer('collectModels');
+        if (this._expired()) {
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
+        }
 
-        var update = this;
+        this.startTimer('collectModels');
 
         var requestPromise = new Vow.Promise();
 
@@ -195,46 +197,17 @@
             this.stopTimer('requestSyncModels');
         }, this);
 
-        var asyncPromises = [];
+        /*
+         Каждому async-view передаем главный Promise из Update
+         Когда он зарезолвится, вид сам запустит update на себе
 
-        // Для каждого async-view запрашиваем его модели.
-        // Когда они приходят, запускаем точно такой же update.
-        // Причем ждем отрисовку sync-view, чтобы точно запуститься после него.
-        views.async.forEach(function(view) {
-            var models = views2models([view]);
-            var asyncPromise = new Vow.Promise();
-            asyncPromises.push(asyncPromise);
-
-            Vow.all([
-                update.promise,
-                update._requestModels(models)
-            ]).then(function() {
-
-                // FIXME: в идеале нужно вынести подготовку и запуск нового update
-                // в сценарий render, т.к. этот метод - только про запрос моделей
-
-                var layout;
-                var params;
-                // start new async update with current page params to prevent problems
-                // if other updates had been completed
-                if (ns.page.current.layout) {
-                    var currentPage = ns.page.current;
-                    layout = currentPage.layout;
-                    params = currentPage.params;
-                } else {
-                    layout = {};
-                    layout[update.view.id] = update.layout;
-                    params = update.params;
-                }
-
-                asyncPromise.sync(
-                    new ns.Update(update.view, layout, params, {execFlag: ns.U.EXEC.ASYNC}).rerender()
-                );
-
-            }, function(error) {
-                asyncPromise.reject(error);
-            });
-        });
+         TODO: Возможная оптимизация: в этом месте можно сделать запрос моделей для async-видов без какой-либо реакции на результат.
+         Это позволит отрисовать их немного быстрее, потому что в текущем виде они будут ждать полной отрисовки sync-видов.
+         Обратная сторона медали - в браузере могут кончиться коннекты :)
+         */
+        var asyncPromises = views.async.map(function(/** ns.View */view) {
+            return view.updateAfter(this.promise);
+        }, this);
 
         syncPromise.then(function() {
             requestPromise.fulfill({
@@ -245,18 +218,6 @@
         });
 
         return requestPromise;
-    };
-
-    /**
-     * Рекурсивно устанавливает видам asyncState
-     */
-    ns.Update.prototype._setAsyncState = function() {
-        // FIXME: вызов этого метода здесь несколько избыточен.
-        // Он нужен сейчас только для рекурсивного прохода по видам с целью
-        // выставления правильного asyncState, хотя кроме этого делает много другого.
-        // Правильный путь - все рекурсивные обходы видов вынести в ns.Update
-        // Сделаем это позже
-        this.view._getRequestViews({sync: [], async: []}, this.layout.views, this.params);
     };
 
     /**
@@ -272,9 +233,13 @@
     /**
      * Генерирует html недостающих видов
      * @private
-     * @returns {string}
+     * @returns {Vow.Promise}
      */
     ns.Update.prototype._generateHTML = function() {
+        if (this._expired()) {
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
+        }
+
         //  TODO: Проверить, что не начался уже более новый апдейт.
 
         this.startTimer('collectViews');
@@ -302,9 +267,13 @@
      * @private
      * @param {HTMLElement} node
      * @param {boolean} async
-     * @returns {string}
+     * @returns {Vow.Promise}
      */
     ns.Update.prototype._insertNodes = function(node, async) {
+        if (this._expired()) {
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
+        }
+
         this.startTimer('insertNodes');
 
         var viewEvents = {
@@ -384,6 +353,14 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype.start = ns.Update.prototype.render = function() {
+        if (this._expired()) {
+            this._reject({
+                error: this.STATUS.EXPIRED
+            });
+
+            return this.promise;
+        }
+
         this.log('started `render` scenario');
         /*
         TODO: надо всю эту колбасу переписать на promise-way и
@@ -398,27 +375,11 @@
             this._generateHTML().then(function(html) {
                 this._insertNodes(ns.html2node(html)).then(function() {
                     this._fulfill(asyncResult);
-                }, this);
+                }, this._reject, this);
             }, this._reject, this)
             // Если insertNodes кинет exception, то он ловится вот тут.
             // Иначе ns.Update повиснет и ничего не кинет
             .then(null, this._reject, this);
-        }, this._reject, this);
-
-        return this.promise;
-    };
-
-    /**
-     * Сценарий перерисовки страницы без запроса моделей
-     * @returns {Vow.promise}
-     */
-    ns.Update.prototype.rerender = function() {
-        this.log('started `_re_render` scenario');
-        this._setAsyncState();
-        this._generateHTML().then(function(html) {
-            this._insertNodes(ns.html2node(html), true).then(function() {
-                this._fulfill({async: []});
-            }, this);
         }, this._reject, this);
 
         return this.promise;
@@ -460,7 +421,10 @@
      * @private
      */
     ns.Update.prototype._expired = function() {
-        return !this.promise.isResolved() && currentUpdates.indexOf(this) === -1;
+        // update считается просроченным, если
+        // его промис уже зарезолвили (fulfill или reject)
+        // его нет в списке активных update (т.е. его кто-то оттуда убрал)
+        return this.promise.isResolved() || currentUpdates.indexOf(this) === -1;
     };
 
     /**
@@ -495,6 +459,18 @@
         ns.Update._removeFromQueue(this);
         this.promise.reject(reason);
         this.log('scenario was rejected with reason', reason);
+    };
+
+    /**
+     * Возвращает reject-промис с статусом
+     * @param {ns.U.STATUS} status
+     * @returns {Vow.Promise}
+     * @private
+     */
+    ns.Update.prototype._rejectWithStatus = function(status) {
+        return Vow.reject({
+            error: status
+        });
     };
 
     /**

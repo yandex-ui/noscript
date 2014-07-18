@@ -82,7 +82,7 @@ describe('ns.page', function() {
                     ns.page.go('/inbox').then(function() {
                         expect(that.spy).have.been.calledWith(
                             'ns-page-before-load',
-                            [ {}, { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) } ],
+                            [ {}, { page: 'inbox', params: {} } ],
                             '/inbox'
                         );
 
@@ -99,8 +99,8 @@ describe('ns.page', function() {
                             expect(that.spy).have.been.calledWith(
                                 'ns-page-before-load',
                                 [
-                                    { page: 'inbox', params: {}, layout: ns.layout.page('inbox', {}) },
-                                    { page: 'message', params: { id: '1' }, layout: ns.layout.page('message', { id: '1' }) }
+                                    { page: 'inbox', params: {} },
+                                    { page: 'message', params: { id: '1' } }
                                 ],
                                 '/message/1'
                             );

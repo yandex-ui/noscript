@@ -793,6 +793,19 @@ describe('ns.Updater', function() {
             });
 
             it('should resolve promise with new ns.Update instance when async view is finished', function(finish) {
+                this.sinon.server.autoRespond = true;
+                this.sinon.server.respond(function(xhr) {
+                    xhr.respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                { data: true }
+                            ]
+                        })
+                    );
+                });
+
                 var returnValue = this.updater.start();
                 returnValue.then(function(data) {
                     data.async[0].then(function(result) {
@@ -804,19 +817,23 @@ describe('ns.Updater', function() {
                         }
                     });
                 });
-
-                this.sinon.server.requests[0].respond(
-                    200,
-                    {"Content-Type": "application/json"},
-                    JSON.stringify({
-                        models: [
-                            {data: true}
-                        ]
-                    })
-                );
             });
 
             it('should reject promise with status MODELS when ns.request is failed', function(finish) {
+
+                this.sinon.server.autoRespond = true;
+                this.sinon.server.respond(function(xhr) {
+                    xhr.respond(
+                        500,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                { data: true }
+                            ]
+                        })
+                    );
+                });
+
                 var returnValue = this.updater.start();
                 returnValue.then(function(data) {
                     data.async[0].fail(function(result) {
@@ -830,15 +847,6 @@ describe('ns.Updater', function() {
                     });
                 });
 
-                this.sinon.server.requests[0].respond(
-                    500,
-                    {"Content-Type": "application/json"},
-                    JSON.stringify({
-                        models: [
-                            {data: true}
-                        ]
-                    })
-                );
             });
 
         });

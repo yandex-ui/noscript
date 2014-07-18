@@ -96,9 +96,6 @@
     ns.page.startUpdate = function(route) {
         var layout = ns.layout.page(route.page, route.params);
 
-        // save layout for async-view updates
-        ns.page.current.layout = layout;
-
         var update = new ns.Update(ns.MAIN_VIEW, layout, route.params);
         return update.start().then(triggerPageAfterLoad, triggerPageErrorLoad);
     };

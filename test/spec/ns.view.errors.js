@@ -35,7 +35,7 @@ describe('ns.View error handling', function() {
             delete this.update;
         });
 
-        it('render .ns-view-error-content template', function(finish) {
+        it('render .ns-view-error-content template', function() {
             var that = this;
             var update = this.update;
             ns.Update.handleError = function(_error, _update) {
@@ -43,9 +43,8 @@ describe('ns.View error handling', function() {
                 expect(_error.error).to.be.equal('models');
                 return true;
             };
-            this.update.start().then(function() {
-                expect($('.ns-view-letter', that.APP.node).html()).to.be.equal('view-error-content');
-                finish();
+            return this.update.start().then(function() {
+                expect($('.ns-view-letter', that.APP.node).html()).to.be.equal('test ns-view-error-content');
             });
         });
 

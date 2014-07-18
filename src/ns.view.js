@@ -617,6 +617,12 @@
         // При необходимости добавим текущий вид в список "запрашиваемых"
         this._tryPushToRequest(updated);
 
+        // запоминаем свой кусок layout
+        this.layout = {};
+        this.layout[this.id] = {
+            views: pageLayout
+        };
+
         // Создаем подблоки
         for (var view_id in pageLayout) {
             this._addView(view_id, params, pageLayout[view_id].type);
@@ -645,7 +651,11 @@
             var hasValidModels = this.isModelsValid();
             var hasValidStatus = this.isOk();
 
-            if (hasValidModels && !hasValidStatus) {
+            // shouldBeSync - специальный флаг, чтобы вид отрисовался
+            // раньше это работало так,
+            // update параллельно запрашивал модели для синхронных видов и асинхронных
+            // поэтому когда запускался update для асинхронных модели уже были готовы и hasValidModels === true
+            if (this.shouldBeSync || (hasValidModels && !hasValidStatus)) {
                 // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его синхронно
                 updated.sync.push(this);
 
@@ -1099,6 +1109,56 @@
      * @method
      */
     ns.View.prototype.keepValid = ns.View.prototype._saveModelsVersions;
+
+    /**
+     * Запускает собственный ns.Update после завершения promise.
+     * @param {Vow.Promise} promise Промис, после которого запустить ns.Update
+     * @returns {Vow.Promise}
+     */
+    ns.View.prototype.updateAfter = function(promise) {
+        this._asyncPromise = new Vow.Promise();
+
+        var that = this;
+        promise.then(function() {
+            that.update();
+        });
+
+        return this._asyncPromise;
+    };
+
+    /**
+     * Запускает на себе ns.Update
+     * @param {object} [params={}] Дополнительные параметры. Могут использоваться при ручном запуске.
+     * @returns {Vow.Promise}
+     */
+    ns.View.prototype.update = function(params) {
+        this.shouldBeSync = true;
+
+        if (!this.layout) {
+            // если нет layout, то это элемент коллекции и сюда не приходит _applyLayout
+            this.layout = {};
+            this.layout[this.id] = {};
+        }
+
+        var updateParams = this.params;
+        if (params) {
+            // если передали собственные параметры, то надо их скопировать
+            // собственные параметры удобны при ручном вызове этого метода,
+            // если ниже по дереву есть боксы
+            updateParams = no.extend({}, this.params, params);
+        }
+
+        var updatePromise = new ns.Update(this, this.layout, updateParams, {
+            execFlag: ns.U.EXEC.ASYNC
+        }).render();
+
+        // у элемента коллекции его нет
+        if (this._asyncPromise) {
+            this._asyncPromise.sync(updatePromise);
+        }
+
+        return updatePromise;
+    };
 
     var _infos = {};
     var _ctors = {};

@@ -281,6 +281,12 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
                 view = this._addView(viewItem.id, viewItem.params);
             }
 
+            // проставляем для элемента коллекции правильный state
+            view._tryPushToRequest({
+                sync: [],
+                async: []
+            });
+
             decl = null;
             if (this.isValidSelf()) {
                 // Если корневая нода не меняется, то перерендериваем

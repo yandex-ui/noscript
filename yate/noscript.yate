@@ -110,12 +110,8 @@ match .* ns-view-collection {
 
 // Содержимое view при async-инициализации
 // @public
-match .* ns-view-async-content {
-    "async-view-content"
-}
+match .* ns-view-async-content {}
 
 // Часть обязательных моделей не удалось получить или для них вернулась ошибка
 // @public
-match .* ns-view-error-content {
-    "view-error-content"
-}
+match .* ns-view-error-content {}

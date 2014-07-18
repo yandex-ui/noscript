@@ -7,6 +7,10 @@ beforeEach(function() {
     this.sinon.spy(ns, 'renderNode');
     this.sinon.stub(ns.history, 'pushState');
     this.sinon.stub(ns.history, 'replaceState');
+
+    this.sinon.stub(ns.log, 'exception', function(a,b,c) {
+        console.error('ns.log.exception', a, b, c);
+    });
 });
 
 afterEach(function() {

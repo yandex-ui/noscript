@@ -175,9 +175,7 @@
      */
     ns.Update.prototype._requestAllModels = function() {
         if (this._expired()) {
-            return Vow.reject({
-                error: this.STATUS.EXPIRED
-            });
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
         this.startTimer('collectModels');
@@ -235,13 +233,11 @@
     /**
      * Генерирует html недостающих видов
      * @private
-     * @returns {string}
+     * @returns {Vow.Promise}
      */
     ns.Update.prototype._generateHTML = function() {
         if (this._expired()) {
-            return Vow.reject({
-                error: this.STATUS.EXPIRED
-            });
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
         //  TODO: Проверить, что не начался уже более новый апдейт.
@@ -271,13 +267,11 @@
      * @private
      * @param {HTMLElement} node
      * @param {boolean} async
-     * @returns {string}
+     * @returns {Vow.Promise}
      */
     ns.Update.prototype._insertNodes = function(node, async) {
         if (this._expired()) {
-            return Vow.reject({
-                error: this.STATUS.EXPIRED
-            });
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
         this.startTimer('insertNodes');
@@ -465,6 +459,18 @@
         ns.Update._removeFromQueue(this);
         this.promise.reject(reason);
         this.log('scenario was rejected with reason', reason);
+    };
+
+    /**
+     * Возвращает reject-промис с статусом
+     * @param {ns.U.STATUS} status
+     * @returns {Vow.Promise}
+     * @private
+     */
+    ns.Update.prototype._rejectWithStatus = function(status) {
+        return Vow.reject({
+            error: status
+        });
     };
 
     /**

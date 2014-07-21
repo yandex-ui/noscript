@@ -12,6 +12,10 @@
         "type": "git",
         "url": "git://github.com/yandex-ui/noscript.git"
     },
+    "bugs": {
+        "url": "https://github.com/yandex-ui/noscript/issues"
+    },
+    "license": "MIT",
     "dependencies": {
         "nommon": "0.0.23",
         "vow": "0.3.13"

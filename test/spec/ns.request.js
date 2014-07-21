@@ -250,7 +250,6 @@ describe('ns.request.js', function() {
             });
         });
 
-        /*
         describe('STATUS.ERROR', function() {
 
             beforeEach(function() {
@@ -258,70 +257,14 @@ describe('ns.request.js', function() {
                 model.status = model.STATUS.ERROR;
             });
 
-            it('should not create http request for model', function() {
+            it('should create http request for model', function() {
                 ns.request('test-model');
-                expect(this.sinon.server.requests.length).to.be.equal(0);
-            });
-
-            it('should resolve promise immediately for model', function() {
-                var result = false;
-                ns.request('test-model').then(function() {
-                    result = true;
-                });
-                expect(result).to.be.equal(true);
+                expect(this.sinon.server.requests).to.have.length(1);
             });
 
         });
 
-        describe('STATUS_LOADING', function() {
-
-            beforeEach(function() {
-                var model = ns.Model.get('test-model');
-                model.status = model.STATUS_LOADING;
-                model.promise = new no.Promise();
-            });
-
-            describe('regular', function() {
-                it('should not create http request for model', function() {
-                    no.request('test-model');
-                    expect(this.sinon.server.requests.length).to.be.equal(0);
-                });
-
-                it('should not resolve promise immediately for model', function() {
-                    var result = false;
-                    no.request('test-model').then(function() {
-                        result = true;
-                    });
-
-                    expect(result).to.be.equal(false);
-                });
-            });
-
-            describe('forced', function() {
-
-                beforeEach(function() {
-                    this.requestPromise = no.forcedRequest('test-model');
-                });
-
-                afterEach(function() {
-                    delete this.requestPromise;
-                });
-
-                it('should create http request for model', function() {
-                    expect(this.sinon.server.requests.length).to.be.equal(1);
-                });
-
-                it('should not resolve promise immediately for model', function() {
-                    var result = false;
-                    this.requestPromise.then(function() {
-                        result = true;
-                    });
-
-                    expect(result).to.be.equal(false);
-                });
-            });
-        });
-
+        /*
         describe('STATUS_FAILED', function() {
 
             beforeEach(function() {

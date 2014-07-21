@@ -264,24 +264,38 @@ describe('ns.request.js', function() {
 
         });
 
-        /*
+        // это тест самого ns.request.manager
+        // тут поведение, когда запрос завершился с ошибкой
         describe('STATUS_FAILED', function() {
 
             beforeEach(function() {
                 ns.Model.define('test-model-failed');
 
+                this.promise = ns.request(['test-model-failed']);
+
                 this.model = ns.Model.get('test-model-failed');
-                this.model.status = ns.M.STATUS.FAILED;
             });
 
             describe('common', function() {
 
-                beforeEach(function() {
+                beforeEach(function(done) {
                     this.model.canRequest = this.sinon.spy(function() {
                         return false;
                     });
 
-                    this.promise = ns.request.models([this.model]);
+                    this.sinon.server.requests[0].respond(
+                        500,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {data: false}
+                            ]
+                        })
+                    );
+
+                    window.setTimeout(function() {
+                        done();
+                    }, 100);
                 });
 
                 it('should call model.canRequest', function() {
@@ -295,56 +309,72 @@ describe('ns.request.js', function() {
 
             describe('cant retry', function() {
 
-                beforeEach(function() {
+                beforeEach(function(done) {
                     this.model.canRequest = function() {
                         return false;
                     };
-                    this.promise = ns.request.models([this.model]);
+
+                    this.sinon.server.requests[0].respond(
+                        500,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {data: false}
+                            ]
+                        })
+                    );
+
+                    window.setTimeout(function() {
+                        done();
+                    }, 100);
                 });
 
                 it('should not create http request', function() {
-                    expect(this.sinon.server.requests.length).to.be.equal(0);
+                    expect(this.sinon.server.requests.length).to.be.equal(1);
                 });
 
-                it('should set status to STATUS.ERROR', function() {
-                    expect(this.model.status).to.be.equal(this.model.STATUS.ERROR);
-                });
-
-                it('should resolve promise immediately', function() {
-                    var result = false;
+                it('should set status to STATUS.ERROR', function(done) {
                     this.promise.then(function() {
-                        result = true;
-                    });
+                        done('fulfill')
+                    }, function() {
+                        expect(this.model.status).to.be.equal(this.model.STATUS.ERROR);
+                        done();
+                    }, this);
+                });
 
-                    expect(result).to.be.equal(true);
+                it('should reject promise immediately', function(done) {
+                    this.promise.then(function() {
+                        done('fulfill');
+                    }, function() {
+                        done();
+                    });
                 });
             });
 
             describe('can retry', function() {
 
-                beforeEach(function() {
-                    this.model.canRequest = function() {
-                        return true;
-                    };
-                    this.promise = ns.request.models([this.model]);
+                beforeEach(function(done) {
+                    this.sinon.server.requests[0].respond(
+                        500,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {data: false}
+                            ]
+                        })
+                    );
+
+                    window.setTimeout(function() {
+                        done();
+                    }, 100);
                 });
 
-                it('should create http request', function() {
-                    expect(this.sinon.server.requests.length).to.be.equal(1);
-                });
-
-                it('should not resolve promise immediately', function() {
-                    var result = false;
-                    this.promise.then(function() {
-                        result = true;
-                    });
-
-                    expect(result).to.be.equal(false);
+                it('should create second http request', function() {
+                    expect(this.sinon.server.requests.length).to.be.equal(2);
                 });
             });
 
         });
-        */
 
     });
 

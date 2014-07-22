@@ -1137,7 +1137,7 @@
         if (!this.layout) {
             // если нет layout, то это элемент коллекции и сюда не приходит _applyLayout
             this.layout = {};
-            this.layout[this.id] = {};
+            this.layout[this.id] = { views: {} };
         }
 
         var updateParams = this.params;

@@ -376,6 +376,19 @@ describe('ns.request.js', function() {
 
         });
 
+        describe('do-model', function() {
+
+            beforeEach(function() {
+                ns.Model.define('do-test-model');
+                ns.request('do-test-model');
+            });
+
+            it('should create http request for model', function() {
+                expect(this.sinon.server.requests).to.have.length(1);
+            });
+
+        });
+
     });
 
     describe('addRequestParams', function() {

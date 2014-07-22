@@ -365,7 +365,7 @@
      */
     ns.Model.prototype.canRequest = function() {
         //  do-модели нельзя перезапрашивать.
-        return !this.retries || !this.isDo() && this.retries < 3;
+        return !this.retries || !this.isDo() && this.retries < ns.M.LIMIT.RETRY;
     };
 
     /**

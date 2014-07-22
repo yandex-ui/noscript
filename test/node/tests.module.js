@@ -15,7 +15,7 @@ yr.externals.rand = function() {
 };
 
 // Framework
-var ns = require('../../dist/noscript.module.js');
+var ns = require('../../')();
 
 // Connection between framework and templating engine
 ns.renderString = function(json, mode, module) {

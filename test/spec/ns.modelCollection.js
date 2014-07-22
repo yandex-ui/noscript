@@ -665,7 +665,7 @@ describe('ns.ModelCollection', function() {
                 expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.equal(true);
             });
 
-            it.only('ns-model-destroyed', function() {
+            it('ns-model-destroyed', function() {
                 var destroyedModel = this.models[1];
                 var countElementsBefore = this.mc.models.length;
 

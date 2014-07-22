@@ -162,11 +162,17 @@
 
     /**
      * Уничтожает модель.
+     * @fires ns.Model#ns-model-destroyed
      */
     ns.Model.prototype.destroy = function() {
         this._reset(this.STATUS.NONE);
         // еще надо убрать все обработчики
         this._unbindEvents();
+        /**
+         * Сообщает об уничтожении модели
+         * @events ns.Model#ns-model-destroyed
+         */
+        this.trigger('ns-model-destroyed');
     };
 
     /**
@@ -497,7 +503,6 @@
     /**
      * Completely destroy model and delete it from cache.
      * @param {ns.Model} model
-     * @fires ns.Model#ns-model-destroyed
      */
     ns.Model.destroy = function(model) {
         // do-models are not cached
@@ -510,11 +515,6 @@
 
         var cached = _cache[id][key];
         if (cached) {
-            /**
-             * Сообщает об уничтожении модели
-             * @events ns.Model#ns-model-destroyed
-             */
-            model.trigger('ns-model-destroyed');
             model.destroy();
         }
     };

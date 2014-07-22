@@ -672,7 +672,7 @@ describe('ns.ModelCollection', function() {
                 destroyedModel.destroy();
                 expect(this.onItemDestroyedSpy.callCount).to.be.equal(1);
                 expect(this.onItemDestroyedSpy.calledWithExactly('ns-model-destroyed', destroyedModel)).to.be.equal(true);
-                expect(countElementsBefore).to.be.equal(countElementsBefore - 1);
+                expect(this.mc.models.length).to.be.equal(countElementsBefore - 1);
             });
         });
 

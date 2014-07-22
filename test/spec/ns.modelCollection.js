@@ -665,13 +665,14 @@ describe('ns.ModelCollection', function() {
                 expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.equal(true);
             });
 
-            it('ns-model-destroyed', function() {
-                var touchedModel = this.models[1];
+            it.only('ns-model-destroyed', function() {
+                var destroyedModel = this.models[1];
+                var countElementsBefore = this.mc.models.length;
 
-                touchedModel.touch();
-                expect(this.touchSpy.callCount).to.be.equal(0);
-                expect(this.onItemTouchedSpy.callCount).to.be.equal(1);
-                expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.equal(true);
+                destroyedModel.destroy();
+                expect(this.onItemDestroyedSpy.callCount).to.be.equal(1);
+                expect(this.onItemDestroyedSpy.calledWithExactly('ns-model-destroyed', destroyedModel)).to.be.equal(true);
+                expect(countElementsBefore).to.be.equal(countElementsBefore - 1);
             });
         });
 

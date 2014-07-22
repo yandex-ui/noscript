@@ -123,7 +123,7 @@ describe('ns.ViewCollection. Подписка на события моделей
             });
 
             it('ViewCollection должен вызвать соответствующие методы, указанные в декларации ', function() {
-            	ns.Model.destroy(this.collection);
+                ns.Model.destroy(this.collection);
 
                 expect(this.onInsert.callCount).to.equal(1);
                 // ns-model-remove кидается два раза
@@ -139,7 +139,7 @@ describe('ns.ViewCollection. Подписка на события моделей
             });
         });
 
-        
+
 
         // it('ViewCollection не должен вызывать методы при событиях элемента коллекции', function() {
         //     var item = ns.Model.get('item', {id: 2});

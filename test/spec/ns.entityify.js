@@ -41,7 +41,7 @@ describe('ns.entityify', function() {
         });
 
     });
-    
+
     describe('ns.deentityify', function() {
 
         // copy

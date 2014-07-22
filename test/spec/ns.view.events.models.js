@@ -108,7 +108,7 @@ describe('ns.View. Подписка на события моделей.', functi
 
         it('После ns-model-changed{jpath} виды должны остаться валидными', function() {
             ns.Model.get('season').set('.name', 'winter');
-            
+
             this.assertViewsValid('universe', 'infinity', 'gravity', 'timeflow');
         });
 
@@ -127,7 +127,7 @@ describe('ns.View. Подписка на события моделей.', functi
         it('После ns-model-destroyed виды должны стать невалидными', function() {
             ns.Model.destroy(ns.Model.get('season'));
             this.assertViewsInvalid('universe', 'infinity', 'gravity', 'timeflow');
-        });   
+        });
 
     });
 
@@ -200,7 +200,7 @@ describe('ns.View. Подписка на события моделей.', functi
 
         it('После ns-model-changed{jpath} виды должны стать невалидными', function() {
             ns.Model.get('season').set('.name', 'winter');
-            
+
             this.assertViewsInvalid('evolution', 'policy', 'sales', 'weather');
         });
 
@@ -423,5 +423,5 @@ describe('ns.View. Подписка на события моделей.', functi
         });
 
     });
-    
+
 });

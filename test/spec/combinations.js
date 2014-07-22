@@ -60,7 +60,7 @@ describe('Combinations of entities', function() {
                         done();
                     });
             });
-            
+
         });
 
         afterEach(function() {

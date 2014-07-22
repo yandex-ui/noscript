@@ -15,7 +15,7 @@ yr.externals.rand = function() {
 };
 
 // Framework
-var ns = require('../../dist/noscript.module.js');
+var ns = require('../../')();
 
 // Connection between framework and templating engine
 ns.renderString = function(json, mode, module) {
@@ -44,8 +44,8 @@ afterEach(function() {
 });
 
 describe('app rendering in node.js', function() {
-	beforeEach(function() {
-		ns.layout.define('asyncLayout', {
+    beforeEach(function() {
+        ns.layout.define('asyncLayout', {
             'app': {
                 'vSync0':   ['vSync1', 'vSync2'],
                 'vAsync1&': ['vSync3', 'vSync4'],
@@ -87,9 +87,9 @@ describe('app rendering in node.js', function() {
                 {"data": {"async2": true}}
             ]
         });
-	});
+    });
 
-	describe('generateHTML', function() {
+    describe('generateHTML', function() {
         beforeEach(function(done) {
 
             this.nockScope = nock(appRoot).post(modelsPath + '?_m=mSync1,mSync2,mSync3').reply(

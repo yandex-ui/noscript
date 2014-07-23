@@ -26,6 +26,8 @@
      */
     ns.Model.prototype.STATUS = ns.M.STATUS;
 
+    ns.Model.prototype.RETRY_LIMIT = 3;
+
     /**
      * Состояние модели.
      * @type {ns.M.STATUS}
@@ -365,7 +367,7 @@
      */
     ns.Model.prototype.canRequest = function() {
         //  do-модели нельзя перезапрашивать.
-        return !this.retries || !this.isDo() && this.retries < ns.M.LIMIT.RETRY;
+        return !this.retries || !this.isDo() && this.retries < this.RETRY_LIMIT;
     };
 
     /**

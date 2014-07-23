@@ -208,7 +208,18 @@ ns.ViewCollection.prototype._apply = function(callback) {
     }
 };
 
-ns.ViewCollection.prototype._getRequestViews = ns.View.prototype._tryPushToRequest;
+ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout) {
+    // у ViewCollection нет детей в обычном понимании,
+    // поэтому не нужно хождение вниз по дереву как в ns.View#_getRequestViews
+
+    // TODO: вроде бы ничего не мешает не переопределять этот метод и дать возможность коллекции иметь детей
+    // Все элементы коллекции в контейнере, а коллекция может иметь собственную разметку, в т.ч. с другими видами
+
+    this._saveLayout(pageLayout);
+
+    // При необходимости добавим текущий вид в список "запрашиваемых"
+    return this._tryPushToRequest(updated);
+};
 
 /**
  *

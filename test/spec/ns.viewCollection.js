@@ -785,4 +785,97 @@ describe('ns.ViewCollection', function() {
             });
         });
     });
+
+    describe('асинхронная коллекция', function() {
+
+        beforeEach(function() {
+
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {
+                                data: {
+                                    items: [
+                                        {id: '1', val: 1},
+                                        {id: '2', val: 2},
+                                        {id: '3', val: 3}
+                                    ]
+                                }
+                            }
+                        ]
+                    })
+                );
+            });
+
+            ns.layout.define('app', {
+                'app': {
+                    'vc&': {}
+                }
+            });
+
+            ns.Model.define('mc', {
+                split: {
+                    model_id: 'mc-item',
+                    items: '.items',
+                    params: {
+                        id: '.id'
+                    }
+                }
+            });
+            ns.Model.define('mc-item', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.View.define('app');
+            ns.ViewCollection.define('vc', {
+                models: ['mc'],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            });
+
+            ns.View.define('vc-item', {
+                models: ['mc-item']
+            });
+
+
+            this.view = ns.View.create('app');
+            var layout = ns.layout.page('app');
+
+            return new ns.Update(this.view, layout, {})
+                .render()
+                .then(function(result) {
+                    this.result = result;
+                }, this);
+        });
+
+        it('коллекция должна отрисоваться в async-режиме', function() {
+            expect(this.view.node.querySelectorAll('.ns-view-vc.ns-async')).to.have.length(1);
+        });
+
+        describe('перерисовка после получения моделей', function() {
+
+            beforeEach(function() {
+                return Vow.all(this.result.async);
+            });
+
+            it('коллекция должна отрисоваться в обычном режиме', function() {
+                expect(this.view.node.querySelectorAll('.ns-view-vc.ns-view-visible')).to.have.length(1);
+            });
+
+            it('коллекция должна отрисовать свои элементы', function() {
+                expect(this.view.node.querySelectorAll('.ns-view-vc-item')).to.have.length(3);
+            });
+
+        });
+
+
+    });
 });

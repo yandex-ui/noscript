@@ -603,6 +603,19 @@
     };
 
     /**
+     * Запоминаем свой кусок раскладки страницы для дальнейших перерисовок (например, async).
+     * @param {object} pageLayout
+     * @private
+     */
+    ns.View.prototype._saveLayout = function(pageLayout) {
+        // запоминаем свой кусок layout
+        this.layout = {};
+        this.layout[this.id] = {
+            views: pageLayout
+        };
+    };
+
+    /**
      * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
      * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
      * @param {object} updated Hash for sync and async views.
@@ -617,11 +630,7 @@
         // При необходимости добавим текущий вид в список "запрашиваемых"
         this._tryPushToRequest(updated);
 
-        // запоминаем свой кусок layout
-        this.layout = {};
-        this.layout[this.id] = {
-            views: pageLayout
-        };
+        this._saveLayout(pageLayout);
 
         // Создаем подблоки
         for (var view_id in pageLayout) {

@@ -988,8 +988,6 @@
                 
                     <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
                 
-                    <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
-                
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
                 
                     <li data-name="ns.Update#generateHTML"><a href="ns.Update.html#generateHTML">generateHTML</a></li>
@@ -1003,8 +1001,6 @@
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
                 
                     <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
-                
-                    <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
                 </ul>
             
@@ -1119,6 +1115,10 @@
                 
                     <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
+                    <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
+                
+                    <li data-name="ns.View#updateAfter"><a href="ns.View.html#updateAfter">updateAfter</a></li>
+                
                 </ul>
             
 
@@ -1227,6 +1227,10 @@
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
                 
                     <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
+                
+                    <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
+                
+                    <li data-name="ns.ViewCollection#updateAfter"><a href="ns.ViewCollection.html#updateAfter">updateAfter</a></li>
                 
                 </ul>
             
@@ -1752,7 +1756,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1474
+            ns.view.js, line 1534
         </div>
         
     </div>
@@ -1954,7 +1958,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1128
+            ns.view.js, line 1188
         </div>
         
     </div>
@@ -2321,7 +2325,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1381
+            ns.view.js, line 1441
         </div>
         
     </div>
@@ -2501,7 +2505,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1390
+            ns.view.js, line 1450
         </div>
         
     </div>
@@ -2578,7 +2582,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1174
+            ns.view.js, line 1234
         </div>
         
     </div>
@@ -2711,7 +2715,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 696
+            ns.view.js, line 706
         </div>
         
     </div>
@@ -3162,7 +3166,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1091
+            ns.view.js, line 1101
         </div>
         
     </div>
@@ -3233,7 +3237,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 945
+            ns.view.js, line 955
         </div>
         
     </div>
@@ -3477,7 +3481,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 869
+            ns.view.js, line 879
         </div>
         
     </div>
@@ -3598,7 +3602,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 878
+            ns.view.js, line 888
         </div>
         
     </div>
@@ -4290,7 +4294,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1101
+            ns.view.js, line 1111
         </div>
         
     </div>
@@ -4361,7 +4365,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 800
+            ns.view.js, line 810
         </div>
         
     </div>
@@ -4500,7 +4504,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 896
+            ns.view.js, line 906
         </div>
         
     </div>
@@ -4642,6 +4646,263 @@ block.tmpl({ ... })
 block.tmpl('mode', { ... })</code></pre></code></pre>
     
 
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="update">
+            
+            update<span class="signature">(<span class="optional">params</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1134
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Запускает на себе ns.Update</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Дополнительные параметры. Могут использоваться при ручном запуске.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="updateAfter">
+            
+            updateAfter<span class="signature">(promise)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1118
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Запускает собственный ns.Update после завершения promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>promise</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Vow.Promise</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Промис, после которого запустить ns.Update</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
     
 </dd>
 
@@ -4906,7 +5167,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 23 2014 13:36:21 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

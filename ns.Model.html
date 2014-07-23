@@ -988,8 +988,6 @@
                 
                     <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
                 
-                    <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
-                
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
                 
                     <li data-name="ns.Update#generateHTML"><a href="ns.Update.html#generateHTML">generateHTML</a></li>
@@ -1003,8 +1001,6 @@
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
                 
                     <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
-                
-                    <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
                 </ul>
             
@@ -1119,6 +1115,10 @@
                 
                     <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
+                    <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
+                
+                    <li data-name="ns.View#updateAfter"><a href="ns.View.html#updateAfter">updateAfter</a></li>
+                
                 </ul>
             
 
@@ -1227,6 +1227,10 @@
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
                 
                     <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
+                
+                    <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
+                
+                    <li data-name="ns.ViewCollection#updateAfter"><a href="ns.ViewCollection.html#updateAfter">updateAfter</a></li>
                 
                 </ul>
             
@@ -1745,7 +1749,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 502
+            ns.model.js, line 507
         </div>
         
     </div>
@@ -1837,11 +1841,6 @@
 </dl>
 
     
-    
-    <h5>Fires:</h5>
-    <ul>
-        <li>ns.Model#event:ns-model-destroyed</li>
-    </ul>
     
 
     
@@ -2008,7 +2007,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 450
+            ns.model.js, line 456
         </div>
         
     </div>
@@ -2164,7 +2163,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 475
+            ns.model.js, line 481
         </div>
         
     </div>
@@ -3145,7 +3144,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 366
+            ns.model.js, line 372
         </div>
         
     </div>
@@ -3221,7 +3220,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 166
+            ns.model.js, line 167
         </div>
         
     </div>
@@ -3269,6 +3268,11 @@
 
     
     
+    <h5>Fires:</h5>
+    <ul>
+        <li>ns.Model#event:ns-model-destroyed</li>
+    </ul>
+    
 
     
 
@@ -3292,7 +3296,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 439
+            ns.model.js, line 445
         </div>
         
     </div>
@@ -3404,7 +3408,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 376
+            ns.model.js, line 382
         </div>
         
     </div>
@@ -3521,7 +3525,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 387
+            ns.model.js, line 393
         </div>
         
     </div>
@@ -3638,7 +3642,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 196
+            ns.model.js, line 202
         </div>
         
     </div>
@@ -3768,7 +3772,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 184
+            ns.model.js, line 190
         </div>
         
     </div>
@@ -3840,7 +3844,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 321
+            ns.model.js, line 327
         </div>
         
     </div>
@@ -3912,7 +3916,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 358
+            ns.model.js, line 364
         </div>
         
     </div>
@@ -3984,7 +3988,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 405
+            ns.model.js, line 411
         </div>
         
     </div>
@@ -4060,7 +4064,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 313
+            ns.model.js, line 319
         </div>
         
     </div>
@@ -4248,7 +4252,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 397
+            ns.model.js, line 403
         </div>
         
     </div>
@@ -4320,7 +4324,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 176
+            ns.model.js, line 182
         </div>
         
     </div>
@@ -4392,7 +4396,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 427
+            ns.model.js, line 433
         </div>
         
     </div>
@@ -4513,7 +4517,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 350
+            ns.model.js, line 356
         </div>
         
     </div>
@@ -4630,7 +4634,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 209
+            ns.model.js, line 215
         </div>
         
     </div>
@@ -4752,7 +4756,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 225
+            ns.model.js, line 231
         </div>
         
     </div>
@@ -4996,7 +5000,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 274
+            ns.model.js, line 280
         </div>
         
     </div>
@@ -5217,7 +5221,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 329
+            ns.model.js, line 335
         </div>
         
     </div>
@@ -5329,7 +5333,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 413
+            ns.model.js, line 419
         </div>
         
     </div>
@@ -5413,7 +5417,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 242
+            ns.model.js, line 248
         </div>
         
     </div>
@@ -5600,7 +5604,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 415
+            ns.model.js, line 421
         </div>
         
     </div>
@@ -5679,7 +5683,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 23 2014 13:36:21 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

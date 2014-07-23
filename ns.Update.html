@@ -988,8 +988,6 @@
                 
                     <li data-name="ns.Update#_applyLayout"><a href="ns.Update.html#_applyLayout">_applyLayout</a></li>
                 
-                    <li data-name="ns.Update#_setAsyncState"><a href="ns.Update.html#_setAsyncState">_setAsyncState</a></li>
-                
                     <li data-name="ns.Update#applyTemplate"><a href="ns.Update.html#applyTemplate">applyTemplate</a></li>
                 
                     <li data-name="ns.Update#generateHTML"><a href="ns.Update.html#generateHTML">generateHTML</a></li>
@@ -1003,8 +1001,6 @@
                     <li data-name="ns.Update#prerender"><a href="ns.Update.html#prerender">prerender</a></li>
                 
                     <li data-name="ns.Update#reconstruct"><a href="ns.Update.html#reconstruct">reconstruct</a></li>
-                
-                    <li data-name="ns.Update#rerender"><a href="ns.Update.html#rerender">rerender</a></li>
                 
                 </ul>
             
@@ -1119,6 +1115,10 @@
                 
                     <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
+                    <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
+                
+                    <li data-name="ns.View#updateAfter"><a href="ns.View.html#updateAfter">updateAfter</a></li>
+                
                 </ul>
             
 
@@ -1227,6 +1227,10 @@
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
                 
                     <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
+                
+                    <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
+                
+                    <li data-name="ns.ViewCollection#updateAfter"><a href="ns.ViewCollection.html#updateAfter">updateAfter</a></li>
                 
                 </ul>
             
@@ -1731,7 +1735,7 @@ update.start();</code></pre></code></pre>
     
         
         <div class="tag-source">
-            ns.update.js, line 584
+            ns.update.js, line 560
         </div>
         
     </div>
@@ -1859,7 +1863,7 @@ Cases:</p>
     
         
         <div class="tag-source">
-            ns.update.js, line 563
+            ns.update.js, line 539
         </div>
         
     </div>
@@ -1930,7 +1934,7 @@ Cases:</p>
     
         
         <div class="tag-source">
-            ns.update.js, line 536
+            ns.update.js, line 512
         </div>
         
     </div>
@@ -2078,7 +2082,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 267
+            ns.update.js, line 228
         </div>
         
     </div>
@@ -2146,77 +2150,6 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="_setAsyncState">
-            
-            _setAsyncState<span class="signature">()</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.update.js, line 253
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Рекурсивно устанавливает видам asyncState</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
         <h4 class="name" id="applyTemplate">
             
             applyTemplate<span class="signature">(tree, params, layout)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
@@ -2224,7 +2157,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 453
+            ns.update.js, line 414
         </div>
         
     </div>
@@ -2393,7 +2326,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 357
+            ns.update.js, line 326
         </div>
         
     </div>
@@ -2472,7 +2405,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 504
+            ns.update.js, line 480
         </div>
         
     </div>
@@ -2548,7 +2481,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 515
+            ns.update.js, line 491
         </div>
         
     </div>
@@ -2665,7 +2598,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 343
+            ns.update.js, line 312
         </div>
         
     </div>
@@ -2743,7 +2676,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 374
+            ns.update.js, line 343
         </div>
         
     </div>
@@ -2821,7 +2754,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
     
         
         <div class="tag-source">
-            ns.update.js, line 432
+            ns.update.js, line 393
         </div>
         
     </div>
@@ -2885,82 +2818,6 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
 	
 	</tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="rerender">
-            
-            rerender<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.promise}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.update.js, line 415
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Сценарий перерисовки страницы без запроса моделей</p>
-    </div>
-    
-
-    
-    
-    
-    
     
     
     
@@ -3241,7 +3098,7 @@ If <code>true</code> - update can continue, otherwise update cannot continue.
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 16 2014 17:37:49 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 23 2014 13:36:21 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

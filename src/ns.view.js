@@ -1235,13 +1235,25 @@
     };
 
     /**
-     * Возвращает информацию о View.
-     * @param {string} id Название модели.
+     * Возвращает сохраненную декларацию ns.View без обработки.
+     * @param {string} id Название вида.
      * @returns {object}
-     * @throws Бросает исключения, если нет
+     * @throws Бросает исключения, если вид не определен
+     */
+    ns.View.infoLite = function(id) {
+        var info = _infos[id];
+        ns.assert(info, 'ns.View', "'%s' is not defined", id);
+        return info;
+    };
+
+    /**
+     * Возвращает обработанную информацию о View.
+     * @param {string} id Название вида.
+     * @returns {object}
+     * @throws Бросает исключения, если вид не определен
      */
     ns.View.info = function(id) {
-        var info = _infos[id];
+        var info = ns.View.infoLite(id);
         // если есть декларация, но еще нет pGroups, то надо завершить определение View
         if (info && !info.pGroups) {
             ns.View._initInfoParams(info);
@@ -1435,9 +1447,6 @@
                 }
             }
         }
-
-        // больше не нужны
-        delete info.events;
     };
 
     /**

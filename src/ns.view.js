@@ -1140,13 +1140,17 @@
      * @param {object} [params={}] Дополнительные параметры. Могут использоваться при ручном запуске.
      * @returns {Vow.Promise}
      */
-    ns.View.prototype.update = function(params) {
+    ns.View.prototype.update = function(params, flag) {
         this.shouldBeSync = true;
 
         if (!this.layout) {
+            console.log('create layout for', this.id, this.key);
             // если нет layout, то это элемент коллекции и сюда не приходит _applyLayout
+            //FIXME: кажется надо тут делать настоящий layout, а не подделывать его
             this.layout = {};
-            this.layout[this.id] = {};
+            this.layout[this.id] = {
+                views: {}
+            };
         }
 
         var updateParams = this.params;
@@ -1158,7 +1162,7 @@
         }
 
         var updatePromise = new ns.Update(this, this.layout, updateParams, {
-            execFlag: ns.U.EXEC.ASYNC
+            execFlag: flag || ns.U.EXEC.ASYNC
         }).render();
 
         // у элемента коллекции его нет

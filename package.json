@@ -28,11 +28,13 @@
         "jsdom": "*",
         "jscs": "1.0.11",
         "jshint": "2.5.x",
+        "chai": "~1.9",
+        "sinon": ">=1.4.0 <2",
         "karma": "0.12.x",
         "karma-borschik-preprocessor": "~0.1.2",
         "karma-mocha": "^0.1.3",
         "karma-phantomjs-launcher": "~0.1.0",
-        "karma-sinon-chai": "0.1.x",
+        "karma-sinon-chai": "0.2.x",
         "mocha": "^1.18.2",
         "nock": "0.36.2",
         "request": "2.36.x",
@@ -50,6 +52,6 @@
         "build/src.client.js"
     ],
     "scripts": {
-        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start && ./node_modules/mocha/bin/mocha test/node/tests.module.js"
+        "test": "make prepare && jshint src && jscs . && ./node_modules/karma/bin/karma start && mocha test/node"
     }
 }

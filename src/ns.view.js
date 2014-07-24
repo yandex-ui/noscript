@@ -1144,9 +1144,26 @@
         this.shouldBeSync = true;
 
         if (!this.layout) {
+            /*
+            FIXME: надо тут делать настоящий layout.define, потом undefine, а не подделывать структуру
+            // создаем фейковый временный layout, чтобы отправить его в update
+            var fakeLayoutName = 'ns-temp-layout-for-' + this.id;
+            var fakeLayout = {};
+            fakeLayout[this.id] = {};
+            ns.layout.define(fakeLayoutName, fakeLayout);
+
+            this.layout = ns.layout.page(fakeLayoutName, updateParams);
+
+            // удаляем временный layout
+            ns.layout.undefine(fakeLayoutName);
+
+             */
+
             // если нет layout, то это элемент коллекции и сюда не приходит _applyLayout
             this.layout = {};
-            this.layout[this.id] = {};
+            this.layout[this.id] = {
+                views: {}
+            };
         }
 
         var updateParams = this.params;

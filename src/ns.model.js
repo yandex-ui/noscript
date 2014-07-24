@@ -773,6 +773,24 @@
         return (model.info || ns.Model.infoLite(model.id)).isCollection;
     };
 
+    /**
+     * Проходит по всем инстансам модели и передаёт их в callback.
+     * @param {string} id идентификатор модели
+     * @param {Function} callback
+     */
+    ns.Model.traverse = function(id, callback) {
+        ns.assert((id in _infos), 'ns.Model', "'%s' is not defined", id);
+        ns.assert(('function' === typeof callback), 'ns.Model.traverse', 'callback must be a function');
+
+        var models = _cache[id];
+
+        for (var key in models) {
+            if (models.hasOwnProperty(key)) {
+                callback(models[key]);
+            }
+        }
+    };
+
     // ----------------------------------------------------------------------------------------------------------------- //
 
     // TODO а это кто-то использует вообще? я сюда не смотрел совсем :)

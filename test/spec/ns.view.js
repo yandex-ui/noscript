@@ -26,6 +26,64 @@ describe('ns.View', function() {
         });
     });
 
+    describe('ns.View.info', function() {
+
+        it('должен кинуть ошибку, если вид не определен', function() {
+            expect(function() {
+                ns.View.info('unknown');
+            }).to.throw(Error);
+        });
+
+        it('должен разобрать параметры', function() {
+            ns.View.define('test');
+            expect(ns.View.info('test'))
+                .to.have.property('pGroups')
+                .and.be.an('Array');
+        });
+
+        it('должен разобрать события', function() {
+            ns.View.define('test');
+            expect(ns.View.info('test'))
+                .to.have.property('createEvents')
+                .and.be.an('Array');
+        });
+
+        it('не должен удалять исходную декларацию событий', function() {
+            ns.View.define('test');
+            expect(ns.View.info('test'))
+                .to.have.property('events')
+                .and.be.a('object');
+        });
+
+    });
+
+    describe('ns.View.infoLite', function() {
+
+        it('должен кинуть ошибку, если вид не определен', function() {
+            expect(function() {
+                ns.View.infoLite('unknown');
+            }).to.throw(Error);
+        });
+
+        it('не должен разобрать параметры', function() {
+            ns.View.define('test');
+            expect(ns.View.infoLite('test')).to.not.have.property('pGroups');
+        });
+
+        it('не должен разобрать события', function() {
+            ns.View.define('test');
+            expect(ns.View.infoLite('test')).to.not.have.property('createEvents')
+        });
+
+        it('не должен удалять исходную декларацию событий', function() {
+            ns.View.define('test');
+            expect(ns.View.infoLite('test'))
+                .to.have.property('events')
+                .and.be.a('object');
+        });
+
+    });
+
     describe('ns.View getModel/getModelData', function() {
 
         beforeEach(function() {

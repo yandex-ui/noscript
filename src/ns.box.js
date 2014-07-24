@@ -12,7 +12,8 @@ ns.Box = function(id, params) {
 
     this.views = {};
 
-    this.key = ns.View.getKey(id, params);
+    // у бокса нет декларации и ключ строить не надо
+    this.key = ns.Box.getKey(id);
 
     this.node = null;
     this.active = {};
@@ -23,14 +24,34 @@ ns.Box = function(id, params) {
 ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
 
 /**
+ * Возвращает ключ вида
+ * @param {string} id Название вида
+ * @param {object} params Параметры для ключа
+ * @param {ns.L.TYPE} type Тип
+ * @returns {string}
+ * @private
+ */
+ns.Box.prototype._getViewKey = function(id, params, type) {
+    var key;
+    if (type === ns.L.BOX) {
+        key = ns.Box.getKey(id);
+    } else {
+        key = ns.View.getKey(id, params);
+    }
+
+    return key;
+};
+
+/**
  *
  * @param {string} id
  * @param {object} params
+ * @param {string} type Тип вида.
  * @returns {ns.View}
  * @private
  */
-ns.Box.prototype._getView = function(id, params) {
-    var key = ns.View.getKey(id, params);
+ns.Box.prototype._getView = function(id, params, type) {
+    var key = this._getViewKey(id, params, type);
     return this.views[key];
 };
 
@@ -43,7 +64,7 @@ ns.Box.prototype._getView = function(id, params) {
  * @private
  */
 ns.Box.prototype._addView = function(id, params, type) {
-    var view = this._getView(id, params);
+    var view = this._getView(id, params, type);
     if (!view) {
         if (type === ns.L.BOX) {
             view = new ns.Box(id, params);
@@ -107,8 +128,9 @@ ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
     } else {
         var views = this.views;
         for (var id in layout) {
-            var key = ns.View.getKey(id, params);
-            views[key]._getUpdateTree(tree, layout[id].views, params);
+            var selfLayout = layout[id];
+            var key = this._getViewKey(id, params, selfLayout.type);
+            views[key]._getUpdateTree(tree, selfLayout.views, params);
         }
     }
 };
@@ -126,8 +148,9 @@ ns.Box.prototype._getViewTree = function(layout, params) {
 
     var views = this.views;
     for (var id in layout) {
-        var key = ns.View.getKey(id, params);
-        tree.views[id] = views[key]._getViewTree(layout[id].views, params);
+        var selfLayout = layout[id];
+        var key = this._getViewKey(id, params, selfLayout.type);
+        tree.views[id] = views[key]._getViewTree(selfLayout.views, params);
     }
 
     return tree;
@@ -173,7 +196,8 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
     //  (включая синхронную и все асинхронные подапдейты).
     for (var id in layout) {
-        var key = ns.View.getKey(id, params);
+        var selfLayout = layout[id];
+        var key = this._getViewKey(id, params, selfLayout.type);
         layoutActive[id] = key;
 
         //  Достаем ранее созданный блок (в _getRequestViews).
@@ -183,7 +207,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         var viewWasNone = view.isNone();
 
         //  Обновляем его.
-        view._updateHTML(node, layout[id].views, params, options, events);
+        view._updateHTML(node, selfLayout.views, params, options, events);
 
         // вставляем view в DOM, только если ноды раньше не было (view.status === NONE)
         // если нода была, то view._updateHTML() сделаем сам все свои обновления
@@ -283,4 +307,14 @@ ns.Box.prototype.isLoading = no.false;
  */
 ns.Box.prototype.isNone = function() {
     return !this.node;
+};
+
+/**
+ * Создает ключ для ns.Box.
+ * @param {string} id Название ns.Box.
+ * @returns {string}
+ * @static
+ */
+ns.Box.getKey = function(id) {
+    return 'box=' + id;
 };

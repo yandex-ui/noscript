@@ -744,8 +744,8 @@ describe('ns.Model', function() {
                 this._traverseModel1 = ns.Model.get('traverseModel', { p: 1 }).setData({ part: 1 });
                 this._traverseModel2 = ns.Model.get('traverseModel', { p: 2 }).setData({ part: 2 });
                 this._traverseModel3 = ns.Model.get('traverseModel', { p: 3 }).setData({ part: 3 });
-                this._traverseModel3 = ns.Model.get('traverseModel', { p: 4 }).setData({ part: 4 });
-                this._traverseModel3 = ns.Model.get('traverseModel', { p: 5 }).setData({ part: 5 });
+                this._traverseModel4 = ns.Model.get('traverseModel', { p: 4 }).setData({ part: 4 });
+                this._traverseModel5 = ns.Model.get('traverseModel', { p: 5 }).setData({ part: 5 });
 
                 this.partsSum = 15;
 
@@ -759,7 +759,7 @@ describe('ns.Model', function() {
 
             it('should throw error if tried to call without callback function', function() {
                 expect(function() {
-                    return ns.Model.traverse('m0');
+                    return ns.Model.traverse('traverseModel');
                 }).to.throw();
             });
 

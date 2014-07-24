@@ -89,15 +89,18 @@
      * Регистрирует указанное событие, добавляя к нему признаки ns.update
      * @private
      */
-    ns.Update.prototype.log = no.nop;
-
     ns.Update.prototype.log = function() {
         if (!ns.DEBUG) {
             return;
         }
-        ns.log.debug.apply(ns.log,
-            ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
-        );
+
+        var args = Array.prototype.slice.apply(arguments);
+        // тут выходит оочень большая портянка html-кода и читать его неудобно
+        // оборачиваем в ноду
+        if (args[0] === 'generated html') {
+            args[1] = ns.html2node(args[1]);
+        }
+        ns.log.debug.apply(ns.log, ['[ns.Update]', this.id].concat(args));
     };
 
     /**

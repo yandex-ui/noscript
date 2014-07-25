@@ -2,9 +2,16 @@
  * Replaces oldNode with newNode
  * @param {Element} oldNode
  * @param {Element} newNode
+ * @returns {boolean}
  */
 ns.replaceNode = function(oldNode, newNode) {
-    oldNode.parentNode.replaceChild(newNode, oldNode);
+    // если oldNode детачена из DOM, то у нее нет родителя
+    if (oldNode.parentNode) {
+        oldNode.parentNode.replaceChild(newNode, oldNode);
+        return true;
+    }
+
+    return false;
 };
 
 /**

@@ -91,12 +91,15 @@ match .my-view-collection ns-view-content {
         <div class="my-view-collection__text">My View Collection</div>
         <div class="my-view-collection__items ns-view-container-desc">
             // сюда будут отрисованы элементы коллекции
-            // не забывайте добавлять класс для родителя элементов коллекции
+            // не забывайте добавлять класс "ns-view-container-desc" для родителя элементов коллекции
             apply . ns-view-collection
         </div>
     </div>
 }
 ```
+
+Помните, что элементы коллекции невозможно отрисовать модой `ns-view-desc` или через `apply /.views.* ns-view`.
+Элементы коллекции отрисует только мода `ns-view-collection`!
 
 ## Yate-хелперы
 

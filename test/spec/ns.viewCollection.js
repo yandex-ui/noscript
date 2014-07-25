@@ -82,6 +82,106 @@ describe('ns.ViewCollection', function() {
 
     });
 
+    describe('Наследование от другой коллекции', function() {
+
+        beforeEach(function() {
+
+            ns.View.define('vc-item');
+            ns.Model.define('mc-item');
+            ns.Model.define('mc', {
+                split: {
+                    model_id: 'mc-item'
+                }
+            });
+
+            var parentMegaView = ns.ViewCollection.define('parentMegaView', {
+                methods: {
+                    superMethod: function() {}
+                },
+                models: ['mc'],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            });
+
+            // inherits by class reference
+            ns.ViewCollection.define('childMegaViewByFunction', {
+                methods: {
+                    oneMore: function() {}
+                },
+                models: ['mc'],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            }, parentMegaView);
+
+            // inherits by view name
+            ns.ViewCollection.define('childMegaViewByName', {
+                methods: {
+                    oneMore: function() {}
+                },
+                models: ['mc'],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            }, 'parentMegaView');
+        });
+
+        afterEach(function() {
+            delete this.view;
+        });
+
+        var tests = {
+            'childMegaViewByFunction': 'inherits by class reference',
+            'childMegaViewByName': 'inherits by view name'
+        };
+
+        for (var viewName in tests) {
+            (function(viewName, suiteName) {
+
+                describe(suiteName, function() {
+
+                    beforeEach(function() {
+                        this.view = ns.View.create(viewName, {});
+                    });
+
+                    it('наследуемый view должен быть ns.View', function() {
+                        expect(this.view instanceof ns.ViewCollection).to.be.equal(true);
+                    });
+
+                    it('методы наследуются от базового view', function() {
+                        expect(this.view.superMethod).to.be.a('function');
+                    });
+
+                    it('методы от базового view не ушли в ns.View', function() {
+                        expect(ns.View.prototype.superMethod).to.be.an('undefined');
+                    });
+
+                    it('методы от базового view не ушли в ns.ViewCollection', function() {
+                        expect(ns.ViewCollection.prototype.superMethod).to.be.an('undefined');
+                    });
+
+                    it('методы ns.View на месте', function() {
+                        expect(this.view.isOk).to.be.a('function');
+                    });
+
+                    it('методы ns.ViewCollection на месте', function() {
+                        expect(this.view.isValidDesc).to.be.a('function');
+                    });
+
+                    it('методы из info.methods тоже не потерялись', function() {
+                        expect(this.view.oneMore).to.be.a('function');
+                    });
+
+                });
+
+            })(viewName, tests[viewName]);
+        }
+    });
+
     describe('Разнородная коллекция', function() {
 
         beforeEach(function(finish) {

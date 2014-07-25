@@ -98,13 +98,6 @@
          */
         this._modelsVersions = {};
 
-        /**
-         * Обработчики событий моделей
-         * @type {object}
-         * @private
-         */
-        this._modelsHandlers = {};
-
         this.views = {};
 
         /**
@@ -140,6 +133,12 @@
      */
     ns.View.prototype._initModels = function() {
         this.models = {};
+
+        /**
+         * Обработчики событий моделей
+         * @type {object}
+         * @private
+         */
         this._modelsHandlers = {};
 
         // Создаём модели или берем их из кэша, если они уже есть
@@ -322,7 +321,7 @@
      */
     ns.View.prototype._bindModel = function(model, eventName, handler) {
         model.on(eventName, handler);
-        this._modelsHandlers[model.key] = handler;
+        this._modelsHandlers[model.key][eventName] = handler;
     };
 
     /**
@@ -337,9 +336,8 @@
 
             for (var eventName in events) {
                 model.off(eventName, events[eventName]);
+                delete events[eventName];
             }
-
-            delete this._modelsHandlers[model.key];
         }
     };
 

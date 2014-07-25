@@ -336,6 +336,44 @@ describe('ns.View', function() {
                 });
             });
         });
+
+        describe('сохранение подписок при обновлении вида', function() {
+
+            beforeEach(function() {
+
+                this.methodSpy = this.sinon.spy();
+
+                ns.Model.define('model');
+                ns.Model.get('model').setData({foo: 1});
+
+                ns.View.define('view', {
+                    methods: {
+                        myMethod: this.methodSpy
+                    },
+                    models: {
+                        model: {
+                            'ns-model-changed': 'myMethod'
+                        }
+                    }
+                });
+
+                this.view = ns.View.create('view');
+                return this.view.update();
+            });
+
+            it('должен вызвать обработчик один раз при изменении модели', function() {
+                ns.Model.get('model').set('.foo', 1);
+                expect(this.methodSpy).to.have.callCount(1);
+            });
+
+            it('должен вызвать обработчик один раз при изменении модели', function() {
+                this.view.invalidate();
+                return this.view.update().then(function() {
+                    ns.Model.get('model').set('.foo', 2);
+                    expect(this.methodSpy).to.have.callCount(1);
+                }, this);
+            });
+        });
     });
 
     describe('ns.View render errors', function() {

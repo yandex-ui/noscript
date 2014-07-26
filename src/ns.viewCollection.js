@@ -555,7 +555,7 @@ ns.ViewCollection.prototype._getViewItem = function(modelItem, updateParams) {
     if (typeof infoViewId === 'function') {
         // если intoViews - функция, то передаем туда модель и параметры,
         // а она должна вернуть id вида
-        viewId = infoViewId(modelItem, viewItemParams);
+        viewId = infoViewId.call(this, modelItem, viewItemParams);
     } else {
         viewId = infoViewId;
     }

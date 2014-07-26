@@ -164,6 +164,10 @@ describe('ns.ViewCollection', function() {
             expect(this.viewSplitter).to.have.callCount(6);
         });
 
+        it('должен вызвать функцию из intoViews в контексте коллекции', function() {
+            expect(this.viewSplitter).to.be.calledOn(this.view);
+        });
+
         it('должен создать элемент vc-item1', function() {
             expect(this.view.node.getElementsByClassName('ns-view-vc-item1')).to.have.length(1);
         });

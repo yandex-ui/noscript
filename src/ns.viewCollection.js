@@ -16,11 +16,14 @@ no.inherit(ns.ViewCollection, ns.View);
  *
  * @param {string} id
  * @param {object} info
+ * @param {function|string} baseClass
  * @returns {ns.View}
  */
-ns.ViewCollection.define = function(id, info) {
+ns.ViewCollection.define = function(id, info, baseClass) {
     info = info || {};
-    var ctor = ns.View.define.call(this, id, info, this);
+
+    baseClass = baseClass || this;
+    var ctor = ns.View.define.call(this, id, info, baseClass);
 
     ns.assert(info.split, 'ns.ViewCollection', "'%s'  must define 'split' section", id);
     ns.assert(info.split.intoViews, 'ns.ViewCollection', "'%s'  must define 'split.intoViews' section", id);

@@ -731,6 +731,50 @@ describe('ns.Model', function() {
             });
 
         });
+
+        describe('#traverse', function() {
+
+            beforeEach(function() {
+                ns.Model.define('traverseModel', {
+                    params: {
+                        p: null
+                    }
+                });
+
+                ns.Model.get('traverseModel', { p: 1 }).setData({ part: 1 });
+                ns.Model.get('traverseModel', { p: 2 }).setData({ part: 2 });
+                ns.Model.get('traverseModel', { p: 3 }).setData({ part: 3 });
+                ns.Model.get('traverseModel', { p: 4 }).setData({ part: 4 });
+                ns.Model.get('traverseModel', { p: 5 }).setData({ part: 5 });
+
+                this.partsSum = 15;
+
+            });
+
+            it('should throw error if tried to call with undefined model', function() {
+                expect(function() {
+                    return ns.Model.traverse('undefinedModel')
+                }).to.throw();
+            });
+
+            it('should throw error if tried to call without callback function', function() {
+                expect(function() {
+                    return ns.Model.traverse('traverseModel');
+                }).to.throw();
+            });
+
+            it('should go through all instances of model', function() {
+                var counter = 0;
+
+                ns.Model.traverse('traverseModel', function(model) {
+                    counter += model.get('.part');
+                });
+
+                expect(counter).to.be.equal(this.partsSum);
+            });
+
+        });
+
     });
 
     describe('События', function() {

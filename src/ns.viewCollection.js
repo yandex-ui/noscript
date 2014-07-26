@@ -331,6 +331,12 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
         }
     }
 
+    /**
+     * Дерево элементов коллекции, который будут отрисованы
+     * @private
+     */
+    this._tree = result['ns-view-collection-container'];
+
     return result;
 };
 
@@ -466,14 +472,21 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
         }
 
-        // Сначала сделаем добавление новых и обновление изменённых view
-        // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        for (var i = 0, prev; i < MC.models.length; i++) {
-            var viewItem = this._getViewItem(MC.models[i], params);
 
-            // если нет viewId, то это значит, что элемент коллекции был отфильтрован
-            if (!viewItem.id) {
-                continue;
+        // Сначала сделаем добавление новых и обновление изменённых view
+
+        // Отрисовываем строго то, что отрендерили.
+        // Иначе мы можем получить ситауцию:
+        // после рендеринга, какая-то модель поменялась и тут она окажется невалидной, но не найдет свою ноду и бросит expection
+        var itemsToDraw = this._tree;
+        var prev;
+        for (var x = 0, y = itemsToDraw.length; x < y; x++) {
+            var itemToDrawObj = itemsToDraw[x];
+            var viewItem = {};
+            for (var itemToDrawId in itemToDrawObj) {
+                viewItem.id = itemToDrawId;
+                viewItem.params = itemToDrawObj[itemToDrawId].params;
+                break;
             }
 
             // Получим view для вложенной модели
@@ -519,9 +532,21 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 }
             }
 
-            itemsExist[view.key] = view;
-
             prev = view;
+        }
+
+        // теперь проходимся по коллекции, чтобы создать полный список валидных элементов
+        // и убрать те, которые удалились
+        for (var i = 0; i < MC.models.length; i++) {
+            var viewItem = this._getViewItem(MC.models[i], params);
+
+            // если нет viewId, то это значит, что элемент коллекции был отфильтрован
+            if (!viewItem.id) {
+                continue;
+            }
+
+            var view = this._getView(viewItem.id, viewItem.params);
+            itemsExist[view.key] = view;
         }
 
         // Удалим те view, для которых нет моделей

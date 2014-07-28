@@ -48,7 +48,19 @@ ns.parseQuery = function(s) {
                 }
             }
 
-            o[name] = value;
+            if (name in o) {
+                // если параметры имеют вид ?id=1&id=2&id=3,
+                // то на выходе должен получиться массив
+
+                // если массива еще нет, то создаем его
+                if (!Array.isArray(o[name])) {
+                    o[name] = [ o[name] ];
+                }
+
+                o[name].push(value);
+            } else {
+                o[name] = value;
+            }
         }
     });
 

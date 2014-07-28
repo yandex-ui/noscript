@@ -233,4 +233,25 @@ describe('generate url', function() {
 
     });
 
+    describe('GET-параметры вне урла', function() {
+
+        beforeEach(function() {
+            ns.router.routes = {
+                route: {
+                    '/index/{id:int}': 'index'
+                }
+            };
+            ns.router.init();
+        });
+
+        it('должен сгенерить /index/1?p=foo', function() {
+            expect(ns.router.generateUrl('index', {id: 1, p: 'foo'})).to.be.equal('/index/1?p=foo');
+        });
+
+        it('должен сгенерить /index/1?p=foo&p=bar', function() {
+            expect(ns.router.generateUrl('index', {id: 1, p: ['foo', 'bar']})).to.be.equal('/index/1?p=foo&p=bar');
+        });
+
+    });
+
 });

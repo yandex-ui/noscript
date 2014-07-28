@@ -348,11 +348,10 @@
      */
     ns.Update.prototype.generateHTML = function() {
         this.log('started `generateHTML` scenario');
-        this._requestSyncModels().then(function() {
-            this._generateHTML().then(function(html) {
-                this._fulfill(html);
-            }, this._reject, this);
-        }, this._reject, this);
+
+        Vow.invoke(this._requestSyncModels.bind(this))
+            .then(this._generateHTML, null, this)
+            .then(this._fulfill, this._reject, this);
 
         return this.promise;
     };
@@ -385,23 +384,21 @@
         }
 
         this.log('started `render` scenario');
-        /*
-        TODO: надо всю эту колбасу переписать на promise-way и
-        проверить, что обрабатывается исключение из каждой стадии
 
-        this._requestAllModels()
-            .then(this._generateHTML)
-            .then(this._insertNodes)
-            .then(this._fulfill, this._reject)
-         */
-        this._requestAllModels().then(function(asyncResult) {
-            this._updateDOM().then(function() {
-                this._fulfill(asyncResult);
-            }, this._reject, this)
-            // Если insertNodes кинет exception, то он ловится вот тут.
-            // Иначе ns.Update повиснет и ничего не кинет
-            .then(null, this._reject, this);
-        }, this._reject, this);
+        var asyncViewPromises;
+        var saveAsyncPromises = function(result) {
+            // сохраняем результат
+            asyncViewPromises = result;
+        };
+        var fulfillWithAsyncPromises = function() {
+            this._fulfill(asyncViewPromises);
+        };
+
+        // начинаем цепочку с промиса, чтобы ловить ошибки в том числе и из _requestAllModels
+        Vow.invoke(this._requestAllModels.bind(this))
+            .then(saveAsyncPromises, null, this)
+            .then(this._updateDOM, null, this)
+            .then(fulfillWithAsyncPromises, this._reject, this);
 
         return this.promise;
     };
@@ -414,9 +411,11 @@
     ns.Update.prototype.reconstruct = function(node) {
         this.log('started `reconstruct` scenario');
         this._applyLayout();
-        this._insertNodes(node).then(function() {
-            this._fulfill({async: []});
-        }, this);
+
+        Vow.invoke(this._insertNodes.bind(this), node)
+            .then(function() {
+                this._fulfill({async: []});
+            }, this._reject, this);
 
         return this.promise;
     };

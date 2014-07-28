@@ -912,6 +912,32 @@ describe('ns.View', function() {
 
         });
 
+        describe('перерисовка на детаченной ноде', function() {
+
+            beforeEach(function() {
+                ns.View.define('popup');
+                this.view = ns.View.create('popup');
+                return this.view.update();
+            });
+
+            it('вид должен перерисоваться и получить новую ноду', function() {
+                var oldNode = this.view.node;
+
+                // эмулируем, что вставили эту ноду куда-то в DOM
+                var div = document.createElement('div');
+                div.appendChild(this.view.node);
+
+                // эмулируем детач
+                div.removeChild(this.view.node);
+
+                this.view.invalidate();
+                return this.view.update().then(function() {
+                    expect(this.view.node).to.not.be.equal(oldNode);
+                }, this);
+            });
+
+        });
+
     });
 
     describe('ns.View update after model destruction', function() {

@@ -241,7 +241,10 @@
         }
 
         //  TODO: Проверить, что не начался уже более новый апдейт.
+        return Vow.fulfill(this._renderUpdateTree());
+    };
 
+    ns.Update.prototype._renderUpdateTree = function() {
         this.startTimer('collectViews');
 
         var tree = {
@@ -250,7 +253,7 @@
         this.view._getUpdateTree(tree, this.layout.views, this.params);
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
-        
+
         var html;
         if (!ns.object.isEmpty(tree.views)) {
             this.startTimer('generateHTML');
@@ -259,7 +262,7 @@
             this.stopTimer('generateHTML');
         }
 
-        return Vow.fulfill(html);
+        return html;
     };
 
     /**
@@ -287,6 +290,7 @@
 
         this.view._updateHTML(node, this.layout.views, this.params, {
             toplevel: true,
+            //TODO: надо понять по истории зачем этот флаг
             async: async
         }, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
@@ -301,6 +305,25 @@
         this.stopTimer('triggerEvents');
 
         return Vow.fulfill();
+    };
+
+    /**
+     * Обновляет DOM-представление вида.
+     * @description Этот метод - комбинация из generateHTML и insertNodes,
+     * которые должны отработать синхронно, чтобы избежать различных спецэффектов.
+     *
+     * Без этого, например, отрендерить можно одно состояние, но обновить DOM не получится,
+     * потому что у видов будет уже другое состояние, если что-то поменяется между generateHTML и insertNodes
+     * @private
+     */
+    ns.Update.prototype._updateDOM = function() {
+        if (this._expired()) {
+            return this._rejectWithStatus(this.STATUS.EXPIRED);
+        }
+
+        var html = this._renderUpdateTree();
+        var node = ns.html2node(html || '');
+        return this._insertNodes(node);
     };
 
     /**
@@ -372,10 +395,8 @@
             .then(this._fulfill, this._reject)
          */
         this._requestAllModels().then(function(asyncResult) {
-            this._generateHTML().then(function(html) {
-                this._insertNodes(ns.html2node(html)).then(function() {
-                    this._fulfill(asyncResult);
-                }, this._reject, this);
+            this._updateDOM().then(function() {
+                this._fulfill(asyncResult);
             }, this._reject, this)
             // Если insertNodes кинет exception, то он ловится вот тут.
             // Иначе ns.Update повиснет и ничего не кинет

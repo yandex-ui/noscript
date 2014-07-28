@@ -14,11 +14,13 @@ node_modules: package.json
 
 # Тесты
 .PHONY: test test-jshint test-node test-karma yate
-test: test-jshint test-node test-karma
+test:
+	$(MAKE) test-jshint
+	$(MAKE) test-karma test-node
 
 test-jshint: dist | node_modules
-	-jshint src
-	-jscs src
+	jshint src
+	jscs src
 
 test-node: dist yate | node_modules
 	mocha test/node
@@ -36,7 +38,7 @@ npm-publish: dist
 	npm publish
 
 gh-pages:
-	git clone -b gh-pages --reference ./ git://github.com/yandex-ui/noscript.git gh-pages
+	git clone -b gh-pages --reference ./ git@github.com:yandex-ui/noscript.git gh-pages
 
 jsdoc: gh-pages
 	$(MAKE) -C gh-pages

@@ -67,7 +67,7 @@ match .my-view2 ns-view-content {
 В async-режиме у view не бывает дочерних элементов. Они появляются в нормальной отрисовке, когда используется `ns-view-content`
 
 ```
-match .my-view1 ns-view-content {
+match .my-view1 ns-view-async-content {
     <div class="view1-content">
         <img src="loader.gif"/>
     </div>

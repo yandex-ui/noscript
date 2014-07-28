@@ -316,7 +316,7 @@
      * потому что у видов будет уже другое состояние, если что-то поменяется между generateHTML и insertNodes
      * @private
      */
-    ns.Update.prototype._updateViewTree = function() {
+    ns.Update.prototype._updateDOM = function() {
         if (this._expired()) {
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
@@ -395,7 +395,7 @@
             .then(this._fulfill, this._reject)
          */
         this._requestAllModels().then(function(asyncResult) {
-            this._updateViewTree().then(function() {
+            this._updateDOM().then(function() {
                 this._fulfill(asyncResult);
             }, this._reject, this)
             // Если insertNodes кинет exception, то он ловится вот тут.

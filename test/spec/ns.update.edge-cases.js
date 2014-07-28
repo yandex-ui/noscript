@@ -7,8 +7,8 @@ describe('Виды должны обновлять то, что отрендер
         this.sinon.spy(ns.View.prototype, '_getUpdateTree');
         this.sinon.spy(ns.View.prototype, '_updateHTML');
 
-        var originalMethod = ns.Update.prototype._updateViewTree;
-        this.sinon.stub(ns.Update.prototype, '_updateViewTree', function() {
+        var originalMethod = ns.Update.prototype._updateDOM;
+        this.sinon.stub(ns.Update.prototype, '_updateDOM', function() {
             var result = originalMethod.call(this);
 
             // не придумал лучше способа как сделать такую проверку :(

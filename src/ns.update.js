@@ -351,9 +351,7 @@
 
         Vow.invoke(this._requestSyncModels.bind(this))
             .then(this._generateHTML, null, this)
-            .then(function(html) {
-                this._fulfill(html);
-            }, this._reject, this);
+            .then(this._fulfill, this._reject, this);
 
         return this.promise;
     };

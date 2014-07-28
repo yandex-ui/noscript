@@ -203,9 +203,9 @@
      */
     ns.ModelCollection.prototype.onItemTouched = function(evt, model) {
         /* jshint unused: false */
-        // У коллекции есть собственная версия (this._versionSelf) и версия элементов коллекции (this._version).
-        // Когда меняется элемент коллекции - версия самой коллекции не меняется.
-        this._version++;
+
+        // Версия коллекции не должна зависить от версии элементов, поэтому
+        // когда меняется элемент коллекции - версия самой коллекции не меняется.
     };
 
     /**
@@ -215,29 +215,6 @@
      */
     ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
         this.remove(model);
-    };
-
-    /**
-     * Returns data version (included items version).
-     * @returns {number}
-     */
-    ns.ModelCollection.prototype.getSelfVersion = function() {
-        return this._versionSelf;
-    };
-
-    /**
-     * Обновляет _version модели
-     */
-    ns.ModelCollection.prototype.touch = function() {
-        ns.Model.prototype.touch.apply(this, arguments);
-
-        /**
-         * _versionSelf показывает версию изменений внешней модели
-         * в то время, как _version - последнее время изменения внешней или внутренней модели
-         * @type {*}
-         * @private
-         */
-        this._versionSelf = this._version;
     };
 
     /**

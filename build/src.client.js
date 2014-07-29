@@ -9,6 +9,7 @@
     /* borschik:include:../src/ns.js */
     /* borschik:include:../src/ns.consts.js */
     /* borschik:include:../src/ns.consts.events.js */
+    /* borschik:include:../src/ns.consts.client.js */
     /* borschik:include:../src/ns.dom.js */
     /* borschik:include:../src/ns.entityify.js */
     /* borschik:include:../src/ns.events.js */

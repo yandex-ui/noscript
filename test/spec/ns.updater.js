@@ -1103,68 +1103,6 @@ describe('ns.Updater', function() {
         });
     });
 
-    describe('Состояние async-view определяется один раз за update и не пересчитывается динамически', function() {
-
-        // Это синтетический тест и на данный момент такого в реальности быть не может
-
-        // Cейчас работоспособность этого случая обеспечивается исключительно синхронностью вызова методов
-        // ns.View#_getUpdateTree() -> ns.Update#render() -> ns.View._updateHTML() в ns.Update#_update()
-        // Т.е. заменив какую-то часть на асинхронную, мы напоримсся на странный баг,
-        // когда вроде бы асинхронный вид отрисовал ns-view-async-content и так в нем и остался
-
-        // Баг заключается в том, что в ns.View._updateHTML() состояние async определеяется не по ранее рассчитанному флагу,
-        // которое попало в дерево отрисовки, а заново на основе isModelsValid()
-        // 1 - это в корне неверно, потому что состояние должно определяться из того, что отрисовали
-        // 2 - это лишние вызовы
-
-
-        beforeEach(function(done) {
-            this.htmlinitSpy = this.sinon.spy();
-            this.asyncSpy = this.sinon.spy();
-
-            ns.layout.define('app', {
-                'app': {
-                    'async&': true
-                }
-            });
-
-            ns.Model.define('model-async');
-
-            /// Views
-            ns.View.define('app');
-            ns.View.define('async', {
-                events: {
-                    'ns-view-async': this.asyncSpy,
-                    'ns-view-htmlinit': this.htmlinitSpy
-                },
-                models: ['model-async']
-            });
-
-            ns.Update.prototype._render = ns.Update.prototype.render;
-            this.sinon.stub(ns.Update.prototype, 'render', function() {
-                ns.Model.get('model-async').setData({});
-                return this._render.apply(this, arguments);
-            });
-
-            var view = ns.View.create('app');
-            var layout = ns.layout.page('app', {});
-            new ns.Update(view, layout, {})
-                .start()
-                .then(function() {
-                    done();
-                });
-        });
-
-        it('не должно быть события ns-view-htmlinit', function() {
-            expect(this.htmlinitSpy).to.not.be.called;
-        });
-
-        it('должно быть событиt ns-view-async', function() {
-            expect(this.asyncSpy).to.be.calledOnce;
-        });
-
-    });
-
     describe('Очереди, приоритеты, прерывания', function() {
 
         describe('2 ASYNC, потом 1 GLOBAL', function() {

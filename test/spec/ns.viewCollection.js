@@ -604,7 +604,7 @@ describe('ns.ViewCollection', function() {
                 // touching model after a small timeout to guarantee, that
                 // model and view will have different timeout attribute
                 window.setTimeout(function() {
-                    ns.Model.get('m-collection').touch();
+                    ns.Model.get('m-collection').touch({silent: true});
 
                     // start update to redraw a core view
                     var layout = ns.layout.page('app', {});

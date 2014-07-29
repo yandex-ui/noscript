@@ -226,8 +226,7 @@
      * Сохраняет value по пути jpath.
      * @param {string} jpath jpath до значения.
      * @param {*} value Новое значение.
-     * @param {object} [options] Флаги.
-     * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
+     * @param {ns.Model~setOptions} [options] Флаги.
      * @fires ns.Model#ns-model-changed
      */
     ns.Model.prototype.set = function(jpath, value, options) {
@@ -241,19 +240,14 @@
         //  Пока что будет версия без сравнения.
 
         no.jpath.set(jpath, data, value);
-        this.touch();
 
-        if (options && options.silent) {
+        options = options || {};
+        options.jpath = jpath;
+        this.touch(options);
+
+        if (options.silent) {
             return;
         }
-
-        /**
-         * Сообщение о том, что модель изменилась.
-         * @event ns.Model#ns-model-changed
-         * @param {string} evt Название события
-         * @params {string} jpath JPath, по которому изменились данные. Если пустой, то изменилась вся модель.
-         */
-        this.trigger('ns-model-changed', jpath);
 
         //  Кидаем сообщения о том, что изменились части модели.
         //  Например, если jpath был '.foo.bar', то кидаем два сообщения: 'ns-model-changed.foo.bar' и 'ns-model-changed.foo'.
@@ -274,8 +268,7 @@
     /**
      * Устанавливает новые данные модели.
      * @param {*} data Новые данные.
-     * @param {object} [options] Флаги.
-     * @param {Boolean} [options.silent = false] Если true, то не генерируется событие о том, что модель изменилась.
+     * @param {ns.Model~setOptions} [options] Флаги.
      * @returns {ns.Model}
      * @fires ns.Model#ns-model-changed
      */
@@ -298,16 +291,7 @@
             this.status = this.STATUS.OK;
             this.error = null;
 
-            this.touch();
-
-            //  Не проверяем здесь, действительно ли data отличается от oldData --
-            //  setData должен вызываться только когда обновленная модель целиком перезапрошена.
-            //  Можно считать, что она в этом случае всегда меняется.
-            //  @chestozo: это может выйти боком, если мы, к примеру, по событию changed делаем ajax запрос
-            var silent = options && options.silent;
-            if (!silent) {
-                this.trigger('ns-model-changed', '', '');
-            }
+            this.touch(options);
         }
 
         return this;
@@ -417,14 +401,30 @@
     /**
      * Инкрементирует версию модели.
      * @fires ns.Model#ns-model-touched
+     * @fires ns.Model#ns-model-changed
      */
-    ns.Model.prototype.touch = function() {
+    ns.Model.prototype.touch = function(options) {
         this._version++;
+
         /**
          * Событие сообщает об инкрементации версии модели.
          * @event ns.Model#ns-model-touched
          */
         this.trigger('ns-model-touched');
+
+        options = options || {};
+        if (!options.silent) {
+
+            var jpath = options.jpath || '';
+
+            /**
+             * Сообщение о том, что модель изменилась.
+             * @event ns.Model#ns-model-changed
+             * @param {string} evt Название события
+             * @params {string} jpath JPath, по которому изменились данные. Если пустой, то изменилась вся модель.
+             */
+            this.trigger('ns-model-changed', jpath);
+        }
     };
 
     /**
@@ -790,6 +790,14 @@
             callback(models[key]);
         }
     };
+
+    /**
+     * Опции изменения модели.
+     * @typedef ns.Model~setOptions
+     * @type {object}
+     * @property {boolean} [silent = false] Не генерировать событие об изменении (ns-model-changed).
+     * @property {string} [jpath] jpath, по которому произошло изменение
+     */
 
     // ----------------------------------------------------------------------------------------------------------------- //
 

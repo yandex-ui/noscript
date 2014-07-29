@@ -108,7 +108,7 @@ describe('app rendering in node.js', function() {
             this.nockScope.done();
         });
 
-        it.only('should create correctly nested nodes of sync views', function() {
+        it('should create correctly nested nodes of sync views', function() {
             var vSync0node = this.document.querySelector('.ns-view-vSync0');
 
             expect(vSync0node).to.be.ok;

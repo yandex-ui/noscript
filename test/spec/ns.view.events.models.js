@@ -131,6 +131,53 @@ describe('ns.View. Подписка на события моделей.', functi
 
     });
 
+    describe('Игнорирование событий одной модели не влияет на другую.', function() {
+
+        beforeEach(function() {
+
+            ns.layout.define('app1', {
+                app: {
+                    variable: {}
+                }
+            });
+
+            ns.View.define('variable', {
+                models: {
+                    elements: false,
+                    season: true
+                }
+            });
+            this.view = ns.View.create('variable');
+
+            return new ns.Update(this.viewApp, ns.layout.page('app1', {}), {}).render();
+        });
+
+        it('До изменений виды должны быть валидными', function() {
+            this.assertViewsValid('variable');
+        });
+
+        it('При изменении игнорируемой модели вид должен остаться валидными', function() {
+            ns.Model.get('elements').setData('true');
+            this.assertViewsValid('variable');
+        });
+
+        it('При изменении неигнорируемой модели вид должен стать невалидными', function() {
+            ns.Model.get('season').setData('true');
+            this.assertViewsInvalid('variable');
+        });
+
+        it('При изменении игнорируемой и неигнорируемой моделей вид должен стать невалидными', function() {
+            // изменяем версию модели, это сделает вид невалидным, потому что не совпадет версия
+            ns.Model.get('season').touch();
+            // теперь меняем данные у игнорируемой модели, это вызывает keepValid (синхронизацию версий)
+            // если keepValid синхронизирует только свою версию, то вид так и останется невалидным (ОК)
+            // если keepValid синхронизирует версии всех моделей, то вид станет валидным, а не должен (FAIL)
+            ns.Model.get('elements').setData('true');
+            this.assertViewsInvalid('variable');
+        });
+
+    });
+
     describe('Безусловная инвалидация вида ("invalidate" | true).', function() {
 
         beforeEach(function(done) {

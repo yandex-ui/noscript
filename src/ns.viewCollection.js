@@ -85,14 +85,14 @@ ns.ViewCollection.prototype._init = function() {
 /**
  * Вызывает обработчик события модели
  */
-ns.ViewCollection.prototype._invokeModelHandler = function(handler, e, o) {
+ns.ViewCollection.prototype._invokeModelHandler = function(handler, model, e, o) {
     // Отфильтруем события вложенных моделей
     if (o && o.model) {
         return;
     }
 
-    this._saveModelsVersions();
-    return handler.apply(this, Array.prototype.slice.call(arguments, 1));
+    this._saveModelVersion(model.id);
+    return handler.apply(this, Array.prototype.slice.call(arguments, 2));
 };
 
 /**

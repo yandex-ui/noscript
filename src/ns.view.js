@@ -294,8 +294,16 @@
                 var handlerName = decl[eventName];
                 var handler = this[handlerName] || decl[eventName];
                 if ('function' === typeof handler) {
+
+                    // сам keepValid биндить не надо,
+                    // потому что _invokeModelHandler и так синхронизирует версию
+                    if (handler === this.keepValid) {
+                        // заменяем его на пустую функцию
+                        handler = no.nop;
+                    }
+
                     this._bindModel(model, eventName,
-                        this._invokeModelHandler.bind(this, handler)
+                        this._invokeModelHandler.bind(this, handler, model)
                     );
                 }
             }
@@ -305,11 +313,16 @@
     /**
      * Вызывает обработчик события модели
      * @param {function} handler
+     * @param {ns.Model} model Модель, на которое произошло событие
      * @private
      */
-    ns.View.prototype._invokeModelHandler = function(handler) {
-        this._saveModelsVersions();
-        return handler.apply(this, Array.prototype.slice.call(arguments, 1));
+    ns.View.prototype._invokeModelHandler = function(handler, model) {
+        // сохраняем версию модели, которая бросила событие
+        this._saveModelVersions(model.id);
+
+        // по нашей логики мы всегда делаем вид валидным,
+        // если его надо инвалидировать, то это надо делать руками методом 'invalidate'
+        return handler.apply(this, Array.prototype.slice.call(arguments, 2));
     };
 
     /**
@@ -1107,8 +1120,17 @@
      */
     ns.View.prototype._saveModelsVersions = function() {
         for (var modelId in this.models) {
-            this._modelsVersions[modelId] = this.models[modelId].getVersion();
+            this._saveModelVersions(modelId);
         }
+    };
+
+    /**
+     * Safe model versions to track changes.
+     * @param {string} modelId ID модели
+     * @protected
+     */
+    ns.View.prototype._saveModelVersions = function(modelId) {
+        this._modelsVersions[modelId] = this.models[modelId].getVersion();
     };
 
     /**

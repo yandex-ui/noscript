@@ -366,7 +366,7 @@ describe('ns.View', function() {
                 expect(this.methodSpy).to.have.callCount(1);
             });
 
-            it('должен вызвать обработчик один раз при изменении модели', function() {
+            it('после перерисовки вида должен вызвать обработчик один раз при изменении модели', function() {
                 this.view.invalidate();
                 return this.view.update().then(function() {
                     ns.Model.get('model').set('.foo', 2);

@@ -1,6 +1,6 @@
 // Testing utilities
-var expect = require('../../node_modules/karma-sinon-chai/node_modules/chai/lib/chai.js').expect;
-var sinon = require('../../node_modules/karma-sinon-chai/node_modules/sinon/lib/sinon.js');
+var expect = require('karma-sinon-chai/node_modules/chai').expect;
+var sinon = require('karma-sinon-chai/node_modules/sinon');
 var nock = require('nock');
 var jsdom = require('jsdom');
 

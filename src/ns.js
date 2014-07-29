@@ -6,10 +6,6 @@
  */
 var ns = {};
 
-if (typeof window === 'undefined') {
-    module.exports = ns;
-}
-
 /**
  * Удобная функция для расстановки TODO, кидает исключение при вызове.
  */

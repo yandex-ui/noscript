@@ -1,4 +1,6 @@
-export NPM_BIN=$(CURDIR)/node_modules/.bin
+export NPM_BIN:=$(CURDIR)/node_modules/.bin
+# it should be export PATH:=$(CURDIR)/node_modules/.bin:$(PATH)
+# but there is bug in OSX https://discussions.apple.com/thread/2520853
 
 # сборка для npm
 dist: build/*.js src/*.js | node_modules

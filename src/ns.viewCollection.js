@@ -91,7 +91,7 @@ ns.ViewCollection.prototype._invokeModelHandler = function(handler, model, e, o)
         return;
     }
 
-    this._saveModelVersions(model.id);
+    this._saveModelVersion(model.id);
     return handler.apply(this, Array.prototype.slice.call(arguments, 2));
 };
 

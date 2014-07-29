@@ -318,7 +318,7 @@
      */
     ns.View.prototype._invokeModelHandler = function(handler, model) {
         // сохраняем версию модели, которая бросила событие
-        this._saveModelVersions(model.id);
+        this._saveModelVersion(model.id);
 
         // по нашей логики мы всегда делаем вид валидным,
         // если его надо инвалидировать, то это надо делать руками методом 'invalidate'
@@ -1120,16 +1120,16 @@
      */
     ns.View.prototype._saveModelsVersions = function() {
         for (var modelId in this.models) {
-            this._saveModelVersions(modelId);
+            this._saveModelVersion(modelId);
         }
     };
 
     /**
-     * Safe model versions to track changes.
+     * Safe model version to track changes.
      * @param {string} modelId ID модели
      * @protected
      */
-    ns.View.prototype._saveModelVersions = function(modelId) {
+    ns.View.prototype._saveModelVersion = function(modelId) {
         this._modelsVersions[modelId] = this.models[modelId].getVersion();
     };
 

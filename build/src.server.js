@@ -6,6 +6,7 @@ module.exports = function() {
 
     /* borschik:include:../src/ns.js */
     /* borschik:include:../src/ns.consts.js */
+    /* borschik:include:../src/ns.consts.events.js */
     /* borschik:include:../src/ns.entityify.js */
     /* borschik:include:../src/ns.events.js */
     /* borschik:include:../src/ns.http.server.js */

@@ -28,8 +28,6 @@
         "jsdom": "*",
         "jscs": "1.0.11",
         "jshint": "2.5.x",
-        "chai": "~1.9",
-        "sinon": ">=1.4.0 <2",
         "karma": "0.12.x",
         "karma-borschik-preprocessor": "~0.1.2",
         "karma-mocha": "^0.1.3",

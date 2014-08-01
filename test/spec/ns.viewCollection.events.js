@@ -8,6 +8,8 @@ describe('ns.ViewСollection ns-view-* events', function() {
                     var spyName = view + '-' + event + '-spy';
                     if (not === false) {
                         expect(this.events[spyName][check]).to.be.equal(false);
+                    } else if (typeof not === 'number') {
+                        expect(this.events[spyName]).to.have.callCount(not);
                     } else {
                         expect(this.events[spyName][check]).to.be.equal(true);
                     }
@@ -84,14 +86,38 @@ describe('ns.ViewСollection ns-view-* events', function() {
             }
         });
 
+        ns.Model.get('model-collection').setData({
+            item: [
+                {id: 1, data: 'item1'},
+                {id: 2, data: 'item2'},
+                {id: 3, data: 'item3'}
+            ]
+        });
+
+        this.events = {};
+        this.events['content-collection-item-ns-view-async-spy'] = this.sinon.spy();
+        this.events['content-collection-item-ns-view-init-spy'] = this.sinon.spy();
+        this.events['content-collection-item-ns-view-htmlinit-spy'] = this.sinon.spy();
+        this.events['content-collection-item-ns-view-show-spy'] = this.sinon.spy();
+        this.events['content-collection-item-ns-view-touch-spy'] = this.sinon.spy();
+        this.events['content-collection-item-ns-view-hide-spy'] = this.sinon.spy();
+        this.events['content-collection-item-ns-view-htmldestroy-spy'] = this.sinon.spy();
+
         ns.View.define('content-collection-item', {
+            events: {
+                'ns-view-async': this.events['content-collection-item-ns-view-async-spy'],
+                'ns-view-init': this.events['content-collection-item-ns-view-init-spy'],
+                'ns-view-htmlinit': this.events['content-collection-item-ns-view-htmlinit-spy'],
+                'ns-view-show': this.events['content-collection-item-ns-view-show-spy'],
+                'ns-view-touch': this.events['content-collection-item-ns-view-touch-spy'],
+                'ns-view-hide': this.events['content-collection-item-ns-view-hide-spy'],
+                'ns-view-htmldestroy': this.events['content-collection-item-ns-view-htmldestroy-spy']
+            },
             models: [ 'model-collection-item' ]
         });
 
         var views = ['app', 'head', 'content-collection@model-collection', 'content2'];
         var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-touch', 'ns-view-hide', 'ns-view-htmldestroy'];
-
-        this.events = {};
 
         for (var i = 0, j = views.length; i < j; i++) {
             var viewDecl = views[i].split('@');
@@ -165,25 +191,6 @@ describe('ns.ViewСollection ns-view-* events', function() {
             update.start().then(function() {
                 finish();
             });
-
-            // finish first draw
-            this.sinon.server.requests[0].respond(
-                200,
-                {"Content-Type": "application/json"},
-                JSON.stringify({
-                    models: [
-                        {
-                            data: {
-                                item: [
-                                    {id: 1, data: 'item1'},
-                                    {id: 2, data: 'item2'},
-                                    {id: 3, data: 'item3'}
-                                ]
-                            }
-                        }
-                    ]
-                })
-            );
         });
 
         genTests([
@@ -193,7 +200,15 @@ describe('ns.ViewСollection ns-view-* events', function() {
             ['content-collection', 'ns-view-show', 'calledOnce'],
             ['content-collection', 'ns-view-touch', 'calledOnce'],
             ['content-collection', 'ns-view-hide', 'called', false],
-            ['content-collection', 'ns-view-htmldestroy', 'called', false]
+            ['content-collection', 'ns-view-htmldestroy', 'called', false],
+
+            ['content-collection-item', 'ns-view-async', 'called', false],
+            ['content-collection-item', 'ns-view-init', 'calledThrice'],
+            ['content-collection-item', 'ns-view-htmlinit', 'calledThrice'],
+            ['content-collection-item', 'ns-view-show', 'calledThrice'],
+            ['content-collection-item', 'ns-view-touch', 'calledThrice'],
+            ['content-collection-item', 'ns-view-hide', 'called', false],
+            ['content-collection-item', 'ns-view-htmldestroy', 'called', false]
         ]);
 
     });
@@ -210,24 +225,6 @@ describe('ns.ViewСollection ns-view-* events', function() {
                 });
             }.bind(this));
 
-            // finish first draw
-            this.sinon.server.requests[0].respond(
-                200,
-                {"Content-Type": "application/json"},
-                JSON.stringify({
-                    models: [
-                        {
-                            data: {
-                                item: [
-                                    {id: 1, data: 'item1'},
-                                    {id: 2, data: 'item2'},
-                                    {id: 3, data: 'item3'}
-                                ]
-                            }
-                        }
-                    ]
-                })
-            );
         });
 
         genTests([
@@ -237,7 +234,15 @@ describe('ns.ViewСollection ns-view-* events', function() {
             ['content-collection', 'ns-view-show', 'calledOnce'],
             ['content-collection', 'ns-view-touch', 'calledOnce'],
             ['content-collection', 'ns-view-hide', 'calledOnce'],
-            ['content-collection', 'ns-view-htmldestroy', 'called', false]
+            ['content-collection', 'ns-view-htmldestroy', 'called', false],
+
+            ['content-collection-item', 'ns-view-async', 'called', false],
+            ['content-collection-item', 'ns-view-init', '', 3],
+            ['content-collection-item', 'ns-view-htmlinit', '', 3],
+            ['content-collection-item', 'ns-view-show', '', 3],
+            ['content-collection-item', 'ns-view-touch', '', 3],
+            ['content-collection-item', 'ns-view-hide', '', 3],
+            ['content-collection-item', 'ns-view-htmldestroy', 'called', false]
         ]);
 
     });

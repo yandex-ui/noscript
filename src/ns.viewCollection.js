@@ -487,6 +487,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 // Получим view для вложенной модели
                 // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
                 var view = this._getView(viewItem.id, viewItem.params);
+                if (!view) {
+                    continue;
+                }
 
                 // Здесь возможны следующие ситуации:
                 if (isOuterPlaceholder) {

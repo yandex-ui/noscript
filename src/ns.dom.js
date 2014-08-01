@@ -5,6 +5,11 @@
  * @returns {boolean}
  */
 ns.replaceNode = function(oldNode, newNode) {
+    // такая вот защита от лишних действий
+    if (oldNode === newNode) {
+        return true;
+    }
+
     // если oldNode детачена из DOM, то у нее нет родителя
     if (oldNode.parentNode) {
         oldNode.parentNode.replaceChild(newNode, oldNode);

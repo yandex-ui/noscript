@@ -117,36 +117,6 @@ ns.ViewCollection.prototype.isValidDesc = function() {
 };
 
 /**
- * Возвращает true, если все модели валидны.
- * @param {object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
- * @returns {Boolean}
- */
-ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
-    var models = this.models;
-    for (var id in models) {
-        /** @type ns.Model|ns.ModelCollection */
-        var model = models[id];
-        var modelVersion = model.getVersion();
-        // при сравнении с версией модели-коллекции используем versionSelf,
-        // не зависящий от внутренних моделей
-        if (ns.Model.isCollection(model)) {
-            modelVersion = model.getSelfVersion();
-        }
-
-        if (
-            // модель не валидна
-            !model.isValid() ||
-            // или ее кеш более свежий
-            (modelsVersions && modelVersion > modelsVersions[id])
-        ) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-/**
  *
  * @param {string} id
  * @param {object} params

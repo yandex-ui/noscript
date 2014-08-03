@@ -742,6 +742,15 @@ describe('ns.ModelCollection', function() {
 
         });
 
+        it('изменение версии элемента не изменяет версию коллекции', function() {
+            var oldVersion = this.mc.getVersion();
+            this.models[0].touch();
+
+            expect(this.mc.getVersion())
+                .to.be.equal(oldVersion)
+                .and.to.be.a('number');
+        });
+
     });
 
     describe('Разнородная коллекция', function() {

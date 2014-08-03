@@ -139,6 +139,10 @@ describe('ns.Events', function() {
         });
 
         it('очередь не должна ломаться, если обработчик кидает исключение', function() {
+            // spy бросит исключение,
+            // мы это точно знаем, поэтому убираем логирование,
+            // чтобы не бросать в лог лишнего
+            ns.log.exception.restore();
             this.spy.throws('1');
 
             this.spy2 = this.sinon.spy();

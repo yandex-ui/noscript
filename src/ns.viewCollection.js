@@ -147,6 +147,20 @@ ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
 };
 
 /**
+ * Делает вид невалидным.
+ * @description Cтатус валидности самой коллекции и ее элементов рассчитыается независимо.
+ * Поэтому этот метод инвалидирует только себя и оставляет элементы коллекции без изменений.
+ */
+ns.ViewCollection.prototype.invalidate = function() {
+    this.status = this.STATUS.INVALID;
+};
+
+/**
+ * @borrows ns.View.prototype.invalidate as ns.ViewCollection.prototype.invalidateAll
+ */
+ns.ViewCollection.prototype.invalidateAll = ns.View.prototype.invalidate;
+
+/**
  *
  * @param {string} id
  * @param {object} params

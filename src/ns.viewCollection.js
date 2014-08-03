@@ -96,6 +96,25 @@ ns.ViewCollection.prototype._invokeModelHandler = function(handler, model, e, o)
 };
 
 /**
+ * @borrows ns.View.prototype._getModelVersion as ns.ViewCollection.prototype._getModelVersion
+ */
+ns.ViewCollection.prototype._getModelVersion = function(modelId) {
+    var model = this.models[modelId];
+    var modelVersion;
+
+    if (modelId === this.info.modelCollectionId) {
+        // для зависимой модели-коллекции берем собственную версию,
+        // которая не зависит от элементов коллекции
+        modelVersion = model.getSelfVersion();
+
+    } else {
+        modelVersion = model.getVersion();
+    }
+
+    return modelVersion;
+};
+
+/**
  *
  * @returns {boolean}
  */
@@ -113,36 +132,6 @@ ns.ViewCollection.prototype.isValidDesc = function() {
             return false;
         }
     }
-    return true;
-};
-
-/**
- * Возвращает true, если все модели валидны.
- * @param {object} [modelsVersions] Также проверяем, что кеш модели не свежее переданной версии.
- * @returns {Boolean}
- */
-ns.ViewCollection.prototype.isModelsValid = function(modelsVersions) {
-    var models = this.models;
-    for (var id in models) {
-        /** @type ns.Model|ns.ModelCollection */
-        var model = models[id];
-        var modelVersion = model.getVersion();
-        // при сравнении с версией модели-коллекции используем versionSelf,
-        // не зависящий от внутренних моделей
-        if (ns.Model.isCollection(model)) {
-            modelVersion = model.getSelfVersion();
-        }
-
-        if (
-            // модель не валидна
-            !model.isValid() ||
-            // или ее кеш более свежий
-            (modelsVersions && modelVersion > modelsVersions[id])
-        ) {
-            return false;
-        }
-    }
-
     return true;
 };
 

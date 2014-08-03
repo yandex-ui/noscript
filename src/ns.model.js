@@ -398,13 +398,17 @@
         return this._version;
     };
 
+    ns.Model.prototype._incVersion = function() {
+        this._version++;
+    };
+
     /**
      * Инкрементирует версию модели.
      * @fires ns.Model#ns-model-touched
      * @fires ns.Model#ns-model-changed
      */
     ns.Model.prototype.touch = function(options) {
-        this._version++;
+        this._incVersion();
 
         /**
          * Событие сообщает об инкрементации версии модели.

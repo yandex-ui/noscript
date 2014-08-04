@@ -675,6 +675,41 @@ describe('ns.View', function() {
 
     });
 
+    describe('#invalidate.', function() {
+
+        beforeEach(function() {
+            this.sinon.spy(ns.View.prototype, 'invalidate');
+            ns.layout.define('app', {
+                'view1': {
+                    'view2': {}
+                }
+            });
+
+            ns.View.define('view1');
+            ns.View.define('view2');
+            ns.View.define('view3');
+
+            this.view = ns.View.create('view1');
+
+            return new ns.Update(
+                this.view,
+                ns.layout.page('app'),
+                {}
+            ).render();
+        });
+
+        it('должен инвалидировать вид', function() {
+            this.view.invalidate();
+            expect(this.view.isValid()).to.be.equal(false);
+        });
+
+        it('должен инвалидировать дочерние виды', function() {
+            this.view.invalidate();
+            expect(this.view.views['view2'].isValid()).to.be.equal(false);
+        });
+
+    });
+
     describe('#patchTree()', function() {
 
         beforeEach(function(done) {

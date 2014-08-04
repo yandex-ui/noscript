@@ -282,6 +282,82 @@ describe('ns.ViewCollection', function() {
 
     });
 
+    describe('#invalidate / #invalidateAll.', function() {
+
+        beforeEach(function() {
+            this.sinon.spy(ns.View.prototype, 'invalidate');
+            ns.layout.define('app', {
+                'vc': {}
+            });
+
+            ns.Model.define('mc', {
+                split: {
+                    items: '.items',
+                    params: {
+                        'id': '.id'
+                    },
+                    model_id: 'mc-item'
+                }
+            });
+            ns.Model.define('mc-item', {
+                params: {
+                    id: null
+                }
+            });
+            ns.Model.get('mc').setData({
+                items: [
+                    {id: 1, val: 1},
+                    {id: 2, val: 2}
+                ]
+            });
+
+            ns.ViewCollection.define('vc', {
+                models: ['mc'],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            });
+
+            ns.View.define('vc-item', {
+                models: ['mc-item']
+            });
+
+            this.view = ns.View.create('vc');
+
+            return new ns.Update(
+                this.view,
+                ns.layout.page('app'),
+                {}
+            ).render();
+        });
+
+        it('#invalidate должен инвалидировать вид', function() {
+            this.view.invalidate();
+            expect(this.view.isValid()).to.be.equal(false);
+        });
+
+        it('#invalidate не должен инвалидировать дочерние виды', function() {
+            this.view.invalidate();
+            for (var key in this.view.views) {
+                expect(this.view.views[key].isValid()).to.be.equal(true);
+            }
+        });
+
+        it('#invalidateAll должен инвалидировать вид', function() {
+            this.view.invalidateAll();
+            expect(this.view.isValid()).to.be.equal(false);
+        });
+
+        it('#invalidateAll должен инвалидировать дочерние виды', function() {
+            this.view.invalidateAll();
+            for (var key in this.view.views) {
+                expect(this.view.views[key].isValid()).to.be.equal(false);
+            }
+        });
+
+    });
+
     describe('redraw ViewCollection within parent view', function() {
 
         beforeEach(function(finish) {
@@ -604,7 +680,7 @@ describe('ns.ViewCollection', function() {
                 // touching model after a small timeout to guarantee, that
                 // model and view will have different timeout attribute
                 window.setTimeout(function() {
-                    ns.Model.get('m-collection').touch({silent: true});
+                    ns.Model.get('m-collection').touch();
 
                     // start update to redraw a core view
                     var layout = ns.layout.page('app', {});

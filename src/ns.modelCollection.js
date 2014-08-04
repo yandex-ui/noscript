@@ -226,10 +226,10 @@
     };
 
     /**
-     * Обновляет _version модели
+     * @borrows ns.Model.prototype._incVersion as ns.ModelCollection.prototype._incVersion
      */
-    ns.ModelCollection.prototype.touch = function() {
-        ns.Model.prototype.touch.apply(this, arguments);
+    ns.ModelCollection.prototype._incVersion = function() {
+        ns.Model.prototype._incVersion.apply(this, arguments);
 
         /**
          * _versionSelf показывает версию изменений внешней модели

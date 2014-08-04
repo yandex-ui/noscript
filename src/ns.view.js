@@ -591,7 +591,7 @@
                 // модель не валидна
                 !model.isValid() ||
                 // или у неё уже более новая версия данных
-                (modelsVersions && model.getVersion() > modelsVersions[id])
+                (modelsVersions && this._getModelVersion(id) > modelsVersions[id])
             ) {
                 return false;
             }
@@ -1125,12 +1125,22 @@
     };
 
     /**
+     * Возвращает версию модели.
+     * @param {string} modelId ID модели.
+     * @returns {number}
+     * @private
+     */
+    ns.View.prototype._getModelVersion = function(modelId) {
+        return this.models[modelId].getVersion();
+    };
+
+    /**
      * Safe model version to track changes.
      * @param {string} modelId ID модели
      * @protected
      */
     ns.View.prototype._saveModelVersion = function(modelId) {
-        this._modelsVersions[modelId] = this.models[modelId].getVersion();
+        this._modelsVersions[modelId] = this._getModelVersion(modelId);
     };
 
     /**

@@ -677,6 +677,8 @@
                         
                             <li data-name="ns.Model.key"><a href="ns.Model.html#key">key</a></li>
                         
+                            <li data-name="ns.Model.traverse"><a href="ns.Model.html#traverse">traverse</a></li>
+                        
                     </ul>
                 
             
@@ -741,6 +743,10 @@
 
             <ul class="typedefs itemMembers">
             
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.Model~setOptions"><a href="ns.Model.html#setOptions">setOptions</a></li>
+            
             </ul>
 
             <ul class="events itemMembers">
@@ -778,6 +784,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ModelCollection#_incVersion"><a href="ns.ModelCollection.html#_incVersion">_incVersion</a></li>
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
@@ -1048,6 +1056,8 @@
                         
                             <li data-name="ns.View.info"><a href="ns.View.html#info">info</a></li>
                         
+                            <li data-name="ns.View.infoLite"><a href="ns.View.html#infoLite">infoLite</a></li>
+                        
                     </ul>
                 
             
@@ -1086,6 +1096,8 @@
                     <li data-name="ns.View#_htmlinit"><a href="ns.View.html#_htmlinit">_htmlinit</a></li>
                 
                     <li data-name="ns.View#_saveModelsVersions"><a href="ns.View.html#_saveModelsVersions">_saveModelsVersions</a></li>
+                
+                    <li data-name="ns.View#_saveModelVersion"><a href="ns.View.html#_saveModelVersion">_saveModelVersion</a></li>
                 
                     <li data-name="ns.View#_setNode"><a href="ns.View.html#_setNode">_setNode</a></li>
                 
@@ -1172,6 +1184,8 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#invalidateAll"><a href="ns.ViewCollection.html#invalidateAll">invalidateAll</a></li>
+                
                     <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
                 
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
@@ -1188,6 +1202,8 @@
                 
                     <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
+                    <li data-name="ns.ViewCollection#_getModelVersion"><a href="ns.ViewCollection.html#_getModelVersion">_getModelVersion</a></li>
+                
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.ViewCollection#_htmldestroy"><a href="ns.ViewCollection.html#_htmldestroy">_htmldestroy</a></li>
@@ -1197,6 +1213,8 @@
                     <li data-name="ns.ViewCollection#_invokeModelHandler"><a href="ns.ViewCollection.html#_invokeModelHandler">_invokeModelHandler</a></li>
                 
                     <li data-name="ns.ViewCollection#_saveModelsVersions"><a href="ns.ViewCollection.html#_saveModelsVersions">_saveModelsVersions</a></li>
+                
+                    <li data-name="ns.ViewCollection#_saveModelVersion"><a href="ns.ViewCollection.html#_saveModelVersion">_saveModelVersion</a></li>
                 
                     <li data-name="ns.ViewCollection#_setNode"><a href="ns.ViewCollection.html#_setNode">_setNode</a></li>
                 
@@ -1781,7 +1799,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 105
+            ns.js, line 101
         </div>
         
     </div>
@@ -1944,7 +1962,7 @@
     
         
         <div class="tag-source">
-            ns.dom.js, line 33
+            ns.dom.js, line 45
         </div>
         
     </div>
@@ -2330,7 +2348,7 @@
     
         
         <div class="tag-source">
-            ns.dom.js, line 26
+            ns.dom.js, line 38
         </div>
         
     </div>
@@ -2819,7 +2837,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 76
+            ns.js, line 72
         </div>
         
     </div>
@@ -2890,7 +2908,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 86
+            ns.js, line 82
         </div>
         
     </div>
@@ -2961,7 +2979,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 131
+            ns.js, line 127
         </div>
         
     </div>
@@ -3109,7 +3127,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 25
+            ns.js, line 21
         </div>
         
     </div>
@@ -3230,7 +3248,7 @@
     
         
         <div class="tag-source">
-            ns.dom.js, line 14
+            ns.dom.js, line 26
         </div>
         
     </div>
@@ -3346,7 +3364,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 65
+            ns.js, line 61
         </div>
         
     </div>
@@ -3541,12 +3559,12 @@
     <div class="nameContainer">
         <h4 class="name" id="replaceNode">
             
-            <span class="type-signature static">static</span>ns.replaceNode<span class="signature">(oldNode, newNode)</span>
+            <span class="type-signature static">static</span>ns.replaceNode<span class="signature">(oldNode, newNode)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.dom.js, line 6
+            ns.dom.js, line 7
         </div>
         
     </div>
@@ -3672,6 +3690,11 @@
     
     
     
+
+
+    
+    
+    
 </dd>
 
         
@@ -3685,7 +3708,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 143
+            ns.js, line 139
         </div>
         
     </div>
@@ -3756,7 +3779,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 16
+            ns.js, line 12
         </div>
         
     </div>
@@ -3839,7 +3862,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 23 2014 13:36:21 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Aug 04 2014 16:54:52 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

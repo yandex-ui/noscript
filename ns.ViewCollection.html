@@ -677,6 +677,8 @@
                         
                             <li data-name="ns.Model.key"><a href="ns.Model.html#key">key</a></li>
                         
+                            <li data-name="ns.Model.traverse"><a href="ns.Model.html#traverse">traverse</a></li>
+                        
                     </ul>
                 
             
@@ -741,6 +743,10 @@
 
             <ul class="typedefs itemMembers">
             
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.Model~setOptions"><a href="ns.Model.html#setOptions">setOptions</a></li>
+            
             </ul>
 
             <ul class="events itemMembers">
@@ -778,6 +784,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ModelCollection#_incVersion"><a href="ns.ModelCollection.html#_incVersion">_incVersion</a></li>
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
@@ -1048,6 +1056,8 @@
                         
                             <li data-name="ns.View.info"><a href="ns.View.html#info">info</a></li>
                         
+                            <li data-name="ns.View.infoLite"><a href="ns.View.html#infoLite">infoLite</a></li>
+                        
                     </ul>
                 
             
@@ -1086,6 +1096,8 @@
                     <li data-name="ns.View#_htmlinit"><a href="ns.View.html#_htmlinit">_htmlinit</a></li>
                 
                     <li data-name="ns.View#_saveModelsVersions"><a href="ns.View.html#_saveModelsVersions">_saveModelsVersions</a></li>
+                
+                    <li data-name="ns.View#_saveModelVersion"><a href="ns.View.html#_saveModelVersion">_saveModelVersion</a></li>
                 
                     <li data-name="ns.View#_setNode"><a href="ns.View.html#_setNode">_setNode</a></li>
                 
@@ -1172,6 +1184,8 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#invalidateAll"><a href="ns.ViewCollection.html#invalidateAll">invalidateAll</a></li>
+                
                     <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
                 
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
@@ -1188,6 +1202,8 @@
                 
                     <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
+                    <li data-name="ns.ViewCollection#_getModelVersion"><a href="ns.ViewCollection.html#_getModelVersion">_getModelVersion</a></li>
+                
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.ViewCollection#_htmldestroy"><a href="ns.ViewCollection.html#_htmldestroy">_htmldestroy</a></li>
@@ -1197,6 +1213,8 @@
                     <li data-name="ns.ViewCollection#_invokeModelHandler"><a href="ns.ViewCollection.html#_invokeModelHandler">_invokeModelHandler</a></li>
                 
                     <li data-name="ns.ViewCollection#_saveModelsVersions"><a href="ns.ViewCollection.html#_saveModelsVersions">_saveModelsVersions</a></li>
+                
+                    <li data-name="ns.ViewCollection#_saveModelVersion"><a href="ns.ViewCollection.html#_saveModelVersion">_saveModelVersion</a></li>
                 
                     <li data-name="ns.ViewCollection#_setNode"><a href="ns.ViewCollection.html#_setNode">_setNode</a></li>
                 
@@ -1558,6 +1576,47 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="invalidateAll">invalidateAll</h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="key">key<span class="type-signature type string">string</span> </h4>
     </div>
     
@@ -1749,12 +1808,12 @@
     <div class="nameContainer">
         <h4 class="name" id="define">
             
-            <span class="type-signature static">static</span>ns.ViewCollection.define<span class="signature">(id, info)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.View.html">ns.View</a>}</span>
+            <span class="type-signature static">static</span>ns.ViewCollection.define<span class="signature">(id, info, baseClass)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.View.html">ns.View</a>}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 21
+            ns.viewCollection.js, line 22
         </div>
         
     </div>
@@ -1835,6 +1894,32 @@
         </tr>
 	
 	
+	
+        <tr>
+            
+                <td class="name"><code>baseClass</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+|
+
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
 	</tbody>
 </table>
     
@@ -1896,7 +1981,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 706
+            ns.view.js, line 726
         </div>
         
     </div>
@@ -1965,6 +2050,73 @@
         
             
 <dt>
+    <div class="nameContainer">
+        <h4 class="name" id="_getModelVersion">
+            
+            _getModelVersion<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.viewCollection.js, line 101
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <div class="nameContainer inherited">
         <h4 class="name" id="_hide">
             
@@ -1975,7 +2127,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 212
+            ns.view.js, line 211
         </div>
         
     </div>
@@ -2105,7 +2257,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 191
+            ns.view.js, line 190
         </div>
         
     </div>
@@ -2230,7 +2382,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 201
+            ns.view.js, line 200
         </div>
         
     </div>
@@ -2353,7 +2505,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 85
+            ns.viewCollection.js, line 88
         </div>
         
     </div>
@@ -2426,7 +2578,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1101
+            ns.view.js, line 1121
         </div>
         
     </div>
@@ -2490,6 +2642,124 @@
             
 <dt>
     <div class="nameContainer inherited">
+        <h4 class="name" id="_saveModelVersion">
+            
+                <span class="inherited"><a href="ns.View.html#_saveModelVersion">inherited</a></span>
+            
+            <span class="type-signature ">protected</span>_saveModelVersion<span class="signature">(modelId)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1142
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Safe model version to track changes.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>modelId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>ID модели</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
         <h4 class="name" id="_setNode">
             
                 <span class="inherited"><a href="ns.View.html#_setNode">inherited</a></span>
@@ -2499,7 +2769,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 955
+            ns.view.js, line 975
         </div>
         
     </div>
@@ -2617,7 +2887,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 255
+            ns.view.js, line 254
         </div>
         
     </div>
@@ -2747,7 +3017,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 879
+            ns.view.js, line 899
         </div>
         
     </div>
@@ -2870,7 +3140,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 888
+            ns.view.js, line 908
         </div>
         
     </div>
@@ -2983,17 +3253,15 @@
         
             
 <dt>
-    <div class="nameContainer inherited">
+    <div class="nameContainer">
         <h4 class="name" id="invalidate">
-            
-                <span class="inherited"><a href="ns.View.html#invalidate">inherited</a></span>
             
             invalidate<span class="signature">()</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.view.js, line 513
+            ns.viewCollection.js, line 143
         </div>
         
     </div>
@@ -3004,7 +3272,8 @@
     
     
     <div class="description">
-        <p>Инвалидует себя и своих потомков.</p>
+        <p>Cтатус валидности самой коллекции и ее элементов рассчитыается независимо.
+Поэтому этот метод инвалидирует только себя и оставляет элементы коллекции без изменений.</p>
     </div>
     
 
@@ -3066,7 +3335,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 533
+            ns.view.js, line 544
         </div>
         
     </div>
@@ -3130,15 +3399,17 @@
         
             
 <dt>
-    <div class="nameContainer">
+    <div class="nameContainer inherited">
         <h4 class="name" id="isModelsValid">
+            
+                <span class="inherited"><a href="ns.View.html#isModelsValid">inherited</a></span>
             
             isModelsValid<span class="signature">(<span class="optional">modelsVersions</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Boolean}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 121
+            ns.view.js, line 585
         </div>
         
     </div>
@@ -3268,7 +3539,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 565
+            ns.view.js, line 576
         </div>
         
     </div>
@@ -3346,7 +3617,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 541
+            ns.view.js, line 552
         </div>
         
     </div>
@@ -3424,7 +3695,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 525
+            ns.view.js, line 536
         </div>
         
     </div>
@@ -3496,7 +3767,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 99
+            ns.viewCollection.js, line 121
         </div>
         
     </div>
@@ -3568,7 +3839,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 107
+            ns.viewCollection.js, line 129
         </div>
         
     </div>
@@ -3642,7 +3913,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1111
+            ns.view.js, line 1150
         </div>
         
     </div>
@@ -3715,7 +3986,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 810
+            ns.view.js, line 830
         </div>
         
     </div>
@@ -3856,7 +4127,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 906
+            ns.view.js, line 926
         </div>
         
     </div>
@@ -4014,7 +4285,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
     
         
         <div class="tag-source">
-            ns.view.js, line 1134
+            ns.view.js, line 1173
         </div>
         
     </div>
@@ -4152,7 +4423,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
     
         
         <div class="tag-source">
-            ns.view.js, line 1118
+            ns.view.js, line 1157
         </div>
         
     </div>
@@ -4285,7 +4556,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 23 2014 13:36:22 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Aug 04 2014 16:54:53 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

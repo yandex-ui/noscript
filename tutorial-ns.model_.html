@@ -677,6 +677,8 @@
                         
                             <li data-name="ns.Model.key"><a href="ns.Model.html#key">key</a></li>
                         
+                            <li data-name="ns.Model.traverse"><a href="ns.Model.html#traverse">traverse</a></li>
+                        
                     </ul>
                 
             
@@ -741,6 +743,10 @@
 
             <ul class="typedefs itemMembers">
             
+            <span class="subtitle">Typedefs</span>
+            
+                <li data-name="ns.Model~setOptions"><a href="ns.Model.html#setOptions">setOptions</a></li>
+            
             </ul>
 
             <ul class="events itemMembers">
@@ -778,6 +784,8 @@
                 <ul class="methods itemMembers">
                 
                 <span class="subtitle">Instance methods</span>
+                
+                    <li data-name="ns.ModelCollection#_incVersion"><a href="ns.ModelCollection.html#_incVersion">_incVersion</a></li>
                 
                     <li data-name="ns.ModelCollection#bindModel"><a href="ns.ModelCollection.html#bindModel">bindModel</a></li>
                 
@@ -1048,6 +1056,8 @@
                         
                             <li data-name="ns.View.info"><a href="ns.View.html#info">info</a></li>
                         
+                            <li data-name="ns.View.infoLite"><a href="ns.View.html#infoLite">infoLite</a></li>
+                        
                     </ul>
                 
             
@@ -1086,6 +1096,8 @@
                     <li data-name="ns.View#_htmlinit"><a href="ns.View.html#_htmlinit">_htmlinit</a></li>
                 
                     <li data-name="ns.View#_saveModelsVersions"><a href="ns.View.html#_saveModelsVersions">_saveModelsVersions</a></li>
+                
+                    <li data-name="ns.View#_saveModelVersion"><a href="ns.View.html#_saveModelVersion">_saveModelVersion</a></li>
                 
                     <li data-name="ns.View#_setNode"><a href="ns.View.html#_setNode">_setNode</a></li>
                 
@@ -1172,6 +1184,8 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#invalidateAll"><a href="ns.ViewCollection.html#invalidateAll">invalidateAll</a></li>
+                
                     <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
                 
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
@@ -1188,6 +1202,8 @@
                 
                     <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
+                    <li data-name="ns.ViewCollection#_getModelVersion"><a href="ns.ViewCollection.html#_getModelVersion">_getModelVersion</a></li>
+                
                     <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
                 
                     <li data-name="ns.ViewCollection#_htmldestroy"><a href="ns.ViewCollection.html#_htmldestroy">_htmldestroy</a></li>
@@ -1197,6 +1213,8 @@
                     <li data-name="ns.ViewCollection#_invokeModelHandler"><a href="ns.ViewCollection.html#_invokeModelHandler">_invokeModelHandler</a></li>
                 
                     <li data-name="ns.ViewCollection#_saveModelsVersions"><a href="ns.ViewCollection.html#_saveModelsVersions">_saveModelsVersions</a></li>
+                
+                    <li data-name="ns.ViewCollection#_saveModelVersion"><a href="ns.ViewCollection.html#_saveModelVersion">_saveModelVersion</a></li>
                 
                     <li data-name="ns.ViewCollection#_setNode"><a href="ns.ViewCollection.html#_setNode">_setNode</a></li>
                 
@@ -1335,7 +1353,16 @@ ns.Model.define('my-model', {
         'page': 0,
         'pageSize': 20
     }
-});</code></pre><h2>Получение экземпляра модели</h2><ul>
+});</code></pre><p>В запросе на сервер отправляются все параметры, которые не <code>null</code>.</p>
+<p>Важно понимать, что HTTP - текстовый протокол, поэтому все значения отправятся как строки.
+Т.о. <code>0</code> станет <code>&quot;0&quot;</code>, <code>false</code> - <code>&quot;false&quot;</code>. А это значит, что параметры, которые в вашем приложении не обрабатываются как строки, надо приводить к правильному типу на сервере. Иначе, можно получить такую ошибку</p>
+<pre class="prettyprint source lang-js"><code>// отправили параметры как
+// ?lag=false
+//
+
+if (params.flag) {
+   // эта ветка выполнится, потому что params.flag === &quot;false&quot;
+}</code></pre><h2>Получение экземпляра модели</h2><ul>
 <li><code>ns.Model.get('modelName', params)</code> - строит ключ из <code>params</code> и возвращает соответствующую модель. Если такого экземпляра нет, то он будет создан.</li>
 <li><code>ns.Model.getValid('modelName', params)</code> - тоже самое что и <code>ns.Model.get</code>. Только экземпляр еще проверяется на валидность. Если валидный экземпляр не найден, то возвращается <code>null</code>.</li>
 </ul>
@@ -1464,7 +1491,7 @@ this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Jul 23 2014 13:36:22 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Aug 04 2014 16:54:53 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

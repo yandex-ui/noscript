@@ -247,4 +247,116 @@ describe('ns.ViewСollection ns-view-* events', function() {
 
     });
 
+    describe('показать коллекцию -> скрыть коллекцию -> показать коллекцию', function() {
+
+        beforeEach(function() {
+            var layout1 = ns.layout.page('content1', {});
+            var layout2 = ns.layout.page('content2', {});
+            return new ns.Update(this.APP, layout1, {}).render().then(function() {
+                return new ns.Update(this.APP, layout2, {}).render().then(function() {
+                    return new ns.Update(this.APP, layout1, {}).render()
+                }, null, this);
+            }, null, this);
+
+        });
+
+        genTests([
+            ['content-collection', 'ns-view-async', 'called', false],
+            ['content-collection', 'ns-view-init', 'calledOnce'],
+            ['content-collection', 'ns-view-htmlinit', 'calledOnce'],
+            ['content-collection', 'ns-view-show', '', 2],
+            ['content-collection', 'ns-view-touch', '', 2],
+            ['content-collection', 'ns-view-hide', '', 1],
+            ['content-collection', 'ns-view-htmldestroy', 'called', false],
+
+            ['content-collection-item', 'ns-view-async', 'called', false],
+            ['content-collection-item', 'ns-view-init', '', 3],
+            ['content-collection-item', 'ns-view-htmlinit', '', 3],
+            ['content-collection-item', 'ns-view-show', '', 6],
+            ['content-collection-item', 'ns-view-touch', '', 6],
+            ['content-collection-item', 'ns-view-hide', '', 3],
+            ['content-collection-item', 'ns-view-htmldestroy', 'called', false]
+        ]);
+
+    });
+
+    describe('показать коллекцию -> скрыть коллекцию -> показать коллекцию (с полной перерисовкой)', function() {
+
+        // тот же самый тест,
+        // но при втором пока коллекция будет перерисована полностью
+
+        beforeEach(function() {
+            var layout1 = ns.layout.page('content1', {});
+            var layout2 = ns.layout.page('content2', {});
+            return new ns.Update(this.APP, layout1, {}).render().then(function() {
+                return new ns.Update(this.APP, layout2, {}).render().then(function() {
+
+                    var mc = ns.Model.get('model-collection');
+                    mc.setData(mc.getData());
+                    return new ns.Update(this.APP, layout1, {}).render()
+
+                }, null, this);
+            }, null, this);
+
+        });
+
+        genTests([
+            ['content-collection', 'ns-view-async', 'called', false],
+            ['content-collection', 'ns-view-init', 'calledOnce'],
+            ['content-collection', 'ns-view-htmlinit', '', 2],
+            ['content-collection', 'ns-view-show', '', 2],
+            ['content-collection', 'ns-view-touch', '', 2],
+            ['content-collection', 'ns-view-hide', '', 1],
+            ['content-collection', 'ns-view-htmldestroy', '', 1],
+
+            ['content-collection-item', 'ns-view-async', 'called', false],
+            ['content-collection-item', 'ns-view-init', '', 3],
+            ['content-collection-item', 'ns-view-htmlinit', '', 6],
+            ['content-collection-item', 'ns-view-show', '', 6],
+            ['content-collection-item', 'ns-view-touch', '', 6],
+            ['content-collection-item', 'ns-view-hide', '', 3],
+            ['content-collection-item', 'ns-view-htmldestroy', '', 3]
+        ]);
+
+    });
+
+    describe('показать коллекцию -> скрыть коллекцию -> показать коллекцию (с перерисовкой, без элементов)', function() {
+
+        // тот же самый тест,
+        // но при повтороном показе коллекция будет перерисована без детей
+
+        beforeEach(function() {
+            var layout1 = ns.layout.page('content1', {});
+            var layout2 = ns.layout.page('content2', {});
+            return new ns.Update(this.APP, layout1, {}).render().then(function() {
+                return new ns.Update(this.APP, layout2, {}).render().then(function() {
+                    var mc = ns.Model.get('model-collection');
+                    mc.set('.test', 1, {silent: true});
+                    return new ns.Update(this.APP, layout1, {}).render()
+
+                }, null, this);
+            }, null, this);
+
+        });
+
+        genTests([
+            ['content-collection', 'ns-view-async', 'called', false],
+            ['content-collection', 'ns-view-init', 'calledOnce'],
+            ['content-collection', 'ns-view-htmlinit', '', 2],
+            ['content-collection', 'ns-view-show', '', 2],
+            ['content-collection', 'ns-view-touch', '', 2],
+            ['content-collection', 'ns-view-hide', '', 1],
+            ['content-collection', 'ns-view-htmldestroy', '', 1],
+
+            ['content-collection-item', 'ns-view-async', 'called', false],
+            ['content-collection-item', 'ns-view-init', '', 3],
+            ['content-collection-item', 'ns-view-htmlinit', '', 3],
+            ['content-collection-item', 'ns-view-show', '', 6],
+            ['content-collection-item', 'ns-view-touch', '', 6],
+            ['content-collection-item', 'ns-view-hide', '', 3],
+            ['content-collection-item', 'ns-view-htmldestroy', '', 0]
+        ]);
+
+    });
+
 });

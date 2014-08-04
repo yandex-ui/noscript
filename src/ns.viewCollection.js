@@ -469,6 +469,11 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
         }
 
+        // Коллекции могут быть вложенны рекурсивно,
+        // но плейсхолдер отрисуется только для самых верних,
+        // поэтому на всякий случай поставляем сюда свою текущую ноду
+        newNode = newNode || this.node;
+
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
         for (var i = 0, prev; i < MC.models.length; i++) {
@@ -491,9 +496,13 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //      1.1 view не валиден, то делаем _updateHtml и вставляем его в правильное
                 //          место
                 //      1.2 view валиден, то ничего не делаем
-                if (!view.isValid()) {
-                    view._updateHTML(newNode, null, params, options_next, events);
+                var viewItemWasInValid = !view.isValid();
 
+                // updateHTML надо пройти в любом случае,
+                // чтобы у всех элементов коллекции сгенерились правильные события
+                view._updateHTML(newNode, null, params, options_next, events);
+
+                if (viewItemWasInValid) {
                     // поставим ноду в правильное место
                     if (prev) {
                         // Либо после предыдущего вида
@@ -511,9 +520,14 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //      1.1 view не валиден, то он уже занял правильное место в корневом html.
                 //          Делаем _updateHtml
                 //      1.2 view валиден, то заменим placeholder на правильный html.
-                if (!view.isValid()) {
-                    view._updateHTML(newNode, null, params, options_next, events);
-                } else {
+
+                var viewItemWasValid = view.isValid();
+
+                // updateHTML надо пройти в любом случае,
+                // чтобы у всех элементов коллекции сгенерились правильные события
+                view._updateHTML(newNode, null, params, options_next, events);
+
+                if (viewItemWasValid) {
                     // здесь не нужно перевешивать события, т.к. они могут быть повешены
                     // либо непосредственно на ноду, либо на document. В первом случае
                     // события переедут вместе со старой нодой, а во втором останутся там,

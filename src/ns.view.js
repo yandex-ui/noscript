@@ -69,6 +69,12 @@
     ns.View.prototype.views = null;
 
     /**
+     * ID (название) вида
+     * @type {string}
+     */
+    ns.View.prototype.id = null;
+
+    /**
      * Инициализирует экземпляр вида
      * @param {string} id
      * @param {object} params

@@ -833,6 +833,30 @@ describe('ns.Model', function() {
 
         });
 
+        describe('ns-model-destroy', function() {
+            beforeEach(function() {
+                this.nsModelDestroySpy = sinon.spy();
+
+                ns.Model.define('test-destroy-model', {
+                    events: {
+                        'ns-model-destroyed': this.nsModelDestroySpy
+                    }
+                });
+
+                this.model = ns.Model.get('test-destroy-model');
+                this.model.destroy();
+            });
+
+            afterEach(function() {
+                delete this.model;
+                delete this.nsModelDestroySpy;
+            });
+
+            it('вызывается однократно при уничтожении модели', function() {
+                expect(this.nsModelDestroySpy.calledOnce).to.be.equal(true);
+            });
+        });
+
     });
 
     describe('ns.model.canRequest()', function() {

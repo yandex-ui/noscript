@@ -168,13 +168,12 @@
      */
     ns.Model.prototype.destroy = function() {
         this._reset(this.STATUS.NONE);
-        // еще надо убрать все обработчики
-        this._unbindEvents();
         /**
          * Сообщает об уничтожении модели
          * @events ns.Model#ns-model-destroyed
          */
         this.trigger('ns-model-destroyed');
+        this._unbindEvents();
     };
 
     /**

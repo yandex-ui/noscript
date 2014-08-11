@@ -367,7 +367,7 @@
                         });
 
                     } else {
-                        that.extract(requesting, r);
+                        that.extract(regularRequests, r);
                     }
 
                 }, function(e, xhr) {
@@ -376,7 +376,7 @@
                         xhr: xhr
                     });
                     // уходим в извлечение, чтобы пометить запрос завершенным
-                    that.extract(requesting, {});
+                    that.extract(regularRequests, {});
                 });
             }
 

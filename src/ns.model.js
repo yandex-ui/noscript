@@ -784,6 +784,7 @@
      * @param {Function} callback
      */
     ns.Model.traverse = function(id, callback) {
+        // вызов infoLite нужен, чтобы бросить ошибку в случае, если модель не определена
         ns.Model.infoLite(id);
         ns.assert(('function' === typeof callback), 'ns.Model.traverse', 'callback must be a function');
 

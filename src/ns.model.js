@@ -39,10 +39,9 @@
      *
      * @param {string} id
      * @param {object} params
-     * @param {*} data
      * @private
      */
-    ns.Model.prototype._init = function(id, params, data) {
+    ns.Model.prototype._init = function(id, params) {
         this.id = id;
         this.params = params || {};
 
@@ -50,8 +49,6 @@
 
         this.info = ns.Model.info(id);
         this.key = ns.Model.key(id, params, this.info);
-
-        this.setData(data);
 
         this._reinit();
     };

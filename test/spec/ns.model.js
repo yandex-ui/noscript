@@ -410,13 +410,12 @@ describe('ns.Model', function() {
                 this.sinon.spy(model, '_reset');
                 this.sinon.spy(model, 'setData');
                 this.sinon.spy(model, '_bindEvents');
-                model._init('m1', {p1: 1, p2: 2, p3: 3, p4: 4}, {foo: 'bar'});
+                model._init('m1', {p1: 1, p2: 2, p3: 3, p4: 4});
 
                 expect(model.id).to.be.equal('m1');
                 expect(model.params).to.eql({p1: 1, p2: 2, p3: 3, p4: 4});
 
                 expect(model._reset.calledOnce).to.be.equal(true);
-                expect(model.setData.calledWith({foo: 'bar'})).to.be.equal(true);
 
                 expect(model.info).to.be.equal( ns.Model.info('m1') );
                 expect(model.key)

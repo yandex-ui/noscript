@@ -285,12 +285,10 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
             if (this.isValidSelf()) {
                 // Если корневая нода не меняется, то перерендериваем
                 // только невалидные элементы коллекции
-                if (!view.isValid()) {
-                    if (view.info.isCollection && view.isValidSelf()) {
-                        decl = view._getPlaceholderTree(layout, params);
-                    } else {
-                        decl = view._getViewTree(layout, params);
-                    }
+                if (view.info.isCollection && view.isValidSelf()) {
+                    decl = view._getPlaceholderTree(layout, params);
+                } else if (!view.isValid()) {
+                    decl = view._getViewTree(layout, params);
                 }
             } else {
                 // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все

@@ -913,6 +913,100 @@ describe('ns.ViewCollection', function() {
         });
     });
 
+    describe('Update of nested view collections', function() {
+        before(function() {
+            ns.Model.define('nested-model', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.Model.define('outer-collection-model', {
+                isCollection: true
+            });
+
+            ns.Model.define('nested-collection', {
+                isCollection: true,
+                params: {
+                    id: null
+                }
+            });
+
+            ns.View.define('nested-view-collection-item', {
+                models: [ 'nested-model' ]
+            });
+
+            ns.ViewCollection.define('nested-view-collection', {
+                models: [ 'nested-collection' ],
+                split: {
+                    byModel: 'nested-collection',
+                    intoViews: 'nested-view-collection-item'
+                }
+            });
+
+            ns.ViewCollection.define('outer-view-collection', {
+                models: [ 'outer-collection-model' ],
+                split: {
+                    byModel: 'outer-collection-model',
+                    intoViews: 'nested-view-collection'
+                }
+            });
+
+            ns.View.define('app');
+            this.APP = ns.View.create('app');
+
+            ns.layout.define('app-3', {
+                'app': 'outer-view-collection'
+            });
+        });
+
+        beforeEach(function(finish) {
+            var parent = ns.Model.get('outer-collection-model');
+
+            var itemA = ns.Model.get('nested-model', {id: 'A'}).setData({});
+            var itemB = ns.Model.get('nested-model', {id: 'B'}).setData({});
+            var itemC = ns.Model.get('nested-model', {id: 'C'}).setData({});
+
+            var childA = ns.Model.get('nested-collection', {id: 'A'});
+            var childB = ns.Model.get('nested-collection', {id: 'B'});
+
+            childA.insert([itemA]);
+            childB.insert([itemB, itemC]);
+
+            parent.insert([childA, childB]);
+
+            var layout = ns.layout.page('app-3');
+            new ns.Update(this.APP, layout, {})
+                .start()
+                .done(function() {
+                    var itemD = ns.Model.get('nested-model', {id: 'D'}).setData({});
+                    var childC = ns.Model.get('nested-collection', {id: 'C'});
+
+                    childC.insert([itemD]);
+                    parent.insert(childC, 2);
+
+                    var layout = ns.layout.page('app-3');
+                    new ns.Update(this.APP, layout, {})
+                        .start()
+                        .done(function() {
+                            this.collectionViewNode = this.APP.node.querySelector('.ns-view-outer-view-collection');
+                            finish();
+                        }.bind(this));
+                }.bind(this));
+        });
+
+        it('should correctly update nested nodes', function() {
+            var childNodesContainer = this.collectionViewNode.firstChild.childNodes;
+            var childANode = childNodesContainer[0];
+            var childBNode = childNodesContainer[1];
+            var childCNode = childNodesContainer[2];
+
+            expect(childANode.querySelector('.ns-view-container-desc').childNodes).to.have.length(1);
+            expect(childBNode.querySelector('.ns-view-container-desc').childNodes).to.have.length(2);
+            expect(childCNode.querySelector('.ns-view-container-desc').childNodes).to.have.length(1);
+        });
+    });
+
 
     describe('ViewCollection.isModelsValid', function() {
 

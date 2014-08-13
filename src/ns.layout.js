@@ -30,6 +30,14 @@
     };
 
     /**
+     * Удаляет определение раскладки.
+     * @param {string} id ID раскладки.
+     */
+    ns.layout.undefine = function(id) {
+        delete _pages[id];
+    };
+
+    /**
      * Устанавливает layout в начальное состояние
      * @private
      */

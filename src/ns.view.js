@@ -655,7 +655,8 @@
         }
 
         this._apply(function(view, id) {
-            view._getRequestViews(updated, pageLayout[id].views, params);
+            var viewPageLayout = pageLayout[id] || {};
+            view._getRequestViews(updated, viewPageLayout.views, params);
         });
 
         return updated;
@@ -717,7 +718,8 @@
             tree.views[this.id] = this._getViewTree(layout, params);
         } else {
             this._apply(function(view, id) {
-                view._getUpdateTree(tree, layout[id].views, params);
+                var viewLayout = layout[id] || {};
+                view._getUpdateTree(tree, viewLayout.views, params);
             });
         }
 
@@ -916,44 +918,42 @@
     };
 
     /**
-     * Быстро что-нибудь сгенерить из данных блока.
-     * Можно передать моду и дополнительный объект, который попадет в /.extra:
-     * @param {string} mode
-     * @param {object} extra
-     * @returns {HTMLElement}
+     * Метод для изолированного рендеринга.
+     * @description Этот метод запустит изолированный Update на виде,
+     * т.е. запросит все модели, отрендерит и вызовет все события.
+     *
+     * Метод удобно использовать для инициализации изолированных видов, например, попапов или дропдаунов.
      * @example
      * ```js
-     * block.tmpl()
-     * block.tmpl('mode')
-     * block.tmpl({ ... })
-     * block.tmpl('mode', { ... })
+     * ns.View.define('my-popup-view');
+     *
+     * ns.View.create('my-popup-view')
+     *   .tmpl()
+     *   .then(function() {
+     *      openPopup(this.node);
+     *   }, function() {
+     *      alert('oops')
+     *   });
      * ```
+     * @returns {Vow.Promise}
      */
-    ns.View.prototype.tmpl = function(mode, extra) {
-        switch (arguments.length) {
-            case 0:
-                mode = '';
-                break;
-            case 1:
-                if (typeof mode === 'object') {
-                    extra = mode;
-                    mode = '';
-                }
-        }
+    ns.View.prototype.tmpl = function() {
+        // создаем фейковый временный layout, чтобы отправить его в update
+        var fakeLayoutName = 'ns-temp-layout-for-' + this.id;
+        var fakeLayout = {};
+        fakeLayout[this.id] = {};
+        ns.layout.define(fakeLayoutName, fakeLayout);
 
-        var renderTree = this._getTree();
-        renderTree.models = this._getModelsForTree();
+        var layout = ns.layout.page(fakeLayoutName, this.params);
 
-        if (extra) {
-            renderTree.extra = extra;
-        }
+        // удаляем временный layout
+        ns.layout.undefine(fakeLayoutName);
 
-        var mainTree = {
-            views: {}
-        };
-        mainTree.views[this.id] = renderTree;
-
-        return ns.renderNode(mainTree, mode);
+        // запускаем update для этого вида
+        return new ns.Update(this, layout, this.params, {
+            // запускаем паралелльный (независимый) update, чтобы его никто не убил
+            execFlag: ns.U.EXEC.PARALLEL
+        }).render();
     };
 
     /**
@@ -1115,7 +1115,8 @@
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view, id) {
-                view._updateHTML(viewNode, layout[id].views, params, options_next, events);
+                var viewLayout = layout[id] || {};
+                view._updateHTML(viewNode, viewLayout.views, params, options_next, events);
             });
         }
     };

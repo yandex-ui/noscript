@@ -376,7 +376,8 @@ describe('ns.View', function() {
         });
     });
 
-    describe('ns.View render errors', function() {
+    // после изменения ns.View#tmpl не знаю как правильно это описать
+    xdescribe('ns.View render errors', function() {
         beforeEach(function() {
             ns.Model.define('a');
             ns.Model.define('b');
@@ -747,6 +748,132 @@ describe('ns.View', function() {
         it('в дерево отрисовки вида не должны попасть свойства, перетирающие стандартные', function() {
             var renderTree = ns.renderString.getCall(0).args[0];
             renderTree.views.tst.should.not.have.property('key', 'foo');
+        });
+
+    });
+
+    describe('#tmpl', function() {
+
+        beforeEach(function(done) {
+
+            this.spyOnhtmlinit = this.sinon.spy();
+            this.spyOnshow = this.sinon.spy();
+
+            this.sinon.spy(ns, 'Update');
+
+            ns.View.define('my-popup-view', {
+                events: {
+                    'ns-view-htmlinit': this.spyOnhtmlinit,
+                    'ns-view-show': this.spyOnshow
+                }
+            });
+
+            this.view = ns.View.create('my-popup-view');
+            this.view
+                .tmpl()
+                .then(function() {
+                    done();
+                }, function(e) {
+                    done(e);
+                });
+
+        });
+
+        afterEach(function() {
+            delete this.view;
+        });
+
+        it('должен вызвать ns.Update', function() {
+            expect(ns.Update).to.have.callCount(1);
+        });
+
+        it('должен вызвать параллельный ns.Update с временной раскладкой', function() {
+            var testLayout = {};
+            testLayout[this.view.id] = {};
+            ns.layout.define('test', testLayout);
+
+            expect(ns.Update).to.be.calledWith(
+                this.view,
+                ns.layout.page('test'),
+                this.view.params, {
+                execFlag: ns.U.EXEC.PARALLEL
+            });
+        });
+
+        it('должен сделать view валидный', function() {
+            expect(this.view.isValid()).to.be.equal(true);
+        });
+
+        it('должен вызвать обработчик ns-view-htmlinit', function() {
+            expect(this.spyOnhtmlinit).to.have.callCount(1);
+        });
+
+        it('должен вызвать обработчик ns-view-show', function() {
+            expect(this.spyOnshow).to.have.callCount(1);
+        });
+
+    });
+
+    describe('#tmpl для уже созданного вида (локальный update)', function() {
+
+        // вот это на самом деле сайд-эффект от #tmpl
+        // написал тесты, чтобы проверить его работоспособность
+
+        beforeEach(function(done) {
+
+            this.spyParentOntouch = this.sinon.spy();
+            this.spyChildOntouch = this.sinon.spy();
+
+            ns.View.define('my-parent-view', {
+                events: {
+                    'ns-view-touch': this.spyParentOntouch
+                }
+            });
+
+            ns.View.define('my-child-view', {
+                events: {
+                    'ns-view-touch': this.spyChildOntouch
+                }
+            });
+
+            ns.layout.define('test', {
+                'my-parent-view': {
+                   'my-child-view': {}
+                }
+            });
+
+            this.view = ns.View.create('my-parent-view');
+
+            new ns.Update(this.view, ns.layout.page('test'), {})
+                .render()
+                .then(function() {
+
+                    this.spyParentOntouch.reset();
+                    this.spyChildOntouch.reset();
+
+                    this.view
+                        .tmpl()
+                        .then(function() {
+                            done();
+                        }, function(e) {
+                            done(e);
+                        });
+                }, function(e) {
+                    done(e);
+                }, this);
+
+        });
+
+        afterEach(function() {
+            delete this.view;
+        });
+
+        it('должен вызвать ns-view-touch у родителя', function() {
+            expect(this.spyParentOntouch).to.have.callCount(1);
+        });
+
+        it('должен вызвать ns-view-touch у ребенка', function() {
+            expect(this.spyChildOntouch).to.have.callCount(1);
         });
 
     });

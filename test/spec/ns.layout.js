@@ -433,5 +433,18 @@ describe('ns.layout', function() {
 
     });
 
+    describe('.undefine()', function() {
+
+        it('должен удалить декларацию', function() {
+            // определяем
+            ns.layout.define('test', {});
+            // удаляем
+            ns.layout.undefine('test');
+            // если undefine работает правильно, то повторный define не бросит ошибку
+            ns.layout.define('test', {});
+        });
+
+    });
+
 });
 

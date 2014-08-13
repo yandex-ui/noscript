@@ -149,6 +149,10 @@ ns.key = function(prefix, params) {
  * Clean internal data after tests
  */
 ns.reset = function() {
+    // в сборке для node.js его нет
+    if (ns.action) {
+        ns.action._reset();
+    }
     ns.router._reset();
     ns.layout._reset();
     ns.Model._reset();

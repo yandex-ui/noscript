@@ -31,4 +31,22 @@ describe('no.action', function() {
 
     });
 
+    describe('run', function() {
+
+        it('должен выполнить обработчик action', function() {
+            var handler = this.sinon.spy();
+            ns.action.define('test', handler);
+            ns.action.run('test');
+
+            expect(handler).to.have.callCount(1);
+        });
+
+        it('должен бросить исключение, если action не определен', function() {
+            var fn = function() {
+                ns.action.run('test');
+            };
+            expect(fn).to.throw();
+        });
+
+    })
 });

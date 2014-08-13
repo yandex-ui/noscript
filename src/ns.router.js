@@ -261,7 +261,7 @@ ns.router._generateUrl = function(def, params) {
                     return null;
                 }
 
-                svalue += pvalue;
+                svalue += encodeURIComponent(pvalue);
                 delete query[param.name];
             }
         }
@@ -271,7 +271,7 @@ ns.router._generateUrl = function(def, params) {
             continue;
         }
 
-        result.push(encodeURIComponent(svalue));
+        result.push(svalue);
     }
 
     url = result.join('/');

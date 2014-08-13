@@ -184,13 +184,16 @@ describe('router: new route parsing method', function() {
 
     describe('ns.router.generateUrl()', function() {
         beforeEach(function() {
+            ns.router.regexps.any = '.+?';
+
             ns.router.routes = {
                 route: {
                     '/{context==search}/{query}/image/{id:int}': 'view',
                     '/{context==tag}/{tag}/image/{id:int}': 'view',
                     '/{context==top}/image/{id:int}': 'view',
                     '/{context}/image/{id:int}': 'view',
-                    '/test/{id}': 'test'
+                    '/test/{id}': 'test',
+                    '/search/query={query:any}': 'encode'
                 }
             };
             ns.router.init();
@@ -232,6 +235,18 @@ describe('router: new route parsing method', function() {
                 id: 'view',
                 params: { context: 'new-context', id: 4 },
                 result: '/new-context/image/4'
+            },
+            {
+                name: 'should encode only url values',
+                id: 'encode',
+                params: { query: '/' },
+                result: '/search/query=%2F'
+            },
+            {
+                name: 'should encode GET-params',
+                id: 'encode',
+                params: { query: '1', foo: '/' },
+                result: '/search/query=1?foo=%2F'
             }
         ];
 

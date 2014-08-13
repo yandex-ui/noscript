@@ -6,8 +6,7 @@
      * @param {ns.View} view Корневой view.
      * @param {object} layout Layout для этого view, результат от ns.layout.page()
      * @param {object} params Параметры, результат от ns.router()
-     * @param {object} [options] Options for ns.Update
-     * @param {ns.U.EXEC} [options.execFlag=ns.U.EXEC.GLOBAL] Options for ns.Update
+     * @param {ns.Update~options} [options] Опции исполнения.
      * @constructor
      * @example
      * ```js
@@ -16,6 +15,7 @@
      * var update = new ns.Update(AppBlock, layout, route.params);
      * update.start();
      * ```
+     * @tutorial ns.update
      * @tutorial ns.update.logic
      * @mixes ns.profile
      */
@@ -626,5 +626,12 @@
 
         return true;
     };
+
+    /**
+     * Опции исполнения.
+     * @typedef ns.Update~options
+     * @type {object}
+     * @property {ns.U.EXEC} [execFlag=ns.U.EXEC.GLOBAL] Флаг выполнения.
+     */
 
 })();

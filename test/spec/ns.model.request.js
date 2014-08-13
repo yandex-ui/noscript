@@ -133,7 +133,30 @@ describe('ns.Model#request', function() {
     describe('запрос обычной модели и с #request', function() {
 
         beforeEach(function() {
+
+            var data = {
+                'https://api.twitter.com?foo=1&bar=2': {
+                    fromModel: 'model'
+                },
+                '/models/?_m=regular-model': {
+                    "models": [
+                        { "data": { fromModel: 'regular-model' } }
+                    ]
+                }
+            };
+
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    '200',
+                    { "Content-Type": "application/json" },
+                    JSON.stringify(data[xhr.url])
+                );
+            });
+
+
             ns.Model.define('regular-model');
+
             this.request = ns.request(['model', 'regular-model']);
         });
 
@@ -142,20 +165,27 @@ describe('ns.Model#request', function() {
         });
 
         it('должен зарезолвить промис, когда запрос завершился', function(done) {
-            this.sinon.server.autoRespond = true;
-            this.sinon.server.respond(function(xhr) {
-                xhr.respond(
-                    '200',
-                    { "Content-Type": "application/json" },
-                    '{ "models": [ { "data": {} } ] }'
-                );
-            });
-
             this.request.then(function() {
                 done()
             }, function(err) {
                 done(err);
             })
+        });
+
+        it('должен сохранить правильные данные для обычной модели', function() {
+            return this.request.then(function() {
+                expect(ns.Model.get('regular-model').getData()).to.be.eql({
+                    fromModel: 'regular-model'
+                });
+            });
+        });
+
+        it('должен сохранить правильные данные для модели с собственным запросом', function() {
+            return this.request.then(function() {
+                expect(ns.Model.get('model').getData()).to.be.eql({
+                    fromModel: 'model'
+                });
+            });
         });
     });
 

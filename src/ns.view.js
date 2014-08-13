@@ -1173,34 +1173,12 @@
 
     /**
      * Запускает на себе ns.Update
-     * @param {object} [params={}] Дополнительные параметры. Могут использоваться при ручном запуске.
+     * @param {object} [params] Дополнительные параметры. Могут использоваться при ручном запуске.
+     * @param {ns.Update~options} [options] Опции исполнения. Если указан execFlag, то запускается ASYNC-обновление.
      * @returns {Vow.Promise}
      */
-    ns.View.prototype.update = function(params) {
+    ns.View.prototype.update = function(params, options) {
         this.shouldBeSync = true;
-
-        if (!this.layout) {
-            /*
-            FIXME: надо тут делать настоящий layout.define, потом undefine, а не подделывать структуру
-            // создаем фейковый временный layout, чтобы отправить его в update
-            var fakeLayoutName = 'ns-temp-layout-for-' + this.id;
-            var fakeLayout = {};
-            fakeLayout[this.id] = {};
-            ns.layout.define(fakeLayoutName, fakeLayout);
-
-            this.layout = ns.layout.page(fakeLayoutName, updateParams);
-
-            // удаляем временный layout
-            ns.layout.undefine(fakeLayoutName);
-
-             */
-
-            // если нет layout, то это элемент коллекции и сюда не приходит _applyLayout
-            this.layout = {};
-            this.layout[this.id] = {
-                views: {}
-            };
-        }
 
         var updateParams = this.params;
         if (params) {
@@ -1210,9 +1188,26 @@
             updateParams = no.extend({}, this.params, params);
         }
 
-        var updatePromise = new ns.Update(this, this.layout, updateParams, {
-            execFlag: ns.U.EXEC.ASYNC
-        }).render();
+        // если нет layout, то это
+        // - элемент коллекции и сюда не приходит _applyLayout
+        // - отдельно созданный вид через ns.View.create
+        if (!this.layout) {
+            // создаем временный layout, чтобы отправить его в update
+            var fakeLayoutName = 'ns-temp-layout-for-' + this.id;
+            var fakeLayout = {};
+            fakeLayout[this.id] = {};
+            ns.layout.define(fakeLayoutName, fakeLayout);
+
+            this.layout = ns.layout.page(fakeLayoutName, updateParams);
+
+            // удаляем временный layout
+            ns.layout.undefine(fakeLayoutName);
+        }
+
+        options = options || {};
+        options.execFlag = options.execFlag || ns.U.EXEC.ASYNC;
+
+        var updatePromise = new ns.Update(this, this.layout, updateParams, options).render();
 
         // у элемента коллекции его нет
         if (this._asyncPromise) {

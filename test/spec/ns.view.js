@@ -121,6 +121,30 @@ describe('ns.View', function() {
             expect(this.view.getModelData('test-getModel')).to.be.equal(this.modelData);
         });
 
+        it('должен создавать модели по своим параметрам', function() {
+            ns.View.define('view', {
+                models: ['model'],
+                'params-': ['p2']
+            });
+
+            ns.Model.define('model', {
+                params: {
+                    'p1': null,
+                    'p2': null
+                }
+            });
+
+            // инициализуем модель с двумя параметрами
+            // из-за 'params-' вид должен выкинуть параметр p2
+            // и взять модель 'p1=1'
+            var view = ns.View.create('view', {
+                p1: 1,
+                p2: 2
+            });
+
+            expect(view.getModel('model').key).to.be.equal('model=model&p1=1');
+        });
+
     });
 
     describe('#_bindModels', function(done) {

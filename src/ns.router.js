@@ -93,6 +93,13 @@ ns.router = function(url) {
 };
 
 /**
+ * Первый символ урла. Если приложение работает на хешах, то его надо переопределить в #.
+ * @type {string}
+ * @constant
+ */
+ns.router.URL_FIRST_SYMBOL = '/';
+
+/**
  * Get params for router from url
  * @param {string} url - current url
  * @param {object} route - compiled route or redirect
@@ -275,7 +282,7 @@ ns.router._generateUrl = function(def, params) {
     }
 
     url = result.join('/');
-    url = (url) ? ('/' + url) : '';
+    url = (url) ? (ns.router.URL_FIRST_SYMBOL + url) : '';
 
     // Разворачиваем rewrite правила, чтобы получить красивый урл до rewrite-ов.
     var rewrote = true;
@@ -302,13 +309,21 @@ ns.router._generateUrl = function(def, params) {
  */
 ns.router.compile = function(route) {
     // Удаляем слеши в начале и в конце урла.
-    route = route
-        .replace(/^\//, '')
-        .replace(/\/$/, '');
+    route = route.replace(/\/$/, '');
+    if (route[0] === ns.router.URL_FIRST_SYMBOL) {
+        route = route.substr(1);
+    }
 
     var parts = route.split('/');
     var sections = parts.map(ns.router._parseSection);
     var sregexps = sections.map(ns.router._generateSectionRegexp);
+
+    // смысл это махинации - поставить правильный символ в начале урла
+    // все секции генерятся с / в начале
+    // поэтому заменяем первый символ на константу
+    if (sregexps[0] === ns.router.URL_FIRST_SYMBOL) {
+        sregexps[0] = ns.router.URL_FIRST_SYMBOL + sregexps[0].substr(1);
+    }
     var regexp = sregexps.join('');
 
     // Вычленяем только параметры.

@@ -697,6 +697,29 @@ describe('ns.View', function() {
 
         });
 
+        describe.only('11', function() {
+
+            it('12', function() {
+                var genParams = function() {
+                    return {
+                        p: 1
+                    }
+                };
+                genParams.gid = 1;
+
+                ns.Model.define('model', {
+                    params: genParams
+                });
+                ns.View.define('view', {
+                    models: ['model']
+                });
+
+                debugger;
+                expect(ns.View.create('view').key).to.be.equal('view=view&p=1');
+            });
+
+        });
+
     });
 
     describe('#invalidate.', function() {

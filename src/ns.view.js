@@ -1354,6 +1354,7 @@
                 var modelInfo = ns.Model.info(model_id);
                 ns.assert(modelInfo, ns.View, 'Model %s is not defined!', model_id);
 
+                
                 no.extend( params, modelInfo.params );
             }
 

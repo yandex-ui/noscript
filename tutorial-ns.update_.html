@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: ns.layout</title>
+    <title>Tutorial: ns.update</title>
     
     
     
@@ -1286,7 +1286,7 @@
 
     <div class="main">
         
-            <h1 class="page-title">Tutorial: ns.layout</h1>
+            <h1 class="page-title">Tutorial: ns.update</h1>
         
 
         <section>
@@ -1294,142 +1294,19 @@
 <header>
     
 
-    <h2>ns.layout</h2>
+    <h2>ns.update</h2>
 </header>  
 
 <article>
-    <h2>Раскладка страницы (ns.Layout)</h2><p>Раскладка служит для декларативного описания структуры видов на странице. При определении раскладки указывается её id и декларация.</p>
-<pre class="prettyprint source"><code>    ns.layout.define('main', {
-        app: {
-            view1: true,
-            view2: {
-                view21: true
-            }
-        }
-    });</code></pre><p>В примере создаётся раскладка страницы, состоящей из четырёх видов. Корневой вид <code>app</code> содержит в себе <code>view1</code> и <code>view2</code>, а <code>view2</code> содержит в себе <code>view21</code>.</p>
-<p>Каждый узел декларации соответствует виду. Ключ указывает на класс вида, в значении содержится декларация вложенных видов.</p>
-<p>Способы описания структуры видов</p>
-<pre class="prettyprint source"><code>    ns.layout.define('main', {
-        app: {
-
-            // Для описания вида без вложенностей значение устанавливается в true
-            view1: true,
-
-            // Для описания одного вложенного вида в значении указывается его класс
-            view2: 'view21',
-
-            // Для описания статической структуры видов используется объект
-            view3: {
-                view31: true,
-                view32: 'view321'
-            },
-            // Для описания динамической структуры видов узел объяляется боксом,
-            // а вложенность задаётся функцией.
-            // В params приходят параметры страницы.
-            // Функция может вернуть любой из выше перечисленных форматов декларации
-            // видов, или falsy, чтобы отменить добавление вида в страницу.
-            view4@: function(params) {
-                if (params.value1) {
-                    return null;
-                }
-                if (params.value2) {
-                    return 'view41';
-                }
-                if (params.value3) {
-                    return {
-                        'view42': {
-                            'view421': true;
-                        }
-                    };
-                }
-            }
-        }
-    });</code></pre><p>Кроме описания структуры видов раскладка так же позволяет декларировать специальные атрибуты видов.</p>
-<h3>Бокс</h3><p>Бокс - это специальный вид-контейнер. Он не имеет собственного html-содержимого и представлен в DOM только одним узлом, содержащим непосредственно в себе все вложенности. Бокс позволяет решать следующие задачи.</p>
-<p>Кеширование экземпляров вида</p>
-<pre class="prettyprint source"><code>    ns.layout.define('main', {
-        app: {
-            box@: 'view1'
-        }
-    });</code></pre><p>В примере <code>box</code> будет содержать один вложенный вид <code>view1</code>. Если <code>view1</code> зависит от параметров, то при изменении параметров предыдущие html-узлы будут скрываться, но оставаться в DOM-дереве, а новые - добавляться в <code>box</code> и показываться. При возврате к одному из предыдущих наборов параметров будет показан ранее сгенерированный соответствующий ему html-узел.</p>
-<p>Создание динамической раскладки</p>
-<pre class="prettyprint source"><code>    ns.layout.define('main', {
-        app: {
-            view1: true,
-            view2@: function(params) {
-                if (params.value1) {
-                    return null;
-                }
-                if (params.value2) {
-                    return 'view41';
-                }
-                if (params.value3) {
-                    return {
-                        'view42': 'view421',
-                        'view43': 'view431'
-                    };
-                }
-            }
-        }
-    });</code></pre><p>В примере вид в зависимости от параметров может отсутствовать, содержать единственный вид <code>view41</code>, или содержать <code>view42</code> и <code>view43</code>, содержащие в свою очередь соответственно <code>view421</code> и <code>view431</code>. Для создания такой структуры <code>view2</code> обязательно должен быть боксом. Обычный view, содержащий вложенные виды, при их исчезновении после обновления может работать некорректно.</p>
-<h3>Асинхронные виды</h3><p>Асинхронный вид позволяет на время загрузки его моделей рисовать его в виде заглушки. Updater запросит модели асинхронных видов отдельными запросами и отрисует страницу до получения этих данных. Загрузив модели, Updater сделает повторный проход только по асинхронным видам и обновит их.</p>
-<pre class="prettyprint source"><code>    ns.layout.define('main', {
-        app: {
-            viewLight: true,
-            viewHard&: true
-        }
-    });</code></pre><pre class="prettyprint source"><code>    ns.View.define('viewLight', {
-        models: ['modelLight']
-    })
-    ns.View.define('viewHard', {
-        models: ['modelHard']
-    })</code></pre><pre class="prettyprint source"><code>    match .view[id=&quot;viewLight&quot;] ns-view {
-        // основное html-содержимое вида viewLight
-    }
-
-
-    match .view[id=&quot;viewHard&quot;] ns-view-async {
-        // html-содержимое заглушки для вида viewHard
-    }
-    match .view[id=&quot;viewHard&quot;] ns-view {
-        // основное html-содержимое вида viewHard
-    }</code></pre><p>Предположим, что modelLight запросить легко, а запрос modelHard требует заметного времени. При обновлении Updater запросит модели отдельно: сначала modelLight, а затем modelHard. Получив данные для modelLight, Updater отрисует страницу. Вид viewHard при этом отрисуется в виде заглушки (с использованием шаблона ns-view-async). После получения данных для modelHard Updater сделает ещё один такт обновления и вместо заглушки отрисует основное содержимое viewHard.</p>
-<h2>Наследование</h2><p>Один layout может наследовать от другого. Наследование реализуется следующим образом</p>
-<pre class="prettyprint source lang-js"><code>// объявляет общий layout для всех страниц
-ns.layout.define('common', {
-    'app': {
-        // каждая страница в проекте состоит из шапки, левой колонки и правой колонки
-        'header-box@': {},
-        'left-box@': {},
-        'right-box@': {},
-    }
-});
-
-// страница 1
-// обратите внимание, что header-box@ не доопределяелся и берется как есть из common
-ns.layout.define('posts', {
-    // чтобы заново не описывать структуру, путь до видов указывается через пробел
-    'app left-box@': {
-        'navigation': {}
-    },
-    'app right-box@': {
-        'posts': {}
-    }
-// последним параметром для ns.layout.define указывает, что layout наследуется от common
-}, 'common');
-
-// страница 2
-ns.layout.define('profile', {
-    'app header-box@': {
-        'user-header': {}
-    },
-    'app left-box@': {
-        'navigation': {}
-    },
-    'app right-box@': {
-        'profile': {}
-    }
-}, 'common');</code></pre>
+    <h1>ns.Update</h1><h2>Флаг исполнения <code>execFlag</code></h2><p>ns.Update можно запустить с одним из следующих флагов:</p>
+<ul>
+<li><strong>GLOBAL</strong>: глобальное обновление (обычно всей страницы). С таким флагом <code>ns.Update</code> запускается из <code>ns.page.go</code>.
+Такое обновление может прервать только другой с флагом <code>GLOBAL</code>. В один момент времени в приложении может работать единственное GLOBAL-обновление, иначе состояние страницы может стать непредсказуемым.
+GLOBAL-обновление прерываем все ASYNC-обновления.</li>
+<li><strong>ASYNC</strong>: обновление для асинхронных вид. Таких обновлений может быть несколько и они будут работать одновременно.
+ASYNC-обновление может запустить только, если в текущий момент нет GLOBAL-обновление.</li>
+<li><strong>PARALLEL</strong>: параллельное обновление. Выполняется в любом случае, его никто не может прервать.</li>
+</ul>
 </article>
 
 </section>  

@@ -213,6 +213,8 @@
                         
                             <li data-name="ns.layout.page"><a href="ns.layout.html#page">page</a></li>
                         
+                            <li data-name="ns.layout.undefine"><a href="ns.layout.html#undefine">undefine</a></li>
+                        
                     </ul>
                 
             
@@ -521,6 +523,13 @@
             </span>
 
             
+                
+                    <ul class="members itemMembers">
+                        <span class="subtitle">Static members</span>
+                        
+                        <li data-name="ns.router.URL_FIRST_SYMBOL"><a href="ns.router.html#URL_FIRST_SYMBOL">URL_FIRST_SYMBOL</a></li>
+                        
+                    </ul>
                 
 
                 
@@ -1017,6 +1026,8 @@
             
             <span class="subtitle">Typedefs</span>
             
+                <li data-name="ns.Update~options"><a href="ns.Update.html#options">options</a></li>
+            
                 <li data-name="ns.Update~PerformanceTimings"><a href="ns.Update.html#PerformanceTimings">PerformanceTimings</a></li>
             
             </ul>
@@ -1073,11 +1084,15 @@
                 
                     <li data-name="ns.View#asyncState"><a href="ns.View.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.View#id"><a href="ns.View.html#id">id</a></li>
+                
                     <li data-name="ns.View#key"><a href="ns.View.html#key">key</a></li>
                 
                     <li data-name="ns.View#node"><a href="ns.View.html#node">node</a></li>
                 
                     <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
+                
+                    <li data-name="ns.View#selfParams"><a href="ns.View.html#selfParams">selfParams</a></li>
                 
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
@@ -1184,6 +1199,8 @@
                 
                     <li data-name="ns.ViewCollection#asyncState"><a href="ns.ViewCollection.html#asyncState">asyncState</a></li>
                 
+                    <li data-name="ns.ViewCollection#id"><a href="ns.ViewCollection.html#id">id</a></li>
+                
                     <li data-name="ns.ViewCollection#invalidateAll"><a href="ns.ViewCollection.html#invalidateAll">invalidateAll</a></li>
                 
                     <li data-name="ns.ViewCollection#key"><a href="ns.ViewCollection.html#key">key</a></li>
@@ -1191,6 +1208,8 @@
                     <li data-name="ns.ViewCollection#node"><a href="ns.ViewCollection.html#node">node</a></li>
                 
                     <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
+                
+                    <li data-name="ns.ViewCollection#selfParams"><a href="ns.ViewCollection.html#selfParams">selfParams</a></li>
                 
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
@@ -1799,7 +1818,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 101
+            ns.js, line 113
         </div>
         
     </div>
@@ -2464,190 +2483,6 @@
     <div class="nameContainer">
         <h4 class="name" id="http">
             
-            <span class="type-signature static">static</span>ns.http<span class="signature">(url, params, <span class="optional">options</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.http.client.js, line 8
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Creates and executes ajax request (a POST request with json return data type by default).</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>url</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                <p>Request parameters.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Standart jQuery.ajax settings object.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="http">
-            
             <span class="type-signature static">static</span>ns.http<span class="signature">(uri, params, <span class="optional">options</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
         </h4>
     
@@ -2830,6 +2665,190 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="http">
+            
+            <span class="type-signature static">static</span>ns.http<span class="signature">(url, params, <span class="optional">options</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.http.client.js, line 8
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates and executes ajax request (a POST request with json return data type by default).</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                <p>Request parameters.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Standart jQuery.ajax settings object.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="init">
             
             <span class="type-signature static">static</span>ns.init<span class="signature">()</span>
@@ -2837,7 +2856,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 72
+            ns.js, line 84
         </div>
         
     </div>
@@ -2908,7 +2927,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 82
+            ns.js, line 94
         </div>
         
     </div>
@@ -2979,7 +2998,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 127
+            ns.js, line 139
         </div>
         
     </div>
@@ -3364,7 +3383,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 61
+            ns.js, line 73
         </div>
         
     </div>
@@ -3708,7 +3727,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 139
+            ns.js, line 151
         </div>
         
     </div>
@@ -3862,7 +3881,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Aug 04 2014 16:54:52 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Fri Aug 15 2014 21:25:25 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

@@ -321,7 +321,7 @@ ns.router.compile = function(route) {
     // смысл это махинации - поставить правильный символ в начале урла
     // все секции генерятся с / в начале
     // поэтому заменяем первый символ на константу
-    if (sregexps[0] === '/') {
+    if (sregexps[0][0] === '/') {
         sregexps[0] = ns.router.URL_FIRST_SYMBOL + sregexps[0].substr(1);
     }
     var regexp = sregexps.join('');

@@ -542,7 +542,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             }
 
         } else {
-            ns.log.debug('!WARNING!', '[ns.ViewCollection]', 'Collection', this.key, 'seems to have invalid model', MC.key, "and can't be redrawed. Note that noscript can't redraw nested ViewCollection in this version.");
+            if (!ns.object.isEmpty(this.views)) {
+                ns.log.debug('!WARNING!', '[ns.ViewCollection]', 'Collection', this.key, 'seems to have invalid model', MC.key, "and can't be redrawed. Note that noscript can't redraw nested ViewCollection in this version.");
+            }
         }
 
         // Удалим те view, для которых нет моделей

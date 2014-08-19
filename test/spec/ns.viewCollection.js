@@ -1007,6 +1007,81 @@ describe('ns.ViewCollection', function() {
         });
     });
 
+    describe('Обновление внешней коллекции работает корректно, если внутренняя не изменилсь', function() {
+
+        // это тест, чтобы исправить JS-ошибку
+        // теперь должен кидаться варнинг, а вложенная коллекция инвалидироваться
+
+        beforeEach(function() {
+
+            ns.Model.define('parent-mc', {isCollection: true});
+            ns.Model.define('parent-mc-item', { params: {pid: null} });
+
+            ns.Model.define('child-mc', {
+                isCollection: true
+            });
+            ns.Model.define('child-mc-item', { params: {cid: null} });
+
+            ns.ViewCollection.define('parent-vc', {
+                models: [ 'parent-mc' ],
+                split: {
+                    byModel: 'parent-mc',
+                    intoViews: 'child-vc'
+                }
+            });
+            ns.ViewCollection.define('child-vc', {
+                models: [ 'parent-mc-item', 'child-mc' ],
+                split: {
+                    byModel: 'child-mc',
+                    intoViews: 'child-vc-item'
+                }
+            });
+            ns.View.define('child-vc-item', {
+                models: ['child-mc-item']
+            });
+
+            ns.View.define('app');
+
+            ns.layout.define('test', {
+                'app': {
+                    'parent-vc': {}
+                }
+            });
+
+
+            ns.Model.get('parent-mc').insert([
+                ns.Model.get('parent-mc-item', {pid: 1}).setData({pid: 1, val: 1})
+            ]);
+
+            ns.Model.get('child-mc', {pid: 1}).insert([
+                ns.Model.get('child-mc-item', {cid: 1}).setData({cid: 1, val: 1})
+            ]);
+
+            this.sinon.stub(ns.log, 'debug');
+
+            this.view = ns.View.create('app');
+            var layout = ns.layout.page('test');
+            return new ns.Update(this.view, layout, {})
+                .render()
+                .then(function() {
+                    ns.Model.get('child-mc', {pid: 1}).invalidate();
+                    return new ns.Update(this.view, layout, {}).render();
+                }, null, this);
+        });
+
+        it('должен написать сообщение', function() {
+            expect(ns.log.debug)
+                .to.have.callCount(1)
+                .and.to.be.calledWith('!WARNING!', '[ns.ViewCollection]');
+        });
+
+        it('должен удалить элемент вложенной коллекции', function() {
+            var childVC = this.view.node.getElementsByClassName('ns-view-child-vc')[0];
+            var childVCContainer = childVC.getElementsByClassName('ns-view-container-desc')[0];
+            expect(childVCContainer.childNodes).to.have.length(0);
+        });
+
+    });
 
     describe('ViewCollection.isModelsValid', function() {
 

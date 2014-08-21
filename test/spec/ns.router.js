@@ -302,4 +302,23 @@ describe('ns.router', function() {
         test_route('/from/var/logs/nginx/copy', { page: 'page', params: { dialog: 'copy', 'from-path': '/var/logs/nginx' } } );
         test_route('/from/var/logs/nginx', { page: 'page', params: { 'from-path': '/var/logs/nginx' } } );
     });
+
+    it('Не допускаем рекурсии в ns.router', function() {
+        ns.router.routes = {
+            redirect: {
+                '/url-1': function() {
+                    ns.router('/url-1');
+                    return '/url-2';
+                }
+            },
+            route: {
+                '/url-1': 'url-1',
+                '/url-2': 'url-2'
+            }
+        };
+
+        ns.router.init();
+        expect(ns.router('/url-1')).to.be.eql({page: 'ns-router-redirect', params: {}, redirect: '/url-2'});
+    });
+
 });

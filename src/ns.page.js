@@ -72,6 +72,12 @@
          */
         ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
+        // не надо пушить в историю тот же самый URL
+        // это очень легко сделать, если просто обновлять страницу через ns.page.go()
+        if (action === 'push' && url === ns.page.currentUrl) {
+            action = 'replace';
+        }
+
         return ns.page.followRoute(route)
             .then(function() {
 

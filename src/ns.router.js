@@ -34,7 +34,7 @@ ns.router = function(url) {
     routesDef.redirect.forEach(function(redirect) {
         if (!redirect.inUse && redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
             if (typeof redirect.path === 'function') {
-                // Защита от зацикливания в случае, когда ns.request() вызывается внутри редиректов
+                // Защита от зацикливания в случае, когда ns.router() вызывается внутри редиректов
                 redirect.inUse = true;
                 pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
                 delete redirect.inUse;

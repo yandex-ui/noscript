@@ -52,8 +52,16 @@
                 this.data = {};
             }
 
-            // делаем нужное поле в .data и делаем его пустым
-            no.jpath.set(jpathItems, this.data, []);
+            // если корень (this.data)
+            if (jpathItems === '/') {
+                // нельзя передать this.data в функцию и ждать, что он станет пустым массивом,
+                // поэтому делаем это руками
+                this.data = [];
+
+            } else {
+                // делаем нужное поле в .data и делаем его пустым
+                no.jpath.set(jpathItems, this.data, []);
+            }
             // ссылка куда вставлять данные моделей
             var items = no.jpath(jpathItems, this.data);
 

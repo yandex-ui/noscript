@@ -220,6 +220,29 @@ describe('ns.ModelCollection', function() {
             });
         });
 
+        describe('split моделей из корня "/"', function() {
+
+            beforeEach(function() {
+                ns.Model.define('mc', {
+                    split: {
+                        items: '/',
+                        params: {id: '.id'},
+                        model_id: 'mc-item'
+                    }
+                });
+                ns.Model.define('mc-item', {
+                    params: {id: null}
+                });
+
+                this.model = ns.Model.get('mc').setData([ {id: 1, val:1}, {id:2, val:2}  ])
+            });
+
+            it('должен вернуть массив из 2-элементов', function() {
+                expect(this.model.getData()).to.have.length(2);
+            });
+
+        });
+
         describe('setData в ns-view-init', function() {
 
             beforeEach(function() {

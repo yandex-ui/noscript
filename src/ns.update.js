@@ -104,7 +104,7 @@
         }
 
         ns.log.debug.apply(ns.log,
-            ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
+            ['[ns.Update]', this.id].concat(args)
         );
     };
 

@@ -95,8 +95,16 @@
         if (!ns.DEBUG) {
             return;
         }
+
+        var args = Array.prototype.slice.apply(arguments);
+        // Тут приходит оочень большая портянка html-кода, читать ее неудобно и она засоряет консоль.
+        // Поэтому оборачиваем в ноду.
+        if (args[0] === 'generated html') {
+            args[1] = ns.html2node(args[1]);
+        }
+
         ns.log.debug.apply(ns.log,
-            ['[ns.Update]', this.id].concat(Array.prototype.slice.apply(arguments))
+            ['[ns.Update]', this.id].concat(args)
         );
     };
 

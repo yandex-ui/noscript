@@ -1026,6 +1026,30 @@
         return viewNode;
     };
 
+    ns.View.prototype._selfBeforeUpdateHTML = function(events) {
+        var viewWasInvalid = !this.isValidSelf();
+        if ( viewWasInvalid ) {
+            // если была видимая нода
+            if (this.node && !this.isLoading()) {
+                if (this._visible === true) {
+                    events['ns-view-hide'].push(this);
+                }
+                events['ns-view-htmldestroy'].push(this);
+            }
+        }
+    };
+
+    ns.View.prototype.beforeUpdateHTML = function(layout, params, events) {
+        this._selfBeforeUpdateHTML(events);
+
+        //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
+        if (!this.asyncState) {
+            this._apply(function(view, id) {
+                view.beforeUpdateHTML(layout[id].views, params, events);
+            });
+        }
+    };
+
     /**
      * Обновляем (если нужно) ноду блока.
      * @param {HTMLElement} node

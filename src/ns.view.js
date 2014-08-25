@@ -537,7 +537,12 @@
         // рекурсивно инвалидируем себя и потомков
         var views = this._getDescendants();
         for (var i = 0, j = views.length; i < j; i++) {
-            views[i].status = this.STATUS.INVALID;
+            var view = views[i];
+            // меняем статус только у валидных видов,
+            // т.к. есть еще статус NONE
+            if (view.status === this.STATUS.OK) {
+                view.status = this.STATUS.INVALID;
+            }
         }
     };
 
@@ -699,6 +704,10 @@
                 return updated;
             }
         } else if (!this.isValidSelf()) {
+            // реинвалидируем дочерние виды,
+            // потому что их тоже придется перерисовать вместе с родителем
+            this.invalidate();
+
             // если обычный блок не валиден
             updated.sync.push(this);
         }

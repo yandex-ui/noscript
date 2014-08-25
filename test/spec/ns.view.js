@@ -734,6 +734,90 @@ describe('ns.View', function() {
 
     });
 
+    describe('Реинвалидация дочерних видов во время обновления', function() {
+
+        /*
+         Описываю ситуацию:
+
+         Есть view1 с зависимой моделью model1. Внутри него есть async-вид view2. Запускаем обновление view1.
+         view1 отрисуется и view2 запустит свою async-перерисовку.
+
+         Теперь представим, что view2 еще не успел отрисоваться, пользователь что-то сделал и поменял данные в model1.
+         Т.о. view1 из-за подписки на модель становится невалидным и инвалидирует своих детей (view2).
+
+         После этого view2 дорисовывается и становится валидным.
+
+         Если теперь обновить view1, то он отрисуется без view2, т.к. он валиден. Что приведет к исчезновению содержимого view2 из DOM.
+
+         Аналогичная ситуация, если верхний вид инвалидируется при изменении модели, а внутрений нет.
+
+         Варианты решения проблемы
+          1) при обновлении view1 он должен еще раз инвалидировать своих детей
+          2) научиться не перерисовывать валидные дочерние виды, а вынимать их из DOM и вставлять обратно
+         */
+
+
+        beforeEach(function() {
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            { data: true }
+                        ]
+                    })
+                );
+            });
+
+            ns.Model.define('model1');
+            ns.Model.define('model2');
+            ns.layout.define('app', {
+                'view1': {
+                    'view2&': {}
+                }
+            });
+
+            ns.View.define('view1', {
+                models: ['model1']
+            });
+
+            ns.View.define('view2', {
+                models: ['model2'],
+                events: {
+                    'ns-view-htmlinit': 'htmlinit'
+                },
+                methods: {
+                    htmlinit: function() {
+                        this.node.innerHTML = 'VIEW2_CONTENT';
+                    }
+                }
+            });
+
+            this.layout = ns.layout.page('app');
+            this.view = ns.View.create('view1');
+
+            return new ns.Update(this.view, this.layout, {})
+                .render()
+                .then(function(promises) {
+                    this.view.getModel('model1').set('.foo', 'bar');
+
+                    return Vow.all(promises.async);
+                }, null, this);
+        });
+
+        it('Вид должен реинвалидировать детей при обновлении', function() {
+            return new ns.Update(this.view, this.layout, {})
+                .render()
+                .then(function() {
+                    var view2Node = this.view.node.getElementsByClassName('ns-view-view2')[0];
+                    expect(view2Node.innerHTML).to.contain('VIEW2_CONTENT');
+                }, null, this);
+        });
+
+    });
+
     describe('#patchTree()', function() {
 
         beforeEach(function(done) {

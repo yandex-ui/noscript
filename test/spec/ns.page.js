@@ -203,7 +203,7 @@ describe('ns.page', function() {
                             ns.page._fillHistory.reset();
 
                             return ns.page.go('/inbox').then(function() {
-                                expect(ns.page._fillHistory).to.be.calledWith('/inbox', 'replace');
+                                expect(ns.page._fillHistory).to.be.calledWith('/inbox', 'preserve');
                             });
                         });
                 });

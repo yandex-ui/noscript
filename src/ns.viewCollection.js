@@ -353,6 +353,34 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
+ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) {
+    this._selfBeforeUpdateHTML(events);
+
+    // проходимся по элементам коллекции
+    if (!this.isLoading()) {
+        // ModelCollection
+        var MC = this.models[this.info.modelCollectionId];
+        if (MC.isValid()) {
+            // Сначала сделаем добавление новых и обновление изменённых view
+            // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
+            for (var i = 0; i < MC.models.length; i++) {
+                var viewItem = this._getViewItem(MC.models[i], params);
+
+                // если нет viewId, то это значит, что элемент коллекции был отфильтрован
+                if (!viewItem.id) {
+                    continue;
+                }
+
+                // Получим view для вложенной модели
+                // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
+                var view = this._getView(viewItem.id, viewItem.params);
+                view.beforeUpdateHTML(null, params, events);
+            }
+
+        }
+    }
+};
+
 /**
  *
  * @param {HTMLElement} node

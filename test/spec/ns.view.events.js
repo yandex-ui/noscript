@@ -497,4 +497,58 @@ describe('ns.View.events', function() {
         });
 
     });
+
+    describe('"ns-view-hide" и "ns-view-htmldestroy" вызываются на старой ноде', function() {
+
+        // Этот тест проверяет, что при перерисовке вида в событиях ns-view-hide и ns-view-htmldestroy доступна старая нода
+        // Без этого будут большие утечки памяти, т.к. нет возможности что-то сделать со старой нодой в событиях.
+
+        beforeEach(function() {
+            var that = this;
+            this.hideNodes = [];
+            this.hideSpy = this.sinon.spy(function() {
+                that.hideNodes.push(this.node);
+            });
+
+            this.destroyNodes = [];
+            this.destroySpy = this.sinon.spy(function() {
+                that.destroyNodes.push(this.node);
+            });
+
+            ns.View.define('view', {
+                events: {
+                    'ns-view-hide': '_onHide',
+                    'ns-view-htmldestroy': '_onDestroy'
+                },
+                methods: {
+                    _onHide: this.hideSpy,
+                    _onDestroy: this.destroySpy
+                }
+            });
+
+            this.view = ns.View.create('view');
+            return this.view.update();
+        });
+
+        it('в ns-view-hide доступна нода до перерисовки', function() {
+            var oldViewNode = this.view.node;
+            this.view.invalidate();
+
+            return this.view.update()
+                .then(function() {
+                    expect(this.hideNodes[0]).to.be.equal(oldViewNode);
+                }, null, this);
+        });
+
+        it('в ns-view-htmldestroy доступна нода до перерисовки', function() {
+            var oldViewNode = this.view.node;
+            this.view.invalidate();
+
+            return this.view.update()
+                .then(function() {
+                    expect(this.destroyNodes[0]).to.be.equal(oldViewNode);
+                }, null, this);
+        });
+
+    });
 });

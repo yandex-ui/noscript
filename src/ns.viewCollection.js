@@ -253,6 +253,30 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
     return tree;
 };
 
+ns.ViewCollection.prototype._forEachCollectionItem = function(cb, params) {
+    // Какие элементы коллекции рендерить, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если есть все данные
+    if (this.isModelsValid()) {
+        // ModelCollection
+        var MC = this.models[this.info.modelCollectionId];
+
+        var modelItems = MC.models;
+        // Проходом по элементам MC определим, какие виды нужно срендерить
+        for (var i = 0, j = modelItems.length; i < j; i++) {
+            var viewItem = this._getViewItem(modelItems[i], params);
+
+            // если нет viewId, то это значит, что элемент коллекции был отфильтрован
+            if (!viewItem.id) {
+                continue;
+            }
+
+            var view = this._addView(viewItem.id, viewItem.params);
+
+            cb(view);
+        }
+    }
+};
+
 /**
  *
  * @param {object} layout
@@ -261,80 +285,60 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
  * @private
  */
 ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
+    var that = this;
     var result = {};
     result['ns-view-collection-container'] = [];
 
-    // Какие элементы коллекции рендерить, мы можем понять только по модели
-    // Поэтому, полезем внутрь, только если есть все данные
-    if (this.isModelsValid()) {
-        // ModelCollection
-        var MC = this.models[this.info.modelCollectionId];
-
-        // Проходом по элементам MC определим, какие виды нужно срендерить
-        for (var i = 0, view, decl; i < MC.models.length; i++) {
-            var viewItem = this._getViewItem(MC.models[i], params);
-
-            // если нет viewId, то это значит, что элемент коллекции был отфильтрован
-            if (!viewItem.id) {
-                continue;
+    this._forEachCollectionItem(function(view) {
+        var decl = null;
+        if (that.isValidSelf()) {
+            // Если корневая нода не меняется, то перерендериваем
+            // только невалидные элементы коллекции
+            if (view.info.isCollection && view.isValidSelf()) {
+                decl = view._getPlaceholderTree(layout, params);
+            } else if (!view.isValid()) {
+                decl = view._getViewTree(layout, params);
             }
-
-            view = this._getView(viewItem.id, viewItem.params);
-
-            if (!view) {
-                view = this._addView(viewItem.id, viewItem.params);
-            }
-
-            decl = null;
-            if (this.isValidSelf()) {
-                // Если корневая нода не меняется, то перерендериваем
-                // только невалидные элементы коллекции
-                if (view.info.isCollection && view.isValidSelf()) {
-                    decl = view._getPlaceholderTree(layout, params);
-                } else if (!view.isValid()) {
-                    decl = view._getViewTree(layout, params);
-                }
+        } else {
+            // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
+            // элементы коллекции. Невалидные - полностью, а валидные в виде placeholder'ов
+            if (view.isValid()) {
+                decl = view._getPlaceholderTree(layout, params);
             } else {
-                // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
-                // элементы коллекции. Невалидные - полностью, а валидные в виде placeholder'ов
-                if (view.isValid()) {
-                    decl = view._getPlaceholderTree(layout, params);
-                } else {
-                    decl = view._getViewTree(layout, params);
-                }
-            }
-
-            if (decl) {
-                /*
-                 тут создаем специальное дерево, чтобы рендерить разнородные элементы как и обычные виды
-
-                 {
-                    'views': {
-                        // массив разнородных элементов коллекции
-                        'ns-view-collection': [
-                            {
-                                'view-item-type1': { ... дерево ... }
-                            },
-                            {
-                                'view-item-type2': { ... дерево ... }
-                            },
-                            {
-                                'view-item-type2': { ... дерево ... }
-                            },
-                            {
-                                'view-item-type1': { ... дерево ... }
-                            }
-                        ]
-                    }
-                 }
-
-                 */
-                var viewItemTree = {};
-                viewItemTree[view.id] = decl;
-                result['ns-view-collection-container'].push(viewItemTree);
+                decl = view._getViewTree(layout, params);
             }
         }
-    }
+
+        if (decl) {
+            /*
+             тут создаем специальное дерево, чтобы рендерить разнородные элементы как и обычные виды
+
+             {
+             'views': {
+             // массив разнородных элементов коллекции
+             'ns-view-collection': [
+             {
+             'view-item-type1': { ... дерево ... }
+             },
+             {
+             'view-item-type2': { ... дерево ... }
+             },
+             {
+             'view-item-type2': { ... дерево ... }
+             },
+             {
+             'view-item-type1': { ... дерево ... }
+             }
+             ]
+             }
+             }
+
+             */
+            var viewItemTree = {};
+            viewItemTree[view.id] = decl;
+            result['ns-view-collection-container'].push(viewItemTree);
+        }
+    }, params);
 
     return result;
 };
@@ -480,104 +484,84 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
     // Будем обновлять вложенные виды
     // только если это не первая отрисовка async-view
     if (!this.isLoading()) {
-        // ModelCollection
-        var MC = this.models[this.info.modelCollectionId];
         var itemsExist = {};
 
-        if (MC.isValid()) {
-
-            // Контейнер потомков.
-            var containerDesc;
-            if (this.$node.is('.ns-view-container-desc')) {
-                containerDesc = this.node;
-            } else {
-                containerDesc = ns.byClass('ns-view-container-desc', this.node)[0];
-            }
-
-            // Без него нельзя, т.к. если например при предыдущей отрисовке
-            // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
-            // в какое место их вставлять
-            if (!containerDesc) {
-                throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
-            }
-
-            // Коллекции могут быть вложенны рекурсивно,
-            // но плейсхолдер отрисуется только для самых верних,
-            // поэтому на всякий случай поставляем сюда свою текущую ноду
-            newNode = newNode || this.node;
-
-            // Сначала сделаем добавление новых и обновление изменённых view
-            // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-            for (var i = 0, prev; i < MC.models.length; i++) {
-                var viewItem = this._getViewItem(MC.models[i], params);
-
-                // если нет viewId, то это значит, что элемент коллекции был отфильтрован
-                if (!viewItem.id) {
-                    continue;
-                }
-
-                // Получим view для вложенной модели
-                // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
-                var view = this._getView(viewItem.id, viewItem.params);
-
-                // Здесь возможны следующие ситуации:
-                if (isOuterPlaceholder) {
-                    // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
-                    // нам пришёл placeholder, содержащий в себе те вложенные виды, которые нужно
-                    // перерендерить. Поэтому если
-                    //      1.1 view не валиден, то делаем _updateHtml и вставляем его в правильное
-                    //          место
-                    //      1.2 view валиден, то ничего не делаем
-                    var viewItemWasInValid = !view.isValid();
-
-                    // updateHTML надо пройти в любом случае,
-                    // чтобы у всех элементов коллекции сгенерились правильные события
-                    view._updateHTML(newNode, null, params, options_next, events);
-
-                    if (viewItemWasInValid) {
-                        // поставим ноду в правильное место
-                        if (prev) {
-                            // Либо после предыдущего вида
-                            $(prev.node).after(view.node);
-                            // this.node.insertBefore(view.node, prev.node.nextSibling);
-                        } else {
-                            // Либо в самом начале, если предыдущего нет (т.е. это первый)
-                            $(containerDesc).prepend(view.node);
-                        }
-                    }
-                } else {
-                    // 2. html внешнего вида только что изменился. Это значит, что он вставится в dom
-                    //    вместе с внутренними видами. Для невалидных там будет новый html, а для
-                    //    валидных там будет placeholder. Поэтому если
-                    //      1.1 view не валиден, то он уже занял правильное место в корневом html.
-                    //          Делаем _updateHtml
-                    //      1.2 view валиден, то заменим placeholder на правильный html.
-
-                    var viewItemWasValid = view.isValid();
-
-                    // updateHTML надо пройти в любом случае,
-                    // чтобы у всех элементов коллекции сгенерились правильные события
-                    view._updateHTML(newNode, null, params, options_next, events);
-
-                    if (viewItemWasValid) {
-                        // здесь не нужно перевешивать события, т.к. они могут быть повешены
-                        // либо непосредственно на ноду, либо на document. В первом случае
-                        // события переедут вместе со старой нодой, а во втором останутся там,
-                        // где и были раньше
-                        ns.replaceNode(view._extractNode(newNode), view.node);
-                    }
-                }
-
-                itemsExist[view.key] = view;
-
-                prev = view;
-            }
-
+        // Контейнер потомков.
+        var containerDesc;
+        if (this.$node.is('.ns-view-container-desc')) {
+            containerDesc = this.node;
         } else {
-            if (!ns.object.isEmpty(this.views)) {
-                ns.log.debug('!WARNING!', '[ns.ViewCollection]', 'Collection', this.key, 'seems to have invalid model', MC.key, "and can't be redrawed. Note that noscript can't redraw nested ViewCollection in this version.");
-            }
+            containerDesc = ns.byClass('ns-view-container-desc', this.node)[0];
         }
+
+        // Без него нельзя, т.к. если например при предыдущей отрисовке
+        // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
+        // в какое место их вставлять
+        if (!containerDesc) {
+            throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
+        }
+
+        // Коллекции могут быть вложенны рекурсивно,
+        // но плейсхолдер отрисуется только для самых верних,
+        // поэтому на всякий случай поставляем сюда свою текущую ноду
+        newNode = newNode || this.node;
+
+        var prev;
+        // Сначала сделаем добавление новых и обновление изменённых view
+        // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
+        this._forEachCollectionItem(function(view) {
+            // Здесь возможны следующие ситуации:
+            if (isOuterPlaceholder) {
+                // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
+                // нам пришёл placeholder, содержащий в себе те вложенные виды, которые нужно
+                // перерендерить. Поэтому если
+                //      1.1 view не валиден, то делаем _updateHtml и вставляем его в правильное
+                //          место
+                //      1.2 view валиден, то ничего не делаем
+                var viewItemWasInValid = !view.isValid();
+
+                // updateHTML надо пройти в любом случае,
+                // чтобы у всех элементов коллекции сгенерились правильные события
+                view._updateHTML(newNode, null, params, options_next, events);
+
+                if (viewItemWasInValid) {
+                    // поставим ноду в правильное место
+                    if (prev) {
+                        // Либо после предыдущего вида
+                        $(prev.node).after(view.node);
+                        // this.node.insertBefore(view.node, prev.node.nextSibling);
+                    } else {
+                        // Либо в самом начале, если предыдущего нет (т.е. это первый)
+                        $(containerDesc).prepend(view.node);
+                    }
+                }
+            } else {
+                // 2. html внешнего вида только что изменился. Это значит, что он вставится в dom
+                //    вместе с внутренними видами. Для невалидных там будет новый html, а для
+                //    валидных там будет placeholder. Поэтому если
+                //      1.1 view не валиден, то он уже занял правильное место в корневом html.
+                //          Делаем _updateHtml
+                //      1.2 view валиден, то заменим placeholder на правильный html.
+
+                var viewItemWasValid = view.isValid();
+
+                // updateHTML надо пройти в любом случае,
+                // чтобы у всех элементов коллекции сгенерились правильные события
+                view._updateHTML(newNode, null, params, options_next, events);
+
+                if (viewItemWasValid) {
+                    // здесь не нужно перевешивать события, т.к. они могут быть повешены
+                    // либо непосредственно на ноду, либо на document. В первом случае
+                    // события переедут вместе со старой нодой, а во втором останутся там,
+                    // где и были раньше
+                    ns.replaceNode(view._extractNode(newNode), view.node);
+                }
+            }
+
+            itemsExist[view.key] = view;
+
+            prev = view;
+        }, params);
 
         // Удалим те view, для которых нет моделей
         this._apply(function(/** ns.View */view) {

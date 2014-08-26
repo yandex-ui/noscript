@@ -989,6 +989,78 @@ describe('ns.ViewCollection', function() {
         });
     });
 
+    describe('Updat of partially valid nested ViewCollections', function() {
+
+        before(function() {
+            ns.Model.define('invalid-model');
+
+            ns.Model.define('nested-model', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.Model.define('outer-collection-model', {
+                isCollection: true
+            });
+
+            ns.Model.define('nested-collection', {
+                isCollection: true,
+                params: {
+                    id: null
+                }
+            });
+
+            ns.View.define('nested-view-collection-item', {
+                models: [ 'nested-model' ]
+            });
+
+            ns.ViewCollection.define('nested-view-collection', {
+                models: [ 'nested-collection', 'invalid-model' ],
+                split: {
+                    byModel: 'nested-collection',
+                    intoViews: 'nested-view-collection-item'
+                }
+            });
+
+            ns.ViewCollection.define('outer-view-collection', {
+                models: [ 'outer-collection-model' ],
+                split: {
+                    byModel: 'outer-collection-model',
+                    intoViews: 'nested-view-collection'
+                }
+            });
+
+            ns.View.define('app');
+            this.APP = ns.View.create('app');
+
+            ns.layout.define('app-3', {
+                'app': 'outer-view-collection'
+            });
+        });
+
+        it('should correctly update', function() {
+            var parent = ns.Model.get('outer-collection-model');
+
+            var itemA = ns.Model.get('nested-model', {id: 'A'}).setData({});
+            var itemB = ns.Model.get('nested-model', {id: 'B'}).setData({});
+            var itemC = ns.Model.get('nested-model', {id: 'C'}).setData({});
+
+            var childA = ns.Model.get('nested-collection', {id: 'A'});
+            var childB = ns.Model.get('nested-collection', {id: 'B'});
+
+            childA.insert([itemA]);
+            childB.insert([itemB, itemC]);
+
+            parent.insert([childA, childB]);
+
+            var layout = ns.layout.page('app-3');
+            return new ns.Update(this.APP, layout, {}).render();
+        });
+
+
+    });
+
     describe('Обновление внешней коллекции работает корректно, если внутренняя не изменилсь', function() {
 
         // это тест, чтобы исправить JS-ошибку
@@ -1049,12 +1121,6 @@ describe('ns.ViewCollection', function() {
                     ns.Model.get('child-mc', {pid: 1}).invalidate();
                     return new ns.Update(this.view, layout, {}).render();
                 }, null, this);
-        });
-
-        it('должен написать сообщение', function() {
-            expect(ns.log.debug)
-                .to.have.callCount(1)
-                .and.to.be.calledWith('!WARNING!', '[ns.ViewCollection]');
         });
 
         it('должен удалить элемент вложенной коллекции', function() {

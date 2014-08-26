@@ -374,6 +374,11 @@ ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) 
                 // Получим view для вложенной модели
                 // view для этой модели уже точно есть, т.к. мы его создали в _getUpdateTree.
                 var view = this._getView(viewItem.id, viewItem.params);
+                
+                if (!view) {
+                    continue;
+                }
+                
                 view.beforeUpdateHTML(null, params, events);
             }
 

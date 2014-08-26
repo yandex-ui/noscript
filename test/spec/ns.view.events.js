@@ -182,20 +182,21 @@ describe('ns.View.events', function() {
 
         describe('order', function() {
             genOrderTests([
-                ['content1-inner', 'ns-view-htmlinit'],
-                ['content1', 'ns-view-htmlinit'],
-                ['head', 'ns-view-htmlinit'],
                 ['app', 'ns-view-htmlinit'],
-
-                ['content1-inner', 'ns-view-show'],
-                ['content1', 'ns-view-show'],
-                ['head', 'ns-view-show'],
                 ['app', 'ns-view-show'],
+                ['app', 'ns-view-touch'],
 
-                ['content1-inner', 'ns-view-touch'],
-                ['content1', 'ns-view-touch'],
+                ['head', 'ns-view-htmlinit'],
+                ['head', 'ns-view-show'],
                 ['head', 'ns-view-touch'],
-                ['app', 'ns-view-touch']
+
+                ['content1', 'ns-view-htmlinit'],
+                ['content1', 'ns-view-show'],
+                ['content1', 'ns-view-touch'],
+
+                ['content1-inner', 'ns-view-htmlinit'],
+                ['content1-inner', 'ns-view-show'],
+                ['content1-inner', 'ns-view-touch']
             ]);
         });
 
@@ -239,35 +240,37 @@ describe('ns.View.events', function() {
             ['content2-inner', 'ns-view-touch', 'calledOnce']
         ]);
 
-        describe('order', function() {
+        describe.only('order', function() {
             genOrderTests([
-                ['content1-inner', 'ns-view-htmlinit', 0],
-                ['content1', 'ns-view-htmlinit', 0],
-                ['head', 'ns-view-htmlinit', 0],
                 ['app', 'ns-view-htmlinit', 0],
-
-                ['content1-inner', 'ns-view-show', 0],
-                ['content1', 'ns-view-show', 0],
-                ['head', 'ns-view-show', 0],
                 ['app', 'ns-view-show', 0],
-
-                ['content1-inner', 'ns-view-touch', 0],
-                ['content1', 'ns-view-touch', 0],
-                ['head', 'ns-view-touch', 0],
                 ['app', 'ns-view-touch', 0],
 
-                ['content1-inner', 'ns-view-hide', 0],
-                ['content1', 'ns-view-hide', 0],
+                ['head', 'ns-view-htmlinit', 0],
+                ['head', 'ns-view-show', 0],
+                ['head', 'ns-view-touch', 0],
+
+                ['content1', 'ns-view-htmlinit', 0],
+                ['content1', 'ns-view-show', 0],
+                ['content1', 'ns-view-touch', 0],
+
+                ['content1-inner', 'ns-view-htmlinit', 0],
+                ['content1-inner', 'ns-view-show', 0],
+                ['content1-inner', 'ns-view-touch', 0],
+
+                ['app', 'ns-view-touch', 1],
+                ['head', 'ns-view-touch', 1],
+
+                ['content2', 'ns-view-htmlinit', 0],
+                ['content2', 'ns-view-show', 0],
+                ['content2', 'ns-view-touch', 0],
 
                 ['content2-inner', 'ns-view-htmlinit', 0],
-                ['content2', 'ns-view-htmlinit', 0],
                 ['content2-inner', 'ns-view-show', 0],
-                ['content2', 'ns-view-show', 0],
-
                 ['content2-inner', 'ns-view-touch', 0],
-                ['content2', 'ns-view-touch', 0],
-                ['head', 'ns-view-touch', 1],
-                ['app', 'ns-view-touch', 1]
+
+                ['content1', 'ns-view-hide', 0],
+                ['content1-inner', 'ns-view-hide', 0]
             ]);
         });
     });

@@ -303,6 +303,7 @@
         }, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
+        /*
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
             var event = this._EVENTS_ORDER[i];
             var views = viewEvents[event];
@@ -310,6 +311,8 @@
                 views[k].trigger(event, this.params);
             }
         }
+        */
+
         this.stopTimer('triggerEvents');
 
         return Vow.fulfill();

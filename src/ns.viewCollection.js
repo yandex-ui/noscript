@@ -429,7 +429,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
         } else if (this.isLoading()) {
             // В асинхронном запросе вызываем async для view, которые являются заглушкой.
-            events['ns-view-async'].push(this);
+            this.trigger('ns-view-async');
         }
     }
 
@@ -441,7 +441,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
     if ( (syncUpdate || viewWasInvalid) && this.isOk() ) {
         // событие show будет вызвано, если у view поменяется this._visible
         this._show(events['ns-view-show']);
-        events['ns-view-touch'].push(this);
+        this.trigger('ns-view-touch');
         this._saveModelsVersions();
     }
 

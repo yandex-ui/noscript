@@ -196,22 +196,20 @@
 
     /**
      * Обработчик htmldestroy
-     * @param {Array} [events] Массив событий.
      * @protected
      */
-    ns.View.prototype._htmldestroy = function(events) {
+    ns.View.prototype._htmldestroy = function() {
         this._unbindEvents('init');
-        events.push(this);
+        this.trigger('ns-view-htmldestroy');
     };
 
     /**
      * Обработчик htmlinit
-     * @param {array} [events] Массив событий.
      * @protected
      */
-    ns.View.prototype._htmlinit = function(events) {
+    ns.View.prototype._htmlinit = function() {
         this._bindEvents('init');
-        events.push(this);
+        this.trigger('ns-view-htmlinit');
     };
 
     /**
@@ -228,12 +226,12 @@
             // Написал тест кейс, чтобы это опять не сломать.
             // this._unbindModels();
 
+            if (events) {
+                this.trigger('ns-view-hide');
+            }
             this._unbindEvents('show');
             this._hideNode();
             this._visible = false;
-            if (events) {
-                events.push(this);
-            }
             return true;
 
         } else if (this.isLoading() && this._visible !== false) {
@@ -276,7 +274,7 @@
             this._showNode();
             this._visible = true;
             if (events) {
-                events.push(this);
+                this.trigger('ns-view-show');
             }
             return true;
         }
@@ -1081,7 +1079,7 @@
             //  вызываем htmldestory только если нода была заменена
             if (this.node && !this.isLoading()) {
                 this._hide(events['ns-view-hide']);
-                this._htmldestroy(events['ns-view-htmldestroy']);
+                this._htmldestroy();
             }
 
             //  новая нода должна в любом случае попасть в DOM
@@ -1093,11 +1091,11 @@
             this._setNode(viewNode);
 
             if ( this.isOk() ) {
-                this._htmlinit(events['ns-view-htmlinit']);
+                this._htmlinit();
 
             } else if (this.isLoading()) {
                 // В асинхронном запросе вызываем async для view, которые являются заглушкой.
-                events['ns-view-async'].push(this);
+                this.trigger('ns-view-async');
             }
 
             this._saveModelsVersions();
@@ -1111,7 +1109,7 @@
         if ( (syncUpdate || viewWasInvalid) && this.isOk() ) {
             // событие show будет вызвано, если у view поменяется this._visible
             this._show(events['ns-view-show']);
-            events['ns-view-touch'].push(this);
+            this.trigger('ns-view-touch');
         }
 
         //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть

@@ -236,7 +236,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
             for (var i = 0, l = descs.length; i < l; i++) {
                 // если view был скрыт
                 if (descs[i]._hide()) {
-                    events['ns-view-hide'].push(descs[i]);
+                    descs[i].trigger('ns-view-hide');
                 }
             }
             // Если нода вида лежит в старой ноде бокса

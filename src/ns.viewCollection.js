@@ -141,7 +141,11 @@ ns.ViewCollection.prototype.isValidDesc = function() {
  * Поэтому этот метод инвалидирует только себя и оставляет элементы коллекции без изменений.
  */
 ns.ViewCollection.prototype.invalidate = function() {
-    this.status = this.STATUS.INVALID;
+    if (this.status === this.STATUS.OK) {
+        // меняем статус только у валидных видов,
+        // т.к. есть еще статус NONE
+        this.status = this.STATUS.INVALID;
+    }
 };
 
 /**

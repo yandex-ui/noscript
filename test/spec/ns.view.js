@@ -641,6 +641,25 @@ describe('ns.View', function() {
 
         });
 
+        describe('Model.params - функция', function() {
+
+            it('Не должен делать no.extend(model.params) (баг #335)', function() {
+
+                var mParams = function() { return {} };
+                mParams.foo = 'bar';
+
+                ns.Model.define('model', {
+                    params: mParams
+                });
+                ns.View.define('view', {
+                    models: ['model']
+                });
+
+                expect(ns.View.getKeyAndParams('view', {}).key).to.eql('view=view');
+            });
+
+        });
+
     });
 
     describe('#invalidate.', function() {

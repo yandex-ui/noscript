@@ -217,6 +217,8 @@
             return view.updateAfter(this.promise);
         }, this);
 
+        this._affectedViews = views;
+
         syncPromise.then(function() {
             requestPromise.fulfill({
                 async: asyncPromises
@@ -303,11 +305,29 @@
         }, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
+        // это коллекция всех видов, затронутых в этом Update
+        var affectedView = [].concat(viewEvents['ns-view-async'], viewEvents['ns-view-touch']);
+        for (var i = 0, j = affectedView.length; i < j; i++) {
+            // сообщаем им промис,
+            // чтобы они могли понять, когда можно запускать собственные апдейты
+            affectedView[i].canUpdateAfter(this.promise);
+        }
+
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
             var event = this._EVENTS_ORDER[i];
             var views = viewEvents[event];
             for (var k = views.length - 1; k >= 0; k--) {
+                var view = views[k];
                 views[k].trigger(event, this.params);
+
+                // TODO: если отказать от того, что мы в промис апдейта передаем промисы от async'ов, то этот updateAfter можно не дублировать в _requestAllModels
+                // есть async вид, который не попал в _requestAllModels,
+                // это могут быть только асинхронные элементы коллекции
+                // NOTE: _affectedViews может не быть в разных сценариях
+                if (event === 'ns-view-async' && this._affectedViews && this._affectedViews.async.indexOf(view) === -1) {
+                    // говорим этим элементам, когда они могут обновиться
+                    view.updateAfter(this.promise);
+                }
             }
         }
         this.stopTimer('triggerEvents');

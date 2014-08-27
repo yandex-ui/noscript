@@ -1,4 +1,4 @@
-xdescribe('ns.ViewCollection с async-видами', function() {
+describe('ns.ViewCollection с async-видами', function() {
 
     beforeEach(function(done) {
 

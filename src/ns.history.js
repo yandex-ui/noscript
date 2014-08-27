@@ -19,7 +19,7 @@
             ns.history.onpopstate(e);
         });
 
-        $(document).on('click', ns.history._onAnchorClick);
+        $(document).on('click', 'a', ns.history._onAnchorClick);
     };
 
     /**

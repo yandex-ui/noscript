@@ -541,6 +541,15 @@ describe('ns.Model', function() {
                         }
                     }
                 });
+
+                ns.Model.define('m12', {
+                    methods: {
+                        hasDataChanged: function(data) {
+                            var oldData = this.getData() || {};
+                            return oldData.version !== data.version;
+                        }
+                    }
+                });
             });
 
             describe('default version', function() {
@@ -574,6 +583,14 @@ describe('ns.Model', function() {
                     m.setData({ isNew: false, some: 'data' });
                     expect(m._version).to.be.equal(0);
                     expect(m.getData()).to.be.equal(null);
+                });
+
+                it('must set data even if it is not changed but model is invalid', function() {
+                    var m = ns.Model.get('m12');
+                    m.setData({ version: 1 });
+                    m.invalidate();
+                    m.setData({ version: 1 });
+                    expect(m.isValid()).to.be.equal(true);
                 });
             });
 

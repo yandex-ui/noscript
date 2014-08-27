@@ -989,45 +989,34 @@ describe('ns.ViewCollection', function() {
         });
     });
 
-    describe('Updat of partially valid nested ViewCollections', function() {
+    describe('Перерисовка части валидной коллекции', function() {
 
-        before(function() {
-            ns.Model.define('invalid-model');
+        beforeEach(function() {
+            ns.Model.define('invalid-model', {
+                methods: {
+                    canRequest: no.false
+                }
+            });
 
-            ns.Model.define('nested-model', {
+            ns.Model.define('mc-item', {
                 params: {
                     id: null
                 }
             });
 
-            ns.Model.define('outer-collection-model', {
+            ns.Model.define('mc', {
                 isCollection: true
             });
 
-            ns.Model.define('nested-collection', {
-                isCollection: true,
-                params: {
-                    id: null
-                }
+            ns.View.define('vc-item', {
+                models: [ 'mc-item' ]
             });
 
-            ns.View.define('nested-view-collection-item', {
-                models: [ 'nested-model' ]
-            });
-
-            ns.ViewCollection.define('nested-view-collection', {
-                models: [ 'nested-collection', 'invalid-model' ],
+            ns.ViewCollection.define('vc', {
+                models: [ 'mc', 'invalid-model' ],
                 split: {
-                    byModel: 'nested-collection',
-                    intoViews: 'nested-view-collection-item'
-                }
-            });
-
-            ns.ViewCollection.define('outer-view-collection', {
-                models: [ 'outer-collection-model' ],
-                split: {
-                    byModel: 'outer-collection-model',
-                    intoViews: 'nested-view-collection'
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
                 }
             });
 
@@ -1035,29 +1024,23 @@ describe('ns.ViewCollection', function() {
             this.APP = ns.View.create('app');
 
             ns.layout.define('app-3', {
-                'app': 'outer-view-collection'
+                'app': 'vc'
             });
+
+            ns.Update.handleError = no.true;
         });
 
         it('should correctly update', function() {
-            var parent = ns.Model.get('outer-collection-model');
+            var parent = ns.Model.get('mc');
 
-            var itemA = ns.Model.get('nested-model', {id: 'A'}).setData({});
-            var itemB = ns.Model.get('nested-model', {id: 'B'}).setData({});
-            var itemC = ns.Model.get('nested-model', {id: 'C'}).setData({});
-
-            var childA = ns.Model.get('nested-collection', {id: 'A'});
-            var childB = ns.Model.get('nested-collection', {id: 'B'});
-
-            childA.insert([itemA]);
-            childB.insert([itemB, itemC]);
+            var childA = ns.Model.get('mc-item', {id: 'A'});
+            var childB = ns.Model.get('mc-item', {id: 'B'});
 
             parent.insert([childA, childB]);
 
             var layout = ns.layout.page('app-3');
-            return new ns.Update(this.APP, layout, {}).render();
+            return new ns.Update(this.APP, layout, {id: 'A'}).render();
         });
-
 
     });
 

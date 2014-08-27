@@ -88,4 +88,26 @@ describe('ns.Update. Синтетические случаи', function() {
 
     });
 
+    it('Не должен вызывать ns.request.models, если все модели валидные', function() {
+        /*
+         Этот тест решает следующую задачу:
+
+         Если вид view и модель model. Оба валидны и имеют данные.
+         Кто-то в приложении сделал ns.forcedRequest('model').
+         Если теперь запустить обновление на view, то оно не завершится, пока не завершится запрос за моделью model, потому что он forced.
+         Это происходит, потому что Update безусловно все модели отправляет в ns.request для контроля их валидности.
+        */
+
+        this.sinon.spy(ns.request, 'models');
+
+        ns.Model.define('model');
+        ns.Model.get('model').setData({});
+        ns.View.define('view', { models: ['model'] });
+
+        return ns.View.create('view')
+            .update()
+            .then(function() {
+                expect(ns.request.models).to.have.callCount(0);
+            });
+    });
 });

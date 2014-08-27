@@ -433,14 +433,6 @@ describe('ns.ViewCollection', function() {
 
     describe('ViewCollection view in case on ModelCollection changes', function() {
 
-        function shouldNotRequestMCollectionTwice() {
-            it('should not request m-collection twice', function() {
-                expect(
-                    ns.request.models.getCall(1).calledWith([])
-                ).to.be.equal(true);
-            });
-        }
-
         function shouldSaveVCollectionNode() {
             it('should save view-collection node', function() {
                 var newVCollectionNode = this.APP.node.getElementsByClassName('ns-view-v-collection')[0];
@@ -546,12 +538,6 @@ describe('ns.ViewCollection', function() {
 
             shouldHaveNViewCollectionItemNodes(2);
 
-            it('should request m-collection once', function() {
-                expect(
-                    ns.request.models.calledWith( [ns.Model.get('m-collection')] )
-                ).to.be.equal(true);
-            });
-
         });
 
         describe('refresh layout without models changes', function() {
@@ -565,7 +551,6 @@ describe('ns.ViewCollection', function() {
                     });
             });
 
-            shouldNotRequestMCollectionTwice();
             shouldSaveVCollectionNode();
             shouldSaveNVCollectionItemNode(0);
             shouldSaveNVCollectionItemNode(1);
@@ -589,7 +574,6 @@ describe('ns.ViewCollection', function() {
                     });
             });
 
-            shouldNotRequestMCollectionTwice();
             shouldSaveVCollectionNode();
             shouldHaveNViewCollectionItemNodes(2);
 
@@ -619,7 +603,6 @@ describe('ns.ViewCollection', function() {
                     });
             });
 
-            shouldNotRequestMCollectionTwice();
             shouldHaveNViewCollectionItemNodes(3);
             shouldSaveVCollectionNode();
             shouldSaveNVCollectionItemNode(0);
@@ -642,7 +625,6 @@ describe('ns.ViewCollection', function() {
                     });
             });
 
-            shouldNotRequestMCollectionTwice();
             shouldHaveNViewCollectionItemNodes(1);
             shouldSaveVCollectionNode();
 

@@ -119,6 +119,19 @@
 
         this.log('started models request', models);
 
+        var allModelsValid = true;
+        for (var i = 0, j = models.length; i < j; i++) {
+            if (!models[i].isValid()) {
+                allModelsValid = false;
+                break;
+            }
+        }
+
+        if (allModelsValid) {
+            this.log('received models', models);
+            return Vow.fulfill(models);
+        }
+
         ns.request.models(models)
             .then(function(models) {
                 if (this._expired()) {

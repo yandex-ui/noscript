@@ -87,6 +87,25 @@ describe('ns.Events', function() {
 
     });
 
+    describe('#once', function() {
+
+        beforeEach(function() {
+            this.spy = this.sinon.spy();
+            ns.events.once('test', this.spy);
+            ns.events.trigger('test');
+            ns.events.trigger('test');
+        });
+
+        it('должен вызвать обработчик один раз', function() {
+            expect(this.spy).to.have.callCount(1);
+        });
+
+        it('должен вызвать обработчик в контексте ns.events', function() {
+            expect(this.spy.getCall(0).thisValue).to.be.equal(ns.events);
+        });
+
+    });
+
     describe('#trigger', function() {
 
         beforeEach(function() {

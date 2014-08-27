@@ -1560,10 +1560,31 @@
      * @private
      */
     ns.View._getKeyParams = function(id, params, info) {
+        var extendedModels = {};
+        var paramsExtendedByModels = false;
+        // расширяем params параметрами из моделей, у которых info.params - функция
+        for (var model in info.models) {
+            var modelInfo = ns.Model.info(model);
+            if (typeof modelInfo.params === 'function') {
+                paramsExtendedByModels = true;
+                no.extend(extendedModels, modelInfo.params(params));
+            }
+        }
+
+        if (paramsExtendedByModels) {
+            // расширяем оригинальными params, чтобы они все перетерли
+            no.extend(extendedModels, params);
+            params = extendedModels;
+        }
+
         var pGroups = info.pGroups || [];
 
         // Группы параметров могут быть не заданы (это ок).
         if (!pGroups.length) {
+            // если нет собственных групп, но есть параметры модели, то надо брать их
+            if (paramsExtendedByModels) {
+                return params;
+            }
             return {};
         }
 

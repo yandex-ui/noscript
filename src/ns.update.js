@@ -382,7 +382,7 @@
      * Сценарий полного рендеринга страницы
      * @returns {Vow.promise}
      */
-    ns.Update.prototype.start = ns.Update.prototype.render = function() {
+    ns.Update.prototype.render = function() {
         if (this._expired()) {
             this._reject({
                 error: this.STATUS.EXPIRED
@@ -410,6 +410,13 @@
 
         return this.promise;
     };
+
+    /**
+     * @see #render
+     * @deprecated Надо использовать #render
+     * @function
+     */
+    ns.Update.prototype.start = ns.Update.prototype.render;
 
     /**
      * Сценарий воссоздания приложения из заранее сформированнного dom-дерева страницы

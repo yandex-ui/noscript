@@ -922,47 +922,6 @@
     };
 
     /**
-     * Быстро что-нибудь сгенерить из данных блока.
-     * Можно передать моду и дополнительный объект, который попадет в /.extra:
-     * @param {string} mode
-     * @param {object} extra
-     * @returns {HTMLElement}
-     * @example
-     * ```js
-     * block.tmpl()
-     * block.tmpl('mode')
-     * block.tmpl({ ... })
-     * block.tmpl('mode', { ... })
-     * ```
-     */
-    ns.View.prototype.tmpl = function(mode, extra) {
-        switch (arguments.length) {
-            case 0:
-                mode = '';
-                break;
-            case 1:
-                if (typeof mode === 'object') {
-                    extra = mode;
-                    mode = '';
-                }
-        }
-
-        var renderTree = this._getTree();
-        renderTree.models = this._getModelsForTree();
-
-        if (extra) {
-            renderTree.extra = extra;
-        }
-
-        var mainTree = {
-            views: {}
-        };
-        mainTree.views[this.id] = renderTree;
-
-        return ns.renderNode(mainTree, mode);
-    };
-
-    /**
      * Возвращает массив всех вложенных view, включая себя
      * FIXME: это же _getDescendantsOrSelf
      * @param {Array} [views=[]] Начальный массив.

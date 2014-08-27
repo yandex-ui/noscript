@@ -35,7 +35,7 @@ match / generate-url {
     </a>
 }
 
-match .test-yate-helper-model ns-view-content {
+match .test-yate-helper-model ns-view-error-content {
     <div class="data">
         model('a')
     </div>

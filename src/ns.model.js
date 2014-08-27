@@ -272,7 +272,7 @@
         // переинициализация после #destroy()
         this._reinit();
 
-        if (data && this.hasDataChanged(data)) {
+        if (data && (!this.isValid() || this.hasDataChanged(data))) {
 
             /**
              * Данные модели.

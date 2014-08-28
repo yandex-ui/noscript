@@ -26,6 +26,22 @@ ns.Events.on = function(name, handler) {
 };
 
 /**
+ * Подписывает обработчик handler на событие name, который испольняется только один раз.
+ * @param {string} name Название события.
+ * @param {function} handler Обработчик события.
+ * @returns {ns.Events}
+ */
+ns.Events.once = function( name, handler ) {
+    var that = this;
+    var once = function() {
+        that.off( name, once );
+        handler.apply(this, arguments);
+    };
+    this.on( name, once );
+    return this;
+};
+
+/**
  * Отписывает обработчик handler от события name.
  * Если не передать handler, то удалятся вообще все обработчики события name.
  * @param {string} name Название события.

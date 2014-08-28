@@ -36,6 +36,18 @@
     ns.Model.prototype.status = ns.M.STATUS.NONE;
 
     /**
+     * Уникальный ключ модели.
+     * @type {string}
+     */
+    ns.Model.prototype.key = null;
+
+    /**
+     * Параметры модели.
+     * @type {object}
+     */
+    ns.Model.prototype.params = null;
+
+    /**
      *
      * @param {string} id
      * @param {object} params
@@ -43,12 +55,11 @@
      */
     ns.Model.prototype._init = function(id, params) {
         this.id = id;
-        this.params = params || {};
 
         this._reset();
 
         this.info = ns.Model.info(id);
-        this.key = ns.Model.key(id, params, this.info);
+        no.extend(this, ns.Model.getKeyAndParams(id, params, this.info));
 
         this._reinit();
     };
@@ -669,22 +680,42 @@
      *
      * @param {string} id
      * @param {object} params
-     * @param {object} info
+     * @param {object} [info]
      * @returns {string}
+     * @static
      */
     ns.Model.key = function(id, params, info) {
+        return ns.Model.getKeyAndParams(id, params, info).key;
+    };
+
+    /**
+     * Возвращает ключ и собственные параметры модели.
+     * @param {string} id
+     * @param {object} params
+     * @param {object} [info]
+     * @returns {object}
+     * @static
+     */
+    ns.Model.getKeyAndParams = function(id, params, info) {
         info = info || ns.Model.info(id);
 
         ns.assert(info, 'ns.Model', 'Unknown model type "%s"', id);
 
         //  Для do-моделей ключ строим особым образом.
         if (info.isDo) {
-            return 'do-' + id + '-' + _keySuffix++;
+            return {
+                key: 'do-' + id + '-' + _keySuffix++,
+                params: params
+            };
         }
 
         var keyPrefix = 'model=' + id;
         var keyParams = ns.Model._getKeyParams(id, params, info);
-        return ns.key(keyPrefix, keyParams);
+
+        return {
+            key: ns.key(keyPrefix, keyParams),
+            params: keyParams
+        };
     };
 
     /**

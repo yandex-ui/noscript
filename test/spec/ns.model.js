@@ -798,6 +798,20 @@ describe('ns.Model', function() {
 
         });
 
+        describe('params', function() {
+
+            it('должны соответствовать собственным параметрам модели', function() {
+                ns.Model.define('model', {
+                    params: {
+                        p1: null
+                    }
+                });
+
+                expect(ns.Model.get('model', {p1: 1, p2: 2}).params).to.be.eql({p1: 1});
+            });
+
+        });
+
     });
 
     describe('События', function() {

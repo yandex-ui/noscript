@@ -298,7 +298,7 @@ ns.router._generateUrl = function(def, params) {
 
     // Дописываем query string по traditional-схеме,
     // где массивы разворачиваются в ?id=1&id=2&id=3
-    var queryString = $.param(query, true);
+    var queryString = ns.params2query(query);
     return (queryString) ? (url + '?' + queryString) : url;
 };
 

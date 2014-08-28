@@ -251,7 +251,11 @@ ns.router._generateUrl = function(def, params) {
                 // Добавляем статический кусок урла как есть.
                 svalue += param.default_value;
             } else {
-                var pvalue = params[param.name] || param.default_value;
+                var pvalue = params[param.name];
+
+                if (!pvalue && param.is_optional) {
+                    pvalue = param.default_value;
+                }
 
                 // Обязательный параметр должен быть указан.
                 if (!param.is_optional && !pvalue) {

@@ -44,16 +44,10 @@
     ns.View.prototype.key = null;
 
     /**
-     * Параметры, с которыми был создан вид.
+     * Параметры вида.
      * @type {object}
      */
     ns.View.prototype.params = null;
-
-    /**
-     * Собственные параметры вида, которые участвуют в построении ключа.
-     * @type {object}
-     */
-    ns.View.prototype.selfParams = null;
 
     /**
      * Собственная нода вида
@@ -156,7 +150,7 @@
         // Создаём модели или берем их из кэша, если они уже есть
         for (var id in this.info.models) {
             if (!this.models[id]) {
-                var model = ns.Model.get(id, this.selfParams);
+                var model = ns.Model.get(id, this.params);
                 this.models[id] = model;
                 this._modelsHandlers[model.key] = {};
             }
@@ -1499,12 +1493,8 @@
         ns.assert(keyParams, 'ns.View', 'Could not generate key for view %s', id);
 
         return {
-            // параметры с учётом rewrite (полный набор параметров, а не только то, что нужно в ключе)
-            params: params,
-            // ключ с учётом правильных параметров для ключа
-            key: ns.key('view=' + id, keyParams),
-            // собственные параметры вида
-            selfParams: keyParams
+            params: keyParams,
+            key: ns.key('view=' + id, keyParams)
         };
     };
 

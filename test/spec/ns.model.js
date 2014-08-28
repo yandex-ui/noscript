@@ -537,7 +537,8 @@ describe('ns.Model', function() {
                 ns.Model.define('m11', {
                     methods: {
                         hasDataChanged: function(data) {
-                            return data.isNew;
+                            var oldData = this.getData() || {};
+                            return oldData.version !== data.version;
                         }
                     }
                 });
@@ -562,18 +563,41 @@ describe('ns.Model', function() {
             });
 
             describe('custom version', function() {
-                it('should set data', function() {
+                it('should not check data changed for the first setData call', function() {
                     var m = ns.Model.get('m11');
-                    m.setData({ isNew: true, some: 'data' });
+                    var spy = sinon.spy(m, 'hasDataChanged');
+                    m.setData({ version: 1 });
+
+                    expect(spy.callCount).to.be.equal(0);
                     expect(m._version).to.be.equal(1);
-                    expect(m.getData()).to.be.eql({ isNew: true, some: 'data' });
+                    expect(m.getData()).to.be.eql({ version: 1 });
+
+                    spy.restore();
                 });
 
-                it('should not set data', function() {
+                it('should set data', function() {
                     var m = ns.Model.get('m11');
-                    m.setData({ isNew: false, some: 'data' });
-                    expect(m._version).to.be.equal(0);
-                    expect(m.getData()).to.be.equal(null);
+                    m.setData({ version: 1 });
+                    m.setData({ version: 2 });
+                    expect(m._version).to.be.equal(2);
+                    expect(m.getData()).to.be.eql({ version: 2 });
+                });
+
+                it('should not set data if not changed', function() {
+                    var m = ns.Model.get('m11');
+                    m.setData({ version: 1 });
+                    m.setData({ version: 1 });
+                    expect(m._version).to.be.equal(1);
+                    expect(m.getData()).to.be.eql({ version: 1 });
+                });
+
+                it('should set data even if it is not changed but model is invalid', function() {
+                    var m = ns.Model.get('m11');
+                    m.setData({ version: 1 });
+                    m.invalidate();
+                    m.setData({ version: 1 });
+                    expect(m.isValid()).to.be.equal(true);
+                    expect(m.getData()).to.be.eql({ version: 1 });
                 });
             });
 

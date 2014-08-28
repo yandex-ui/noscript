@@ -3,8 +3,10 @@ describe('хелперы yate', function() {
     describe('доступ к данными модели', function() {
 
         beforeEach(function() {
+            ns.Update.handleError = no.true;
+
             ns.Model.define('a');
-            ns.Model.define('b');
+            ns.Model.define('b', {methods: {canRequest: no.false}});
             ns.Model.define('c');
 
             ns.View.define('test-yate-helper-model', {
@@ -17,7 +19,13 @@ describe('хелперы yate', function() {
             ns.Model.get('a').setData('model-a-data');
             ns.Model.get('b').setError('model-b-error');
 
-            this.result = ns.View.create('test-yate-helper-model', {}, false).tmpl().innerHTML;
+            var view = ns.View.create('test-yate-helper-model', {});
+
+            return view
+                .update()
+                .then(function() {
+                    this.result = view.node.innerHTML;
+                }, null, this);
         });
 
         afterEach(function() {

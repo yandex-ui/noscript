@@ -400,62 +400,6 @@ describe('ns.View', function() {
         });
     });
 
-    describe('ns.View render errors', function() {
-        beforeEach(function() {
-            ns.Model.define('a');
-            ns.Model.define('b');
-            ns.Model.define('c');
-
-            ns.View.define('test-view-render_complex', {
-                models: {
-                    a: true,
-                    b: false,
-                    c: false
-                }
-            });
-        });
-
-        it('render errors also', function() {
-            var a = ns.Model.get('a', { id: 1 });
-            var b = ns.Model.get('b', { id: 2 });
-            var c = ns.Model.get('c', { id: 3 });
-
-            a.setData({ data: 'a' });
-            b.setError({ error: 'b invalid' });
-            c.setError({ error: 'c invalid' });
-
-            var view = ns.View.create('test-view-render_complex', {}, false);
-            view.tmpl();
-
-            expect(ns.renderNode).to.be.calledWithMatch({
-                views: {
-                    'test-view-render_complex': {
-                        models: {
-                            a: {
-                                a: {
-                                    data: 'a'
-                                },
-                                status: 'ok'
-                            },
-                            b: {
-                                b: {
-                                    error: 'b invalid'
-                                },
-                                status: 'error'
-                            },
-                            c: {
-                                c: {
-                                    error: 'c invalid'
-                                },
-                                status: 'error'
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    });
-
     describe('ns-view-init event', function() {
 
         it('should call event handler defined as string', function() {

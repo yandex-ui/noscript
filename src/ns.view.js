@@ -1468,7 +1468,7 @@
     };
 
     /**
-     * Возвращает ключ объекта и параметры с учётом rewriteParamsOnInit
+     * Возвращает ключ объекта и параметры.
      * В этом методе собрана вся логика рерайтов параметров при создании view
      * @returns {object}
      */
@@ -1477,15 +1477,10 @@
         //  в частности, для боксов.
         info = info || ns.View.info(id) || {};
 
-        if ('function' === typeof info.rewriteParamsOnInit) {
-            //  если для view определен метод rewriteParamsOnInit и он вернул объект,
-            //  то перепишем параметры
-            params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
-        }
-
         var keyParams;
         if ('function' === typeof info.params) {
-            keyParams = info.params(params);
+            // передаем копию параметров, т.к. их сейчас будут менять
+            keyParams = info.params(no.extend({}, params));
         } else {
             keyParams = ns.View._getKeyParams(id, params, info);
         }

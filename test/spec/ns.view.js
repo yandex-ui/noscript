@@ -555,7 +555,13 @@ describe('ns.View', function() {
                 ns.View.define('slider', {
                     params: function(params) {
                         if (params.mode === 'custom') {
-                            return { id: params['id'] };
+                            return {
+                                id: params['id']
+                            };
+
+                        } else if (params.mode === 'rewrite') {
+                            params.mode = 'rewrited';
+                            return params;
                         }
                         return {};
                     }
@@ -572,6 +578,16 @@ describe('ns.View', function() {
 
             it('view=slider', function() {
                 expect(ns.View.getKey('slider', { mode: 'new' })).to.be.eql('view=slider');
+            });
+
+            it('должен копировать параметры при передаче в функцию', function() {
+                var params = {
+                    mode: 'rewrite'
+                };
+                ns.View.getKey('slider', params);
+                expect(params).to.be.eql({
+                    mode: 'rewrite'
+                });
             });
         });
 

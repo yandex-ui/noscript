@@ -63,10 +63,7 @@ describe('ns.Box', function() {
         });
 
         ns.View.define('content4', {
-            params: {
-                pOwn: null
-            },
-            rewriteParamsOnInit: function(params) {
+            params: function() {
                 return {
                     pOwn: ns.Model.getValid('model4').get('.value')
                 };

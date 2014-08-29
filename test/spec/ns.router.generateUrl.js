@@ -256,6 +256,10 @@ describe('generate url', function() {
             expect(ns.router.generateUrl('index', {id: 1, p: ['foo', 'bar']})).to.be.equal('/index/1?p=foo&p=bar');
         });
 
+        it('должен сгенерить /index/1?p=foo&p=bar', function() {
+            expect(ns.router.generateUrl('index', {id: 1, p: ['1 1', '2 2']})).to.be.equal('/index/1?p=1%201&p=2%202');
+        });
+
     });
 
 });

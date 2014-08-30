@@ -26,17 +26,17 @@ describe('router: new route parsing method', function() {
 
     describe('parse parameter', function() {
         var _tests = {
-            'param':            { name: 'param', type: 'id', default_value: undefined, is_optional: false },
-            'param=':           { name: 'param', type: 'id', default_value: '', is_optional: true },
-            'param:int':        { name: 'param', type: 'int', default_value: undefined, is_optional: false },
-            'param:int=':       { name: 'param', type: 'int', default_value: '', is_optional: true },
-            'param=value':      { name: 'param', type: 'id', default_value: 'value', is_optional: true },
-            'param:int=value':  { name: 'param', type: 'int', default_value: 'value', is_optional: true },
+            'param':            { name: 'param', type: 'id', default_value: undefined, is_optional: false, is_filter: false },
+            'param=':           { name: 'param', type: 'id', default_value: '', is_optional: true, is_filter: false },
+            'param:int':        { name: 'param', type: 'int', default_value: undefined, is_optional: false, is_filter: false },
+            'param:int=':       { name: 'param', type: 'int', default_value: '', is_optional: true, is_filter: false },
+            'param=value':      { name: 'param', type: 'id', default_value: 'value', is_optional: true, is_filter: false },
+            'param:int=value':  { name: 'param', type: 'int', default_value: 'value', is_optional: true, is_filter: false },
             'param==':          { throw: "[ns.router] Parameter 'param' value must be specified" },
             'param:int==':      { throw: "[ns.router] Parameter 'param' value must be specified" },
-            'param==value':     { name: 'param', type: 'id', default_value: 'value', is_optional: false },
+            'param==value':     { name: 'param', type: 'id', default_value: 'value', is_optional: false, is_filter: true },
             'param:int==value': { throw: "[ns.router] Wrong value for 'param' parameter" },
-            'param:int==123':   { name: 'param', type: 'int', default_value: '123', is_optional: false }
+            'param:int==123':   { name: 'param', type: 'int', default_value: '123', is_optional: false, is_filter: true }
         };
 
         for (var test in _tests) {
@@ -106,21 +106,21 @@ describe('router: new route parsing method', function() {
     describe('parse section', function() {
         var _tests = {
             'static':                     { is_optional: false, items: [ { default_value: 'static' } ]  },
-            '{param}':                    { is_optional: false, items: [ { name: 'param', type: 'id', default_value: undefined, is_optional: false } ] },
-            '{param=}':                   { is_optional: true, items: [ { name: 'param', type: 'id', default_value: '', is_optional: true } ] },
-            '{param:int}':                { is_optional: false, items: [ { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
-            '{param:int=}':               { is_optional: true, items: [ { name: 'param', type: 'int', default_value: '', is_optional: true } ] },
-            '{param=value}':              { is_optional: true, items: [ { name: 'param', type: 'id', default_value: 'value', is_optional: true } ] },
-            '{param:int=value}':          { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true } ] },
+            '{param}':                    { is_optional: false, items: [ { name: 'param', type: 'id', default_value: undefined, is_optional: false, is_filter: false } ] },
+            '{param=}':                   { is_optional: true, items: [ { name: 'param', type: 'id', default_value: '', is_optional: true, is_filter: false } ] },
+            '{param:int}':                { is_optional: false, items: [ { name: 'param', type: 'int', default_value: undefined, is_optional: false, is_filter: false } ] },
+            '{param:int=}':               { is_optional: true, items: [ { name: 'param', type: 'int', default_value: '', is_optional: true, is_filter: false } ]},
+            '{param=value}':              { is_optional: true, items: [ { name: 'param', type: 'id', default_value: 'value', is_optional: true, is_filter: false } ] },
+            '{param:int=value}':          { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true, is_filter: false } ] },
             '{param:int==value}':         { throw: "[ns.router] Wrong value for 'param' parameter" },
-            '{param:int==123}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: '123', is_optional: false } ] },
-            'prefix-{param:int}':         { is_optional: false, items: [ { default_value: 'prefix-' }, { name: 'param', type: 'int', default_value: undefined, is_optional: false } ] },
+            '{param:int==123}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: '123', is_optional: false, is_filter: true } ]},
+            'prefix-{param:int}':         { is_optional: false, items: [ { default_value: 'prefix-' }, { name: 'param', type: 'int', default_value: undefined, is_optional: false, is_filter: false } ]},
             'prefix-{part1:int}{part2=}': {
                 is_optional: false,
                 items: [
                     { default_value: 'prefix-' },
-                    { name: 'part1', type: 'int', default_value: undefined, is_optional: false },
-                    { name: 'part2', type: 'id', default_value: '', is_optional: true }
+                    { name: 'part1', type: 'int', default_value: undefined, is_optional: false, is_filter: false },
+                    { name: 'part2', type: 'id', default_value: '', is_optional: true, is_filter: false }
                 ]
             },
             'some{thing': { throw: /^\[ns\.router\] could not parse parameter in url section: some{thing$/ }

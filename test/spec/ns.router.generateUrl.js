@@ -272,7 +272,11 @@ describe('generate url', function() {
 
         it('не срабатывают, если не передано нужное значение', function() {
             expect(ns.router.generateUrl('layout', { id: 1 })).to.be.equal('/1');
-        })
+        });
+
+        it('не срабатывают, если передано неправильно значение', function() {
+            expect(ns.router.generateUrl('layout', { id: 1, index: 'badvalue' })).to.be.equal('/1?index=badvalue');
+        });
 
     });
 

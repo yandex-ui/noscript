@@ -251,10 +251,16 @@ ns.router._generateUrl = function(def, params) {
                 // Добавляем статический кусок урла как есть.
                 svalue += param.default_value;
             } else {
-                var pvalue = params[param.name];
+                pvalue = params[param.name];
 
-                if (!pvalue && param.is_optional) {
+                // Выставляем дефолтное значение только необязательным параметрам.
+                if (param.is_optional && !pvalue) {
                     pvalue = param.default_value;
+                }
+
+                // Если это фильтр, то проверяем точное совпадение.
+                if (param.is_filter && pvalue !== param.default_value) {
+                    return null;
                 }
 
                 // Обязательный параметр должен быть указан.
@@ -407,6 +413,7 @@ ns.router._parseParam = function(param) {
     var param_default;
     var param_is_optional;
     var paramName;
+    var isFilter = false;
 
     chunks = param.split('=');
     // название и тип всегда идут вместе "paramName:paramType"
@@ -420,6 +427,8 @@ ns.router._parseParam = function(param) {
     if (chunks.length === 3) {
         param_is_optional = false;
         param_default = chunks[2];
+        isFilter = true;
+
         ns.assert(param_default, 'ns.router', "Parameter '%s' value must be specified", paramName);
         ns.assert(ns.router._isParamValid(param_default, param_type), 'ns.router', "Wrong value for '%s' parameter", paramName);
 
@@ -434,7 +443,8 @@ ns.router._parseParam = function(param) {
         name: paramName,
         type: param_type,
         default_value: param_default,
-        is_optional: param_is_optional
+        is_optional: param_is_optional,
+        is_filter: isFilter
     };
 };
 

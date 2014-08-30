@@ -252,24 +252,25 @@ ns.router._generateUrl = function(def, params) {
                 svalue += param.default_value;
             } else {
                 pvalue = params[param.name];
+                var pvalueDefined = param.name in params;
 
                 // Выставляем дефолтное значение только необязательным параметрам.
-                if (param.is_optional && !pvalue) {
+                if (param.is_optional && !pvalueDefined) {
                     pvalue = param.default_value;
                 }
 
                 // Если это фильтр, то проверяем точное совпадение.
-                if (param.is_filter && pvalue !== param.default_value) {
+                if (param.is_filter && pvalue !== param.filter_value) {
                     return null;
                 }
 
                 // Обязательный параметр должен быть указан.
-                if (!param.is_optional && !pvalue) {
+                if (!param.is_optional && !pvalueDefined) {
                     return null;
                 }
 
                 // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
-                if (param.is_optional && !(param.name in params)) {
+                if (param.is_optional && !pvalueDefined) {
                     continue;
                 }
 
@@ -412,8 +413,9 @@ ns.router._parseParam = function(param) {
     var param_type;
     var param_default;
     var param_is_optional;
+    var param_filter_value;
+    var param_is_filter = false;
     var paramName;
-    var isFilter = false;
 
     chunks = param.split('=');
     // название и тип всегда идут вместе "paramName:paramType"
@@ -426,11 +428,11 @@ ns.router._parseParam = function(param) {
     // фильтр "=="
     if (chunks.length === 3) {
         param_is_optional = false;
-        param_default = chunks[2];
-        isFilter = true;
+        param_is_filter = true;
+        param_filter_value = param_default = chunks[2];
 
-        ns.assert(param_default, 'ns.router', "Parameter '%s' value must be specified", paramName);
-        ns.assert(ns.router._isParamValid(param_default, param_type), 'ns.router', "Wrong value for '%s' parameter", paramName);
+        ns.assert(param_filter_value, 'ns.router', "Parameter '%s' value must be specified", paramName);
+        ns.assert(ns.router._isParamValid(param_filter_value, param_type), 'ns.router', "Wrong value for '%s' parameter", paramName);
 
     } else {
         // если в декларации одно "=", то параметр опциональный
@@ -444,7 +446,8 @@ ns.router._parseParam = function(param) {
         type: param_type,
         default_value: param_default,
         is_optional: param_is_optional,
-        is_filter: isFilter
+        is_filter: param_is_filter,
+        filter_value: param_filter_value
     };
 };
 

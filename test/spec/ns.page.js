@@ -181,6 +181,34 @@ describe('ns.page', function() {
 
             });
 
+            describe('Запись в историю', function() {
+
+                beforeEach(function() {
+                    this.sinon.spy(ns.page, '_fillHistory');
+                    this.sinon.stub(ns.page, 'startUpdate', function() {
+                        return Vow.fulfill();
+                    })
+                });
+
+                it('должен записать переход в историю', function() {
+                    return ns.page.go('/inbox')
+                        .then(function() {
+                            expect(ns.page._fillHistory).to.be.calledWith('/inbox', 'push');
+                        });
+                });
+
+                it('не должен записать переход на тот же URL в историю ', function() {
+                    return ns.page.go('/inbox')
+                        .then(function() {
+                            ns.page._fillHistory.reset();
+
+                            return ns.page.go('/inbox').then(function() {
+                                expect(ns.page._fillHistory).to.be.calledWith('/inbox', 'preserve');
+                            });
+                        });
+                });
+
+            });
 
         });
 

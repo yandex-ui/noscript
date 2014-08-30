@@ -146,6 +146,30 @@ ns.key = function(prefix, params) {
 };
 
 /**
+ * Конкатенирует параметры в GET-запрос
+ * @param {object} params Параметры запроса
+ * @returns {string}
+ */
+ns.params2query = function(params) {
+    var query = [];
+
+    var pName;
+    var pValue;
+    for (pName in params) {
+        pValue = params[pName];
+        if (Array.isArray(pValue)) {
+            for (var i = 0; i < pValue.length; i++) {
+                query.push(encodeURIComponent(pName) + '=' + encodeURIComponent(pValue[i]));
+            }
+        } else {
+            query.push(encodeURIComponent(pName) + '=' + encodeURIComponent(pValue));
+        }
+    }
+
+    return query.join('&');
+};
+
+/**
  * Clean internal data after tests
  */
 ns.reset = function() {

@@ -1,0 +1,15 @@
+@include philosophy
+@include entities
+@include ns.init
+@include ns.router
+@include ns.history
+@include ns.layout
+@include ns.page
+@include ns.view
+@include ns.model
+@include ns.update
+@include ns.updatelogic
+@include ns.viewCollection
+@include ns.modelCollection
+@include pattern_model_state
+@include pattern_model_partial

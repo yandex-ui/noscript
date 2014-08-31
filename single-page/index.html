@@ -1,0 +1,1925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Философия работы noscript Node.js v0.10.17 Manual &amp; Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/sh.css">
+  <link rel="canonical" href="http://nodejs.org/api/index.md.html">
+</head>
+<body class="alt apidoc" id="api-section-index.md">
+    <!-- <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+            <img id="logo" src="http://nodejs.org/images/logo-light.png" alt="node.js">
+        </a>
+    </div> -->
+    <div id="content" class="clearfix">
+        <!-- <div id="column2" class="interior">
+            <ul>
+                <li><a href="/" class="home">Home</a></li>
+                <li><a href="/download/" class="download">Download</a></li>
+                <li><a href="/about/" class="about">About</a></li>
+                <li><a href="http://npmjs.org/" class="npm">npm Registry</a></li>
+                <li><a href="http://nodejs.org/api/" class="docs current">Docs</a></li>
+                <li><a href="http://blog.nodejs.org" class="blog">Blog</a></li>
+                <li><a href="/community/" class="community">Community</a></li>
+                <li><a href="/logos/" class="logos">Logos</a></li>
+                <li><a href="http://jobs.nodejs.org/" class="jobs">Jobs</a></li>
+            </ul>
+            <p class="twitter"><a href="http://twitter.com/nodejs">@nodejs</a></p>
+        </div> -->
+        <div id="column1" class="interior">
+          <header>
+            <!-- <h1>Node.js v0.10.17 Manual &amp; Documentation</h1> -->
+            <h1>Noscript документация одной страницей</h1>
+            <!-- <div id="gtoc">
+              <p>
+                <a href="index.html" name="toc">Index</a> |
+                <a href="all.html">View on single page</a> |
+                <a href="index.md.json">View as JSON</a>
+              </p>
+            </div> -->
+
+            <a href="https://travis-ci.org/yandex-ui/noscript" target="_blank"><img src="https://travis-ci.org/yandex-ui/noscript.png?branch=master" alt="Build Status" title="Build Status" /></a>
+            <a href="http://badge.fury.io/js/noscript" target="_blank"><img src="https://badge.fury.io/js/noscript.png" alt="NPM version" title="NPM version" /></a>
+            <a href="https://david-dm.org/yandex-ui/noscript" target="_blank"><img src="https://david-dm.org/yandex-ui/noscript.png" alt="Dependency Status" title="Dependency Status" /></a>
+            <hr>
+          </header>
+
+          <div id="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+<li><a href="#index_md_noscript">Философия работы noscript</a></li>
+<li><a href="#index_md">Ключевые сущности</a><ul>
+<li><a href="#index_md_1">Страница</a></li>
+<li><a href="#index_md_2">Адрес страницы</a></li>
+<li><a href="#index_md_3">Параметры страницы</a></li>
+<li><a href="#index_md_4">Маршрутизатор</a></li>
+<li><a href="#index_md_5">Модель</a></li>
+<li><a href="#index_md_6">Вид</a></li>
+<li><a href="#index_md_7">Раскладка страницы</a></li>
+<li><a href="#index_md_8">Контроллер обновления</a></li>
+</ul>
+</li>
+<li><a href="#index_md_9">Инициализация приложения</a><ul>
+<li><a href="#index_md_10">Конфигурация</a><ul>
+<li><a href="#index_md_url">Базовый путь в URL</a></li>
+<li><a href="#index_md_11">Заголовок страницы</a></li>
+<li><a href="#index_md_url_1">URL запроса моделей</a></li>
+<li><a href="#index_md_12">Дополнительные параметры при запросе моделей</a></li>
+<li><a href="#index_md_13">Условная обработка ответа моделей</a></li>
+<li><a href="#index_md_yate">Переопределение модуля Yate-шаблонов</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#index_md_ns_router">ns.router</a><ul>
+<li><a href="#index_md_api">API</a><ul>
+<li><a href="#index_md_ns_router_basedir_string"><code>ns.router.baseDir</code>: <code>{string}</code></a></li>
+<li><a href="#index_md_ns_router_url_page_string_params_object"><code>ns.router(url)</code>: <code>{ page:string, params:{object} }</code></a></li>
+<li><a href="#index_md_ns_router_url_url_string"><code>ns.router.url(url)</code>: <code>{ string }</code></a></li>
+<li><a href="#index_md_ns_router_generateurl_id_params_string"><code>ns.router.generateUrl(id, params)</code>: <code>{string}</code></a></li>
+<li><a href="#index_md_ns_router_routes_object"><code>ns.router.routes</code>: <code>{object}</code></a></li>
+<li><a href="#index_md_ns_router_regexps_object"><code>ns.router.regexps</code>: <code>{object}</code></a></li>
+</ul>
+</li>
+<li><a href="#index_md_14">Параметры</a></li>
+</ul>
+</li>
+<li><a href="#index_md_ns_history">ns.History</a><ul>
+<li><a href="#index_md_polyfill_ie">Polyfill для IE</a></li>
+<li><a href="#index_md_ns_layout">Раскладка страницы (ns.Layout)</a><ul>
+<li><a href="#index_md_15">Бокс</a></li>
+<li><a href="#index_md_16">Асинхронные виды</a></li>
+</ul>
+</li>
+<li><a href="#index_md_17">Наследование</a></li>
+<li><a href="#index_md_ns_page">Переходы по страницам (ns.page)</a></li>
+<li><a href="#index_md_ns_page_block">ns.page.block</a></li>
+<li><a href="#index_md_ns_page_history">ns.page.history</a></li>
+</ul>
+</li>
+<li><a href="#index_md_ns_view">ns.View</a><ul>
+<li><a href="#index_md_18">Декларация</a><ul>
+<li><a href="#index_md_ctor">ctor</a></li>
+<li><a href="#index_md_events"><code>events</code></a><ul>
+<li><a href="#index_md_dom">DOM-события</a></li>
+<li><a href="#index_md_noscript_1">&quot;Космические&quot; события noscript</a></li>
+<li><a href="#index_md_19">Встроенные события</a></li>
+</ul>
+</li>
+<li><a href="#index_md_methods">methods</a></li>
+<li><a href="#index_md_models">models</a></li>
+<li><a href="#index_md_20">Параметры</a><ul>
+<li><a href="#index_md_params">params+</a></li>
+<li><a href="#index_md_params_1">params-</a></li>
+<li><a href="#index_md_params_2">params</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#index_md_21">Валидность</a></li>
+<li><a href="#index_md_22">Взаимодействие</a></li>
+<li><a href="#index_md_async">async</a></li>
+</ul>
+</li>
+<li><a href="#index_md_ns_model">ns.Model</a><ul>
+<li><a href="#index_md_23">Декларация</a><ul>
+<li><a href="#index_md_ctor_1">ctor</a></li>
+<li><a href="#index_md_events_1"><code>events</code></a></li>
+<li><a href="#index_md_methods_1">methods</a></li>
+<li><a href="#index_md_params_3">params</a></li>
+</ul>
+</li>
+<li><a href="#index_md_24">Получение экземпляра модели</a></li>
+<li><a href="#index_md_25">Запрос данных модели с сервера</a><ul>
+<li><a href="#index_md_26">Локальные модели</a></li>
+</ul>
+</li>
+<li><a href="#index_md_27">Работа с данными</a></li>
+<li><a href="#index_md_28">Пре- и постобработка данных</a><ul>
+<li><a href="#index_md_extractdata">extractData</a></li>
+<li><a href="#index_md_extracterror">extractError</a></li>
+<li><a href="#index_md_hasdatachanged">hasDataChanged</a></li>
+<li><a href="#index_md_preprocessdata">preprocessData</a></li>
+</ul>
+</li>
+<li><a href="#index_md_29">События</a></li>
+<li><a href="#index_md_30">Запрос</a></li>
+</ul>
+</li>
+<li><a href="#index_md_ns_update">ns.Update</a><ul>
+<li><a href="#index_md_execflag">Флаг исполнения <code>execFlag</code></a></li>
+<li><a href="#index_md_31">Логика построения и обновления страницы</a></li>
+</ul>
+</li>
+<li><a href="#index_md_ns_viewcollection">ns.ViewCollection</a><ul>
+<li><a href="#index_md_32">Декларация</a></li>
+<li><a href="#index_md_33">Фильтрация и разнородная коллекция</a></li>
+</ul>
+</li>
+<li><a href="#index_md_ns_modelcollection">ns.ModelCollection</a><ul>
+<li><a href="#index_md_34">Декларация</a></li>
+<li><a href="#index_md_35">Фильтрация и разнородная коллекция</a></li>
+</ul>
+</li>
+<li><a href="#index_md_36">Шаблон: модель состояние</a></li>
+<li><a href="#index_md_37">Шаблон: модель с дозагрузкой данных</a></li>
+</ul>
+
+          </div>
+
+          <div id="apicontent">
+            <h1>Философия работы noscript<span><a class="mark" href="#index_md_noscript" id="index_md_noscript">#</a></span></h1>
+<p>В первую очередь, noscript - фреймворк для построение одностраничного положения с множеством виртуальных страниц.
+Другими словами, для легкого создания полноценного сайта, работающего исключительно в браузере.
+Исходя из этого, некоторые концепии отличаются от популярных mvc-фреймворков.
+
+</p>
+<p>Рассмотрим на примере приложения todo, как работает noscript.
+Приложение имеет 3 страницы: дело (todo), список дел (todo-list), список списков дел (todo-lists).
+
+</p>
+<p>Определяющими понятиями для страницы являются ее название и параметры (например, id списка дел или дела).
+Эти параметры можно составлять вручную или преобразовывать из адреса страницы.
+
+</p>
+<p>Двухсторонним преобразователем адреса страницы в параметры является ns.router. Подробнее про него можно прочитать <a href="./ns.router.md">тут</a>.
+
+</p>
+<p>Теперь надо описать из каких видов будет состоять каждая страница.
+Для этого служит модуль ns.layout.
+Он сопоставляет название страницы (по сути, название layout) с деревом видов, которые должны быть на странице.
+
+</p>
+<pre><code class="js">ns.layout(&apos;todo-lists&apos;, {
+  &apos;app&apos;: {
+    &apos;todo-lists&apos;: {}
+  }
+});</code></pre>
+<p>Таким образом мы описали, что на странице есть вид app, внутри которого есть todo-lists.
+К виду todo-lists привязан модель todo-lists.
+
+</p>
+<p>Клеем между видами и layout является ns.Update.
+Это «обновлятор» страницы. Он умеет ходить по дереву видов, запрашивать им нужные модели и перерисовывать страницу.
+
+</p>
+<p>Теперь опишем вторую страницу. 
+
+</p>
+<pre><code class="js">ns.layout(&apos;todo-list&apos;, {
+  &apos;app&apos;: {
+    &apos;todo-list&apos;: {}
+  }
+});</code></pre>
+<p>К виду todo-list привязана модель todo-list.
+У модели есть параметр lid (list id).
+Но данный пример будет работать неправильно при переключении список.
+Почему так происходит?
+
+</p>
+<p>Во-первых, в отличии от многих фреймворков в noscript вид жестко привязывает себя к своему экземпляру модели при инициализации.
+
+</p>
+<p>Как это происходит? У модели todo-list есть параметр lid.
+При создании экземпляра ей генерируется ключ, который однозначно идентифицирует экземпляр.
+noscript делает так, что не может быть двух экземпляров с одним ключом.
+Ключ выглядит следующим образом model=todo-list&amp;list-id=1.
+
+</p>
+<p>Параметры модели (если не указано другое) копируются в параметры вида.
+Вид тоже генерирует себе ключ view=todo-list&amp;list-id=1. Таким образом, чтобы показать список дел с list-id=2 noscript должен создать другой вид с другим ключом.
+
+</p>
+<p>Во-вторых, виды жестко привязывают список вложенных видов с ключами. В этом «виноваты» и сам вид и ns.Update. Когда ns.Update проходится по дереву, то всем видам передается layout и каждый вид создает себе своих детей. Это операция происходит единственный раз во время инициализации вида. Получается, что переключая параметры и, не меняя название страницы, ns.Update ничего не сделает, потому что каждый вид останется на месте и не изменится.
+
+</p>
+<p>А почему бы не пересчитывать детей для каждого вида? Тогда бы все уже работало!
+Это хорошая идея и ее можно сделать, но у нее есть один большой недостаток. Допустим был один ребенок, а стало два. Вид не может понять куда надо вставить новые виды. А с учетом того, что вид имеет собственную разметку и детей он может располагать где угодно, проблема становится нерешаемой.
+
+</p>
+<p>Это и есть одни из главных отличий noscript, ведь в большинстве других фреймворков вид всегда один и при изменении параметров у него заменятся модель, что приводит к перерисовке. А проблему излишних обновлений решают через data-binding или другие инструменты. В noscript же для переключения между двумя списками достаточно скрыть один вид и показать другой.
+
+</p>
+<p>Но чтобы произошла эта магия, надо немного изменить layout.
+
+</p>
+<pre><code class="js">ns.layout(&apos;todo-list&apos;, {
+  &apos;app&apos;: {
+    &apos;todo-list-box@&apos;: {
+      &apos;todo-list&apos;: {}
+    }
+  }
+});</code></pre>
+<p>Как видно, мы добавили еще один вид todo-list-box@, но на самом деле видом он не является и декларировать его не надо. @ в конце названия означает, что здесь будет box. Box - это специальный модуль noscript, который может скрывать и показывать нужные виды внутри себя. По сути, это точка изменения страницы.
+
+</p>
+<p>Как он работает?
+Допустим у нас есть страница с название todo-list и параметрами list-id=1. todo-list-box создат вид todo-list с ключом view=todo-list&amp;list-id=1. При переходе на страницу с параметром list-id=1, box создаст вид с ключом view=todo-list&amp;list-id=2. После этого он увидит, что у него уже есть видимый старый вид и скроет его. А вместо него покажет новый вид.
+У box может быть много внутренних видов и не обязательно, чтобы они все скрывались или показывались. Какие-то могут быть открыты постоянно и box будет сам следить за этим.
+
+</p>
+<p>Теперь можно заметить, что переключение между списками дел работает, но переключится на список списков или дел нельзя. Чтобы это заработало нужно сам app тоже сделать box&apos;ом. Получаются вот такие layout.
+
+</p>
+<pre><code class="js">ns.layout(&apos;todo-lists&apos;, {
+  &apos;app@&apos;: {
+    &apos;todo-lists&apos;: {}
+  }
+});
+
+
+ns.layout(&apos;todo-list&apos;, {
+  &apos;app@&apos;: {
+    &apos;todo-list&apos;: {}
+  }
+});
+
+
+ns.layout(&apos;todo&apos;, {
+  &apos;app@&apos;: {
+    &apos;todo&apos;: {}
+  }
+});</code></pre>
+<p>Box app будет переключать нужные виды в зависимости от параметров и все будет работать правильно.
+
+</p>
+<h1>Ключевые сущности<span><a class="mark" href="#index_md" id="index_md">#</a></span></h1>
+<h2>Страница<span><a class="mark" href="#index_md_1" id="index_md_1">#</a></span></h2>
+<p>Noscript служит для создания одностраничных приложений. Поэтому <code>Страница</code> в контексте noscript - это то же самое, что и приложение. В приложении может быть неограниченное количество логических страниц, но все они будут показываться в рамках одного физического html-документа. Он и есть <code>Страница</code>. В noscript страница представлена объектом <code>ns.page</code>.
+
+</p>
+<h2>Адрес страницы<span><a class="mark" href="#index_md_2" id="index_md_2">#</a></span></h2>
+<p>Основное состояние страницы определяется <code>Адресом страницы</code> (url). Он определяет то состояние, которое должно быть показано при загрузке/перезагрузке страницы.
+Основное состояние может определяться следующими атрибутами:
+ - идентификатор логической страницы (раздел сайта)
+ - идентификатор сущности, оторбражаемой в приложении (id фотки, id файла)
+ - атрибут состояния интерфейса, который хочется иметь возможность задавать извне (идентификатор открытого диалога)
+Адрес страницы служит её <code>внешним API</code>.
+
+</p>
+<h2>Параметры страницы<span><a class="mark" href="#index_md_3" id="index_md_3">#</a></span></h2>
+<p><code>Параметры страницы</code> (ns.page.params) - это параметры, получаемые из адреса страницы. ЧПУ преобразуется в объект, с которым в дальнейшем работают сущности приложения.
+
+</p>
+<h2>Маршрутизатор<span><a class="mark" href="#index_md_4" id="index_md_4">#</a></span></h2>
+<p>Для преобразования адреса в параметры используется <code>маршрутизатор</code> (ns.router). Кроме параметров маршрутизатор так же возвращает идентификатор раскладки страницы (ns.layout).
+
+</p>
+<h2>Модель<span><a class="mark" href="#index_md_5" id="index_md_5">#</a></span></h2>
+<p><code>Модель</code> - это элемент данных. Все данные, которые говорит и показывает интерфейс, должны быть представлены моделями. Модель может быть как клиентским представлением данных на сервере, так и локальным элементом данных, относящихся только к интерфейсу (модели состояний интерфейса).
+
+</p>
+<p>Для работы с данными сначала декларируются прототипы моделей (ns.Model.define).
+Затем создаются конкретные экземпляры модели. Уникальным идентификатором экземпляра модели является свойство <code>key</code>. Свойство <code>id</code> у экземпляра модели указывает на прототип модели.
+
+</p>
+<p>Ключ модели <code>key</code> строится на основе параметров, указанных в декларации модели. К ключам стоит относиться как к хешам. Попытка парсинга ключа - это дорога в ад.
+
+</p>
+<h2>Вид<span><a class="mark" href="#index_md_6" id="index_md_6">#</a></span></h2>
+<p><code>Вид</code> - это элемент интерфейса, из видов состоит страница. Вид может отображать статическое содержимое, значения параметров страницы, или данные моделей. Вид состоит из декларации и шаблона. Декларация содержит
+ - <code>id</code> вида, определяющий прототип
+ - модели, от которых зависит вид
+ - параметры страницы, от которых зависит вид.
+
+</p>
+<p>Экземпляры видов идентифицируются атрибутом <code>key</code>. Ключ вида строится на основании параметров моделей, от которых зависит вид, и параметров, указанных в декларации вида.
+
+</p>
+<p>Экземпляры видов создаются только автоматически в результате работы контроллера обновления (ns.Updater)
+Виды могут быть вложенны друг в друга. На странице всегда существует <code>корневой вид</code>, внутри которого находятся остальные виды приложения.
+Существуют специальные виды: бокс, асинхронный вид, вид-коллексия.
+Шаблон вида может иметь различную структуру в зависимости от используемого шаблонизатора. В комплекте с noscript идёт набор .yate шаблонов, задающих определённую структуру.
+Так же есть ряд нюансов, которые нужно учитывать при написании собственных шаблонов.
+
+</p>
+<h2>Раскладка страницы<span><a class="mark" href="#index_md_7" id="index_md_7">#</a></span></h2>
+<p><code>Раскладка страницы</code> (layout) - это декларация, по которой в зависимости от параметров определяется структура видов. Приложение может иметь несколько раскладок. Раскладка выбирается по идентификатору раскладки, который возвращается маршрутизатором.
+Раскладка представляет собой древовидный json-объект. Каждый узел дерева соответствует виду. В ключе объекта - идентификатор прототипа вида. В значении объекта - вложенные виды. Единственный вложенный вид может быть задан строкой. Более сложная структура может быть задана объектом. Структура, зависящая от каких-то условий может быть задана функцией, которая возвращает одну из перечисленных структур. Чтобы определить вид без вложенностей, значение нужно установить в true.
+
+</p>
+<h2>Контроллер обновления<span><a class="mark" href="#index_md_8" id="index_md_8">#</a></span></h2>
+<p><code>Контроллер обновления</code> (ns.Updater) - объект, реализующий логику построения и обновления страницы.
+
+</p>
+<h1>Инициализация приложения<span><a class="mark" href="#index_md_9" id="index_md_9">#</a></span></h1>
+<p>При использовании конфигурации по умолчанию вся инициализация сводится к вызову
+функции <code>ns.init</code> и запуску первого апдейта:
+
+</p>
+<pre><code class="js">$(function() {
+    ns.init();
+    ns.page.go();
+});</code></pre>
+<p><code>ns.init</code> включает экшены, обрабатывает предварительно заданный роутинг и ищет
+в DOM ноду <code>#app</code> для использования ее в качестве контейнера для интерфейса.
+Вызов <code>ns.page.go</code> нужен для запуска первого глобального апдейта.
+
+</p>
+<h2>Конфигурация<span><a class="mark" href="#index_md_10" id="index_md_10">#</a></span></h2>
+<h3>Базовый путь в URL<span><a class="mark" href="#index_md_url" id="index_md_url">#</a></span></h3>
+<p>До инициализации можно задать префиксный путь для всех ссылок. Это может
+пригодиться, когда ваше приложение находится не по корневому пути
+<code>app.example.com</code>, а, например, <code>app.example.com/checkout</code>:
+
+</p>
+<pre><code class="js">ns.router.baseDir = &apos;/checkout&apos;;</code></pre>
+<h3>Заголовок страницы<span><a class="mark" href="#index_md_11" id="index_md_11">#</a></span></h3>
+<p>Noscript позволяет задавать заголовок страницы, зависящий от текущего URL,
+при переходах внутри приложения. Переопределите функцию <code>ns.page.title</code>:
+
+</p>
+<pre><code class="js">ns.page.title = function(url) {
+    if (&apos;/settings&apos; == url) {
+        return &apos;App - Account Settings&apos;
+    }
+
+    return &apos;App&apos;;
+};</code></pre>
+<p><em>Примечание</em>: При необходимости, для получения параметров страницы
+из полученного URL можно воспользоваться функцией <code>ns.router</code>:
+
+</p>
+<pre><code class="js">ns.page.title = function(url) {
+    var params = ns.router(url).params;
+    // ...
+};</code></pre>
+<h3>URL запроса моделей<span><a class="mark" href="#index_md_url_1" id="index_md_url_1">#</a></span></h3>
+<p>По умолчанию фреймворк группирует запросы моделей, нужных для отрисовки
+интерфейса и запрашивает их по URL <code>/models/</code> <em>вне зависимости
+от <code>ns.router.baseDir</code></em>. Переопределите константу <code>ns.request.URL</code> для задания
+собственного пути:
+
+</p>
+<pre><code class="js">ns.request.URL = &apos;/models/v1/json/&apos;;</code></pre>
+<h3>Дополнительные параметры при запросе моделей<span><a class="mark" href="#index_md_12" id="index_md_12">#</a></span></h3>
+<p>При необходимости пробросить дополнительные параметры при запросе моделей,
+добавьте их в объект <code>ns.request.requestParams</code>:
+
+</p>
+<pre><code class="js">ns.request.requestParams.token = getAuthToken();
+ns.request.requestParams.version = &apos;0.1.1&apos;;</code></pre>
+<p>Это приведет к отправке запросов вида:
+
+</p>
+<pre><code>Request URL: http://example.com/models/?_m=todos
+
+Query String Parameters:
+  _m: todos
+
+Form Data:
+  category.0: home
+  token: 6a5e516725c68c
+  version: 0.1.1</code></pre>
+<h3>Условная обработка ответа моделей<span><a class="mark" href="#index_md_13" id="index_md_13">#</a></span></h3>
+<p>Определение функции <code>ns.request.canProcessResponse</code> позволяет динамически
+заблокировать обработку ответа моделей, например, при несовпадении авторизации
+или рассинхронизации клиента с бекендом:
+
+</p>
+<pre><code class="js">ns.request.canProcessResponse = function(response) {
+    // На бекенде выехала новая версия, а текущий клиент засиделся.
+    if (response.version != APP.version) {
+        location.reload();
+        return false;
+    }
+
+    return true;
+};</code></pre>
+<h3>Переопределение модуля Yate-шаблонов<span><a class="mark" href="#index_md_yate" id="index_md_yate">#</a></span></h3>
+<p>По умолчанию для генерации разметки из шаблонов используется модуль <code>main</code>,
+однако сохраняется возможность его динамического определения в зависимости от
+параметров страницы и текущего лейаута:
+
+</p>
+<pre><code class="js">ns.Update.prototype.applyTemplate = function(tree, params, layout) {
+    var module = &apos;main&apos;;
+
+    if (params.context === &apos;setup&apos;) {
+        module = &apos;setup&apos;;
+    }
+
+    return ns.renderString(tree, null, module);
+};</code></pre>
+<h1>ns.router<span><a class="mark" href="#index_md_ns_router" id="index_md_ns_router">#</a></span></h1>
+<p>Умеет:
+- получать из урла - <code>id</code> страницы (layout) и параметры <code>params</code>
+- генерировать url-ы по <code>id</code> страницы и параметрам <code>params</code>
+
+</p>
+<h2>API<span><a class="mark" href="#index_md_api" id="index_md_api">#</a></span></h2>
+<h3><code>ns.router.baseDir</code>: <code>{string}</code><span><a class="mark" href="#index_md_ns_router_basedir_string" id="index_md_ns_router_basedir_string">#</a></span></h3>
+<p>Базовая часть урла (если приложение располагается не в корне сайта.
+
+</p>
+<h3><code>ns.router(url)</code>: <code>{ page:string, params:{object} }</code><span><a class="mark" href="#index_md_ns_router_url_page_string_params_object" id="index_md_ns_router_url_page_string_params_object">#</a></span></h3>
+<p>Выполняет роутинг: вычисляет по <code>url</code> какая это страница <code>page</code> (это <code>id</code> layout-а) и вытаскивает параметры из урла.
+Если в урле были GET параметры - они подклеиваются в итоговый набор <code>params</code>.
+
+</p>
+<p>Когда выполняется роутинг выполняются:
+- (опционально) redirect-ы (получаем новый урл после redirect-а и ещё раз выполняем роутинг)
+- (опционально) rewrite (текущий урл заменяется на прописанный в rewrite-е, параметры подклеиваются в конце как GET параметры)
+- роутинг (ищем первый подходящий шаблон урла, подробнее см. <code>ns.router.routes</code>. Если не удалось заматчится - считаем, что получили страницу с <code>not-found</code>)
+- (опционально) rewrite параметров (при желании, меняем что-то в полученном объекте с параметрами <code>params</code>).
+
+</p>
+<h3><code>ns.router.url(url)</code>: <code>{ string }</code><span><a class="mark" href="#index_md_ns_router_url_url_string" id="index_md_ns_router_url_url_string">#</a></span></h3>
+<p>Генерация урла, когда урл известен и нужно только дописать базовую часть.
+Странный метод, лучше использовать <code>ns.router.generateUrl</code>
+
+</p>
+<h3><code>ns.router.generateUrl(id, params)</code>: <code>{string}</code><span><a class="mark" href="#index_md_ns_router_generateurl_id_params_string" id="index_md_ns_router_generateurl_id_params_string">#</a></span></h3>
+<p>Генерация урла по <code>id</code> страницы (layout) и по набору параметров.
+Это операция, обратная той, которую делает <code>ns.router</code>.
+Умеет разворачивать rewrite-ы (после генерации урла проверяет, есть ли <code>rewrite</code> правила для полученного урла и выполняет их в обратную сторону).
+В случае неуспеха - кидает ошибку.
+
+</p>
+<h3><code>ns.router.routes</code>: <code>{object}</code><span><a class="mark" href="#index_md_ns_router_routes_object" id="index_md_ns_router_routes_object">#</a></span></h3>
+<p>Это объект, в котором нужно указать все урлы, rewrite-ы и redirect-ы.
+Кроме этого поддерживается rewrite параметров.
+
+</p>
+<p><code>redirect</code> - прописываются редиректы. Можно указать шаблон урла, который надо заматчить и можно указать функцию, которая вычисляет, куда делается редирект.
+
+</p>
+<p><code>rewriteUrl</code> - тут указаны урлы (не шаблоны урлов) и можно указать rewrite для конкретного урла на другой конкретный урл.
+
+</p>
+<p><code>route</code> - тут прописано соответствие шаблона урла - странице (layout-у).
+Матчинг урла выполняется сверху вниз. А значит у урла, который выше - больше приоритет.
+Отсюда правило - более общие шаблоны урлов указывать ниже.
+Матчинг выполняется до первого успешного сопоставления.
+Одной и тоже странице может соответствовать несколько шаблонов урлов.
+
+</p>
+<p><code>rewriteParams</code> - для страницы (layout-а) можно указать функцию, в которой произвольным образом поменять <code>params</code>.
+
+</p>
+<pre><code class="js">ns.router.routes = {
+    redirect: {
+        &apos;/&apos;: &apos;/inbox&apos;,
+        &apos;/inbox/old/{int:int}&apos;: &apos;/inbox&apos;,
+        &apos;/inbox/my&apos;: function() {
+            return &apos;/inbox&apos;;
+        },
+        &apos;/inbox/my/{int:int}&apos;: function(params) {
+            return &apos;/inbox/&apos; + params.int;
+        }
+    },
+    rewriteUrl: {
+        &apos;/page1&apos;: &apos;/page/1&apos;
+    },
+    route: {
+        &apos;/inbox&apos;: &apos;messages&apos;,
+        &apos;/message/{mid:int}&apos;: &apos;message&apos;,
+        &apos;/page/prefix{page:int}&apos;: &apos;url-with-prefix&apos;,
+        &apos;/search/{request:any}&apos;: &apos;search&apos;
+    },
+    rewriteParams: {
+        &apos;message&apos;: function(params) {
+            return { id: params.mid };
+        }
+    }
+};</code></pre>
+<h3><code>ns.router.regexps</code>: <code>{object}</code><span><a class="mark" href="#index_md_ns_router_regexps_object" id="index_md_ns_router_regexps_object">#</a></span></h3>
+<p>Тут задаются типы параметров в виде регулярных выражения.
+
+</p>
+<p>Начальный набор такой:
+</p>
+<pre><code class="js">ns.router.regexps = {
+    &apos;id&apos;: &apos;[A-Za-z_][A-Za-z0-9_-]*&apos;,
+    &apos;int&apos;: &apos;[0-9]+&apos;
+};</code></pre>
+<h2>Параметры<span><a class="mark" href="#index_md_14" id="index_md_14">#</a></span></h2>
+<p>Параметры в урле задаются в <code>{}</code>, к примеру, <code>/message/{message-id}</code>.
+Параметр может быть как между <code>/</code>-ами, так и в промежутках, к примеру, <code>/archive/{year}-{month}-{day}</code>.
+
+</p>
+<p>Тип указывается после имени параметра и отделяется <code>:</code>: <code>{page:int}</code>.
+Если параметр указан без типа - ему присваивается тип <code>id</code>. Т.е. <code>{message-id}</code> соответствует <code>{message-id:id}</code>.
+
+</p>
+<p>Параметр может быть опциональным.
+В этом случае, слеш перед ним тоже становится опциональным.
+Чтобы указать, что параметр опционален - нужно дописать <code>=</code> или <code>=default</code> после имени параметра (или типа, если он указан),
+примерно так: <code>{page=}</code>, <code>{page=0}</code>, <code>{page:int=}</code> или <code>{page:int=0}</code>.
+Если в исходном урле параметр не задан, но указано дефолтное значение - оно будет в итоговом наборе параметров страницы <code>params</code>.
+
+</p>
+<p>Можно указать фильтр значения параметра.
+В этом случае параметр должен иметь строго указанное значение, только в этом случае урл будет заматчен.
+Чтобы указать фильтр нужно дописать <code>==filter</code> после имени параметра (или типа, если он указан), примерно так: <code>{color==green}</code> или <code>{color:colors==green}</code>.
+
+</p>
+<p><strong>Можно указать либо дефолтное значение, либо фильтр</strong>.
+
+</p>
+<h1>ns.History<span><a class="mark" href="#index_md_ns_history" id="index_md_ns_history">#</a></span></h1>
+<p>В noscript для смены URL в адресной строке используется HTML5 History API, который не поддерживается <a href="http://caniuse.com/#feat=history">в IE раньше 10</a>.
+
+</p>
+<h2>Polyfill для IE<span><a class="mark" href="#index_md_polyfill_ie" id="index_md_polyfill_ie">#</a></span></h2>
+<p>В качестве полифилла можно использовать <a href="https://github.com/devote/HTML5-History-API">devote/HTML5-History-API</a>. Скрипт предоставляет стандартизированное API и будет использовать смену хеш-фрагмента URL для навигации.
+
+</p>
+<pre><code>/notes/141 -&gt; /#/notes/141</code></pre>
+<p>Кроме подключения самого скрипта на страницу нужно проделать небольшую работу:
+
+</p>
+<ol>
+<li>Организовать редирект до старта приложения:</li>
+</ol>
+<pre><code class="js">// Тут может произойти смена URL и перезагрузка, поэтому какие-нибудь
+// модели до редиректа запрашивать бессмысленно.
+window.history.redirect();
+
+ns.init();</code></pre>
+<ol>
+<li>Переопределить вычисление текущего URL приложения:</li>
+</ol>
+<pre><code class="js">var history = window.history;
+
+if (history.emulate) {
+    ns.page.getCurrentUrl = function() {
+        return history.location.pathname + history.location.search;
+    };
+}</code></pre>
+<h2>Раскладка страницы (ns.Layout)<span><a class="mark" href="#index_md_ns_layout" id="index_md_ns_layout">#</a></span></h2>
+<p>Раскладка служит для декларативного описания структуры видов на странице. При определении раскладки указывается её id и декларация.
+
+</p>
+<pre><code>    ns.layout.define(&apos;main&apos;, {
+        app: {
+            view1: true,
+            view2: {
+                view21: true
+            }
+        }
+    });</code></pre>
+<p>В примере создаётся раскладка страницы, состоящей из четырёх видов. Корневой вид <code>app</code> содержит в себе <code>view1</code> и <code>view2</code>, а <code>view2</code> содержит в себе <code>view21</code>.
+
+</p>
+<p>Каждый узел декларации соответствует виду. Ключ указывает на класс вида, в значении содержится декларация вложенных видов.
+
+</p>
+<p>Способы описания структуры видов
+
+</p>
+<pre><code>    ns.layout.define(&apos;main&apos;, {
+        app: {
+
+            // Для описания вида без вложенностей значение устанавливается в true
+            view1: true,
+
+            // Для описания одного вложенного вида в значении указывается его класс
+            view2: &apos;view21&apos;,
+
+            // Для описания статической структуры видов используется объект
+            view3: {
+                view31: true,
+                view32: &apos;view321&apos;
+            },
+            // Для описания динамической структуры видов узел объяляется боксом,
+            // а вложенность задаётся функцией.
+            // В params приходят параметры страницы.
+            // Функция может вернуть любой из выше перечисленных форматов декларации
+            // видов, или falsy, чтобы отменить добавление вида в страницу.
+            view4@: function(params) {
+                if (params.value1) {
+                    return null;
+                }
+                if (params.value2) {
+                    return &apos;view41&apos;;
+                }
+                if (params.value3) {
+                    return {
+                        &apos;view42&apos;: {
+                            &apos;view421&apos;: true;
+                        }
+                    };
+                }
+            }
+        }
+    });</code></pre>
+<p>Кроме описания структуры видов раскладка так же позволяет декларировать специальные атрибуты видов.
+
+</p>
+<h3>Бокс<span><a class="mark" href="#index_md_15" id="index_md_15">#</a></span></h3>
+<p>Бокс - это специальный вид-контейнер. Он не имеет собственного html-содержимого и представлен в DOM только одним узлом, содержащим непосредственно в себе все вложенности. Бокс позволяет решать следующие задачи.
+
+
+</p>
+<p>Кеширование экземпляров вида
+
+</p>
+<pre><code>    ns.layout.define(&apos;main&apos;, {
+        app: {
+            box@: &apos;view1&apos;
+        }
+    });</code></pre>
+<p>В примере <code>box</code> будет содержать один вложенный вид <code>view1</code>. Если <code>view1</code> зависит от параметров, то при изменении параметров предыдущие html-узлы будут скрываться, но оставаться в DOM-дереве, а новые - добавляться в <code>box</code> и показываться. При возврате к одному из предыдущих наборов параметров будет показан ранее сгенерированный соответствующий ему html-узел.
+
+
+</p>
+<p>Создание динамической раскладки
+
+</p>
+<pre><code>    ns.layout.define(&apos;main&apos;, {
+        app: {
+            view1: true,
+            view2@: function(params) {
+                if (params.value1) {
+                    return null;
+                }
+                if (params.value2) {
+                    return &apos;view41&apos;;
+                }
+                if (params.value3) {
+                    return {
+                        &apos;view42&apos;: &apos;view421&apos;,
+                        &apos;view43&apos;: &apos;view431&apos;
+                    };
+                }
+            }
+        }
+    });</code></pre>
+<p>В примере вид в зависимости от параметров может отсутствовать, содержать единственный вид <code>view41</code>, или содержать <code>view42</code> и <code>view43</code>, содержащие в свою очередь соответственно <code>view421</code> и <code>view431</code>. Для создания такой структуры <code>view2</code> обязательно должен быть боксом. Обычный view, содержащий вложенные виды, при их исчезновении после обновления может работать некорректно.
+
+</p>
+<h3>Асинхронные виды<span><a class="mark" href="#index_md_16" id="index_md_16">#</a></span></h3>
+<p>Асинхронный вид позволяет на время загрузки его моделей рисовать его в виде заглушки. Updater запросит модели асинхронных видов отдельными запросами и отрисует страницу до получения этих данных. Загрузив модели, Updater сделает повторный проход только по асинхронным видам и обновит их.
+
+</p>
+<pre><code>    ns.layout.define(&apos;main&apos;, {
+        app: {
+            viewLight: true,
+            viewHard&amp;: true
+        }
+    });</code></pre>
+<pre><code>    ns.View.define(&apos;viewLight&apos;, {
+        models: [&apos;modelLight&apos;]
+    })
+    ns.View.define(&apos;viewHard&apos;, {
+        models: [&apos;modelHard&apos;]
+    })</code></pre>
+<pre><code>    match .view[id=&quot;viewLight&quot;] ns-view {
+        // основное html-содержимое вида viewLight
+    }
+
+
+    match .view[id=&quot;viewHard&quot;] ns-view-async {
+        // html-содержимое заглушки для вида viewHard
+    }
+    match .view[id=&quot;viewHard&quot;] ns-view {
+        // основное html-содержимое вида viewHard
+    }</code></pre>
+<p>Предположим, что modelLight запросить легко, а запрос modelHard требует заметного времени. При обновлении Updater запросит модели отдельно: сначала modelLight, а затем modelHard. Получив данные для modelLight, Updater отрисует страницу. Вид viewHard при этом отрисуется в виде заглушки (с использованием шаблона ns-view-async). После получения данных для modelHard Updater сделает ещё один такт обновления и вместо заглушки отрисует основное содержимое viewHard.
+
+</p>
+<h2>Наследование<span><a class="mark" href="#index_md_17" id="index_md_17">#</a></span></h2>
+<p>Один layout может наследовать от другого. Наследование реализуется следующим образом
+
+</p>
+<pre><code class="js">// объявляет общий layout для всех страниц
+ns.layout.define(&apos;common&apos;, {
+    &apos;app&apos;: {
+        // каждая страница в проекте состоит из шапки, левой колонки и правой колонки
+        &apos;header-box@&apos;: {},
+        &apos;left-box@&apos;: {},
+        &apos;right-box@&apos;: {},
+    }
+});
+
+// страница 1
+// обратите внимание, что header-box@ не доопределяелся и берется как есть из common
+ns.layout.define(&apos;posts&apos;, {
+    // чтобы заново не описывать структуру, путь до видов указывается через пробел
+    &apos;app left-box@&apos;: {
+        &apos;navigation&apos;: {}
+    },
+    &apos;app right-box@&apos;: {
+        &apos;posts&apos;: {}
+    }
+// последним параметром для ns.layout.define указывает, что layout наследуется от common
+}, &apos;common&apos;);
+
+// страница 2
+ns.layout.define(&apos;profile&apos;, {
+    &apos;app header-box@&apos;: {
+        &apos;user-header&apos;: {}
+    },
+    &apos;app left-box@&apos;: {
+        &apos;navigation&apos;: {}
+    },
+    &apos;app right-box@&apos;: {
+        &apos;profile&apos;: {}
+    }
+}, &apos;common&apos;);</code></pre>
+<h2>Переходы по страницам (ns.page)<span><a class="mark" href="#index_md_ns_page" id="index_md_ns_page">#</a></span></h2>
+<p><code>ns.page</code> - специальный модуль для перехода по страницам внутри ns-приложения.
+
+</p>
+<p><code>ns.page.go</code> - главный метод. Разроваричивает адрес через <code>ns.router</code>, выбирает <code>layout</code>, запускает <code>ns.Update</code> и
+производит необходимые операции по смене урла в адресной строке и обновления названия (<code>document.title</code>) страницы.
+Метод возвращает промис от <code>ns.Update</code>, но иногда может вернуть отклоненный промис со статусами:
+ - <code>block</code> - переход был заблокирован через <a href="#nspageblock"><code>ns.page.block</code></a>
+
+</p>
+<p><code>ns.page.title</code> - точка расширения приложения. Позволяет задавать <a href="./ns.init.md#Заголовок-страницы">заголовки страниц</a>.
+
+</p>
+<p>Также модуль предоставляет полезные данные:
+ - <code>ns.page.current</code> - текущие параметры страницы
+  - <code>ns.page.current.page</code> - название текущего <code>layout</code>
+  - <code>ns.page.current.params</code> - текущие параметры
+ - <code>ns.page.currentUrl</code> - адрес текущей страницы
+
+
+</p>
+<h2>ns.page.block<span><a class="mark" href="#index_md_ns_page_block" id="index_md_ns_page_block">#</a></span></h2>
+<p>Этот механизм позволяет блокировать переходы по страницам.
+Например, с помощью него можно блокировать уход с формы, если не были сохранены изменения.
+
+</p>
+<pre><code class="js">ns.View.define(&apos;my-view&apos;, {
+    events: {
+        &apos;ns-view-show&apos;: function() {
+            // после показа вида, добавляем функцию блокировки
+            ns.page.block.add( this.checkChanges.bind(this) );
+        },
+        &apos;ns-view-hide&apos;: function() {
+            // после скрытия вида, очищаем функции
+            ns.page.block.clear();
+        }
+    },
+    methods: {
+        /**
+         * @param {string} url ссылка, по которой выполняется переход
+         */
+        checkChanges: function(url) {
+            if (this.hasUnsavedChanges()) {
+                // здесь можно показать какое-то сообщение
+
+                // функция блокировки должна вернуть false, если переход нельзя осуществить
+                return false;
+            }
+
+            return true;
+        }
+    }
+ });</code></pre>
+<h2>ns.page.history<span><a class="mark" href="#index_md_ns_page_history" id="index_md_ns_page_history">#</a></span></h2>
+<p>Этот модуль хранит историю приложения.
+Он нужен, т.к. в History API нельзя получить произвольное состояние на N шагов назад.
+
+</p>
+<p>Имеет два метода:
+ - <code>ns.page.history.back</code> - переход &quot;назад&quot;. Этот метод не аналогичен кнопке &quot;Назад&quot; в браузере. Так, при отсутствии истории, этот метод перейдет на дефолтную страницу приложения (<code>ns.page.getDefaultUrl</code>), а не выйдет из него.
+ - <code>ns.page.history.getPrevious(n)</code> - возвращает урл N страниц назад. 0 - предыдующая страница.
+
+</p>
+<h1>ns.View<span><a class="mark" href="#index_md_ns_view" id="index_md_ns_view">#</a></span></h1>
+<p>Вид представляет собой элемент интерфейса.
+Он однозначно идентифицируется своим ключом, который строится во время инициализации исходя из <a href="#Параметры">параметров вида</a>.
+Разный ключ всегда означает разный экземпляр вида.
+
+</p>
+<p>Не стоит ожидать, что при изменении параметров будет перерисован тот же самый вид.
+Этого можно достичь, но в общем виде будет создан и отрисован новый экземпляр.
+
+</p>
+<p>Ключ очень важен для работы <code>ns.Box</code>.
+<code>ns.Box</code> при каждом обновлении высчитывает ключи для видов, которые должен показать, скрывает все виды, у которых ключ не совпадает и показывает те, которые надо.
+
+</p>
+<h2>Декларация<span><a class="mark" href="#index_md_18" id="index_md_18">#</a></span></h2>
+<p>Определение нового вида происходит через статическую функцию <code>ns.View.define</code>
+</p>
+<pre><code class="js">ns.View.define(&apos;viewName&apos;, viewDeclObject[, baseView])</code></pre>
+<p>Объект-декларация состоит из следующих свойств.
+
+</p>
+<h3>ctor<span><a class="mark" href="#index_md_ctor" id="index_md_ctor">#</a></span></h3>
+<p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самого вида, т.о. в конструкторе еще не доступеы некоторые свойства.
+
+</p>
+<p>Полностью готовый экземпляр бросает событие <code>ns-view-init</code>.
+
+</p>
+<pre><code>/**
+ * @classdesc prj.vMyView
+ * @augments ns.View
+ */
+ns.View.define(&apos;my-view&apos;, {
+    /**
+     * @constructs prj.vMyView
+     */
+    ctor: function() {
+        this._state = &apos;initial&apos;;
+        this.CONST = 100;
+    }
+});</code></pre>
+<h3><code>events</code><span><a class="mark" href="#index_md_events" id="index_md_events">#</a></span></h3>
+<p><code>events</code> - объект с декларацией подписок на события, как DOM, так и noscript.
+
+</p>
+<p>Любая подписка имеет вид:
+</p>
+<pre><code class="json">{
+    &quot;на что подписаться@когда&quot;: &quot;обработчик&quot;
+}</code></pre>
+<p>Обработчиков может быть названием метода из прототипа или функция. Все обработчики вызываются в контексте вида.
+
+</p>
+<p>События с суффиксом <code>@show</code> вешаются во время показа вида (событие <code>ns-view-show</code>) и снимаются во время скрытия (событие <code>ns-view-hide</code>).
+Аналогично, суффикс <code>@init</code> означает, что событие будет активировано на <code>ns-view-htmlinit</code> и деактивировано на <code>ns-view-htmldestroy</code>.
+
+</p>
+<h4>DOM-события<span><a class="mark" href="#index_md_dom" id="index_md_dom">#</a></span></h4>
+<p>DOM-события от события noscript различаются согласно массиву <code>ns.V.DOM_EVENTS</code>. Все, что не входит в этот массив, является &quot;космическим&quot; событием noscript.
+
+</p>
+<p>DOM-события навешиваются через механизм делегирования.
+
+</p>
+<p>Примеры деклараций:
+</p>
+<pre><code class="js">{
+    // событие click на корневой ноде вида
+    &quot;click&quot;: &quot;onClick&quot;,
+
+    // событие click на нодах к классом selector внутри вида
+    &quot;click .selector&quot;: &quot;onSelectorClick&quot;,
+
+    // событие click на нодах к классом selector внутри вида,
+    // из-за @init обработчик навешивается на ns-view-htmlinit и снимается при ns-view-htmldestroy
+    &quot;click@init .selector&quot;: &quot;onInitSelectorClick&quot;,
+
+    // обработчик события scroll на window
+    &quot;scroll window&quot;: &apos;onScroll&apos;
+}</code></pre>
+<p>Правила для DOM-событий:
+ 1. Все (кроме <code>scroll</code>) события работают через механизм <a href="http://www.nczonline.net/blog/2009/06/30/event-delegation-in-javascript/">event delegation</a>.
+ 2. По умолчанию все обработчики навешиваются на <code>ns-view-show</code> и снимаются на <code>ns-view-hide</code>
+ 2. Событие <code>scroll</code> не всплывает, поэтому навешивается напрямую на ноду, указанную в селекторе.
+ 3. В качестве селектора можно указать <code>window</code> или <code>document</code>, в этом случае событие будет навешано на соответствующий глобальный объект.
+
+</p>
+<h4>&quot;Космические&quot; события noscript<span><a class="mark" href="#index_md_noscript_1" id="index_md_noscript_1">#</a></span></h4>
+<p>Декларируются как и остальные события
+</p>
+<pre><code class="js">{
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
+    &quot;my-custom-init@init&quot;: &quot;onCustomInit&quot;
+}</code></pre>
+<p>Если не указано когда вешать обработчик, то оно будет навешан при показе вида и снят при скрытии.
+
+</p>
+<p>&quot;Косимческие&quot; события работают через единую шину <code>ns.events</code>
+</p>
+<pre><code class="js">ns.events.trigger(&apos;my-custom-event&apos;);</code></pre>
+<h4>Встроенные события<span><a class="mark" href="#index_md_19" id="index_md_19">#</a></span></h4>
+<p>Список событий:
+<em> <code>ns-view-hide</code> - вида был скрыт и больше не виден на странице
+</em> <code>ns-view-htmldestroy</code> - старая нода у вида была уничтожена
+<em> <code>ns-view-htmlinit</code> - у вида появилась новая нода
+</em> <code>ns-view-async</code> - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view
+<em> <code>ns-view-show</code> - view был показан и теперь виден на странице
+</em> <code>ns-view-touch</code> - view виден и был затронут в процессе обновления страницы
+
+</p>
+<ol>
+<li>События генерируются снизу вверх, т.е. сначала их получают дочерние вида, потом родительские.</li>
+<li>События генерируются пачками, т.е. сначала одно событие у всех view, потом другое событие у всех view.</li>
+<li>События генерируются в строго определенном порядке, указанном выше</li>
+</ol>
+<p>Примеры последовательностей событий:
+<em> инициализация view: <code>ns-view-htmlinit -&gt; ns-view-show -&gt; ns-view-touch</code>
+</em> перерисовка страница, если view валиден: <code>ns-view-touch</code>
+<em> view был скрыт: <code>ns-view-hide</code> (без <code>ns-view-touch</code>)
+</em> view был показан: <code>ns-view-show -&gt; ns-view-touch</code>
+* view был перерисован: <code>ns-view-hide -&gt; ns-view-htmldestroy -&gt; ns-view-htmlinit -&gt; ns-view-show -&gt; ns-view-touch</code> (<code>ns-view-hide</code> тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на <code>ns-view-show/ns-view-hide</code> и при обновлении ноды, они должны быть переинициализированы)
+
+</p>
+<h3>methods<span><a class="mark" href="#index_md_methods" id="index_md_methods">#</a></span></h3>
+<p><code>methods</code> - объект с методами вида. По сути является прототипом объекта.
+
+</p>
+<pre><code>/**
+ * @classdesc prj.vMyView
+ * @augments ns.View
+ */
+ns.View.define(&apos;my-view&apos;, {
+    /** @lends prj.vMyView.prototype */
+    methods: {
+        BAR: 100
+        foo: function(){}
+    }
+});</code></pre>
+<h3>models<span><a class="mark" href="#index_md_models" id="index_md_models">#</a></span></h3>
+<p><code>models</code> позволяет указать модели, от которых зависит вид. Зависимость означает, что
+ 1. параметры вида будут собраны на основе параметров связанных моделей
+ 2. в шаблонах вида будут доступны данные связанных моделей
+ 3. некоторые методы вида будут подписаны на события связанных моделей
+
+</p>
+<p>По умолчанию вид подписывается на следующие стандартные события модели:
+ - <code>ns-model-changed</code>
+ - <code>ns-model-insert</code>
+ - <code>ns-model-remove</code>
+ - <code>ns-model-destroyed</code>
+и не подписывается на событие <code>ns-model-touched</code>.
+
+</p>
+<p>Если обработчики явно не указаны, то в качестве обработчика стандартных событий устанавливается метод <code>invalidate</code>.
+
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  models: [&apos;album&apos;, &apos;photo&apos;]
+});</code></pre>
+<p>В приведённом примере вид будет инвалидироваться при любом стандартном событии модели.
+
+</p>
+<p>Инвалидировать вид можно так же по любым другим событиям модели. Для этого в декларации нужно явно указать событие и обработчик.
+
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  models: {
+    album: {
+      &apos;ns-model-boof&apos;: &apos;invalidate&apos;
+    }
+  }
+});</code></pre>
+<p>Для того, чтобы предотвратить инвалидацию вида по конекретному событию, в качестве обработчика нужно явно указать метод <code>keepValid</code>.
+
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  models: {
+    album: {
+      &apos;ns-model-changed&apos;: &apos;keepValid&apos;
+    }
+  }
+});</code></pre>
+<p>В приведённом примере при наступлении события ns-model-changed вид будет оставаться валидным и не будет перерисован при последующих update&apos;ах. При любом другом стандартном событии модели он будет проинвалидирован.
+
+</p>
+<p>Для того, чтобы предотвратить инвалидацию вида по любому событию, <code>keepValid</code> нужно установить значением поля модели.
+
+
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  models: {album: &apos;keepValid&apos;}
+});</code></pre>
+<p>В приведённом примере события модели <code>album</code> не будут влиять на валидность вида.
+
+</p>
+<p><code>&apos;invalidate&apos; и &apos;keepValid&apos;</code> - это имена реальных методов. Вместо них можно указать имя любого другого метода вида.
+
+</p>
+<p>Если нужно в качестве обработчика события использовать произвольный метод, и при этом инвалидировать вид, достаточно внутри метода вызвать <code>this.invalidate();</code>.
+
+</p>
+<p>Для краткости вместо методов <code>invalidate</code> и <code>keepValid</code> можно указывать их краткую форму: <code>true</code> и <code>false</code> соответственно. 2 варианта деклараций в следующем примере работают одинаково.
+
+</p>
+<p>Пример использования произвольных обработчиков:
+
+
+</p>
+<pre><code class="js">ns.View.define(&apos;supre-view&apos;, {
+  models: {
+    album: {
+      &apos;ns-model-changed&apos;: &apos;methodOfView&apos;
+    }
+  },
+  methods: {
+    &apos;methodOfView&apos;: function(){ }
+  }
+});</code></pre>
+<pre><code class="js">ns.View.define(&apos;supre-view&apos;, {
+  models: {
+    album: {
+      &apos;ns-model-changed&apos;: function() { }
+    }
+  }
+});</code></pre>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  models: {
+    photo: &apos;invalidate&apos;,
+    album: &apos;keepValid&apos;
+  }
+});
+
+ns.View.define(&apos;super-view&apos;, {
+  models: {
+    photo: true,
+    album: false
+  }
+});</code></pre>
+<p>Для большей краткости зависимости от моделей можно указывать в виде массива. Это будет эквивалентно указанию в качестве обработчика их событий метода <code>invalidate</code>.
+
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  models: [&apos;photo&apos;, &apos;album&apos;]
+});</code></pre>
+<h3>Параметры<span><a class="mark" href="#index_md_20" id="index_md_20">#</a></span></h3>
+<p>Параметры нужны для построения ключа.
+
+</p>
+<p>По умолчанию, если <code>params</code> не указан, то параметры собираются из параметров всех моделей в порядке их объявления.
+Добавлять или удалять из собранных параметров моделей можно с помощью объектов <code>params+</code> и <code>params-</code>
+
+</p>
+<p>Если <code>params</code> явно заданы — нельзя использовать <code>params+</code> / <code>params-</code>.
+
+</p>
+<p>Если ключ view нельзя построить бросается <strong>исключение</strong>.
+
+</p>
+<h4>params+<span><a class="mark" href="#index_md_params" id="index_md_params">#</a></span></h4>
+<p>Добавляет в результирующий набор дополнительные параметры:
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  &quot;models&quot;: [ &apos;album&apos;, &apos;photo&apos; ],
+  &quot;params+&quot;: { page: 23 }
+});</code></pre>
+<h4>params-<span><a class="mark" href="#index_md_params_1" id="index_md_params_1">#</a></span></h4>
+<p>Удаляет из результирующего набора указанные параметры:
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  &quot;models&quot;: [ &apos;album&apos;, &apos;photo&apos; ],
+  &quot;params-&quot;: [ &apos;album-id&apos; ]
+});</code></pre>
+<h4>params<span><a class="mark" href="#index_md_params_2" id="index_md_params_2">#</a></span></h4>
+<p><code>params</code> может быть массивом объектов или функцией.
+Также можно указать объект - это короткая запись массива с одним элементом.
+
+</p>
+<p>Каждый объект представляет собой группу параметров.
+Это позволяет строить ключ по-разному в зависимости от набора.
+</p>
+<pre><code class="js">ns.View.define(&apos;super-view&apos;, {
+  params: [
+    { &quot;context&quot;: &quot;album&quot;, &quot;album-id&quot;: null },
+    { &quot;context&quot;: null }
+  ]
+});</code></pre>
+<p>Как строится ключ:
+- каждое свойство объекта — это обязательный параметр
+- если значение свойства <code>null</code> — параметр обязателен, но значение его может быть любым
+- если значение свойства не <code>null</code> — это <strong>фильтр</strong>, параметр из урла должен иметь именно это значение
+- если есть все нужные параметры и выполняются все фильтры — ключ можно строить
+- иначе — пытаемся строить по следующей группе параметров
+
+</p>
+<p>Т.о. при использовании <code>params</code> все параметры являются обязательными.
+Чтобы сделать их необязательными, используйте <code>params+</code>.
+
+</p>
+<p>Если указана функция, то функция должна вернуть объект с параметрами, по которым будет построен ключ.
+</p>
+<pre><code class="js">ns.View.define(&apos;view&apos;, {
+  // ns.key - готовая функция для склеивания параметров в строку
+  params: ns.key
+})</code></pre>
+<h2>Валидность<span><a class="mark" href="#index_md_21" id="index_md_21">#</a></span></h2>
+<p>Валидность view считается по двум факторам:
+- собственный статус <code>ns.V.STATUS</code>
+- статус привязанных моделей
+
+</p>
+<p>При отрисовке вид запоминает все версии моделей и в дальшейшем сравнимает их. Если версия изменилась, то вид будет перерисован.
+
+</p>
+<p>Также у вида есть собственный статус <code>this.static</code>, значением которого может быть тип ns.V.STATUS. Если статус не <code>ns.V.STATUS.OK</code>, то вид будет перерисован.
+
+</p>
+<p>Инвалидировать вид можно методом <code>this.invalidate()</code>.
+
+</p>
+<p>Вид безусловно подписывается на все изменения моделей и автоматически инвалидирует себя при изменениях.
+
+</p>
+<h2>Взаимодействие<span><a class="mark" href="#index_md_22" id="index_md_22">#</a></span></h2>
+<p>В noscript нет какого-либо способа получить созданный экземпляр вида.
+Поэтому любое внешнее взаимодействие с ним осуществляется исключительно через механизм <a href="#События-noscript">событий noscript</a>
+
+</p>
+<h2>async<span><a class="mark" href="#index_md_async" id="index_md_async">#</a></span></h2>
+<p>Вид может быть &quot;асинхронным&quot;. Такое поведение полезно, когда некоторые модели могут запрашиваться с сервера продолжительное время.
+
+</p>
+<p>Схема работы:
+ 1. Если у вида есть все необходимые данные (все модели валидны) для отрисовки, то он отрисуется в общем потоке.
+ 2. Если модели не валидны, то сначала отрисуется заглушка - мода <code>ns-view-async-content</code>, где будут доступны все валидные на данный момент данные, и сделан запрос за остальными моделями. У вида будет вызвано событие <code>ns-view-async</code>.
+ 3. После получения данных вид будет перерисован с обычной модой <code>ns-view-content</code> и поведет себя как обычно
+
+</p>
+<h1>ns.Model<span><a class="mark" href="#index_md_ns_model" id="index_md_ns_model">#</a></span></h1>
+<p>Модель представляет собой данные.
+Она однозначно идентифицируется своим ключом, который строится во время инициализации.
+Разный ключ всегда означает разный экземпляр модели.
+
+</p>
+<ul>
+<li><a href="#Декларация">Декларация</a><ul>
+<li><a href="#ctor">ctor</a></li>
+<li><a href="#events">events</a></li>
+<li><a href="#methods">methods</a></li>
+<li><a href="#params">params</a></li>
+</ul>
+</li>
+<li><a href="#Получение-экземпляра-модели">Получение экземпляра модели</a></li>
+<li><a href="#Запрос-данных-модели-с-сервера">Запрос данных модели с сервера</a><ul>
+<li><a href="#Локальные-модели">Локальные модели</a></li>
+</ul>
+</li>
+<li><a href="#Работа-с-данными">Работа с данными</a></li>
+<li><a href="#Пре--и-постобработка-данных">Постобработка данных</a><ul>
+<li><a href="#extractdata">extractData</a></li>
+<li><a href="#extracterror">extractError</a></li>
+<li><a href="#hasdatachanged">hasDataChanged</a></li>
+<li><a href="#preprocessdata">preprocessData</a></li>
+</ul>
+</li>
+<li><a href="#События">События</a></li>
+<li><a href="#Запрос">Запрос</a></li>
+</ul>
+<h2>Декларация<span><a class="mark" href="#index_md_23" id="index_md_23">#</a></span></h2>
+<p>Определение новой модели происходит через статическую функцию <code>ns.Model.define</code>
+</p>
+<pre><code class="js">ns.Model.define(&apos;modelName&apos;, modelDeclObject[, baseModel])</code></pre>
+<p>Объект-декларация состоит из следующих свойств.
+
+</p>
+<h3>ctor<span><a class="mark" href="#index_md_ctor_1" id="index_md_ctor_1">#</a></span></h3>
+<p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самой модели, т.о. в конструкторе еще не доступны некоторые свойства.
+
+</p>
+<p>Полностью готовый экземпляр бросает событие <code>ns-model-init</code>.
+
+</p>
+<pre><code class="js">/**
+ * @classdesc prj.mMyModel
+ * @augments ns.Model
+ */
+ns.Model.define(&apos;my-model&apos;, {
+    /**
+     * @constructs prj.mMyModel
+     */
+    ctor: function() {
+        this._state = &apos;initial&apos;;
+        this.CONST = 100;
+    }
+});</code></pre>
+<h3><code>events</code><span><a class="mark" href="#index_md_events_1" id="index_md_events_1">#</a></span></h3>
+<p><code>events</code> - объект с декларацией подписок на события noscript.
+
+</p>
+<p>Любая подписка имеет вид:
+</p>
+<pre><code class="json">{
+    &quot;на что подписаться&quot;: &quot;обработчик&quot;
+}</code></pre>
+<p>Обработчиком может быть название метода из прототипа или функция.
+
+</p>
+<p>Пример:
+</p>
+<pre><code class="js">{
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
+    &quot;my-custom-show@show&quot;: &quot;onCustomShow&quot;
+}</code></pre>
+<h3>methods<span><a class="mark" href="#index_md_methods_1" id="index_md_methods_1">#</a></span></h3>
+<p><code>methods</code> - объект с методами. По сути является прототипом объекта.
+
+</p>
+<pre><code class="js">/**
+ * @classdesc prj.mMyModel
+ * @augments ns.Model
+ */
+ns.Model.define(&apos;my-model&apos;, {
+    /** @lends prj.mMyModel.prototype */
+    methods: {
+        BAR: 100
+        foo: function(){}
+    }
+});</code></pre>
+<h3>params<span><a class="mark" href="#index_md_params_3" id="index_md_params_3">#</a></span></h3>
+<p>Параметры нужны для как для построения ключа, так и для запроса моделей с сервера.
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
+    params: {
+        //  Любое значение, кроме null расценивается как дефолтное значение этого параметра.
+        &apos;author-login&apos;: null,
+        &apos;album-id&apos;: null,
+
+        //  Этим двум параметрам заданы дефолтные значения.
+        &apos;page&apos;: 0,
+        &apos;pageSize&apos;: 20
+    }
+});</code></pre>
+<p>В запросе на сервер отправляются все параметры, которые не <code>null</code>.
+
+</p>
+<p>Важно понимать, что HTTP - текстовый протокол, поэтому все значения отправятся как строки.
+Т.о. <code>0</code> станет <code>&quot;0&quot;</code>, <code>false</code> - <code>&quot;false&quot;</code>. А это значит, что параметры, которые в вашем приложении не обрабатываются как строки, надо приводить к правильному типу на сервере. Иначе, можно получить такую ошибку
+</p>
+<pre><code class="js">// отправили параметры как
+// ?lag=false
+//
+
+if (params.flag) {
+   // эта ветка выполнится, потому что params.flag === &quot;false&quot;
+}</code></pre>
+<h2>Получение экземпляра модели<span><a class="mark" href="#index_md_24" id="index_md_24">#</a></span></h2>
+<div class="signature"><ul>
+<li><code>ns.Model.get(&apos;modelName&apos;, params)</code> - строит ключ из <code>params</code> и возвращает соответствующую модель. Если такого экземпляра нет, то он будет создан.</li>
+<li><code>ns.Model.getValid(&apos;modelName&apos;, params)</code> - тоже самое что и <code>ns.Model.get</code>. Только экземпляр еще проверяется на валидность. Если валидный экземпляр не найден, то возвращается <code>null</code>.</li>
+</div></ul>
+<h2>Запрос данных модели с сервера<span><a class="mark" href="#index_md_25" id="index_md_25">#</a></span></h2>
+<p>Данные модели:
+- могут прийти с севера (модель можно явно запросить с помощью метода <code>ns.request()</code> или неявно, создав и выполнив <code>ns.Update</code> на странице)
+- могут быть установлены вручную (см. <a href="#Работа-с-данными">Работа с данными</a>)
+
+</p>
+<p>В случае запроса модели с сервера модель перезапрашивается если:
+- она не валидна (<code>isValid()</code> возвращает <code>false</code>)
+- её можно запросить ещё раз (<code>canRequest()</code> возвращает <code>true</code>)
+
+</p>
+<h3>Локальные модели<span><a class="mark" href="#index_md_26" id="index_md_26">#</a></span></h3>
+<p>Локальная модель - модель, которая никогда не запрашивается на сервере.
+Данные такой модели устанавливают вручную.
+Чтобы модель стала локальной нужно переопределить метод <code>canRequest()</code>, к примеру, так:
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;local-model&apos;, {
+    methods: {
+        canRequest: function() {
+            return false;
+        }
+    }
+});</code></pre>
+<h2>Работа с данными<span><a class="mark" href="#index_md_27" id="index_md_27">#</a></span></h2>
+<p><strong>Методы для получения данных</strong>:
+ - <code>#getData()</code> - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.
+ - <code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.
+</p>
+<pre><code class="js">{
+    &quot;foo&quot;: &quot;1&quot;,
+    &quot;bar&quot;: [
+        { &quot;id&quot;: 1 }
+    ]
+}
+this.get(&apos;.foo&apos;) -&gt; &quot;1&quot;
+this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
+<ul>
+<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre><code class="js">{
+ &quot;foo&quot;: &quot;1&quot;,
+ &quot;bar&quot;: [
+     { &quot;id&quot;: 1 }
+ ]
+}
+this.get(&apos;.foo&apos;) -&gt; [&quot;1&quot;]
+this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
+</li>
+</ul>
+<p><strong>Методы для изменения данных</strong>:
+ - <code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.
+</p>
+<pre><code class="js">this.set(&apos;.foo&apos;, 2);</code></pre>
+<ul>
+<li><code>#setData(data)</code> - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.</li>
+</ul>
+<h2>Пре- и постобработка данных<span><a class="mark" href="#index_md_28" id="index_md_28">#</a></span></h2>
+<h3>extractData<span><a class="mark" href="#index_md_extractdata" id="index_md_extractdata">#</a></span></h3>
+<p>Метод извлекает данные из ответа сервера. По умолчанию берется поле <code>data</code> из ответа. Если метод не возвращает данные, то считается, что модель загружена с ошибкой.
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
+    methods: {
+        extractData: function(serverResponse) {
+            if (serverResponse) {
+                return serverResponse.result;
+            }
+        }
+    }
+});</code></pre>
+<h3>extractError<span><a class="mark" href="#index_md_extracterror" id="index_md_extracterror">#</a></span></h3>
+<p>Метода извлекает данные об ошибке сервера. По умолчанию берется поле <code>error</code> из ответа.
+
+</p>
+<p>Метод вызывается, когда <code>#extractData()</code> не вернул данные.
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
+    methods: {
+        extractError: function(serverResponse) {
+            if (serverResponse) {
+                return serverResponse.error;
+            }
+        }
+    }
+});</code></pre>
+<h3>hasDataChanged<span><a class="mark" href="#index_md_hasdatachanged" id="index_md_hasdatachanged">#</a></span></h3>
+<p>Этот метод может контроллировать изменились ли данные на самом деле, чтобы не вызывать лишних события и перерисовок.
+Аргументом метода являются новые данные, а старые можно получить способами описанными выше, например <code>#getData</code>. Должен вернуть <code>boolean</code>.
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
+    methods: {
+        hasDataChanged: function(newData) {
+            var oldData = this.getData;
+            // изменяем данные, только если изменилось поле id
+            return oldData.id !== newData.id
+        }
+    }
+});</code></pre>
+<h3>preprocessData<span><a class="mark" href="#index_md_preprocessdata" id="index_md_preprocessdata">#</a></span></h3>
+<p>Этот метод позволяет обработать полученные данные.
+Аргументом метода являются новые данные, должен вернуть обработанные данные.
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
+    methods: {
+        _index: null,
+        preprocessData: function(newData) {
+            var that = this;
+            // строим индекс для быстрого поиска
+            newData.forEach(function(item) {
+                that._index[item.id] = item;
+            });
+            return newData;
+        }
+    }
+});</code></pre>
+<h2>События<span><a class="mark" href="#index_md_29" id="index_md_29">#</a></span></h2>
+<div class="signature"><ul>
+<li><code>ns-model-changed</code> - модель изменилась. В аргументах приходит jpath, по которому было сделано изменение. Если он пустой, то изменилась вся модель (обычно методом <code>#setData()</code>)</li>
+<li><code>ns-model-changed&lt;.jpath&gt;</code> - изменились данные по указанному jpath. В аргументах приходит jpath, по которому было сделано изменение. События кидаются иерархично, т.о. для <code>.for.bar</code> будет три события: <code>ns-model-changed.foo.bar</code>, <code>ns-model-changed.foo</code>, <code>ns-model-changed</code></li>
+<li><code>ns-model-destroyed</code> - модель была инвалидированна и уничтожена.</li>
+<li><code>ns-model-init</code> - модель создана и проинициализованна</li>
+<li><code>ns-model-touched</code> - у модели изменилась версия. Такое событие будет как результатом изменения данных через <code>#set</code> или <code>#setData</code>, так и прямым вызовом метода <code>#touch()</code></li>
+</div></ul>
+<h2>Запрос<span><a class="mark" href="#index_md_30" id="index_md_30">#</a></span></h2>
+<p>По умолчанию все модели запрашиваются по урлу <code>ns.request.URL</code>.
+Если запрашиваются несколько моделей, то они группируются в один запрос.
+
+</p>
+<p>Это поведение можно изменить с помощью метода <code>request()</code> у модели, который должен вернуть <code>Vow.Promise</code>.
+В этом случае, вся логика запроса находится в этом методе, в том числе модель сама должна вызвать методы <code>setData()</code> или <code>setError()</code>.
+Такие запросы не группируются, но подчиняются общим правилам <code>ns.request</code>, т.е. будут работать перезапросы и пока не завершится первый запрос, нельзя сделать дублирующий.
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;model&apos;, {
+    methods: {
+        request: function() {
+            return ns.http(&apos;https://api.twitter.com&apos;, {}, {type: &apos;GET&apos;})
+                .then(function(data) {
+                    this.setData(data);
+                }, function(error) {
+                    this.setError(error);
+                }, this);
+        }
+    }
+});</code></pre>
+<h1>ns.Update<span><a class="mark" href="#index_md_ns_update" id="index_md_ns_update">#</a></span></h1>
+<h2>Флаг исполнения <code>execFlag</code><span><a class="mark" href="#index_md_execflag" id="index_md_execflag">#</a></span></h2>
+<p>ns.Update можно запустить с одним из следующих флагов:
+ - <strong>GLOBAL</strong>: глобальное обновление (обычно всей страницы). С таким флагом <code>ns.Update</code> запускается из <code>ns.page.go</code>.
+ Такое обновление может прервать только другой с флагом <code>GLOBAL</code>. В один момент времени в приложении может работать единственное GLOBAL-обновление, иначе состояние страницы может стать непредсказуемым.
+ GLOBAL-обновление прерываем все ASYNC-обновления.
+ - <strong>ASYNC</strong>: обновление для асинхронных вид. Таких обновлений может быть несколько и они будут работать одновременно.
+ ASYNC-обновление может запустить только, если в текущий момент нет GLOBAL-обновление.
+ - <strong>PARALLEL</strong>: параллельное обновление. Выполняется в любом случае, его никто не может прервать.
+
+</p>
+<h2>Логика построения и обновления страницы<span><a class="mark" href="#index_md_31" id="index_md_31">#</a></span></h2>
+<p>Отрисовка или обновление страницы запускается методом <code>ns.page.go</code>. На вход он принимает адрес страницы, возвращает promise, который разрешается после завершения обновления страницы.
+
+</p>
+<p><code>ns.page.go</code> работает в несколько этапов.
+
+</p>
+<ul>
+<li><p>Адрес страницы с помощью маршрутизатора преобразуется в параметры страницы и id раскладки.</p>
+</li>
+<li><p>По id инстанциируется раскладка</p>
+</li>
+<li><p>В зависимости от значения второго аргумента <code>ns.page.go</code> добавляется или заменяется запись в истории.</p>
+</li>
+<li><p>На основе раскладки и параметров страницы создаётся экземпляр контроллера обновления и запускается. Метод <code>start</code> возвращает promise, который возвращается из метода <code>ns.page.go</code>.</p>
+<ul>
+<li><p>Контроллер обновления рекурсивным проходом по раскладке страницы собирает виды, требующие обновления, и делит их на синхронные и асинхронные.</p>
+</li>
+<li><p>На основании видов получает 2 группы моделей, требующие запроса с сервера.</p>
+</li>
+<li><p>Запрашивает модели для синхронных видов.</p>
+<ul>
+<li><p>Получив модели  для синхронных видов с сервера, контроллер обновления рекурсивным проходом по синхронным видам строит из раскладки страницы и моделей дерево страницы для наложения шаблона.</p>
+</li>
+<li><p>Накладывает шаблон, получает html-узлы обновлённых видов. Асинхронные виды рендерятся в виде заглушек.</p>
+</li>
+<li><p>Рекурсивным проходом по видам контроллер обновления раскладывает по ним html-узлы и собирает события видов, чтобы запустить их в нужный момент.</p>
+</li>
+<li><p>Триггерит события видов.</p>
+</li>
+<li><p>Разрешает promise, выданный при старте.</p>
+</li>
+</ul>
+</li>
+<li><p>Параллельно с запросом моделей для синхронных видов запрашиваются модели для асинхронных видов.</p>
+<ul>
+<li><p>Получив модели  для асинхронных видов с сервера, контроллер обновления рекурсивным проходом по асинхронным видам строит из раскладки страницы и моделей дерево страницы для наложения шаблона.</p>
+</li>
+<li><p>Накладывает шаблон, получает html-узлы обновлённых асинхронных видов.</p>
+</li>
+<li><p>Рекурсивным проходом по асинхронным видам контроллер обновления раскладывает по ним новые html-узлы взамен заглушек и собирает события видов, чтобы запустить их в нужный момент.</p>
+</li>
+<li><p>Триггерит события видов.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1>ns.ViewCollection<span><a class="mark" href="#index_md_ns_viewcollection" id="index_md_ns_viewcollection">#</a></span></h1>
+<p><code>ViewCollection</code> - это коллеция <code>ns.View</code>, привязанная к <code>ns.ModelCollection</code>.
+При изменении коллекции позволяет перерисовывать только изменившиеся элементы.
+
+</p>
+<p>По сути, образуется следующая зависимость один-к-одному:
+</p>
+<pre><code>ViewCollection      -&gt;  ModelCollection
+    view-item-1     -&gt;      model-item-1
+    view-item-2     -&gt;      model-item-2
+                    ...
+    view-item-N     -&gt;      model-item-N</code></pre>
+<p><code>ns.ViewCollection</code> может зависит только от одной <code>ns.ModelCollection</code>.
+
+</p>
+<p><code>ns.ViewCollection</code> может содержать внутренние виды и иметь собственную html-разметку.
+
+</p>
+<h2>Декларация<span><a class="mark" href="#index_md_32" id="index_md_32">#</a></span></h2>
+<pre><code class="js">ns.ViewCollection.define(&apos;my-view-collection&apos;, {
+    models: [ &apos;my-model-collection&apos; ],
+    split: {
+        byModel: &apos;my-model-collection&apos;,
+        intoViews: &apos;my-view-collection-item&apos;
+    }
+});</code></pre>
+<p>Опция <code>split.intoViews</code> определяет из каких <code>ns.View</code> состоит коллекция.
+
+</p>
+<p>Опция <code>split.byModel</code> определяет по какой модели коллекции строить виды.
+
+</p>
+<p>Опция <code>models</code>, как и в ns.View определяет зависимость от моделей и подписки на их события.
+По умолчанию ViewCollection делает следующие подписки:
+ - обработчиком собственных событий <code>ns-model-changed</code> и <code>ns-model-destroyed</code> любых моделей устанавливается <code>invalidate</code>. Эти события наступают при изменении данных, по которым рисуется собственная html-разметка viewCollection&apos;а, поэтому вид по умолчанию становится невалидным, чтобы перерисоваться.
+ - обработчиком <code>ns-model-insert</code> и <code>ns-model-remove</code> модели-коллекции устанавливается <code>keepValid</code>. Эти события наступают при изменении состава модели-коллекции, по которой рисуются вложенные виды viewCollection&apos;а. Собственная html-разметка при этом не затрагивается, поэтому вид по умолчанию остаётся валидным.
+События моделей, вложенных в коллекцию игнорируются и подписаться на них через декларацию нельзя.
+
+
+</p>
+<p>Декларация элемента <code>ns.ViewCollection</code> выглядит так:
+</p>
+<pre><code class="js">ns.View.define(&apos;my-view-collection-item&apos;, {
+    models: [ &apos;my-model-collection-item&apos; ]
+});</code></pre>
+<p>Элемент коллекции ведет себя как обычный <code>ns.View</code> и ничего не знает про коллекцию.
+
+</p>
+<p>Элементы коллекции помещаются в узел-контейнер, размеченный классом <code>ns-view-container-desc</code>.
+Узел-контейнер <strong>обязательно</strong> должен быть указан. Вне этого контейнера можно делать собcтвенную html-разметку.
+
+</p>
+<h2>Фильтрация и разнородная коллекция<span><a class="mark" href="#index_md_33" id="index_md_33">#</a></span></h2>
+<p>Если для <code>split.intoViews</code> указать функцию вместо строки, то это даст как возможность фильтровать виды, так и составлять коллекцию из разных элементов.
+Функция должна возвращать ID вида или <code>false</code>.
+
+</p>
+<pre><code class="js">ns.View.define(&apos;my-view-collection&apos;, {
+    models: [ &apos;my-model-collection&apos; ],
+    split: {
+        byModel: &apos;my-model-collection&apos;,
+        intoViews: function(model) {
+            // эти элементы мы фильтруем и не включаем в коллекцию
+            if (model.get(&apos;.type&apos;) === 3) {
+                return false;
+            }
+
+            if (model.get(&apos;.type&apos;) === 1) {
+                // этот элемент станет видом &apos;view-item-type-1&apos;
+                return &apos;view-item-type-1&apos;;
+            }
+
+            // этот элемент станет видом &apos;view-item&apos;
+            return &apos;view-item&apos;;
+        }
+    }
+});</code></pre>
+<h1>ns.ModelCollection<span><a class="mark" href="#index_md_ns_modelcollection" id="index_md_ns_modelcollection">#</a></span></h1>
+<p><code>ModelCollection</code> - это коллеция (по сути, массив) <code>ns.Model</code>.
+
+</p>
+<p>Может иметь собственные данные.
+Данные коллекции непосредственно не хранит, а собирает динамически из актуальных <code>ns.Model</code>.
+
+</p>
+<p>Коллеция может содержать разные модели.
+
+</p>
+<p><code>ns.ModelCollection</code> наследуется от <code>ns.Model</code> и добавляет к ней некоторые методы:
+ - <code>#clear()</code> - очищает коллекцию
+ - <code>#insert(models[, index = last])</code> - добавляет <code>models</code> в коллекцию на позицию <code>index</code>.
+ - <code>#remove(models)</code> - удаляет <code>models</code> из коллекции.
+
+</p>
+<p>При добавлении элементов бросает событие <code>ns-model-insert</code> со списком новых моделей.
+
+</p>
+<p>При удалении элементов бросает событие <code>ns-model-remove</code> со списком удаленных моделей.
+
+</p>
+<h2>Декларация<span><a class="mark" href="#index_md_34" id="index_md_34">#</a></span></h2>
+<p>Декларация отличается наличием поля <code>split</code>
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model-collection&apos;, {
+    split: {
+        items: &apos;.message&apos;,
+        params: {
+            &apos;mid&apos;: &apos;.mid&apos;
+        },
+        model_id: &apos;message&apos;
+    }
+});</code></pre>
+<p><code>split.items</code> - jpath до элементов коллекции. После получения данных коллекции выберет элементы по этому jpath и сделает из каждого элемента модель. Это и будет коллекция.
+<code>split.model_id</code> - название модели, из которых будет состоять коллекции
+<code>split.params</code> - параметры для элементов коллекции
+
+</p>
+<p>Если модель наполняется вручную, то <code>split</code> можно не указывать, а указать флаг <code>isCollection === true</code>.
+
+</p>
+<p>Для таких колекций так же можно указать jpath, по которому будет лежать коллекция - <code>jpathItems</code> (по умолчанию, <code>.items</code>).
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model-collection&apos;, {
+    isCollection: true,
+    jpathItems: &apos;.files&apos;
+});
+
+ns.Model.define(&apos;my-model-item&apos;, {
+    params: {
+        id: null
+    }
+});
+
+var collection = ns.Model.get(&apos;my-model-collection&apos;);
+var collectionItem1 = ns.Model.get(&apos;my-model-item&apos;, {id : 1}).setData({&apos;foo&apos;: &apos;bar&apos;});
+var collectionItem2 = ns.Model.get(&apos;my-model-item&apos;, {id : 2}).setData({&apos;foo&apos;: &apos;baz&apos;});
+
+// добавляем элементы в коллекцию
+collection.insert(collectionItem1);
+collection.insert(collectionItem2);
+
+// т.к. указан jpathItems, то данные коллекции будут выглядет вот так
+{
+    &quot;files&quot;: [
+        {
+            &quot;foo&quot;: &quot;bar&quot;
+        },
+        {
+            &quot;foo&quot;: &quot;baz&quot;
+        }
+    ]
+}</code></pre>
+<h2>Фильтрация и разнородная коллекция<span><a class="mark" href="#index_md_35" id="index_md_35">#</a></span></h2>
+<p>Если для <code>split.model_id</code> указать функцию вместо строки, то это даст как возможность фильтровать модели, так и составлять коллекцию из разных элементов.
+Функция должна возвращать ID модели или <code>false</code>.
+
+</p>
+<pre><code class="js">ns.Model.define(&apos;my-model-collection&apos;, {
+    split: {
+        items: &apos;.message&apos;,
+        params: {
+            &apos;mid&apos;: &apos;.mid&apos;
+        },
+        model_id: function(modelItemData) {
+            // эти элементы мы фильтруем и не включаем в коллекцию
+            if (modelItemData.type === 3) {
+                return false;
+            }
+
+            if (modelItemData.type === 1) {
+                // эти элементы станут экземпляром модели &apos;model-item-type-1&apos;
+                return &apos;model-item-type-1&apos;;
+            }
+
+            // эти элементы станут экземпляром модели &apos;model-item&apos;
+            return &apos;model-item&apos;;
+        }
+    }
+});</code></pre>
+<h1>Шаблон: модель состояние<span><a class="mark" href="#index_md_36" id="index_md_36">#</a></span></h1>
+<p>Состояние интерфейса в noscript можно хранить одним из двух основных способов:
+ - в url, который затем преобразуется в параметры
+ - в данных модели.
+
+</p>
+<p>Первый способ является основным и базовым. С его помощью формируется множество адресов сервиса, т.е. его внешний api.
+
+</p>
+<p>Этот способ обладает следующими особенностями:
+ - он физически способен вместить очень ограниченное число атрибутов состояния
+ - при перезагрузке страницы он остаётся неизменным
+ - каждый атрибут, добавленный в url фактически добавляется во внешний api web-сервиса, что не всегда хорошо.
+
+</p>
+<p>Эти особенности делают url непригодным для хранения
+ - атрибутов состояния элементов списка, количество которых может быть произвольным
+ - атрибутов состояния компонентов, которые должны быть возвращены в начальное состояние при перезагрузке страницы
+ - атрибутов состояния компонентов, которые не должны управляться извне
+ - атрибутов сущности, которые касаются только отображения и по смыслу не должны храниться в основной модели.
+
+</p>
+<p>Для хранения перечисленных и других подобных атрибутов состояния рекомендуется использовать паттерн <code>модель состояния</code>.
+
+</p>
+<p><code>Модель состояния</code> - это обычная модель. В простейшем случае она локальная, инициализируется данными на клиенте и никогда не запрашивается с сервера. Она добавляется в зависимость вида, состояние которого она должна хранить. Её значения устанавливаются в runtime в методах видов и других моделях. При перезагрузке страницы модель создаётся заново и состояние сбрасывается.
+
+</p>
+<p>Если вдруг появилось желание сохранить атрибуты, из моделей состояния, между перезагрузками страницы, никто не мешает сохранить их в любое хранилище (localStorage, сервер) и считывать при загрузке страницы.
+
+</p>
+<p>В id модели рекомендуется использовать слово <code>state</code>, чтобы явно указать, что эта модель представляет не сущность всего сервиса, а специфическую сущность интерфейса - &quot;состояние компонента&quot;.
+
+</p>
+<p>Пример. Модель состояния элемента списка
+
+</p>
+<pre><code class="js">
+    ns.Model.define(&apos;letters&apos;, {
+        split: {
+            model_id: &apos;letter&apos;,
+            items: &apos;letter&apos;,
+            params: {
+                id: &apos;.id&apos;
+            }
+        }
+    });
+
+    ns.Model.define(&apos;letter&apos;, {
+        params: {
+            id: null
+        }
+    });
+
+    ns.Model.define(&apos;stateLetter&apos;, {
+        events: {
+            // записываем данные в модель при создании
+            &apos;ns-model-init&apos;: function() {
+                this.setData({selected: false});
+            }
+        },
+        methods: {
+            toggleSelected: function() {
+                if (this.get(&apos;.selected&apos;)) {
+                    this.set(&apos;.selected&apos;, false);
+                } else {
+                    this.set(&apos;.selected&apos;, true);
+                }
+            }
+        }
+        params: {
+            id: null
+        }
+    });</code></pre>
+<p>Определена модель-коллекция <code>letters</code>, которая при загрузке автоматически порождает какое-то количество моделей <code>letter</code>. Опраделена модель <code>stateLetter</code> (состояние письма), которая зависит от тех же параметров, что и <code>letter</code>.
+
+</p>
+<p>Модель <code>stateLetter</code> инициализирует свои данные при создании.
+
+</p>
+<pre><code class="js">    ns.ViewCollection.define(&apos;letters&apos;, {
+        split: {
+            byModel: &apos;letters&apos;,
+            intoViews: &apos;letter&apos;
+        },
+        models: [&apos;letters&apos;]
+    });
+
+    ns.View.define(&apos;letter&apos;, {
+        models: {
+            &apos;letter&apos;: true,
+            &apos;stateLetter&apos;: &apos;keepValid&apos;
+        },
+        events: {
+            &apos;click .js-select-letter&apos;: &apos;toggleSelected&apos;
+        },
+        methods: {
+            toggleSelected: function() {
+                this.getModel(&apos;stateLetter&apos;).toggleSelected();
+            }
+        }
+    });</code></pre>
+<p>Определён вид-коллекция <code>letters</code>, который по модели <code>letters</code> создаёт внутри себя виды <code>letter</code>.
+Каждый вид letter зависит от моделей <code>letter</code> и <code>stateLetter</code>.
+
+</p>
+<p>При наступлении события <code>click</code> на dom-элементе <code>.js-select-letter</code> срабатывает метод <code>toggleSelected</code>, который изменяет модель состояния.
+Если dom-элемент <code>.js-select-letter</code> - checkbox, то при клике перерисовывать вид <code>letter</code> уже не нужно.
+Поэтому в зависимости вида <code>letter</code> от модели <code>stateLetter</code> указан метод <code>keepValid</code>, предотвращающий его перерисовку.
+
+</p>
+<p>Данная конструкция позволяет хранить состояние выделенности неограниченного количества элементов списка между запусками ns.Update. При этом атрибут, относящийся только к списку писем хранится в отдельной модели. Этот атрибут никак не будет влиять на другие виды, зависящие от модели <code>letter</code>.
+
+</p>
+<h1>Шаблон: модель с дозагрузкой данных<span><a class="mark" href="#index_md_37" id="index_md_37">#</a></span></h1>
+<p>Часто бекенд сервиса устроен таким образом, что для загрузки данных одной модели нужно получить данные из нескольких источников.
+
+</p>
+<p>Пример задачи 1: список писем. Серверный метод <code>letters</code> отдаёт список кратких описаний писем, а метод <code>letter</code> - подробные данные одного письма.
+
+</p>
+<p>Пример задачи 2: сбор профиля пользователя из аккаунтов нескольких соц. сетей. Для каждой соц. сети есть отдельный серверный метод получения из неё профиля пользователя.
+
+</p>
+<p>В подобных ситуациях важно помнить, что тот факт, что модели и источники данных - &quot;это всё про данные&quot;, абсолютно не означает, что каждому источнику должна обязательно соответствовать модель. Модель должна соответствовать сущности, независимо от способа получения данных. Создание отдельной модели оправдано только тогда, когда осознанно создаётся новая сущность системы.
+
+</p>
+<p>Для того, чтобы в ns совместить в одной модели несколько источников, нужно просто проинициализировать её из первого источника, а затем дополнить данными из второго источника с помощью методов set и setData. При этом, на модели сработают нужные события и виды, зависящие от неё обновятся в момент, предусмотренный используемой схемой обновления.
+
+</p>
+<p>Пример из жизни: раскрытие подробностей письма в списке
+
+</p>
+<pre><code>// Модель-коллекция писем
+// Запрашивается с сервера и автоматом разделяется
+// на отдельные экземпляры модели `letter`.
+// В списке приходят краткие представления данных писем
+ns.Model.define(&apos;letters&apos;, {
+    split: {
+        model_id: &apos;letter&apos;,
+        params: {
+            id: &apos;.id&apos;
+        }
+    }
+});
+
+// Модель отдельного письма
+// Может быть проинициализирована одним из двух способов:
+//    1. При автоматическом разделении данных модели `letters` в `letter` будет краткое
+//     представление письма.
+//    2. При ручном вызове метода `fetch` произойдёт запрос к серверному методу `letter`,
+//     в ответ на который ns автоматом подставит в `letter` новые данные - полное
+//     представление письма.
+ns.Model.define(&apos;letter&apos;, {
+    params: {
+        id: &apos;.id&apos;
+    },
+    methods: {
+        fetch: function() {
+            ns.request.models([this]);
+        }
+    }
+});
+
+ns.View.define(&apos;letters&apos;, {
+    models: [&apos;letters&apos;],
+    split: {
+        byModel: &apos;letters&apos;
+        intoViews: &apos;letter&apos;
+    }
+});
+
+ns.View.define(&apos;letter&apos;, {
+    models: [&apos;letter&apos;],
+    events: {
+        &apos;ns-view-htmlinit&apos;: &apos;onhtmlinit&apos;,
+        &apos;click .js-expand-letter&apos;: &apos;onExpand&apos;
+    },
+    methods: {
+        onhtmlinit: function() {
+            this.getModel(&apos;letter&apos;).on(&apos;ns-model-changed&apos;,
+                ns.page.go.bind(ns.page, null)
+            );
+        },
+        onExpand: function() {
+            this.getModel(&apos;letter&apos;).fetch();
+        }
+    }
+});
+
+ns.layout.define(&apos;main&apos;, {
+    app: {
+        letters: true
+    }
+});</code></pre>
+<p>При начальной отрисовке страницы будет запрошена модель <code>letters</code>. Получив данные, она разделит их на отдельные экземпляры модели <code>letter</code>. На странице появится вид <code>letters</code>, содержащий отдельные виды <code>letter</code>.
+
+</p>
+<p>При клике на элемент вида <code>letter</code> с классом <code>.js-expand-letter</code> у модели <code>letter</code> будет вызван метод <code>fetch</code>, который сходит на сервер за данными из источника <code>letter</code> и положит их в соответствующий экземпляр модели <code>letter</code>. После этого на модели <code>letter</code> произойдёт событие <code>ns-model-changed</code>, которое заставит страницу перерисоваться.
+
+</p>
+<p>При повторной отрисовке вида <code>letter</code> в данных его модели уже будет полное представление данных письма, что позволит в шаблоне отрисовать его раскрытым.
+
+</p>
+<p>Если, например требуется сразу отрисовать список с раскрытым первым письмом, можно доработать серверный метод <code>letters</code> таким образом, чтобы он позволял получать список писем, в котором первое письмо загружено полностью. В итоге список сразу будет отрисован с раскрытым первым элементом.
+
+
+</p>
+<p>Эта схема хороша тем, что все данные об экземпляре сущности сервиса (о письме) хранятся в единой модели. Это избавляет от необходимости поддержки и синхронизации избыточного количества сущностей, т.е.
+ - логика работы с данными письма собрана в единой модели
+ - данные одного экземпляра сущности хранятся в едином экземпляре модели. При удалении и модификации экземпляра на клиенте нужно думать только об одном экземпляре
+ - логика отрисовки экземпляра собрана в едином виде
+
+</p>
+
+          </div>
+
+          <hr/>
+        </div>
+    </div>
+    <!-- <div id="footer">
+        <a href="http://joyent.com" class="joyent-logo">Joyent</a>
+        <ul class="clearfix">
+            <li><a href="/">Node.js</a></li>
+            <li><a href="/download/">Download</a></li>
+            <li><a href="/about/">About</a></li>
+            <li><a href="http://npmjs.org/">npm Registry</a></li>
+            <li><a href="http://nodejs.org/api/">Docs</a></li>
+            <li><a href="http://blog.nodejs.org">Blog</a></li>
+            <li><a href="/community/">Community</a></li>
+            <li><a href="/logos/">Logos</a></li>
+            <li><a href="http://jobs.nodejs.org/">Jobs</a></li>
+            <li><a href="http://twitter.com/nodejs" class="twitter">@nodejs</a></li>
+        </ul>
+
+        <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.17/LICENSE">license</a>.</p>
+    </div> -->
+
+  <script src="assets/sh_main.js"></script>
+  <script src="assets/sh_javascript.min.js"></script>
+  <script>highlight(undefined, undefined, 'pre');</script>
+  <!--<script>
+    window._gaq = [['_setAccount', 'UA-10874194-2'], ['_trackPageview']];
+    (function(d, t) {
+      var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      g.src = '//www.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    }(document, 'script'));
+  </script>-->
+</body>
+</html>
+

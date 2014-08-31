@@ -5,7 +5,8 @@
     "homepage": "http://yandex-ui.github.io/noscript/",
     "dependencies": {
         "jaguarjs-jsdoc": "git://github.com/doochik/jaguarjs-jsdoc.git",
-        "jsdoc": "3.3.x"
+        "jsdoc": "3.3.x",
+        "node-doc-generator": "git://github.com/chestozo/node-doc-generator.git"
     },
     "engines": {
         "node": "0.10"

@@ -40,7 +40,8 @@ describe('ns.ModelCollection', function() {
 
         ns.Model.define('split1-item', {
             params: {
-                id: null
+                id: null,
+                foo: null
             }
         });
 

@@ -89,6 +89,8 @@
                         
                             <li data-name="ns.key"><a href="ns.html#key">key</a></li>
                         
+                            <li data-name="ns.params2query"><a href="ns.html#params2query">params2query</a></li>
+                        
                             <li data-name="ns.parseQuery"><a href="ns.html#parseQuery">parseQuery</a></li>
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
@@ -350,6 +352,8 @@
                         <li data-name="ns.page.current"><a href="ns.page.html#current">current</a></li>
                         
                         <li data-name="ns.page.currentUrl"><a href="ns.page.html#currentUrl">currentUrl</a></li>
+                        
+                        <li data-name="ns.page.DEFAULT_HISTORY_ACTION"><a href="ns.page.html#DEFAULT_HISTORY_ACTION">DEFAULT_HISTORY_ACTION</a></li>
                         
                     </ul>
                 
@@ -672,6 +676,8 @@
                         
                             <li data-name="ns.Model.get"><a href="ns.Model.html#get">get</a></li>
                         
+                            <li data-name="ns.Model.getKeyAndParams"><a href="ns.Model.html#getKeyAndParams">getKeyAndParams</a></li>
+                        
                             <li data-name="ns.Model.getValid"><a href="ns.Model.html#getValid">getValid</a></li>
                         
                             <li data-name="ns.Model.info"><a href="ns.Model.html#info">info</a></li>
@@ -698,6 +704,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.Model#_version"><a href="ns.Model.html#_version">_version</a></li>
+                
+                    <li data-name="ns.Model#key"><a href="ns.Model.html#key">key</a></li>
+                
+                    <li data-name="ns.Model#params"><a href="ns.Model.html#params">params</a></li>
                 
                 </ul>
 
@@ -786,7 +796,11 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
+                    <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
 
@@ -892,6 +906,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ModelUniq#_version"><a href="ns.ModelUniq.html#_version">_version</a></li>
+                
+                    <li data-name="ns.ModelUniq#key"><a href="ns.ModelUniq.html#key">key</a></li>
+                
+                    <li data-name="ns.ModelUniq#params"><a href="ns.ModelUniq.html#params">params</a></li>
                 
                 </ul>
 
@@ -1094,8 +1112,6 @@
                 
                     <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
-                    <li data-name="ns.View#selfParams"><a href="ns.View.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1141,8 +1157,6 @@
                     <li data-name="ns.View#keepValid"><a href="ns.View.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.View#patchTree"><a href="ns.View.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
                 
@@ -1211,8 +1225,6 @@
                 
                     <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
-                    <li data-name="ns.ViewCollection#selfParams"><a href="ns.ViewCollection.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1265,8 +1277,6 @@
                 
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
                 
-                    <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
-                
                     <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
                 
                     <li data-name="ns.ViewCollection#updateAfter"><a href="ns.ViewCollection.html#updateAfter">updateAfter</a></li>
@@ -1300,7 +1310,7 @@
 </header>  
 
 <article>
-    <h2>Инициализация приложения</h2><p>При использовании конфигурации по умолчанию вся инициализация сводится к вызову
+    <h1>Инициализация приложения</h1><p>При использовании конфигурации по умолчанию вся инициализация сводится к вызову
 функции <code>ns.init</code> и запуску первого апдейта:</p>
 <pre class="prettyprint source lang-js"><code>$(function() {
     ns.init();
@@ -1308,10 +1318,10 @@
 });</code></pre><p><code>ns.init</code> включает экшены, обрабатывает предварительно заданный роутинг и ищет
 в DOM ноду <code>#app</code> для использования ее в качестве контейнера для интерфейса.
 Вызов <code>ns.page.go</code> нужен для запуска первого глобального апдейта.</p>
-<h3>Конфигурация</h3><h4>Базовый путь в URL</h4><p>До инициализации можно задать префиксный путь для всех ссылок. Это может
+<h2>Конфигурация</h2><h3>Базовый путь в URL</h3><p>До инициализации можно задать префиксный путь для всех ссылок. Это может
 пригодиться, когда ваше приложение находится не по корневому пути
 <code>app.example.com</code>, а, например, <code>app.example.com/checkout</code>:</p>
-<pre class="prettyprint source lang-js"><code>ns.router.baseDir = '/checkout';</code></pre><h4>Заголовок страницы</h4><p>Noscript позволяет задавать заголовок страницы, зависящий от текущего URL,
+<pre class="prettyprint source lang-js"><code>ns.router.baseDir = '/checkout';</code></pre><h3>Заголовок страницы</h3><p>Noscript позволяет задавать заголовок страницы, зависящий от текущего URL,
 при переходах внутри приложения. Переопределите функцию <code>ns.page.title</code>:</p>
 <pre class="prettyprint source lang-js"><code>ns.page.title = function(url) {
     if ('/settings' == url) {
@@ -1324,11 +1334,11 @@
 <pre class="prettyprint source lang-js"><code>ns.page.title = function(url) {
     var params = ns.router(url).params;
     // ...
-};</code></pre><h4>URL запроса моделей</h4><p>По умолчанию фреймворк группирует запросы моделей, нужных для отрисовки
+};</code></pre><h3>URL запроса моделей</h3><p>По умолчанию фреймворк группирует запросы моделей, нужных для отрисовки
 интерфейса и запрашивает их по URL <code>/models/</code> <em>вне зависимости
 от <code>ns.router.baseDir</code></em>. Переопределите константу <code>ns.request.URL</code> для задания
 собственного пути:</p>
-<pre class="prettyprint source lang-js"><code>ns.request.URL = '/models/v1/json/';</code></pre><h4>Дополнительные параметры при запросе моделей</h4><p>При необходимости пробросить дополнительные параметры при запросе моделей,
+<pre class="prettyprint source lang-js"><code>ns.request.URL = '/models/v1/json/';</code></pre><h3>Дополнительные параметры при запросе моделей</h3><p>При необходимости пробросить дополнительные параметры при запросе моделей,
 добавьте их в объект <code>ns.request.requestParams</code>:</p>
 <pre class="prettyprint source lang-js"><code>ns.request.requestParams.token = getAuthToken();
 ns.request.requestParams.version = '0.1.1';</code></pre><p>Это приведет к отправке запросов вида:</p>
@@ -1340,7 +1350,7 @@ Query String Parameters:
 Form Data:
   category.0: home
   token: 6a5e516725c68c
-  version: 0.1.1</code></pre><h4>Условная обработка ответа моделей</h4><p>Определение функции <code>ns.request.canProcessResponse</code> позволяет динамически
+  version: 0.1.1</code></pre><h3>Условная обработка ответа моделей</h3><p>Определение функции <code>ns.request.canProcessResponse</code> позволяет динамически
 заблокировать обработку ответа моделей, например, при несовпадении авторизации
 или рассинхронизации клиента с бекендом:</p>
 <pre class="prettyprint source lang-js"><code>ns.request.canProcessResponse = function(response) {
@@ -1351,7 +1361,7 @@ Form Data:
     }
 
     return true;
-};</code></pre><h4>Переопределение модуля Yate-шаблонов</h4><p>По умолчанию для генерации разметки из шаблонов используется модуль <code>main</code>,
+};</code></pre><h3>Переопределение модуля Yate-шаблонов</h3><p>По умолчанию для генерации разметки из шаблонов используется модуль <code>main</code>,
 однако сохраняется возможность его динамического определения в зависимости от
 параметров страницы и текущего лейаута:</p>
 <pre class="prettyprint source lang-js"><code>ns.Update.prototype.applyTemplate = function(tree, params, layout) {
@@ -1377,7 +1387,7 @@ Form Data:
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Aug 27 2014 16:04:29 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:38 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

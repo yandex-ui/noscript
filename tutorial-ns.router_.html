@@ -89,6 +89,8 @@
                         
                             <li data-name="ns.key"><a href="ns.html#key">key</a></li>
                         
+                            <li data-name="ns.params2query"><a href="ns.html#params2query">params2query</a></li>
+                        
                             <li data-name="ns.parseQuery"><a href="ns.html#parseQuery">parseQuery</a></li>
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
@@ -350,6 +352,8 @@
                         <li data-name="ns.page.current"><a href="ns.page.html#current">current</a></li>
                         
                         <li data-name="ns.page.currentUrl"><a href="ns.page.html#currentUrl">currentUrl</a></li>
+                        
+                        <li data-name="ns.page.DEFAULT_HISTORY_ACTION"><a href="ns.page.html#DEFAULT_HISTORY_ACTION">DEFAULT_HISTORY_ACTION</a></li>
                         
                     </ul>
                 
@@ -672,6 +676,8 @@
                         
                             <li data-name="ns.Model.get"><a href="ns.Model.html#get">get</a></li>
                         
+                            <li data-name="ns.Model.getKeyAndParams"><a href="ns.Model.html#getKeyAndParams">getKeyAndParams</a></li>
+                        
                             <li data-name="ns.Model.getValid"><a href="ns.Model.html#getValid">getValid</a></li>
                         
                             <li data-name="ns.Model.info"><a href="ns.Model.html#info">info</a></li>
@@ -698,6 +704,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.Model#_version"><a href="ns.Model.html#_version">_version</a></li>
+                
+                    <li data-name="ns.Model#key"><a href="ns.Model.html#key">key</a></li>
+                
+                    <li data-name="ns.Model#params"><a href="ns.Model.html#params">params</a></li>
                 
                 </ul>
 
@@ -786,7 +796,11 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
+                    <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
 
@@ -892,6 +906,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ModelUniq#_version"><a href="ns.ModelUniq.html#_version">_version</a></li>
+                
+                    <li data-name="ns.ModelUniq#key"><a href="ns.ModelUniq.html#key">key</a></li>
+                
+                    <li data-name="ns.ModelUniq#params"><a href="ns.ModelUniq.html#params">params</a></li>
                 
                 </ul>
 
@@ -1094,8 +1112,6 @@
                 
                     <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
-                    <li data-name="ns.View#selfParams"><a href="ns.View.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1141,8 +1157,6 @@
                     <li data-name="ns.View#keepValid"><a href="ns.View.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.View#patchTree"><a href="ns.View.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
                 
@@ -1211,8 +1225,6 @@
                 
                     <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
-                    <li data-name="ns.ViewCollection#selfParams"><a href="ns.ViewCollection.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1265,8 +1277,6 @@
                 
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
                 
-                    <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
-                
                     <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
                 
                     <li data-name="ns.ViewCollection#updateAfter"><a href="ns.ViewCollection.html#updateAfter">updateAfter</a></li>
@@ -1300,13 +1310,13 @@
 </header>  
 
 <article>
-    <h2>ns.router</h2><p>Умеет:</p>
+    <h1>ns.router</h1><p>Умеет:</p>
 <ul>
 <li>получать из урла - <code>id</code> страницы (layout) и параметры <code>params</code></li>
 <li>генерировать url-ы по <code>id</code> страницы и параметрам <code>params</code></li>
 </ul>
-<h3>API</h3><h4><code>ns.router.baseDir</code>: <code>{string}</code></h4><p>Базовая часть урла (если приложение располагается не в корне сайта.</p>
-<h4><code>ns.router(url)</code>: <code>{ page:string, params:{object} }</code></h4><p>Выполняет роутинг: вычисляет по <code>url</code> какая это страница <code>page</code> (это <code>id</code> layout-а) и вытаскивает параметры из урла.
+<h2>API</h2><h3><code>ns.router.baseDir</code>: <code>{string}</code></h3><p>Базовая часть урла (если приложение располагается не в корне сайта.</p>
+<h3><code>ns.router(url)</code>: <code>{ page:string, params:{object} }</code></h3><p>Выполняет роутинг: вычисляет по <code>url</code> какая это страница <code>page</code> (это <code>id</code> layout-а) и вытаскивает параметры из урла.
 Если в урле были GET параметры - они подклеиваются в итоговый набор <code>params</code>.</p>
 <p>Когда выполняется роутинг выполняются:</p>
 <ul>
@@ -1315,13 +1325,13 @@
 <li>роутинг (ищем первый подходящий шаблон урла, подробнее см. <code>ns.router.routes</code>. Если не удалось заматчится - считаем, что получили страницу с <code>not-found</code>)</li>
 <li>(опционально) rewrite параметров (при желании, меняем что-то в полученном объекте с параметрами <code>params</code>).</li>
 </ul>
-<h4><code>ns.router.url(url)</code>: <code>{ string }</code></h4><p>Генерация урла, когда урл известен и нужно только дописать базовую часть.
+<h3><code>ns.router.url(url)</code>: <code>{ string }</code></h3><p>Генерация урла, когда урл известен и нужно только дописать базовую часть.
 Странный метод, лучше использовать <code>ns.router.generateUrl</code></p>
-<h4><code>ns.router.generateUrl(id, params)</code>: <code>{string}</code></h4><p>Генерация урла по <code>id</code> страницы (layout) и по набору параметров.
+<h3><code>ns.router.generateUrl(id, params)</code>: <code>{string}</code></h3><p>Генерация урла по <code>id</code> страницы (layout) и по набору параметров.
 Это операция, обратная той, которую делает <code>ns.router</code>.
 Умеет разворачивать rewrite-ы (после генерации урла проверяет, есть ли <code>rewrite</code> правила для полученного урла и выполняет их в обратную сторону).
 В случае неуспеха - кидает ошибку.</p>
-<h4><code>ns.router.routes</code>: <code>{object}</code></h4><p>Это объект, в котором нужно указать все урлы, rewrite-ы и redirect-ы.
+<h3><code>ns.router.routes</code>: <code>{object}</code></h3><p>Это объект, в котором нужно указать все урлы, rewrite-ы и redirect-ы.
 Кроме этого поддерживается rewrite параметров.</p>
 <p><code>redirect</code> - прописываются редиректы. Можно указать шаблон урла, который надо заматчить и можно указать функцию, которая вычисляет, куда делается редирект.</p>
 <p><code>rewriteUrl</code> - тут указаны урлы (не шаблоны урлов) и можно указать rewrite для конкретного урла на другой конкретный урл.</p>
@@ -1356,12 +1366,12 @@
             return { id: params.mid };
         }
     }
-};</code></pre><h4><code>ns.router.regexps</code>: <code>{object}</code></h4><p>Тут задаются типы параметров в виде регулярных выражения.</p>
+};</code></pre><h3><code>ns.router.regexps</code>: <code>{object}</code></h3><p>Тут задаются типы параметров в виде регулярных выражения.</p>
 <p>Начальный набор такой:</p>
 <pre class="prettyprint source lang-js"><code>ns.router.regexps = {
     'id': '[A-Za-z_][A-Za-z0-9_-]*',
     'int': '[0-9]+'
-};</code></pre><h3>Параметры</h3><p>Параметры в урле задаются в <code>{}</code>, к примеру, <code>/message/{message-id}</code>.
+};</code></pre><h2>Параметры</h2><p>Параметры в урле задаются в <code>{}</code>, к примеру, <code>/message/{message-id}</code>.
 Параметр может быть как между <code>/</code>-ами, так и в промежутках, к примеру, <code>/archive/{year}-{month}-{day}</code>.</p>
 <p>Тип указывается после имени параметра и отделяется <code>:</code>: <code>{page:int}</code>.
 Если параметр указан без типа - ему присваивается тип <code>id</code>. Т.е. <code>{message-id}</code> соответствует <code>{message-id:id}</code>.</p>
@@ -1388,7 +1398,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Aug 27 2014 16:04:29 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:38 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

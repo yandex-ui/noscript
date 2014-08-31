@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: ns.page</title>
+    <title>Tutorial: pattern_model_state</title>
     
     
     
@@ -1298,7 +1298,7 @@
 
     <div class="main">
         
-            <h1 class="page-title">Tutorial: ns.page</h1>
+            <h1 class="page-title">Tutorial: pattern_model_state</h1>
         
 
         <section>
@@ -1306,62 +1306,99 @@
 <header>
     
 
-    <h2>ns.page</h2>
+    <h2>pattern_model_state</h2>
 </header>  
 
 <article>
-    <h2>Переходы по страницам (ns.page)</h2><p><code>ns.page</code> - специальный модуль для перехода по страницам внутри ns-приложения.</p>
-<p><code>ns.page.go</code> - главный метод. Разроваричивает адрес через <code>ns.router</code>, выбирает <code>layout</code>, запускает <code>ns.Update</code> и
-производит необходимые операции по смене урла в адресной строке и обновления названия (<code>document.title</code>) страницы.
-Метод возвращает промис от <code>ns.Update</code>, но иногда может вернуть отклоненный промис со статусами:</p>
+    <h1>Шаблон: модель состояние</h1><p>Состояние интерфейса в noscript можно хранить одним из двух основных способов:</p>
 <ul>
-<li><code>block</code> - переход был заблокирован через <a href="#nspageblock"><code>ns.page.block</code></a></li>
+<li>в url, который затем преобразуется в параметры</li>
+<li>в данных модели.</li>
 </ul>
-<p><code>ns.page.title</code> - точка расширения приложения. Позволяет задавать <a href="./ns.init.md#Заголовок-страницы">заголовки страниц</a>.</p>
-<p>Также модуль предоставляет полезные данные:</p>
+<p>Первый способ является основным и базовым. С его помощью формируется множество адресов сервиса, т.е. его внешний api.</p>
+<p>Этот способ обладает следующими особенностями:</p>
 <ul>
-<li><code>ns.page.current</code> - текущие параметры страницы<ul>
-<li><code>ns.page.current.page</code> - название текущего <code>layout</code></li>
-<li><code>ns.page.current.params</code> - текущие параметры</li>
+<li>он физически способен вместить очень ограниченное число атрибутов состояния</li>
+<li>при перезагрузке страницы он остаётся неизменным</li>
+<li>каждый атрибут, добавленный в url фактически добавляется во внешний api web-сервиса, что не всегда хорошо.</li>
 </ul>
-</li>
-<li><code>ns.page.currentUrl</code> - адрес текущей страницы</li>
+<p>Эти особенности делают url непригодным для хранения</p>
+<ul>
+<li>атрибутов состояния элементов списка, количество которых может быть произвольным</li>
+<li>атрибутов состояния компонентов, которые должны быть возвращены в начальное состояние при перезагрузке страницы</li>
+<li>атрибутов состояния компонентов, которые не должны управляться извне</li>
+<li>атрибутов сущности, которые касаются только отображения и по смыслу не должны храниться в основной модели.</li>
 </ul>
-<h2>ns.page.block</h2><p>Этот механизм позволяет блокировать переходы по страницам.
-Например, с помощью него можно блокировать уход с формы, если не были сохранены изменения.</p>
-<pre class="prettyprint source lang-js"><code>ns.View.define('my-view', {
-    events: {
-        'ns-view-show': function() {
-            // после показа вида, добавляем функцию блокировки
-            ns.page.block.add( this.checkChanges.bind(this) );
-        },
-        'ns-view-hide': function() {
-            // после скрытия вида, очищаем функции
-            ns.page.block.clear();
-        }
-    },
-    methods: {
-        /**
-         * @param {string} url ссылка, по которой выполняется переход
-         */
-        checkChanges: function(url) {
-            if (this.hasUnsavedChanges()) {
-                // здесь можно показать какое-то сообщение
-
-                // функция блокировки должна вернуть false, если переход нельзя осуществить
-                return false;
+<p>Для хранения перечисленных и других подобных атрибутов состояния рекомендуется использовать паттерн <code>модель состояния</code>.</p>
+<p><code>Модель состояния</code> - это обычная модель. В простейшем случае она локальная, инициализируется данными на клиенте и никогда не запрашивается с сервера. Она добавляется в зависимость вида, состояние которого она должна хранить. Её значения устанавливаются в runtime в методах видов и других моделях. При перезагрузке страницы модель создаётся заново и состояние сбрасывается.</p>
+<p>Если вдруг появилось желание сохранить атрибуты, из моделей состояния, между перезагрузками страницы, никто не мешает сохранить их в любое хранилище (localStorage, сервер) и считывать при загрузке страницы.</p>
+<p>В id модели рекомендуется использовать слово <code>state</code>, чтобы явно указать, что эта модель представляет не сущность всего сервиса, а специфическую сущность интерфейса - &quot;состояние компонента&quot;.</p>
+<p>Пример. Модель состояния элемента списка</p>
+<pre class="prettyprint source lang-js"><code>
+    ns.Model.define('letters', {
+        split: {
+            model_id: 'letter',
+            items: 'letter',
+            params: {
+                id: '.id'
             }
-
-            return true;
         }
-    }
- });</code></pre><h2>ns.page.history</h2><p>Этот модуль хранит историю приложения.
-Он нужен, т.к. в History API нельзя получить произвольное состояние на N шагов назад.</p>
-<p>Имеет два метода:</p>
-<ul>
-<li><code>ns.page.history.back</code> - переход &quot;назад&quot;. Этот метод не аналогичен кнопке &quot;Назад&quot; в браузере. Так, при отсутствии истории, этот метод перейдет на дефолтную страницу приложения (<code>ns.page.getDefaultUrl</code>), а не выйдет из него.</li>
-<li><code>ns.page.history.getPrevious(n)</code> - возвращает урл N страниц назад. 0 - предыдующая страница.</li>
-</ul>
+    });
+
+    ns.Model.define('letter', {
+        params: {
+            id: null
+        }
+    });
+
+    ns.Model.define('stateLetter', {
+        events: {
+            // записываем данные в модель при создании
+            'ns-model-init': function() {
+                this.setData({selected: false});
+            }
+        },
+        methods: {
+            toggleSelected: function() {
+                if (this.get('.selected')) {
+                    this.set('.selected', false);
+                } else {
+                    this.set('.selected', true);
+                }
+            }
+        }
+        params: {
+            id: null
+        }
+    });</code></pre><p>Определена модель-коллекция <code>letters</code>, которая при загрузке автоматически порождает какое-то количество моделей <code>letter</code>. Опраделена модель <code>stateLetter</code> (состояние письма), которая зависит от тех же параметров, что и <code>letter</code>.</p>
+<p>Модель <code>stateLetter</code> инициализирует свои данные при создании.</p>
+<pre class="prettyprint source lang-js"><code>    ns.ViewCollection.define('letters', {
+        split: {
+            byModel: 'letters',
+            intoViews: 'letter'
+        },
+        models: ['letters']
+    });
+
+    ns.View.define('letter', {
+        models: {
+            'letter': true,
+            'stateLetter': 'keepValid'
+        },
+        events: {
+            'click .js-select-letter': 'toggleSelected'
+        },
+        methods: {
+            toggleSelected: function() {
+                this.getModel('stateLetter').toggleSelected();
+            }
+        }
+    });</code></pre><p>Определён вид-коллекция <code>letters</code>, который по модели <code>letters</code> создаёт внутри себя виды <code>letter</code>.
+Каждый вид letter зависит от моделей <code>letter</code> и <code>stateLetter</code>.</p>
+<p>При наступлении события <code>click</code> на dom-элементе <code>.js-select-letter</code> срабатывает метод <code>toggleSelected</code>, который изменяет модель состояния.
+Если dom-элемент <code>.js-select-letter</code> - checkbox, то при клике перерисовывать вид <code>letter</code> уже не нужно.
+Поэтому в зависимости вида <code>letter</code> от модели <code>stateLetter</code> указан метод <code>keepValid</code>, предотвращающий его перерисовку.</p>
+<p>Данная конструкция позволяет хранить состояние выделенности неограниченного количества элементов списка между запусками ns.Update. При этом атрибут, относящийся только к списку писем хранится в отдельной модели. Этот атрибут никак не будет влиять на другие виды, зависящие от модели <code>letter</code>.</p>
 </article>
 
 </section>  
@@ -1376,7 +1413,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:38 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:39 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

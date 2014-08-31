@@ -89,6 +89,8 @@
                         
                             <li data-name="ns.key"><a href="ns.html#key">key</a></li>
                         
+                            <li data-name="ns.params2query"><a href="ns.html#params2query">params2query</a></li>
+                        
                             <li data-name="ns.parseQuery"><a href="ns.html#parseQuery">parseQuery</a></li>
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
@@ -350,6 +352,8 @@
                         <li data-name="ns.page.current"><a href="ns.page.html#current">current</a></li>
                         
                         <li data-name="ns.page.currentUrl"><a href="ns.page.html#currentUrl">currentUrl</a></li>
+                        
+                        <li data-name="ns.page.DEFAULT_HISTORY_ACTION"><a href="ns.page.html#DEFAULT_HISTORY_ACTION">DEFAULT_HISTORY_ACTION</a></li>
                         
                     </ul>
                 
@@ -672,6 +676,8 @@
                         
                             <li data-name="ns.Model.get"><a href="ns.Model.html#get">get</a></li>
                         
+                            <li data-name="ns.Model.getKeyAndParams"><a href="ns.Model.html#getKeyAndParams">getKeyAndParams</a></li>
+                        
                             <li data-name="ns.Model.getValid"><a href="ns.Model.html#getValid">getValid</a></li>
                         
                             <li data-name="ns.Model.info"><a href="ns.Model.html#info">info</a></li>
@@ -698,6 +704,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.Model#_version"><a href="ns.Model.html#_version">_version</a></li>
+                
+                    <li data-name="ns.Model#key"><a href="ns.Model.html#key">key</a></li>
+                
+                    <li data-name="ns.Model#params"><a href="ns.Model.html#params">params</a></li>
                 
                 </ul>
 
@@ -786,7 +796,11 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
+                    <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
 
@@ -892,6 +906,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ModelUniq#_version"><a href="ns.ModelUniq.html#_version">_version</a></li>
+                
+                    <li data-name="ns.ModelUniq#key"><a href="ns.ModelUniq.html#key">key</a></li>
+                
+                    <li data-name="ns.ModelUniq#params"><a href="ns.ModelUniq.html#params">params</a></li>
                 
                 </ul>
 
@@ -1094,8 +1112,6 @@
                 
                     <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
-                    <li data-name="ns.View#selfParams"><a href="ns.View.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1141,8 +1157,6 @@
                     <li data-name="ns.View#keepValid"><a href="ns.View.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.View#patchTree"><a href="ns.View.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
                 
@@ -1211,8 +1225,6 @@
                 
                     <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
-                    <li data-name="ns.ViewCollection#selfParams"><a href="ns.ViewCollection.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1265,8 +1277,6 @@
                 
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
                 
-                    <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
-                
                     <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
                 
                     <li data-name="ns.ViewCollection#updateAfter"><a href="ns.ViewCollection.html#updateAfter">updateAfter</a></li>
@@ -1307,30 +1317,6 @@
 Этого можно достичь, но в общем виде будет создан и отрисован новый экземпляр.</p>
 <p>Ключ очень важен для работы <code>ns.Box</code>.
 <code>ns.Box</code> при каждом обновлении высчитывает ключи для видов, которые должен показать, скрывает все виды, у которых ключ не совпадает и показывает те, которые надо.</p>
-<ul>
-<li><a href="#Декларация">Декларация</a><ul>
-<li><a href="#ctor">ctor</a></li>
-<li><a href="#events">events</a><ul>
-<li><a href="#dom-события">DOM-события</a></li>
-<li><a href="#События-noscript">&quot;Космические&quot; события noscript</a></li>
-<li><a href="#Встроенные-события">Встроенные события</a></li>
-</ul>
-</li>
-<li><a href="#methods">methods</a></li>
-<li><a href="#models">models</a></li>
-<li><a href="#Параметры">Параметры</a><ul>
-<li><a href="#params">params+</a></li>
-<li><a href="#params-">params-</a></li>
-<li><a href="#params-1">params</a></li>
-<li><a href="#rewriteParamsOnInit">rewriteParamsOnInit</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#Валидность">Валидность и перерисовки</a></li>
-<li><a href="#Взаимодействие">Взаимодействие с видом</a></li>
-<li><a href="#async">async</a></li>
-</ul>
 <h2>Декларация</h2><p>Определение нового вида происходит через статическую функцию <code>ns.View.define</code></p>
 <pre class="prettyprint source lang-js"><code>ns.View.define('viewName', viewDeclObject[, baseView])</code></pre><p>Объект-декларация состоит из следующих свойств.</p>
 <h3>ctor</h3><p><code>ctor</code> - это функция-конструтор. Обратите внимание, что он вызывается самым первым, до инициализации самого вида, т.о. в конструкторе еще не доступеы некоторые свойства.</p>
@@ -1364,7 +1350,7 @@ ns.View.define('my-view', {
     // событие click на нодах к классом selector внутри вида
     &quot;click .selector&quot;: &quot;onSelectorClick&quot;,
 
-    // событие click на нодах к классом selector внутри вида, 
+    // событие click на нодах к классом selector внутри вида,
     // из-за @init обработчик навешивается на ns-view-htmlinit и снимается при ns-view-htmldestroy
     &quot;click@init .selector&quot;: &quot;onInitSelectorClick&quot;,
 
@@ -1375,7 +1361,7 @@ ns.View.define('my-view', {
 <li>Все (кроме <code>scroll</code>) события работают через механизм <a href="http://www.nczonline.net/blog/2009/06/30/event-delegation-in-javascript/">event delegation</a>.</li>
 <li>По умолчанию все обработчики навешиваются на <code>ns-view-show</code> и снимаются на <code>ns-view-hide</code></li>
 <li>Событие <code>scroll</code> не всплывает, поэтому навешивается напрямую на ноду, указанную в селекторе.</li>
-<li>В качестве селектора можно указать <code>window</code> или <code>document</code>, в этом случае событие будет навешано на соответствующий глобальный объект.   </li>
+<li>В качестве селектора можно указать <code>window</code> или <code>document</code>, в этом случае событие будет навешано на соответствующий глобальный объект.</li>
 </ol>
 <h4>&quot;Космические&quot; события noscript</h4><p>Декларируются как и остальные события</p>
 <pre class="prettyprint source lang-js"><code>{
@@ -1411,7 +1397,7 @@ ns.View.define('my-view', {
  * @augments ns.View
  */
 ns.View.define('my-view', {
-    /** @lends prj.vMyView.prototype
+    /** @lends prj.vMyView.prototype */
     methods: {
         BAR: 100
         foo: function(){}
@@ -1519,24 +1505,11 @@ ns.View.define('super-view', {
 </ul>
 <p>Т.о. при использовании <code>params</code> все параметры являются обязательными.
 Чтобы сделать их необязательными, используйте <code>params+</code>.</p>
-<p>Если указана функция, то она строит ключ сама на основе переданных параметров.</p>
+<p>Если указана функция, то функция должна вернуть объект с параметрами, по которым будет построен ключ.</p>
 <pre class="prettyprint source lang-js"><code>ns.View.define('view', {
   // ns.key - готовая функция для склеивания параметров в строку
   params: ns.key
-})</code></pre><h3>rewriteParamsOnInit</h3><p>При декларации вида можно объявить специальную функцию для обработки параметров.
-Аргументом функции приходят параметры страницы, а функция должна вернуть обработанные параметры.</p>
-<p>Примеры использования:</p>
-<ul>
-<li>вид зависит не от параметров страницы, а от названия <code>layout</code></li>
-<li>в параметры необходимо добавить какое-то фиксированное значение</li>
-</ul>
-<pre class="prettyprint source"><code>ns.View.define('my-view', {
-    rewriteParamsOnInit: function(params) {
-        return {
-            layout: ns.page.current.page
-        }
-    }
-});</code></pre><h2>Валидность</h2><p>Валидность view считается по двум факторам:</p>
+})</code></pre><h2>Валидность</h2><p>Валидность view считается по двум факторам:</p>
 <ul>
 <li>собственный статус <code>ns.V.STATUS</code></li>
 <li>статус привязанных моделей</li>
@@ -1568,7 +1541,7 @@ ns.View.define('super-view', {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Aug 27 2014 16:04:29 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:38 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

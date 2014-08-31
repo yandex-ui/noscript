@@ -89,6 +89,8 @@
                         
                             <li data-name="ns.key"><a href="ns.html#key">key</a></li>
                         
+                            <li data-name="ns.params2query"><a href="ns.html#params2query">params2query</a></li>
+                        
                             <li data-name="ns.parseQuery"><a href="ns.html#parseQuery">parseQuery</a></li>
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
@@ -350,6 +352,8 @@
                         <li data-name="ns.page.current"><a href="ns.page.html#current">current</a></li>
                         
                         <li data-name="ns.page.currentUrl"><a href="ns.page.html#currentUrl">currentUrl</a></li>
+                        
+                        <li data-name="ns.page.DEFAULT_HISTORY_ACTION"><a href="ns.page.html#DEFAULT_HISTORY_ACTION">DEFAULT_HISTORY_ACTION</a></li>
                         
                     </ul>
                 
@@ -672,6 +676,8 @@
                         
                             <li data-name="ns.Model.get"><a href="ns.Model.html#get">get</a></li>
                         
+                            <li data-name="ns.Model.getKeyAndParams"><a href="ns.Model.html#getKeyAndParams">getKeyAndParams</a></li>
+                        
                             <li data-name="ns.Model.getValid"><a href="ns.Model.html#getValid">getValid</a></li>
                         
                             <li data-name="ns.Model.info"><a href="ns.Model.html#info">info</a></li>
@@ -698,6 +704,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.Model#_version"><a href="ns.Model.html#_version">_version</a></li>
+                
+                    <li data-name="ns.Model#key"><a href="ns.Model.html#key">key</a></li>
+                
+                    <li data-name="ns.Model#params"><a href="ns.Model.html#params">params</a></li>
                 
                 </ul>
 
@@ -786,7 +796,11 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
+                    <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
 
@@ -892,6 +906,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ModelUniq#_version"><a href="ns.ModelUniq.html#_version">_version</a></li>
+                
+                    <li data-name="ns.ModelUniq#key"><a href="ns.ModelUniq.html#key">key</a></li>
+                
+                    <li data-name="ns.ModelUniq#params"><a href="ns.ModelUniq.html#params">params</a></li>
                 
                 </ul>
 
@@ -1094,8 +1112,6 @@
                 
                     <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
-                    <li data-name="ns.View#selfParams"><a href="ns.View.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1141,8 +1157,6 @@
                     <li data-name="ns.View#keepValid"><a href="ns.View.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.View#patchTree"><a href="ns.View.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
                 
@@ -1211,8 +1225,6 @@
                 
                     <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
-                    <li data-name="ns.ViewCollection#selfParams"><a href="ns.ViewCollection.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1264,8 +1276,6 @@
                     <li data-name="ns.ViewCollection#keepValid"><a href="ns.ViewCollection.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
                 
@@ -1781,52 +1791,7 @@
 <dd>
     
     <div class="description">
-        <p>Параметры, с которыми был создан вид.</p>
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="selfParams">selfParams<span class="type-signature type object">object</span> </h4>
-    </div>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Собственные параметры вида, которые участвуют в построении ключа.</p>
+        <p>Параметры вида.</p>
     </div>
     
     
@@ -2092,7 +2057,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 738
+            ns.view.js, line 741
         </div>
         
     </div>
@@ -2238,7 +2203,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 223
+            ns.view.js, line 217
         </div>
         
     </div>
@@ -2368,7 +2333,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 202
+            ns.view.js, line 196
         </div>
         
     </div>
@@ -2493,7 +2458,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 212
+            ns.view.js, line 206
         </div>
         
     </div>
@@ -2689,7 +2654,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1133
+            ns.view.js, line 1095
         </div>
         
     </div>
@@ -2762,7 +2727,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1154
+            ns.view.js, line 1116
         </div>
         
     </div>
@@ -2880,7 +2845,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 987
+            ns.view.js, line 949
         </div>
         
     </div>
@@ -2998,7 +2963,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 266
+            ns.view.js, line 260
         </div>
         
     </div>
@@ -3128,7 +3093,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 911
+            ns.view.js, line 914
         </div>
         
     </div>
@@ -3251,7 +3216,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 920
+            ns.view.js, line 923
         </div>
         
     </div>
@@ -3446,7 +3411,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 556
+            ns.view.js, line 555
         </div>
         
     </div>
@@ -3520,7 +3485,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 597
+            ns.view.js, line 596
         </div>
         
     </div>
@@ -3650,7 +3615,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 588
+            ns.view.js, line 587
         </div>
         
     </div>
@@ -3728,7 +3693,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 564
+            ns.view.js, line 563
         </div>
         
     </div>
@@ -3806,7 +3771,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 548
+            ns.view.js, line 547
         </div>
         
     </div>
@@ -4024,7 +3989,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1162
+            ns.view.js, line 1124
         </div>
         
     </div>
@@ -4097,7 +4062,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 842
+            ns.view.js, line 845
         </div>
         
     </div>
@@ -4229,164 +4194,6 @@
             
 <dt>
     <div class="nameContainer inherited">
-        <h4 class="name" id="tmpl">
-            
-                <span class="inherited"><a href="ns.View.html#tmpl">inherited</a></span>
-            
-            tmpl<span class="signature">(mode, extra)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.view.js, line 938
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Быстро что-нибудь сгенерить из данных блока.
-Можно передать моду и дополнительный объект, который попадет в /.extra:</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>mode</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>extra</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-    
-    
-        <h5>Example</h5>
-        
-
-    
-    <pre class="prettyprint"><code><pre class="prettyprint source lang-js"><code>block.tmpl()
-block.tmpl('mode')
-block.tmpl({ ... })
-block.tmpl('mode', { ... })</code></pre></code></pre>
-    
-
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer inherited">
         <h4 class="name" id="update">
             
                 <span class="inherited"><a href="ns.View.html#update">inherited</a></span>
@@ -4396,7 +4203,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
     
         
         <div class="tag-source">
-            ns.view.js, line 1186
+            ns.view.js, line 1148
         </div>
         
     </div>
@@ -4556,7 +4363,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
     
         
         <div class="tag-source">
-            ns.view.js, line 1169
+            ns.view.js, line 1131
         </div>
         
     </div>
@@ -4689,7 +4496,7 @@ block.tmpl('mode', { ... })</code></pre></code></pre>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Aug 27 2014 16:04:29 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:38 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

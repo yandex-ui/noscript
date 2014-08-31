@@ -89,6 +89,8 @@
                         
                             <li data-name="ns.key"><a href="ns.html#key">key</a></li>
                         
+                            <li data-name="ns.params2query"><a href="ns.html#params2query">params2query</a></li>
+                        
                             <li data-name="ns.parseQuery"><a href="ns.html#parseQuery">parseQuery</a></li>
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
@@ -350,6 +352,8 @@
                         <li data-name="ns.page.current"><a href="ns.page.html#current">current</a></li>
                         
                         <li data-name="ns.page.currentUrl"><a href="ns.page.html#currentUrl">currentUrl</a></li>
+                        
+                        <li data-name="ns.page.DEFAULT_HISTORY_ACTION"><a href="ns.page.html#DEFAULT_HISTORY_ACTION">DEFAULT_HISTORY_ACTION</a></li>
                         
                     </ul>
                 
@@ -672,6 +676,8 @@
                         
                             <li data-name="ns.Model.get"><a href="ns.Model.html#get">get</a></li>
                         
+                            <li data-name="ns.Model.getKeyAndParams"><a href="ns.Model.html#getKeyAndParams">getKeyAndParams</a></li>
+                        
                             <li data-name="ns.Model.getValid"><a href="ns.Model.html#getValid">getValid</a></li>
                         
                             <li data-name="ns.Model.info"><a href="ns.Model.html#info">info</a></li>
@@ -698,6 +704,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.Model#_version"><a href="ns.Model.html#_version">_version</a></li>
+                
+                    <li data-name="ns.Model#key"><a href="ns.Model.html#key">key</a></li>
+                
+                    <li data-name="ns.Model#params"><a href="ns.Model.html#params">params</a></li>
                 
                 </ul>
 
@@ -786,7 +796,11 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
+                
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
+                    <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
 
@@ -892,6 +906,10 @@
                 <span class="subtitle">Instance members</span>
                 
                     <li data-name="ns.ModelUniq#_version"><a href="ns.ModelUniq.html#_version">_version</a></li>
+                
+                    <li data-name="ns.ModelUniq#key"><a href="ns.ModelUniq.html#key">key</a></li>
+                
+                    <li data-name="ns.ModelUniq#params"><a href="ns.ModelUniq.html#params">params</a></li>
                 
                 </ul>
 
@@ -1094,8 +1112,6 @@
                 
                     <li data-name="ns.View#params"><a href="ns.View.html#params">params</a></li>
                 
-                    <li data-name="ns.View#selfParams"><a href="ns.View.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.View#STATUS"><a href="ns.View.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1141,8 +1157,6 @@
                     <li data-name="ns.View#keepValid"><a href="ns.View.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.View#patchTree"><a href="ns.View.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.View#tmpl"><a href="ns.View.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.View#update"><a href="ns.View.html#update">update</a></li>
                 
@@ -1211,8 +1225,6 @@
                 
                     <li data-name="ns.ViewCollection#params"><a href="ns.ViewCollection.html#params">params</a></li>
                 
-                    <li data-name="ns.ViewCollection#selfParams"><a href="ns.ViewCollection.html#selfParams">selfParams</a></li>
-                
                     <li data-name="ns.ViewCollection#STATUS"><a href="ns.ViewCollection.html#STATUS">STATUS</a></li>
                 
                 </ul>
@@ -1264,8 +1276,6 @@
                     <li data-name="ns.ViewCollection#keepValid"><a href="ns.ViewCollection.html#keepValid">keepValid</a></li>
                 
                     <li data-name="ns.ViewCollection#patchTree"><a href="ns.ViewCollection.html#patchTree">patchTree</a></li>
-                
-                    <li data-name="ns.ViewCollection#tmpl"><a href="ns.ViewCollection.html#tmpl">tmpl</a></li>
                 
                     <li data-name="ns.ViewCollection#update"><a href="ns.ViewCollection.html#update">update</a></li>
                 
@@ -1459,6 +1469,96 @@
     
 </dd>
 
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="key">key<span class="type-signature type string">string</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Уникальный ключ модели.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="params">params<span class="type-signature type object">object</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Параметры модели.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
         </dl>
     
     
@@ -1476,7 +1576,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 559
+            ns.model.js, line 570
         </div>
         
     </div>
@@ -1788,7 +1888,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 509
+            ns.model.js, line 520
         </div>
         
     </div>
@@ -1904,7 +2004,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 752
+            ns.model.js, line 783
         </div>
         
     </div>
@@ -2046,7 +2146,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 458
+            ns.model.js, line 469
         </div>
         
     </div>
@@ -2195,6 +2295,190 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="getKeyAndParams">
+            
+            <span class="type-signature static">static</span>ns.Model.getKeyAndParams<span class="signature">(id, params, <span class="optional">info</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{object}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.model.js, line 699
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает ключ и собственные параметры модели.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="getValid">
             
             <span class="type-signature static">static</span>ns.Model.getValid<span class="signature">(id, <span class="optional">params</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.Model.html">ns.Model</a>|null}</span>
@@ -2202,7 +2486,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 483
+            ns.model.js, line 494
         </div>
         
     </div>
@@ -2358,7 +2642,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 628
+            ns.model.js, line 639
         </div>
         
     </div>
@@ -2491,7 +2775,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 661
+            ns.model.js, line 672
         </div>
         
     </div>
@@ -2612,7 +2896,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 734
+            ns.model.js, line 765
         </div>
         
     </div>
@@ -2763,7 +3047,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 774
+            ns.model.js, line 805
         </div>
         
     </div>
@@ -2880,7 +3164,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 530
+            ns.model.js, line 541
         </div>
         
     </div>
@@ -3015,12 +3299,12 @@
     <div class="nameContainer">
         <h4 class="name" id="key">
             
-            <span class="type-signature static">static</span>ns.Model.key<span class="signature">(id, params, info)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
+            <span class="type-signature static">static</span>ns.Model.key<span class="signature">(id, params, <span class="optional">info</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.model.js, line 675
+            ns.model.js, line 687
         </div>
         
     </div>
@@ -3074,6 +3358,11 @@
             
             <td class="description last">
                 
+                    
+                    
+                        
+                    
+                
                 </td>
         </tr>
 	
@@ -3097,6 +3386,11 @@
             
             <td class="description last">
                 
+                    
+                    
+                        
+                    
+                
                 </td>
         </tr>
 	
@@ -3119,6 +3413,13 @@
             
             
             <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
                 
                 </td>
         </tr>
@@ -3183,7 +3484,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 783
+            ns.model.js, line 814
         </div>
         
     </div>
@@ -3322,7 +3623,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 354
+            ns.model.js, line 365
         </div>
         
     </div>
@@ -3398,7 +3699,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 166
+            ns.model.js, line 177
         </div>
         
     </div>
@@ -3474,7 +3775,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 447
+            ns.model.js, line 458
         </div>
         
     </div>
@@ -3586,7 +3887,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 364
+            ns.model.js, line 375
         </div>
         
     </div>
@@ -3703,7 +4004,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 375
+            ns.model.js, line 386
         </div>
         
     </div>
@@ -3820,7 +4121,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 200
+            ns.model.js, line 211
         </div>
         
     </div>
@@ -3950,7 +4251,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 188
+            ns.model.js, line 199
         </div>
         
     </div>
@@ -4022,7 +4323,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 309
+            ns.model.js, line 320
         </div>
         
     </div>
@@ -4094,7 +4395,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 346
+            ns.model.js, line 357
         </div>
         
     </div>
@@ -4166,7 +4467,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 393
+            ns.model.js, line 404
         </div>
         
     </div>
@@ -4242,7 +4543,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 301
+            ns.model.js, line 312
         </div>
         
     </div>
@@ -4359,7 +4660,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 158
+            ns.model.js, line 169
         </div>
         
     </div>
@@ -4430,7 +4731,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 385
+            ns.model.js, line 396
         </div>
         
     </div>
@@ -4502,7 +4803,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 180
+            ns.model.js, line 191
         </div>
         
     </div>
@@ -4574,7 +4875,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 435
+            ns.model.js, line 446
         </div>
         
     </div>
@@ -4695,7 +4996,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 338
+            ns.model.js, line 349
         </div>
         
     </div>
@@ -4812,7 +5113,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 213
+            ns.model.js, line 224
         </div>
         
     </div>
@@ -4934,7 +5235,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 228
+            ns.model.js, line 239
         </div>
         
     </div>
@@ -5118,7 +5419,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 271
+            ns.model.js, line 282
         </div>
         
     </div>
@@ -5279,7 +5580,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 317
+            ns.model.js, line 328
         </div>
         
     </div>
@@ -5391,7 +5692,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 406
+            ns.model.js, line 417
         </div>
         
     </div>
@@ -5630,7 +5931,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 420
+            ns.model.js, line 431
         </div>
         
     </div>
@@ -5746,7 +6047,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 64
+            ns.model.js, line 75
         </div>
         
     </div>
@@ -5817,7 +6118,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 409
+            ns.model.js, line 420
         </div>
         
     </div>
@@ -5896,7 +6197,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Aug 27 2014 16:04:28 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 01 2014 01:01:38 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

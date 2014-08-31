@@ -44,16 +44,10 @@
     ns.View.prototype.key = null;
 
     /**
-     * Параметры, с которыми был создан вид.
+     * Параметры вида.
      * @type {object}
      */
     ns.View.prototype.params = null;
-
-    /**
-     * Собственные параметры вида, которые участвуют в построении ключа.
-     * @type {object}
-     */
-    ns.View.prototype.selfParams = null;
 
     /**
      * Собственная нода вида
@@ -156,7 +150,7 @@
         // Создаём модели или берем их из кэша, если они уже есть
         for (var id in this.info.models) {
             if (!this.models[id]) {
-                var model = ns.Model.get(id, this.selfParams);
+                var model = ns.Model.get(id, this.params);
                 this.models[id] = model;
                 this._modelsHandlers[model.key] = {};
             }
@@ -1474,7 +1468,7 @@
     };
 
     /**
-     * Возвращает ключ объекта и параметры с учётом rewriteParamsOnInit
+     * Возвращает ключ объекта и параметры.
      * В этом методе собрана вся логика рерайтов параметров при создании view
      * @returns {object}
      */
@@ -1483,15 +1477,10 @@
         //  в частности, для боксов.
         info = info || ns.View.info(id) || {};
 
-        if ('function' === typeof info.rewriteParamsOnInit) {
-            //  если для view определен метод rewriteParamsOnInit и он вернул объект,
-            //  то перепишем параметры
-            params = info.rewriteParamsOnInit(no.extend({}, params)) || params;
-        }
-
         var keyParams;
         if ('function' === typeof info.params) {
-            keyParams = info.params(params);
+            // передаем копию параметров, т.к. их сейчас будут менять
+            keyParams = info.params(no.extend({}, params));
         } else {
             keyParams = ns.View._getKeyParams(id, params, info);
         }
@@ -1499,12 +1488,8 @@
         ns.assert(keyParams, 'ns.View', 'Could not generate key for view %s', id);
 
         return {
-            // параметры с учётом rewrite (полный набор параметров, а не только то, что нужно в ключе)
-            params: params,
-            // ключ с учётом правильных параметров для ключа
-            key: ns.key('view=' + id, keyParams),
-            // собственные параметры вида
-            selfParams: keyParams
+            params: keyParams,
+            key: ns.key('view=' + id, keyParams)
         };
     };
 

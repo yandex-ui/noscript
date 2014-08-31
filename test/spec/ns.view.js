@@ -555,7 +555,13 @@ describe('ns.View', function() {
                 ns.View.define('slider', {
                     params: function(params) {
                         if (params.mode === 'custom') {
-                            return { id: params['id'] };
+                            return {
+                                id: params['id']
+                            };
+
+                        } else if (params.mode === 'rewrite') {
+                            params.mode = 'rewrited';
+                            return params;
                         }
                         return {};
                     }
@@ -572,6 +578,16 @@ describe('ns.View', function() {
 
             it('view=slider', function() {
                 expect(ns.View.getKey('slider', { mode: 'new' })).to.be.eql('view=slider');
+            });
+
+            it('должен копировать параметры при передаче в функцию', function() {
+                var params = {
+                    mode: 'rewrite'
+                };
+                ns.View.getKey('slider', params);
+                expect(params).to.be.eql({
+                    mode: 'rewrite'
+                });
             });
         });
 
@@ -627,7 +643,7 @@ describe('ns.View', function() {
             });
         });
 
-        describe('Когда ключ view строится по части параметров - this.params у view должны хранить исходный набор (а не тот, что используется в ключе)', function() {
+        describe('Когда ключ view строится по части параметров - this.params у view должны хранить набор, который используется в ключе', function() {
 
             beforeEach(function() {
                 ns.View.define('photo', { params: { login: null, id: null } });
@@ -636,7 +652,10 @@ describe('ns.View', function() {
             it('preserve full params object', function() {
                 var params = { login: 'a', id: 4, one_more: 'xx', per_page: 10 };
                 var view = ns.View.create('photo', params);
-                expect(view.params).to.eql(params);
+                expect(view.params).to.eql({
+                    id: 4,
+                    login: 'a'
+                });
             });
 
         });

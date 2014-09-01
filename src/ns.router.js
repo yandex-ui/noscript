@@ -252,10 +252,10 @@ ns.router._generateUrl = function(def, params) {
                 svalue += param.default_value;
             } else {
                 pvalue = params[param.name];
-                var pvalueDefined = param.name in params;
+                var is_param_present = param.name in params;
 
                 // Выставляем дефолтное значение только необязательным параметрам.
-                if (param.is_optional && !pvalueDefined) {
+                if (param.is_optional && !is_param_present) {
                     pvalue = param.default_value;
                 }
 
@@ -265,12 +265,12 @@ ns.router._generateUrl = function(def, params) {
                 }
 
                 // Обязательный параметр должен быть указан.
-                if (!param.is_optional && !pvalueDefined) {
+                if (!param.is_optional && !is_param_present) {
                     return null;
                 }
 
                 // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
-                if (param.is_optional && !pvalueDefined) {
+                if (param.is_optional && !is_param_present) {
                     continue;
                 }
 

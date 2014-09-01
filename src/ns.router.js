@@ -429,7 +429,7 @@ ns.router._parseParam = function(param) {
     if (chunks.length === 3) {
         param_is_optional = false;
         param_is_filter = true;
-        param_filter_value = param_default = chunks[2];
+        param_filter_value = chunks[2];
 
         ns.assert(param_filter_value, 'ns.router', "Parameter '%s' value must be specified", paramName);
         ns.assert(ns.router._isParamValid(param_filter_value, param_type), 'ns.router', "Wrong value for '%s' parameter", paramName);
@@ -494,8 +494,8 @@ ns.router._generateParamRegexp = function(p) {
     }
 
     // parameter with filter (param==value)
-    if (!p.is_optional && p.default_value) {
-        re = '(' + p.default_value + ')';
+    if (p.is_filter && p.filter_value) {
+        re = '(' + p.filter_value + ')';
 
     } else {
         re = regexps[p.type];

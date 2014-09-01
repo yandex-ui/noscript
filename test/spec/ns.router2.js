@@ -34,9 +34,9 @@ describe('router: new route parsing method', function() {
             'param:int=value':  { name: 'param', type: 'int', default_value: 'value', is_optional: true, is_filter: false, filter_value: undefined },
             'param==':          { throw: "[ns.router] Parameter 'param' value must be specified" },
             'param:int==':      { throw: "[ns.router] Parameter 'param' value must be specified" },
-            'param==value':     { name: 'param', type: 'id', default_value: 'value', is_optional: false, is_filter: true, filter_value: 'value' },
+            'param==value':     { name: 'param', type: 'id', default_value: undefined, is_optional: false, is_filter: true, filter_value: 'value' },
             'param:int==value': { throw: "[ns.router] Wrong value for 'param' parameter" },
-            'param:int==123':   { name: 'param', type: 'int', default_value: '123', is_optional: false, is_filter: true, filter_value: '123' }
+            'param:int==123':   { name: 'param', type: 'int', default_value: undefined, is_optional: false, is_filter: true, filter_value: '123' }
         };
 
         for (var test in _tests) {
@@ -113,7 +113,7 @@ describe('router: new route parsing method', function() {
             '{param=value}':              { is_optional: true, items: [ { name: 'param', type: 'id', default_value: 'value', is_optional: true, is_filter: false, filter_value: undefined } ] },
             '{param:int=value}':          { is_optional: true, items: [ { name: 'param', type: 'int', default_value: 'value', is_optional: true, is_filter: false, filter_value: undefined } ] },
             '{param:int==value}':         { throw: "[ns.router] Wrong value for 'param' parameter" },
-            '{param:int==123}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: '123', is_optional: false, is_filter: true, filter_value: '123' } ]},
+            '{param:int==123}':           { is_optional: false, items: [ { name: 'param', type: 'int', default_value: undefined, is_optional: false, is_filter: true, filter_value: '123' } ]},
             'prefix-{param:int}':         { is_optional: false, items: [ { default_value: 'prefix-' }, { name: 'param', type: 'int', default_value: undefined, is_optional: false, is_filter: false, filter_value: undefined } ]},
             'prefix-{part1:int}{part2=}': {
                 is_optional: false,

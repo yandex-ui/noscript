@@ -8,7 +8,7 @@
     ns.history = {};
 
     /**
-     * Ицициализирует события реакции на изменение адреса.
+     * Ицициализирует обработчики события popstate/hashchange и кликов по ссылкам (<a href=""/>).
      */
     ns.history.init = function() {
         $(window).on('popstate', function(e) {
@@ -18,6 +18,8 @@
 
             ns.history.onpopstate(e);
         });
+
+        $(document).on(ns.V.EVENTS.click, 'a', ns.history._onAnchorClick);
     };
 
     /**
@@ -47,6 +49,59 @@
      */
     ns.history.onpopstate = function() {
         ns.page.go('', true);
+    };
+
+    /**
+     * Метод перехода на ссылке из <a>.
+     * @description Приложение может модифицифровать этот метод,
+     * чтобы реализовать собственную логику.
+     *
+     * @param {string} href
+     * @param {HTMLElement} target
+     * @returns {Vow.Promise}
+     */
+    ns.history.followAnchorHref = function(href, target) {
+        /* jshint unused: false */
+        return ns.page.go(href);
+    };
+
+    /**
+     * Обработчик кликов на <a>.
+     * @description Не обрабатываются следующие клики:
+     *  - если клик был с нажатым alt/ctrl/meta/shift
+     *  - если hostname у ссылки отличается от текущего hostname
+     *  - если у ссылки нет href
+     *  - если у ссылки есть target="_blank"
+     * @param {Event} e
+     * @private
+     */
+    ns.history._onAnchorClick = function(e) {
+        var target = e.currentTarget;
+
+        // Чтобы работал Cmd/Ctrl/Shift + click на ссылках (открыть в новом табе/окне).
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
+            return true;
+        }
+
+        // если hostname ссылки не равен нашему хосту, то она внешняя и ее обрабатывать не надо
+        if (target.hostname !== window.location.hostname) {
+            return true;
+        }
+
+        var href = target.getAttribute('href');
+        if (!href) {
+            return true;
+        }
+
+        if (target.getAttribute('target') !== '_blank') {
+            var returnValue = ns.history.followAnchorHref(href, target);
+            // если вернули Promise, то ссылка была обработана и
+            // надо сделать preventDefault
+            if (Vow.isPromise(returnValue)) {
+                e.preventDefault();
+                return true;
+            }
+        }
     };
 
     /**

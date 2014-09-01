@@ -660,6 +660,49 @@ describe('ns.View', function() {
 
         });
 
+        describe('Model.params - функция', function() {
+
+            it('Не должен делать no.extend(model.params) (баг #335)', function() {
+
+                var mParams = function() { return {} };
+                mParams.foo = 'bar';
+
+                ns.Model.define('model', {
+                    params: mParams
+                });
+                ns.View.define('view', {
+                    models: ['model']
+                });
+
+                expect(ns.View.getKeyAndParams('view', {}).key).to.eql('view=view');
+            });
+
+            it('должен построить ключ по параметрам модели', function() {
+
+                ns.Model.define('model1', {
+                    params: function() {
+                        return {
+                            'p1': 'v1'
+                        }
+                    }
+                });
+                ns.Model.define('model2', {
+                    params: function() {
+                        return {
+                            'p2': 'v2'
+                        }
+                    }
+                });
+
+                ns.View.define('view', {
+                    models: ['model1', 'model2']
+                });
+
+                expect(ns.View.getKeyAndParams('view', {}).key).to.eql('view=view&p1=v1&p2=v2');
+            });
+
+        });
+
     });
 
     describe('#invalidate.', function() {

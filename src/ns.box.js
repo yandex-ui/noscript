@@ -82,7 +82,7 @@ ns.Box.prototype._addView = function(id, params, type) {
  * @returns {array}
  * @private
  */
-ns.Box.prototype._getDescendants = function(descs) {
+ns.Box.prototype._getDescendantsAndSelf = function(descs) {
     var views = this.views;
     var active = this.active;
 
@@ -90,7 +90,7 @@ ns.Box.prototype._getDescendants = function(descs) {
 
     for (var id in active) {
         var view = views[ active[id] ];
-        view._getDescendants(descs);
+        view._getDescendantsAndSelf(descs);
     }
 
     return descs;
@@ -231,7 +231,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         // Если вид не входит в новый active
         if (newActive[view.id] !== view.key) {
             // Скроем виды, не попавшие в layout
-            var descs = view._getDescendants( [] );
+            var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
                 // если view был скрыт
                 if (descs[i]._hide()) {

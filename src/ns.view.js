@@ -529,7 +529,7 @@
      */
     ns.View.prototype.invalidate = function() {
         // рекурсивно инвалидируем себя и потомков
-        var views = this._getDescendants();
+        var views = this._getDescendantsAndSelf();
         for (var i = 0, j = views.length; i < j; i++) {
             var view = views[i];
             // меняем статус только у валидных видов,
@@ -926,16 +926,15 @@
 
     /**
      * Возвращает массив всех вложенных view, включая себя
-     * FIXME: это же _getDescendantsOrSelf
      * @param {Array} [views=[]] Начальный массив.
      * @returns {Array}
      * @private
      */
-    ns.View.prototype._getDescendants = function(views) {
+    ns.View.prototype._getDescendantsAndSelf = function(views) {
         views = views || [];
         views.push(this);
         this._apply(function(view) {
-            view._getDescendants(views);
+            view._getDescendantsAndSelf(views);
         });
 
         return views;

@@ -989,6 +989,61 @@ describe('ns.ViewCollection', function() {
         });
     });
 
+    describe('Перерисовка части валидной коллекции', function() {
+
+        beforeEach(function() {
+            ns.Model.define('invalid-model', {
+                methods: {
+                    canRequest: no.false
+                }
+            });
+
+            ns.Model.define('mc-item', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.Model.define('mc', {
+                isCollection: true
+            });
+
+            ns.View.define('vc-item', {
+                models: [ 'mc-item' ]
+            });
+
+            ns.ViewCollection.define('vc', {
+                models: [ 'mc', 'invalid-model' ],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            });
+
+            ns.View.define('app');
+            this.APP = ns.View.create('app');
+
+            ns.layout.define('app-3', {
+                'app': 'vc'
+            });
+
+            ns.Update.handleError = no.true;
+        });
+
+        it('should correctly update', function() {
+            var parent = ns.Model.get('mc');
+
+            var childA = ns.Model.get('mc-item', {id: 'A'});
+            var childB = ns.Model.get('mc-item', {id: 'B'});
+
+            parent.insert([childA, childB]);
+
+            var layout = ns.layout.page('app-3');
+            return new ns.Update(this.APP, layout, {id: 'A'}).render();
+        });
+
+    });
+
     describe('Обновление внешней коллекции работает корректно, если внутренняя не изменилсь', function() {
 
         // это тест, чтобы исправить JS-ошибку
@@ -1049,12 +1104,6 @@ describe('ns.ViewCollection', function() {
                     ns.Model.get('child-mc', {pid: 1}).invalidate();
                     return new ns.Update(this.view, layout, {}).render();
                 }, null, this);
-        });
-
-        it('должен написать сообщение', function() {
-            expect(ns.log.debug)
-                .to.have.callCount(1)
-                .and.to.be.calledWith('!WARNING!', '[ns.ViewCollection]');
         });
 
         it('должен удалить элемент вложенной коллекции', function() {

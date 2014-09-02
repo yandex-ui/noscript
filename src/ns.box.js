@@ -90,7 +90,6 @@ ns.Box.prototype._getDescendants = function(descs) {
 
     for (var id in active) {
         var view = views[ active[id] ];
-        descs.push(view);
         view._getDescendants(descs);
     }
 

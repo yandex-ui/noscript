@@ -254,12 +254,12 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
 };
 
 ns.ViewCollection.prototype._forEachCollectionItem = function(cb, params) {
-    // Какие элементы коллекции рендерить, мы можем понять только по модели
-    // Поэтому, полезем внутрь, только если есть все данные
-    if (this.isModelsValid()) {
-        // ModelCollection
-        var MC = this.models[this.info.modelCollectionId];
+    // ModelCollection
+    var MC = this.models[this.info.modelCollectionId];
 
+    // Какие элементы коллекции рендерить, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если в ней есть данные
+    if (MC.isValid()) {
         var modelItems = MC.models;
         // Проходом по элементам MC определим, какие виды нужно срендерить
         for (var i = 0, j = modelItems.length; i < j; i++) {

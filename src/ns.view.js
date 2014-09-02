@@ -1140,6 +1140,14 @@
     };
 
     /**
+     * Сообщает виду промис, который его обновляет
+     * @param {Vow.Promise} promise
+     */
+    ns.View.prototype.canUpdateAfter = function(promise) {
+        /* jshint unused: false */
+    };
+
+    /**
      * Запускает на себе ns.Update
      * @param {object} [params] Дополнительные параметры. Могут использоваться при ручном запуске.
      * @param {ns.Update~options} [options] Опции исполнения. Если указан execFlag, то запускается ASYNC-обновление.

@@ -5,27 +5,7 @@
 
 ## Документация
 
-- [Общее описание сущностей](/doc/entities.md)
-- [Инициализация и настройка фреймворка](/doc/ns.init.md)
-- [JSDoc](https://yandex-ui.github.io/noscript/)
-- [Философия работы noscript](/doc/philosophy.md)
-
-Описания компонентов:
-- [ns.layout - раскладка страницы](/doc/ns.layout.md)
-- [ns.Model - модель](/doc/ns.model.md)
- - [Модель-коллекция](/doc/ns.modelCollection.md)
-- [ns.page - переходы по страницам](/doc/ns.page.md)
-- [ns.router - маршрутизатор](/doc/ns.router.md)
-- [ns.Update - построение и обновление страницы](/doc/ns.update.logic.md)
-- [ns.View - вид](/doc/ns.view.md)
- - [Структура шаблона](/doc/ns.view.yate.md)
- - [Вид-коллекция](/doc/ns.viewCollection.md)
-
-## Best practice или примеры проектирования
-
-[Модель состояний](/doc/patterns/ns.pattern.model.state.md)
-
-[Поэтапная инициализация (дозагрузка) модели](/doc/patterns/ns.pattern.model.partial.md)
+[Документация и best practice](https://yandex-ui.github.io/noscript/single-page/) | [JSDoc](https://yandex-ui.github.io/noscript/) 
 
 ## Плагины
 

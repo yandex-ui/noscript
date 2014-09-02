@@ -1,3 +1,5 @@
+# Шаблон: модель состояние
+
 Состояние интерфейса в noscript можно хранить одним из двух основных способов:
  - в url, который затем преобразуется в параметры
  - в данных модели.
@@ -52,7 +54,7 @@
 	    },
 	    methods: {
 	        toggleSelected: function() {
-    	        if (this.get('.selected')) {
+				if (this.get('.selected')) {
                     this.set('.selected', false);
                 } else {
                     this.set('.selected', true);

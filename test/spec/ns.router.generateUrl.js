@@ -262,4 +262,30 @@ describe('generate url', function() {
 
     });
 
+    describe('Фильтры', function() {
+
+        beforeEach(function() {
+            ns.router.routes = {
+                route: {
+                    '/{index==value}/{id:int}': 'layout',
+                    '/{id:int}': 'layout'
+                }
+            };
+            ns.router.init();
+        });
+
+        it('работают', function() {
+            expect(ns.router.generateUrl('layout', { id: 1, index: 'value' })).to.be.equal('/value/1');
+        });
+
+        it('не срабатывают, если не передано нужное значение', function() {
+            expect(ns.router.generateUrl('layout', { id: 1 })).to.be.equal('/1');
+        });
+
+        it('не срабатывают, если передано неправильно значение', function() {
+            expect(ns.router.generateUrl('layout', { id: 1, index: 'badvalue' })).to.be.equal('/1?index=badvalue');
+        });
+
+    });
+
 });

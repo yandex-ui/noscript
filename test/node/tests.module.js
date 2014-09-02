@@ -49,7 +49,22 @@ describe('app rendering in node.js', function() {
             'app': {
                 'vSync0':   ['vSync1', 'vSync2'],
                 'vAsync1&': ['vSync3', 'vSync4'],
-                'vAsync2&': true
+                'vAsync2&': true,
+                'vCollection': true
+            }
+        });
+
+        ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
+        ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
+
+        ns.Model.define('mItem', {params: {id: null}});
+        ns.Model.define('mCollection', {
+            split: {
+                items: '.items',
+                model_id: 'mItem',
+                params: {
+                    id: '.id'
+                }
             }
         });
 
@@ -65,14 +80,21 @@ describe('app rendering in node.js', function() {
         ns.View.define('vAsync1', {models: ['mAsync1']});
         ns.View.define('vAsync2', {models: ['mAsync2']});
 
-        ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
-        ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
+        ns.View.define('vItem', {models: ['mItem']});
+        ns.ViewCollection.define('vCollection', {
+            models: ['mCollection'],
+            split: {
+                byModel: 'mCollection',
+                intoViews: 'vItem'
+            }
+        });
 
         this.response0 = JSON.stringify({
             "models": [
                 {"data": {"sync1": true}},
                 {"data": {"sync2": true}},
-                {"data": {"sync3": true}}
+                {"data": {"sync3": true}},
+                {"data": {"items": [{id: 1}, {id: 2}, {id: 3}]}}
             ]
         });
 
@@ -92,7 +114,7 @@ describe('app rendering in node.js', function() {
     describe('generateHTML', function() {
         beforeEach(function(done) {
 
-            this.nockScope = nock(appRoot).post(modelsPath + '?_m=mSync1,mSync2,mSync3').reply(
+            this.nockScope = nock(appRoot).post(modelsPath + '?_m=mSync1,mSync2,mSync3,mCollection').reply(
                 200, this.response0, {"Content-Type": "application/json"}
             );
 
@@ -108,12 +130,18 @@ describe('app rendering in node.js', function() {
             this.nockScope.done();
         });
 
-        it('should create correctly nested nodes of sync views', function() {
+        it('should create correctly nested nodes of simple sync views', function() {
             var vSync0node = this.document.querySelector('.ns-view-vSync0');
 
             expect(vSync0node).to.be.ok;
             expect(vSync0node.querySelector('.ns-view-vSync1')).to.be.ok;
             expect(vSync0node.querySelector('.ns-view-vSync2')).to.be.ok;
+        });
+
+        it('should create correctly nested nodes of sync viewCollection and items', function() {
+            var vCollection = this.document.querySelector('.ns-view-vCollection');
+            expect(vCollection).to.be.ok;
+            expect(vCollection.querySelectorAll('.ns-view-vItem').length).to.equal(3);
         });
 
         it('should create nodes of async views', function() {

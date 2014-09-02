@@ -13,9 +13,24 @@ describe('ns.Updater', function() {
             'app': {
                 'vSync0': ['vSync1', 'vSync2'],
                 'vSync3': {},
-                'vSync4': {}
+                'vSync4': {},
+                'vCollection': true
             }
         });
+
+        ns.Model.define('mItem', {params: {id: null}});
+        ns.Model.define('mCollection', {
+            split: {
+                items: '.items',
+                model_id: 'mItem',
+                params: {
+                    id: '.id'
+                }
+            }
+        });
+
+        ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
+        ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
 
         ns.View.define('app');
         this.view = ns.View.create('app');
@@ -29,29 +44,35 @@ describe('ns.Updater', function() {
         ns.View.define('vAsync1', {models: ['mAsync1']});
         ns.View.define('vAsync2', {models: ['mAsync2']});
 
+        ns.View.define('vItem', {models: ['mItem']});
+        ns.ViewCollection.define('vCollection', {
+            models: ['mCollection'],
+            split: {
+                byModel: 'mCollection',
+                intoViews: 'vItem'
+            }
+        });
 
-        ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
-        ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
-
-        this.response0 = JSON.stringify({
+        this.response0 = {
             "models": [
                 {"data": {"sync1": true}},
                 {"data": {"sync2": true}},
-                {"data": {"sync3": true}}
+                {"data": {"sync3": true}},
+                {"data": {"items": [{id: 1}, {id: 2}, {id: 3}]}}
             ]
-        });
+        };
 
-        this.response1 = JSON.stringify({
+        this.response1 = {
             "models": [
                 {"data": {"async1": true}}
             ]
-        });
+        };
 
-        this.response2 = JSON.stringify({
+        this.response2 = {
             "models": [
                 {"data": {"async2": true}}
             ]
-        });
+        };
     };
 
     describe('scenario', function() {
@@ -72,7 +93,7 @@ describe('ns.Updater', function() {
                 this.update.prefetch().then(function() {
                     done();
                 });
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
             });
 
             it('should make all models of sync views valid', function() {
@@ -106,7 +127,7 @@ describe('ns.Updater', function() {
                         done();
                     }, this);
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
             });
 
             it('should create correctly nested nodes of sync views', function() {
@@ -153,7 +174,7 @@ describe('ns.Updater', function() {
                         done();
                     });
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
             });
 
             it('should make valid all related models', function() {
@@ -195,12 +216,12 @@ describe('ns.Updater', function() {
                         result.async[1].then(function() {
                             done();
                         }, this);
-                        this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, this.response2);
+                        this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response2));
                     }, this);
-                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, this.response1);
+                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response1));
                 }, this);
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
             });
 
             afterEach(function() {
@@ -299,16 +320,23 @@ describe('ns.Updater', function() {
                     .then(function(html) {
 
                         ns.reset();
+
                         this.createTestApp();
+
+                        ns.Model.get('mSync1').setData(this.response0.models[0].data);
+                        ns.Model.get('mSync2').setData(this.response0.models[1].data);
+                        ns.Model.get('mSync3').setData(this.response0.models[2].data);
+                        ns.Model.get('mCollection').setData(this.response0.models[3].data);
 
                         this.clientUpdate = new ns.Update(this.view, ns.layout.page('syncLayout', {}), {});
                         this.clientUpdate.reconstruct(ns.html2node(html))
                             .then(function() {
                                 done();
                             });
+
                     }, this);
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
             });
 
             afterEach(function() {
@@ -327,6 +355,11 @@ describe('ns.Updater', function() {
 
                 expect(secondViewsLevel.vSync1).to.be.ok;
                 expect(secondViewsLevel.vSync2).to.be.ok;
+
+                var collection = firstViewsLevel.vCollection;
+
+                expect(collection).to.be.ok;
+                expect(Object.keys(collection.views).length).to.equal(3);
             });
 
         });
@@ -367,15 +400,15 @@ describe('ns.Updater', function() {
                                         result.async[1].then(function() {
                                             done();
                                         }, this);
-                                        this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, this.response2);
+                                        this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response2));
                                     }, this);
-                                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, this.response1);
+                                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response1));
                                 }, this);
 
                             }, this);
                     }, this);
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, this.response0);
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
             });
 
             afterEach(function() {

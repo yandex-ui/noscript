@@ -1254,6 +1254,40 @@ describe('ns.Updater', function() {
                 });
         });
 
+        /**
+            У нас есть синхронный и асинхронный вид.
+            Данные для синхронного вида есть - его можно рисовать.
+            Данных на асинхронного вида нет. Он будет отрисоввываться отдельно.
+
+            Когда update для sync вида выполнился - ждём async.
+            Когда async данные пришли и выполнился async update - запускаем ещё один ns.page.go().
+            Проверяем, что async вид не пытается перерисоввывается (потому что он валиден).
+        */
+        it('Когда асинхронный вид отрисовался асинхронно повторный ns.page.go() не вызывает перерисовку асинхронного вида', function() {
+            var that = this;
+            var promise = new Vow.Promise();
+
+            ns.Model.get('my_model1').setData({ data: true });
+
+            return ns.page.go('/page1')
+                .then(function(info) {
+                    expect(info.async.length).to.equal(1);
+
+                    ns.Model.get('my_model2').setData({ data: true });
+                    info.async[0].fulfill();
+
+                    return info.async[0].then(function() {
+                        that.spy1 = sinon.spy(ns.MAIN_VIEW, '_getRequestViews');
+                        return ns.page.go(ns.page.currentUrl, 'preserve')
+                            .then(function() {
+                                expect(that.spy1.callCount).to.equal(1);
+                                expect(ns.MAIN_VIEW.views.box.views['view=photo'].views.ads.isValid()).to.be.ok;
+                                expect(that.spy1.firstCall.returnValue.sync.length).to.equal(0);
+                            });
+                    });
+                });
+        });
+
     });
 
 });

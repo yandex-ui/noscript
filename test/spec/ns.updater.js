@@ -1230,7 +1230,7 @@ describe('ns.Updater', function() {
             delete this.promise;
         });
 
-        it('should save state for page2', function(done) {
+        it('Когда асинхронный вид отрисовался как синхронный повторный ns.page.go() не вызывает перерисовку асинхронного вида', function(done) {
             var that = this;
 
             ns.Model.get('my_model1').setData({ data: true });

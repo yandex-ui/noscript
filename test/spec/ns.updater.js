@@ -1191,4 +1191,69 @@ describe('ns.Updater', function() {
         });
 
     });
+
+    describe('Валидный асинхронный вид не должен перерисоввываться просто так (demo for #450)', function() {
+
+        beforeEach(function() {
+            ns.layout.define('page1', {
+                'app': {
+                    'box@': {
+                        'photo': {
+                            'ads&' : true
+                        }
+                    }
+                }
+            });
+
+            ns.router.routes = {
+                'route': {
+                    '/page1': 'page1'
+                }
+            };
+            ns.router.init();
+
+            ns.Model.define('my_model1');
+            ns.Model.define('my_model2');
+
+            ns.View.define('app');
+            ns.View.define('photo', {
+                models: [ 'my_model1' ]
+            });
+            ns.View.define('ads', {
+                models: [ 'my_model2' ]
+            });
+
+            ns.MAIN_VIEW = ns.View.create('app');
+        });
+
+        afterEach(function() {
+            delete this.promise;
+        });
+
+        it('should save state for page2', function(done) {
+            var that = this;
+
+            ns.Model.get('my_model1').setData({ data: true });
+            ns.Model.get('my_model2').setData({ data: true });
+
+            ns.page.go('/page1')
+                .then(function(info) {
+                    expect(info.async.length).to.equal(0);
+
+                    that.spy1 = sinon.spy(ns.MAIN_VIEW, '_getRequestViews');
+
+                    ns.page.go(ns.page.currentUrl, 'preserve')
+                        .then(function() {
+                            expect(that.spy1.callCount).to.equal(1);
+                            expect(that.spy1.firstCall.returnValue.sync.length).to.equal(0);
+                            done();
+                        });
+                })
+                .fail(function() {
+                    finish('ns.Update fails');
+                });
+        });
+
+    });
+
 });

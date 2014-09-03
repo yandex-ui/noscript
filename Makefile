@@ -15,7 +15,7 @@ node_modules: package.json
 	touch node_modules
 
 # Тесты
-.PHONY: test test-jshint test-node test-karma yate
+.PHONY: test test-jshint test-node test-karma yate test-browser
 test:
 	$(MAKE) test-jshint
 	$(MAKE) test-karma test-node
@@ -29,6 +29,9 @@ test-node: dist yate | node_modules
 
 test-karma: dist yate | node_modules
 	./node_modules/karma/bin/karma start
+
+test-browser: dist yate | node_modules
+	./node_modules/karma/bin/karma start --single-run=false --browsers
 
 yate: test/tests.yate.js
 

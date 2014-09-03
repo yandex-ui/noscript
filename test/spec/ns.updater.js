@@ -1224,10 +1224,17 @@ describe('ns.Updater', function() {
             });
 
             ns.MAIN_VIEW = ns.View.create('app');
+
+            sinon.stub(ns.request, 'models', function(models) {
+                for (var i = 0; i < models.length; i++) {
+                    models[i].setData({ data: true });
+                }
+                return Vow.fulfill(models);
+            });
         });
 
         afterEach(function() {
-            delete this.promise;
+            ns.request.models.restore();
         });
 
         it('Когда асинхронный вид отрисовался как синхронный повторный ns.page.go() не вызывает перерисовку асинхронного вида', function(done) {
@@ -1272,10 +1279,6 @@ describe('ns.Updater', function() {
             return ns.page.go('/page1')
                 .then(function(info) {
                     expect(info.async.length).to.equal(1);
-
-                    ns.Model.get('my_model2').setData({ data: true });
-                    info.async[0].fulfill();
-
                     return info.async[0].then(function() {
                         that.spy1 = sinon.spy(ns.MAIN_VIEW, '_getRequestViews');
                         return ns.page.go(ns.page.currentUrl, 'preserve')

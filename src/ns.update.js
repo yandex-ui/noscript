@@ -89,8 +89,6 @@
      * Регистрирует указанное событие, добавляя к нему признаки ns.update
      * @private
      */
-    ns.Update.prototype.log = no.nop;
-
     ns.Update.prototype.log = function() {
         if (!ns.DEBUG) {
             return;

@@ -678,6 +678,10 @@
          */
         this.asyncState = false;
 
+        if (this.isValid()) {
+            return updated;
+        }
+
         if (this.async) {
             var hasValidModels = this.isModelsValid();
             var hasValidStatus = this.isOk();

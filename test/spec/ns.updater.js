@@ -1291,6 +1291,23 @@ describe('ns.Updater', function() {
                 });
         });
 
+        it('Повторная перерисовка асинхронного вида должна быть асинхронна', function() {
+            // первая отрисовка
+            return ns.page.go('/page1')
+                .then(function(info) {
+                    // ждем завершения отрисовки async-вида
+                    return info.async[0].then(function() {
+                        // заставляем перерисовываться async-вид
+                        ns.Model.get('my_model2').invalidate();
+                        return ns.page.go(ns.page.currentUrl, 'preserve')
+                            .then(function(info) {
+                                // проверяем, что он остался async
+                                expect(info.async).to.have.length(1);
+                            });
+                    });
+                });
+        });
+
     });
 
 });

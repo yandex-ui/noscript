@@ -678,10 +678,6 @@
          */
         this.asyncState = false;
 
-        if (this.isValid()) {
-            return updated;
-        }
-
         if (this.async) {
             var hasValidModels = this.isModelsValid();
             var hasValidStatus = this.isOk();
@@ -709,6 +705,9 @@
             // если обычный блок не валиден
             updated.sync.push(this);
         }
+
+        // сбрасываем флаг, чтобы вид оставался асинхронным
+        this.shouldBeSync = false;
 
         return updated;
     };

@@ -361,7 +361,7 @@
     /**
      * Сценарий генерации html
      * Запрашивает модели всех невалидных и вновь созданных синхронных видов в layout
-     * Геренирует html указанных видов 
+     * Геренирует html указанных видов
      * Результат генерации передаётся строкой при разрешении promise
      * @returns {Vow.promise}
      */
@@ -599,7 +599,7 @@
      *   - Async updates execute simultaneously.
      *   - Parallel update can't be terminated.
      * @static
-     * 
+     *
      * @param {ns.Update} newUpdate New instance of ns.Update.
      * @returns Boolean
      */

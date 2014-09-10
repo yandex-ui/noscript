@@ -706,6 +706,9 @@
             updated.sync.push(this);
         }
 
+        // сбрасываем флаг, чтобы вид оставался асинхронным
+        this.shouldBeSync = false;
+
         return updated;
     };
 

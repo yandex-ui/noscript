@@ -1191,4 +1191,123 @@ describe('ns.Updater', function() {
         });
 
     });
+
+    describe('Валидный асинхронный вид не должен перерисовываться просто так (demo for #450)', function() {
+
+        beforeEach(function() {
+            ns.layout.define('page1', {
+                'app': {
+                    'box@': {
+                        'photo': {
+                            'ads&' : true
+                        }
+                    }
+                }
+            });
+
+            ns.router.routes = {
+                'route': {
+                    '/page1': 'page1'
+                }
+            };
+            ns.router.init();
+
+            ns.Model.define('my_model1');
+            ns.Model.define('my_model2');
+
+            ns.View.define('app');
+            ns.View.define('photo', {
+                models: [ 'my_model1' ]
+            });
+            ns.View.define('ads', {
+                models: [ 'my_model2' ]
+            });
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            sinon.stub(ns.request, 'models', function(models) {
+                for (var i = 0; i < models.length; i++) {
+                    models[i].setData({ data: true });
+                }
+                return Vow.fulfill(models);
+            });
+        });
+
+        afterEach(function() {
+            ns.request.models.restore();
+        });
+
+        it('Когда асинхронный вид отрисовался как синхронный повторный ns.page.go() не вызывает перерисовку асинхронного вида', function(done) {
+            var that = this;
+
+            ns.Model.get('my_model1').setData({ data: true });
+            ns.Model.get('my_model2').setData({ data: true });
+
+            ns.page.go('/page1')
+                .then(function(info) {
+                    expect(info.async.length).to.equal(0);
+
+                    that.spy1 = sinon.spy(ns.MAIN_VIEW, '_getRequestViews');
+
+                    ns.page.go(ns.page.currentUrl, 'preserve')
+                        .then(function() {
+                            expect(that.spy1.callCount).to.equal(1);
+                            expect(that.spy1.firstCall.returnValue.sync.length).to.equal(0);
+                            done();
+                        });
+                })
+                .fail(function() {
+                    finish('ns.Update fails');
+                });
+        });
+
+        /**
+            У нас есть синхронный и асинхронный вид.
+            Данные для синхронного вида есть - его можно рисовать.
+            Данных на асинхронного вида нет. Он будет отрисовываться отдельно.
+
+            Когда update для sync вида выполнился - ждём async.
+            Когда async данные пришли и выполнился async update - запускаем ещё один ns.page.go().
+            Проверяем, что async вид не пытается перерисоваться (потому что он валиден).
+        */
+        it('Когда асинхронный вид отрисовался асинхронно повторный ns.page.go() не вызывает перерисовку асинхронного вида', function() {
+            var that = this;
+            var promise = new Vow.Promise();
+
+            ns.Model.get('my_model1').setData({ data: true });
+
+            return ns.page.go('/page1')
+                .then(function(info) {
+                    expect(info.async.length).to.equal(1);
+                    return info.async[0].then(function() {
+                        that.spy1 = sinon.spy(ns.MAIN_VIEW, '_getRequestViews');
+                        return ns.page.go(ns.page.currentUrl, 'preserve')
+                            .then(function() {
+                                expect(that.spy1.callCount).to.equal(1);
+                                expect(ns.MAIN_VIEW.views.box.views['view=photo'].views.ads.isValid()).to.be.ok;
+                                expect(that.spy1.firstCall.returnValue.sync.length).to.equal(0);
+                            });
+                    });
+                });
+        });
+
+        it('Повторная перерисовка асинхронного вида должна быть асинхронна', function() {
+            // первая отрисовка
+            return ns.page.go('/page1')
+                .then(function(info) {
+                    // ждем завершения отрисовки async-вида
+                    return info.async[0].then(function() {
+                        // заставляем перерисовываться async-вид
+                        ns.Model.get('my_model2').invalidate();
+                        return ns.page.go(ns.page.currentUrl, 'preserve')
+                            .then(function(info) {
+                                // проверяем, что он остался async
+                                expect(info.async).to.have.length(1);
+                            });
+                    });
+                });
+        });
+
+    });
+
 });

@@ -1195,6 +1195,9 @@ describe('ns.Updater', function() {
     describe('Валидный асинхронный вид не должен перерисовываться просто так (demo for #450)', function() {
 
         beforeEach(function() {
+            this.adsHtmlDestroySpy = sinon.spy();
+            this.adsHtmlInitSpy = sinon.spy();
+
             ns.layout.define('page1', {
                 'app': {
                     'box@': {
@@ -1220,7 +1223,11 @@ describe('ns.Updater', function() {
                 models: [ 'my_model1' ]
             });
             ns.View.define('ads', {
-                models: [ 'my_model2' ]
+                models: [ 'my_model2' ],
+                events: {
+                    'ns-view-htmlinit': this.adsHtmlInitSpy,
+                    'ns-view-htmldestroy': this.adsHtmlDestroySpy
+                }
             });
 
             ns.MAIN_VIEW = ns.View.create('app');
@@ -1303,6 +1310,25 @@ describe('ns.Updater', function() {
                             .then(function(info) {
                                 // проверяем, что он остался async
                                 expect(info.async).to.have.length(1);
+                            });
+                    });
+                });
+        });
+
+        it('Для асинхронного вида вызывается ns-view-htmldestroy после асинхронной перерисовки', function() {
+            var that = this;
+            return ns.page.go('/page1')
+                .then(function(info) {
+                    return info.async[0].then(function() {
+                        ns.Model.get('my_model1').invalidate();
+                        ns.Model.get('my_model2').invalidate();
+
+                        return ns.page.go(ns.page.currentUrl, 'preserve')
+                            .then(function(info) {
+                                return info.async[0].then(function() {
+                                    expect(that.adsHtmlInitSpy.callCount).to.equal(2);
+                                    expect(that.adsHtmlDestroySpy.callCount).to.equal(1);
+                                });
                             });
                     });
                 });

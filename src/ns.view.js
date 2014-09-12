@@ -1441,7 +1441,8 @@
                 } else {
                     // событие init тригерится при создании блока, поэтому вешать его надо сразу
                     // событие async тригерится до всего, его тоже надо вешать
-                    if (eventName === 'ns-view-init' || eventName === 'ns-view-async') {
+                    // события htmlinit и htmldestroy надо вешать один раз и не снимать
+                    if (eventName === 'ns-view-init' || eventName === 'ns-view-async' || eventName === 'ns-view-htmlinit' || eventName === 'ns-view-htmldestroy') {
                         info.createEvents.push([eventName, handler]);
 
                     } else {

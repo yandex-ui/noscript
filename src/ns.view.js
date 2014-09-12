@@ -417,8 +417,7 @@
                 'bind': this._bindEventHandlers(eventsInfo['bind'], 2),
                 'delegate': this._bindEventHandlers(eventsInfo['delegate'], 2),
 
-                'ns-global': this._bindEventHandlers(noeventsInfo['global'], 1),
-                'ns-local': this._bindEventHandlers(noeventsInfo['local'], 1)
+                'ns-global': this._bindEventHandlers(noeventsInfo['global'], 1)
             };
         }
         return this[eventProp];
@@ -463,12 +462,6 @@
             $node.find(event[1]).on(event[0] + eventNS, event[2]);
         }
 
-        var localNoevents = events['ns-local'];
-        for (i = 0, j = localNoevents.length; i < j; i++) {
-            event = localNoevents[i];
-            this.on(event[0], event[1]);
-        }
-
         var globalNoevents = events['ns-global'];
         for (i = 0, j = globalNoevents.length; i < j; i++) {
             event = globalNoevents[i];
@@ -509,12 +502,6 @@
         for (i = 0, j = bindEvents.length; i < j; i++) {
             event = bindEvents[i];
             $node.find(event[1]).off(eventNS);
-        }
-
-        var localNoevents = events['ns-local'];
-        for (i = 0, j = localNoevents.length; i < j; i++) {
-            event = localNoevents[i];
-            this.off(event[0], event[1]);
         }
 
         var globalNoevents = events['ns-global'];
@@ -1391,8 +1378,7 @@
          * @type {object}
          */
         info.initNoevents = {
-            'global': [],
-            'local': []
+            'global': []
         };
 
         /**
@@ -1400,8 +1386,7 @@
          * @type {object}
          */
         info.showNoevents = {
-            'global': [],
-            'local': []
+            'global': []
         };
 
         // парсим события View

@@ -410,14 +410,14 @@
 
         if (!this[eventProp]) {
             var eventsInfo = this.info[type + 'Events'];
-            var noeventsInfo = this.info[type + 'Noevents'];
+            var nseventsInfo = this.info[type + 'Nsevents'];
 
             // копируем информацию из info в View и биндим обработчики на этот инстанс
             this[eventProp] = {
                 'bind': this._bindEventHandlers(eventsInfo['bind'], 2),
                 'delegate': this._bindEventHandlers(eventsInfo['delegate'], 2),
 
-                'ns-global': this._bindEventHandlers(noeventsInfo['global'], 1)
+                'nsevents': this._bindEventHandlers(nseventsInfo, 1)
             };
         }
         return this[eventProp];
@@ -462,9 +462,9 @@
             $node.find(event[1]).on(event[0] + eventNS, event[2]);
         }
 
-        var globalNoevents = events['ns-global'];
-        for (i = 0, j = globalNoevents.length; i < j; i++) {
-            event = globalNoevents[i];
+        var nsEvents = events['nsevents'];
+        for (i = 0, j = nsEvents.length; i < j; i++) {
+            event = nsEvents[i];
             ns.events.on(event[0], event[1]);
         }
     };
@@ -504,9 +504,9 @@
             $node.find(event[1]).off(eventNS);
         }
 
-        var globalNoevents = events['ns-global'];
-        for (i = 0, j = globalNoevents.length; i < j; i++) {
-            event = globalNoevents[i];
+        var nsEvents = events['nsevents'];
+        for (i = 0, j = nsEvents.length; i < j; i++) {
+            event = nsEvents[i];
             ns.events.off(event[0], event[1]);
         }
     };
@@ -1377,17 +1377,13 @@
          * Декларации подписок на кастомные события при создании View.
          * @type {object}
          */
-        info.initNoevents = {
-            'global': []
-        };
+        info.initNsevents = [];
 
         /**
          * Декларации подписок на кастомные события при показе View.
          * @type {object}
          */
-        info.showNoevents = {
-            'global': []
-        };
+        info.showNsevents = [];
 
         // парсим события View
         for (var eventDecl in info.events) {
@@ -1440,7 +1436,7 @@
                          */
 
                         when = when || 'show';
-                        info[when + 'Noevents'].global.push([eventName, handler]);
+                        info[when + 'Nsevents'].push([eventName, handler]);
                     }
                 }
             }

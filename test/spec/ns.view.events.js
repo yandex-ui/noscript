@@ -67,7 +67,7 @@ describe('ns.View.events', function() {
             }
         }, 'app');
 
-        var views = ['app', 'head', 'content1', 'content1-async@content1-async-model', 'content1-inner', 'content2', 'content2-inner'];
+        var views = ['app', 'head', 'content1', 'content1-async@content1-async-model', 'content2-async@content2-async-model', 'content1-inner', 'content2', 'content2-inner'];
         var events = ['ns-view-async', 'ns-view-init', 'ns-view-htmlinit', 'ns-view-show', 'ns-view-touch', 'ns-view-hide', 'ns-view-htmldestroy'];
 
         this.events = {};
@@ -497,4 +497,283 @@ describe('ns.View.events', function() {
         });
 
     });
+
+    describe('ns-view-async 2', function() {
+
+        beforeEach(function(done) {
+            ns.layout.define('content2-async', {
+                'app content@': {
+                    'content2-inner': {
+                        'content2-async&': true
+                    }
+                }
+            }, 'app');
+
+            ns.Model.define('content2-async-model');
+
+            var that = this;
+            var layout = ns.layout.page('content2-async', {});
+            new ns.Update(this.APP, layout, {}).start().then(function(result) {
+                that.asyncPromise1 = result.async[0];
+                done();
+            });
+        });
+
+        describe('first pass', function() {
+            describe('events', function() {
+                genTests([
+                    ['content2-inner', 'ns-view-htmldestroy', 'called', false],
+                    ['content2-inner', 'ns-view-hide', 'called', false],
+                    ['content2-inner', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content2-inner', 'ns-view-show', 'calledOnce'],
+                    ['content2-inner', 'ns-view-touch', 'calledOnce'],
+
+                    ['content2-async', 'ns-view-async', 'calledOnce'],
+                    ['content2-async', 'ns-view-htmldestroy', 'called', false],
+                    ['content2-async', 'ns-view-hide', 'called', false],
+                    ['content2-async', 'ns-view-htmlinit', 'called', false],
+                    ['content2-async', 'ns-view-show', 'called', false],
+                    ['content2-async', 'ns-view-touch', 'called', false]
+                ]);
+            });
+
+            describe('order', function() {
+                genOrderTests([
+                    ['content2-inner', 'ns-view-htmlinit', 0],
+                    ['head', 'ns-view-htmlinit', 0],
+                    ['app', 'ns-view-htmlinit', 0],
+
+                    ['content2-async', 'ns-view-async', 0],
+
+                    ['content2-inner', 'ns-view-show', 0],
+                    ['head', 'ns-view-show', 0],
+                    ['app', 'ns-view-show', 0],
+
+                    ['content2-inner', 'ns-view-touch', 0],
+                    ['head', 'ns-view-touch', 0],
+                    ['app', 'ns-view-touch', 0]
+                ]);
+            });
+        });
+
+        describe('second pass', function() {
+
+            beforeEach(function() {
+                this.sinon.server.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+
+                return this.asyncPromise1;
+            });
+
+            describe('events', function() {
+                genTests([
+                    ['content2-inner', 'ns-view-htmldestroy', 'called', false],
+                    ['content2-inner', 'ns-view-hide', 'called', false],
+                    ['content2-inner', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content2-inner', 'ns-view-show', 'calledOnce'],
+                    ['content2-inner', 'ns-view-touch', 'calledOnce'],
+
+                    ['content2-async', 'ns-view-async', 'calledOnce'],
+                    ['content2-async', 'ns-view-htmldestroy', 'called', false],
+                    ['content2-async', 'ns-view-hide', 'called', false],
+                    ['content2-async', 'ns-view-htmlinit', 'calledOnce'], // +1
+                    ['content2-async', 'ns-view-show', 'calledOnce'], // +1
+                    ['content2-async', 'ns-view-touch', 'calledOnce'] // +1
+                ]);
+            });
+
+            describe('order', function() {
+                genOrderTests([
+                    ['content2-inner', 'ns-view-htmlinit', 0],
+                    ['head', 'ns-view-htmlinit', 0],
+                    ['app', 'ns-view-htmlinit', 0],
+
+                    ['content2-async', 'ns-view-async', 0],
+
+                    ['content2-inner', 'ns-view-show', 0],
+                    ['head', 'ns-view-show', 0],
+                    ['app', 'ns-view-show', 0],
+
+                    ['content2-inner', 'ns-view-touch', 0],
+                    ['head', 'ns-view-touch', 0],
+                    ['app', 'ns-view-touch', 0],
+
+                    // После того, как отрендерился content2-async
+                    ['content2-async', 'ns-view-htmlinit', 0],
+                    ['content2-async', 'ns-view-show', 0],
+                    ['content2-async', 'ns-view-touch', 0]
+                ]);
+            });
+        });
+
+        describe('third phase (new update: first phase)', function() {
+
+            beforeEach(function(done) {
+                var that = this;
+
+                this.sinon.server.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+
+                this.asyncPromise1.then(function() {
+                    ns.Model.get('content2-async-model').invalidate();
+
+                    var layout = ns.layout.page('content2-async', {});
+                    new ns.Update(that.APP, layout, {}).start().then(function(result) {
+                        that.asyncPromise2 = result.async[0];
+                        done();
+                    });
+                });
+            });
+
+            describe('events', function() {
+                genTests([
+                    ['content2-inner', 'ns-view-htmldestroy', 'called', false],
+                    ['content2-inner', 'ns-view-hide', 'called', false],
+                    ['content2-inner', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content2-inner', 'ns-view-show', 'calledOnce'],
+                    ['content2-inner', 'ns-view-touch', 'calledTwice'], // +1 показ
+
+                    ['content2-async', 'ns-view-async', 'calledTwice'], // +1 новый async рендеринг
+                    ['content2-async', 'ns-view-htmldestroy', 'calledOnce'], // +1 async вид перерисовался и теперь loading
+                    ['content2-async', 'ns-view-hide', 'calledOnce'], // +1 async вид был спрятан (отрендерили async заглушку)
+                    ['content2-async', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content2-async', 'ns-view-show', 'calledOnce'],
+                    ['content2-async', 'ns-view-touch', 'calledOnce']
+                ]);
+            });
+
+            describe('order', function() {
+                genOrderTests([
+                    ['content2-inner', 'ns-view-htmlinit', 0],
+                    ['head', 'ns-view-htmlinit', 0],
+                    ['app', 'ns-view-htmlinit', 0],
+
+                    ['content2-async', 'ns-view-async', 0],
+
+                    ['content2-inner', 'ns-view-show', 0],
+                    ['head', 'ns-view-show', 0],
+                    ['app', 'ns-view-show', 0],
+
+                    ['content2-inner', 'ns-view-touch', 0],
+                    ['head', 'ns-view-touch', 0],
+                    ['app', 'ns-view-touch', 0],
+
+                    ['content2-async', 'ns-view-htmlinit', 0],
+                    ['content2-async', 'ns-view-show', 0],
+                    ['content2-async', 'ns-view-touch', 0],
+
+                    // Второй update отсюда
+                    ['content2-async', 'ns-view-hide', 0],
+                    ['content2-async', 'ns-view-htmldestroy', 0],
+
+                    ['content2-async', 'ns-view-async', 1],
+                    ['content2-inner', 'ns-view-touch', 1]
+                ]);
+            });
+        });
+
+        describe('fourth phase (new update: second phase)', function() {
+
+            beforeEach(function(done) {
+                var that = this;
+
+                this.sinon.server.requests[0].respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            {data: true}
+                        ]
+                    })
+                );
+
+                this.asyncPromise1.then(function() {
+                    ns.Model.get('content2-async-model').invalidate();
+
+                    var layout = ns.layout.page('content2-async', {});
+                    new ns.Update(that.APP, layout, {}).start().then(function(result) {
+
+                        that.sinon.server.requests[1].respond(
+                            200,
+                            {"Content-Type": "application/json"},
+                            JSON.stringify({
+                                models: [
+                                    {data: true}
+                                ]
+                            })
+                        );
+
+                        result.async[0].then(function() {
+                            done();
+                        });
+                    });
+                });
+            });
+
+            describe('events', function() {
+                genTests([
+                    ['content2-inner', 'ns-view-htmldestroy', 'called', false],
+                    ['content2-inner', 'ns-view-hide', 'called', false],
+                    ['content2-inner', 'ns-view-htmlinit', 'calledOnce'],
+                    ['content2-inner', 'ns-view-show', 'calledOnce'],
+                    ['content2-inner', 'ns-view-touch', 'calledTwice'],
+
+                    ['content2-async', 'ns-view-async', 'calledTwice'],
+                    ['content2-async', 'ns-view-htmldestroy', 'calledOnce'],
+                    ['content2-async', 'ns-view-hide', 'calledOnce'],
+                    ['content2-async', 'ns-view-htmlinit', 'calledTwice'], // +1
+                    ['content2-async', 'ns-view-show', 'calledTwice'], // +1
+                    ['content2-async', 'ns-view-touch', 'calledTwice'] // +1
+                ]);
+            });
+
+            describe('order', function() {
+                genOrderTests([
+                    ['content2-inner', 'ns-view-htmlinit', 0],
+                    ['head', 'ns-view-htmlinit', 0],
+                    ['app', 'ns-view-htmlinit', 0],
+
+                    ['content2-async', 'ns-view-async', 0],
+
+                    ['content2-inner', 'ns-view-show', 0],
+                    ['head', 'ns-view-show', 0],
+                    ['app', 'ns-view-show', 0],
+
+                    ['content2-inner', 'ns-view-touch', 0],
+                    ['head', 'ns-view-touch', 0],
+                    ['app', 'ns-view-touch', 0],
+
+                    ['content2-async', 'ns-view-htmlinit', 0],
+                    ['content2-async', 'ns-view-show', 0],
+                    ['content2-async', 'ns-view-touch', 0],
+
+                    ['content2-async', 'ns-view-hide', 0],
+                    ['content2-async', 'ns-view-htmldestroy', 0],
+
+                    ['content2-async', 'ns-view-async', 1],
+                    ['content2-inner', 'ns-view-touch', 1],
+
+                    ['content2-async', 'ns-view-htmlinit', 1],
+                    ['content2-async', 'ns-view-show', 1],
+                    ['content2-async', 'ns-view-touch', 1]
+                ]);
+            });
+        });
+
+    });
+
 });

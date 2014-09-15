@@ -134,7 +134,8 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
 
 ns.router._processRedirect = function(redirectDefs, urlWithoutQuery, url) {
     var pathRedirect;
-    redirectDefs.forEach(function(redirect) {
+    for (var i = 0, j = redirectDefs.length; i < j; i++) {
+        var redirect = redirectDefs[i];
         if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
             if (typeof redirect.path === 'function') {
                 pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
@@ -142,9 +143,13 @@ ns.router._processRedirect = function(redirectDefs, urlWithoutQuery, url) {
                 pathRedirect = redirect.path;
             }
         }
-    });
 
-    return pathRedirect;
+        if (pathRedirect) {
+            return pathRedirect;
+        }
+    }
+
+    return null;
 };
 
 /**

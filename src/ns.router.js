@@ -30,16 +30,7 @@ ns.router = function(url) {
     // /path/?foo=bar -> /path/
     var urlWithoutQuery = urlChunks.shift();
 
-    var pathRedirect;
-    routesDef.redirect.forEach(function(redirect) {
-        if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
-            if (typeof redirect.path === 'function') {
-                pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
-            } else {
-                pathRedirect = redirect.path;
-            }
-        }
-    });
+    var pathRedirect = ns.router._processRedirect(routesDef.redirect, urlWithoutQuery, url);
 
     // we should check redirect without query
     if (pathRedirect) {
@@ -139,6 +130,21 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
         params[rparam.name] = paramValueFromURL;
     }
     return params;
+};
+
+ns.router._processRedirect = function(redirectDefs, urlWithoutQuery, url) {
+    var pathRedirect;
+    redirectDefs.forEach(function(redirect) {
+        if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
+            if (typeof redirect.path === 'function') {
+                pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
+            } else {
+                pathRedirect = redirect.path;
+            }
+        }
+    });
+
+    return pathRedirect;
 };
 
 /**

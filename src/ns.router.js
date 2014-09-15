@@ -26,13 +26,7 @@ ns.router = function(url) {
         url = '/';
     }
 
-    var urlChunks = url.split('?');
-    // /path/?foo=bar -> /path/
-    var urlWithoutQuery = urlChunks.shift();
-
-    var pathRedirect = ns.router._processRedirect(routesDef.redirect, urlWithoutQuery, url);
-
-    // we should check redirect without query
+    var pathRedirect = ns.router._processRedirect(routesDef.redirect, url);
     if (pathRedirect) {
         return {
             page: ns.R.REDIRECT,
@@ -42,6 +36,10 @@ ns.router = function(url) {
             redirect: baseDir + pathRedirect
         };
     }
+
+    var urlChunks = url.split('?');
+    // /path/?foo=bar -> /path/
+    var urlWithoutQuery = urlChunks.shift();
 
     if (urlWithoutQuery in routesDef.rewriteUrl) {
         var urlQuery = urlChunks.join('?');
@@ -132,11 +130,11 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
     return params;
 };
 
-ns.router._processRedirect = function(redirectDefs, urlWithoutQuery, url) {
+ns.router._processRedirect = function(redirectDefs, url) {
     var pathRedirect;
     for (var i = 0, j = redirectDefs.length; i < j; i++) {
         var redirect = redirectDefs[i];
-        if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
+        if (redirect.regexp && redirect.regexp.test(url)) {
             if (typeof redirect.path === 'function') {
                 pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
             } else {

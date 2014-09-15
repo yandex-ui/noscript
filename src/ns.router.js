@@ -51,16 +51,8 @@ ns.router = function(url) {
     for (var i = 0, j = routes.length; i < j; i++) {
         var route = routes[i];
 
-        var r = route.regexp.exec(url);
-        if (r) {
-            var params = ns.router._getParamsRouteFromUrl(url, route);
-
-            // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
-            var query = r[route.params.length + 1];
-            if (query) {
-                no.extend( params, ns.parseQuery(query) );
-            }
-
+        var params = ns.router._parseUrl(route, url);
+        if (params) {
             // реврайты параметров для этой страницы
             if (route.page in routesDef.rewriteParams) {
                 params = routesDef.rewriteParams[route.page](params);
@@ -130,16 +122,35 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
     return params;
 };
 
+ns.router._parseUrl = function(route, url) {
+    var r = route.regexp.exec(url);
+    if (r) {
+        var params = ns.router._getParamsRouteFromUrl(url, route);
+
+        // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
+        var query = r[route.params.length + 1];
+        if (query) {
+            no.extend(params, ns.parseQuery(query));
+        }
+
+        return params;
+    }
+
+    return null;
+};
+
 ns.router._processRedirect = function(redirectDefs, url) {
     var pathRedirect;
     for (var i = 0, j = redirectDefs.length; i < j; i++) {
         var redirect = redirectDefs[i];
-        if (redirect.regexp && redirect.regexp.test(url)) {
-            if (typeof redirect.path === 'function') {
-                pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
-            } else {
-                pathRedirect = redirect.path;
+        if (typeof redirect.path === 'function') {
+            var parsedParams = ns.router._parseUrl(redirect, url);
+            if (parsedParams) {
+                pathRedirect = redirect.path(parsedParams, url);
             }
+
+        } else if (redirect.regexp.test(url)) {
+            pathRedirect = redirect.path;
         }
 
         if (pathRedirect) {

@@ -122,6 +122,13 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
     return params;
 };
 
+/**
+ * Парсит урл согласно маршруту.
+ * @param {object} route Маршрут.
+ * @param {string} url Обрабатываемый урл.
+ * @returns {object|null} Разобранный объект с параметрами или null
+ * @private
+ */
 ns.router._parseUrl = function(route, url) {
     var r = route.regexp.exec(url);
     if (r) {
@@ -139,13 +146,24 @@ ns.router._parseUrl = function(route, url) {
     return null;
 };
 
+/**
+ * Обрабатывать стадию редиректов в маршрутизаторе.
+ * @param {array} redirectDefs Массив редиректов.
+ * @param {string} url Обрабатываемый урл.
+ * @returns {string|null} Урл, куда надо средиректить, или null
+ * @private
+ */
 ns.router._processRedirect = function(redirectDefs, url) {
     var pathRedirect;
     for (var i = 0, j = redirectDefs.length; i < j; i++) {
         var redirect = redirectDefs[i];
+
+        // если обработчик редиректа - функция
         if (typeof redirect.path === 'function') {
+            // парсим url
             var parsedParams = ns.router._parseUrl(redirect, url);
             if (parsedParams) {
+                // отдаем в обработчик разобранные параметры и обрабатываемый url
                 pathRedirect = redirect.path(parsedParams, url);
             }
 

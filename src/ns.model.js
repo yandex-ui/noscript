@@ -172,9 +172,15 @@
 
     /**
      * Уничтожает модель.
+     * @fires ns.Model#ns-model-before-destroyed
      * @fires ns.Model#ns-model-destroyed
      */
     ns.Model.prototype.destroy = function() {
+        /**
+         * @events ns.Model#ns-model-before-destroyed
+         */
+        this.trigger('ns-model-before-destroyed');
+
         this._reset(this.STATUS.NONE);
         /**
          * Сообщает об уничтожении модели

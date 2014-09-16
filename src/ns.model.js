@@ -415,6 +415,12 @@
      * @fires ns.Model#ns-model-changed
      */
     ns.Model.prototype.touch = function(options) {
+        options = options || {};
+
+        if (options.silent) {
+            return;
+        }
+
         this._incVersion();
 
         /**
@@ -423,19 +429,15 @@
          */
         this.trigger('ns-model-touched');
 
-        options = options || {};
-        if (!options.silent) {
+        var jpath = options.jpath || '';
 
-            var jpath = options.jpath || '';
-
-            /**
-             * Сообщение о том, что модель изменилась.
-             * @event ns.Model#ns-model-changed
-             * @param {string} evt Название события
-             * @params {string} jpath JPath, по которому изменились данные. Если пустой, то изменилась вся модель.
-             */
-            this.trigger('ns-model-changed', jpath);
-        }
+        /**
+         * Сообщение о том, что модель изменилась.
+         * @event ns.Model#ns-model-changed
+         * @param {string} evt Название события
+         * @params {string} jpath JPath, по которому изменились данные. Если пустой, то изменилась вся модель.
+         */
+        this.trigger('ns-model-changed', jpath);
     };
 
     /**

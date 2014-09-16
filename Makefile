@@ -30,6 +30,9 @@ test-node: dist yate | node_modules
 test-karma: dist yate | node_modules
 	./node_modules/karma/bin/karma start
 
+test-karma-live: dist yate | node_modules
+	./node_modules/karma/bin/karma start --single-run=false
+
 test-browser: dist yate | node_modules
 	./node_modules/karma/bin/karma start --single-run=false --browsers
 

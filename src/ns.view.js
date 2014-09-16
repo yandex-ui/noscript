@@ -410,15 +410,14 @@
 
         if (!this[eventProp]) {
             var eventsInfo = this.info[type + 'Events'];
-            var noeventsInfo = this.info[type + 'Noevents'];
+            var nseventsInfo = this.info[type + 'Nsevents'];
 
             // копируем информацию из info в View и биндим обработчики на этот инстанс
             this[eventProp] = {
                 'bind': this._bindEventHandlers(eventsInfo['bind'], 2),
                 'delegate': this._bindEventHandlers(eventsInfo['delegate'], 2),
 
-                'ns-global': this._bindEventHandlers(noeventsInfo['global'], 1),
-                'ns-local': this._bindEventHandlers(noeventsInfo['local'], 1)
+                'nsevents': this._bindEventHandlers(nseventsInfo, 1)
             };
         }
         return this[eventProp];
@@ -463,15 +462,9 @@
             $node.find(event[1]).on(event[0] + eventNS, event[2]);
         }
 
-        var localNoevents = events['ns-local'];
-        for (i = 0, j = localNoevents.length; i < j; i++) {
-            event = localNoevents[i];
-            this.on(event[0], event[1]);
-        }
-
-        var globalNoevents = events['ns-global'];
-        for (i = 0, j = globalNoevents.length; i < j; i++) {
-            event = globalNoevents[i];
+        var nsEvents = events['nsevents'];
+        for (i = 0, j = nsEvents.length; i < j; i++) {
+            event = nsEvents[i];
             ns.events.on(event[0], event[1]);
         }
     };
@@ -511,15 +504,9 @@
             $node.find(event[1]).off(eventNS);
         }
 
-        var localNoevents = events['ns-local'];
-        for (i = 0, j = localNoevents.length; i < j; i++) {
-            event = localNoevents[i];
-            this.off(event[0], event[1]);
-        }
-
-        var globalNoevents = events['ns-global'];
-        for (i = 0, j = globalNoevents.length; i < j; i++) {
-            event = globalNoevents[i];
+        var nsEvents = events['nsevents'];
+        for (i = 0, j = nsEvents.length; i < j; i++) {
+            event = nsEvents[i];
             ns.events.off(event[0], event[1]);
         }
     };
@@ -1390,19 +1377,13 @@
          * Декларации подписок на кастомные события при создании View.
          * @type {object}
          */
-        info.initNoevents = {
-            'global': [],
-            'local': []
-        };
+        info.initNsevents = [];
 
         /**
          * Декларации подписок на кастомные события при показе View.
          * @type {object}
          */
-        info.showNoevents = {
-            'global': [],
-            'local': []
-        };
+        info.showNsevents = [];
 
         // парсим события View
         for (var eventDecl in info.events) {
@@ -1439,30 +1420,23 @@
                     info[when + 'Events'][delegatedEvent ? 'delegate' : 'bind'].push(arr);
 
                 } else {
-                    // событие init тригерится при создании блока, поэтому вешать его надо сразу
-                    // событие async тригерится до всего, его тоже надо вешать
-                    if (eventName === 'ns-view-init' || eventName === 'ns-view-async') {
+                    // все ns-view* события вешаются при создании вида и не снимаются никогда
+                    // TODO возможна утечка памяти (но она была и раньше, когда вешались так только ns-view-init и ns-view-async)
+                    if (ns.V.NS_EVENTS.indexOf(eventName) > -1) {
                         info.createEvents.push([eventName, handler]);
 
                     } else {
-                        // к View нельзя получить доступ, поэтому локальными могут быть только встроенные ns-* события
-                        if (ns.V.NS_EVENTS.indexOf(eventName) > -1) {
-                            // все ns-view-* события вешаем на init
-                            info['initNoevents'].local.push([eventName, handler]);
+                        /*
+                        Кастомные ("космические") события через общую шину (ns.events) по умолчанию вешаются на show и снимаются на hide.
 
-                        } else {
-                            /*
-                            Кастомные ("космические") события через общую шину (ns.events) по умолчанию вешаются на show и снимаются на hide.
+                        Логика такая:
+                        На странице может быть много экземпляров одного вида и каждый из них отреагирует, если будет init.
+                        Но кастомные события создавались для общения вида с внешним миром, и обычно реагировать должны только видимые виды.
+                        Опять же инициатором такого события (в большинстве случаев) будет действие пользователя, а обработчики DOM-событий вешаются на show.
+                         */
 
-                            Логика такая:
-                            На странице может быть много экземпляров одного вида и каждый из них отреагирует, если будет init.
-                            Но кастомные события создавались для общения вида с внешним миром, и обычно реагировать должны только видимые виды.
-                            Опять же инициатором такого события (в большинстве случаев) будет действие пользователя, а обработчики DOM-событий вешаются на show.
-                             */
-
-                            when = when || 'show';
-                            info[when + 'Noevents'].global.push([eventName, handler]);
-                        }
+                        when = when || 'show';
+                        info[when + 'Nsevents'].push([eventName, handler]);
                     }
                 }
             }

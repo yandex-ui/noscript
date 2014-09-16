@@ -26,22 +26,7 @@ ns.router = function(url) {
         url = '/';
     }
 
-    var urlChunks = url.split('?');
-    // /path/?foo=bar -> /path/
-    var urlWithoutQuery = urlChunks.shift();
-
-    var pathRedirect;
-    routesDef.redirect.forEach(function(redirect) {
-        if (redirect.regexp && redirect.regexp.test(urlWithoutQuery)) {
-            if (typeof redirect.path === 'function') {
-                pathRedirect = redirect.path(ns.router._getParamsRouteFromUrl(url, redirect));
-            } else {
-                pathRedirect = redirect.path;
-            }
-        }
-    });
-
-    // we should check redirect without query
+    var pathRedirect = ns.router._processRedirect(routesDef.redirect, url);
     if (pathRedirect) {
         return {
             page: ns.R.REDIRECT,
@@ -51,6 +36,10 @@ ns.router = function(url) {
             redirect: baseDir + pathRedirect
         };
     }
+
+    var urlChunks = url.split('?');
+    // /path/?foo=bar -> /path/
+    var urlWithoutQuery = urlChunks.shift();
 
     if (urlWithoutQuery in routesDef.rewriteUrl) {
         var urlQuery = urlChunks.join('?');
@@ -62,16 +51,8 @@ ns.router = function(url) {
     for (var i = 0, j = routes.length; i < j; i++) {
         var route = routes[i];
 
-        var r = route.regexp.exec(url);
-        if (r) {
-            var params = ns.router._getParamsRouteFromUrl(url, route);
-
-            // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
-            var query = r[route.params.length + 1];
-            if (query) {
-                no.extend( params, ns.parseQuery(query) );
-            }
-
+        var params = ns.router._parseUrl(route, url);
+        if (params) {
             // реврайты параметров для этой страницы
             if (route.page in routesDef.rewriteParams) {
                 params = routesDef.rewriteParams[route.page](params);
@@ -101,17 +82,12 @@ ns.router.URL_FIRST_SYMBOL = '/';
 
 /**
  * Get params for router from url
- * @param {string} url - current url
- * @param {object} route - compiled route or redirect
+ * @param {object} route Compiled route or redirect
+ * @param {array} parsedChunks Result from RegExp.exec
  * @returns {object}
  * @private
  */
-ns.router._getParamsRouteFromUrl = function(url, route) {
-    var r = route.regexp.exec(url);
-    if (!r) {
-        return {};
-    }
-
+ns.router._getParamsRouteFromUrl = function(route, parsedChunks) {
     var rparams = route.params;
 
     var params = {};
@@ -121,7 +97,7 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
     for (var k = 0; k < l; k++) {
         rparam = rparams[k];
 
-        var paramValueFromURL = r[k + 1];
+        var paramValueFromURL = parsedChunks[k + 1];
         if (paramValueFromURL) {
             // try to decode
             try {
@@ -139,6 +115,63 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
         params[rparam.name] = paramValueFromURL;
     }
     return params;
+};
+
+/**
+ * Парсит урл согласно маршруту.
+ * @param {object} route Маршрут.
+ * @param {string} url Обрабатываемый урл.
+ * @returns {object|null} Разобранный объект с параметрами или null
+ * @private
+ */
+ns.router._parseUrl = function(route, url) {
+    var parsedChunks = route.regexp.exec(url);
+    if (parsedChunks) {
+        var params = ns.router._getParamsRouteFromUrl(route, parsedChunks);
+
+        // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
+        var query = parsedChunks[route.params.length + 1];
+        if (query) {
+            no.extend(params, ns.parseQuery(query));
+        }
+
+        return params;
+    }
+
+    return null;
+};
+
+/**
+ * Обрабатывает стадию редиректов в маршрутизаторе.
+ * @param {array} redirectDefs Массив редиректов.
+ * @param {string} url Обрабатываемый урл.
+ * @returns {string|null} Урл, куда надо средиректить, или null
+ * @private
+ */
+ns.router._processRedirect = function(redirectDefs, url) {
+    var pathRedirect;
+    for (var i = 0, j = redirectDefs.length; i < j; i++) {
+        var redirect = redirectDefs[i];
+
+        // если обработчик редиректа - функция
+        if (typeof redirect.path === 'function') {
+            // парсим url
+            var parsedParams = ns.router._parseUrl(redirect, url);
+            if (parsedParams) {
+                // отдаем в обработчик разобранные параметры и обрабатываемый url
+                pathRedirect = redirect.path(parsedParams, url);
+            }
+
+        } else if (redirect.regexp.test(url)) {
+            pathRedirect = redirect.path;
+        }
+
+        if (pathRedirect) {
+            return pathRedirect;
+        }
+    }
+
+    return null;
 };
 
 /**

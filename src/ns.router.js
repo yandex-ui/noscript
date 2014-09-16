@@ -147,7 +147,7 @@ ns.router._parseUrl = function(route, url) {
 };
 
 /**
- * Обрабатывать стадию редиректов в маршрутизаторе.
+ * Обрабатывает стадию редиректов в маршрутизаторе.
  * @param {array} redirectDefs Массив редиректов.
  * @param {string} url Обрабатываемый урл.
  * @returns {string|null} Урл, куда надо средиректить, или null

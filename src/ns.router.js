@@ -82,17 +82,12 @@ ns.router.URL_FIRST_SYMBOL = '/';
 
 /**
  * Get params for router from url
- * @param {string} url - current url
- * @param {object} route - compiled route or redirect
+ * @param {object} route Compiled route or redirect
+ * @param {array} parsedChunks Result from RegExp.exec
  * @returns {object}
  * @private
  */
-ns.router._getParamsRouteFromUrl = function(url, route) {
-    var r = route.regexp.exec(url);
-    if (!r) {
-        return {};
-    }
-
+ns.router._getParamsRouteFromUrl = function(route, parsedChunks) {
     var rparams = route.params;
 
     var params = {};
@@ -102,7 +97,7 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
     for (var k = 0; k < l; k++) {
         rparam = rparams[k];
 
-        var paramValueFromURL = r[k + 1];
+        var paramValueFromURL = parsedChunks[k + 1];
         if (paramValueFromURL) {
             // try to decode
             try {
@@ -130,12 +125,12 @@ ns.router._getParamsRouteFromUrl = function(url, route) {
  * @private
  */
 ns.router._parseUrl = function(route, url) {
-    var r = route.regexp.exec(url);
-    if (r) {
-        var params = ns.router._getParamsRouteFromUrl(url, route);
+    var parsedChunks = route.regexp.exec(url);
+    if (parsedChunks) {
+        var params = ns.router._getParamsRouteFromUrl(route, parsedChunks);
 
         // Смотрим, есть ли дополнительные get-параметры, вида ?param1=value1&param2=value2...
-        var query = r[route.params.length + 1];
+        var query = parsedChunks[route.params.length + 1];
         if (query) {
             no.extend(params, ns.parseQuery(query));
         }

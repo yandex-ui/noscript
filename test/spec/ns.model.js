@@ -67,10 +67,10 @@ describe('ns.Model', function() {
                 var getInfo = function() {ns.Model.infoLite('dm1');};
                 expect(getInfo).to.throw();
 
-                ns.Model.define('dm1', {foo: 'bar'});
+                var ctor = ns.Model.define('dm1', {foo: 'bar'});
 
                 expect(ns.Model.infoLite('dm1'))
-                    .to.eql({foo: 'bar', isCollection: false});
+                    .to.eql({foo: 'bar', ctor: ctor, isCollection: false});
             });
 
             it('should create a constructor', function() {

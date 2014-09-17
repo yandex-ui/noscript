@@ -607,6 +607,7 @@
         // часть дополнительной обработки производится в ns.Model.info
         // т.о. получаем lazy-определение
 
+        info.ctor = ctor;
         _infos[id] = info;
         _ctors[id] = ctor;
 

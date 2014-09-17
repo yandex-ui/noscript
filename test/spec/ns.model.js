@@ -505,7 +505,7 @@ describe('ns.Model', function() {
 
                 this.model.setData(this.data);
 
-                expect(this.model.trigger.calledWith('ns-model-changed'))
+                expect(this.model.trigger.calledWith('ns-model-changed', ''))
                     .to.be.equal(true);
             });
 

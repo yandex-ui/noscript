@@ -206,4 +206,5 @@ describe('ns.Update. Синтетические случаи', function() {
                 expect(ns.request.models).to.have.callCount(0);
             });
     });
+
 });

@@ -114,4 +114,8 @@ match .* ns-view-async-content {}
 
 // Часть обязательных моделей не удалось получить или для них вернулась ошибка
 // @public
-match .* ns-view-error-content {}
+match .* ns-view-error-content {
+    // Надо все равно отрисовать дерево,
+    // чтобы не нарваться на ошибку "Can't find node for <view>"
+    apply . ns-view-content
+}

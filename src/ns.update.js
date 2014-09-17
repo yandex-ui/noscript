@@ -42,6 +42,13 @@
 
         this.promise = new Vow.Promise();
 
+        /**
+         * Количество перезапросов из-за невалидных моделей.
+         * @type {number}
+         * @private
+         */
+        this._restartCount = 1;
+
         options = options || {};
 
         /**
@@ -84,6 +91,13 @@
      * @private
      */
     ns.Update.prototype._EVENTS_ORDER = ['ns-view-hide', 'ns-view-htmldestroy', 'ns-view-htmlinit', 'ns-view-async', 'ns-view-show', 'ns-view-touch'];
+
+    /**
+     * Лимит на перезапрос моделей.
+     * @type {number}
+     * @constant
+     */
+    ns.Update.prototype.RESTART_LIMIT = 2;
 
     /**
      * Регистрирует указанное событие, добавляя к нему признаки ns.update
@@ -147,7 +161,7 @@
         };
 
         if (ns.Update.handleError(error, this)) {
-            return [].concat(err.invalid, err.valid);
+            return Vow.resolve([].concat(err.invalid, err.valid));
 
         } else {
             return Vow.reject(error);
@@ -201,6 +215,12 @@
         this.log('collected incomplete views', views);
 
         var models = views2models(views.sync);
+        /**
+         * Массив моделей, которые должны быть валидны перед отрисовкой.
+         * @private
+         */
+        this._models = models;
+
         this.log('collected needed models', models);
         this.switchTimer('collectModels', 'requestSyncModels');
 
@@ -328,11 +348,53 @@
      * потому что у видов будет уже другое состояние, если что-то поменяется между generateHTML и insertNodes
      * @private
      */
-    ns.Update.prototype._updateDOM = function() {
+    ns.Update.prototype._startUpdateDOM = function() {
         if (this._expired()) {
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
+        // Проверяем валидность моделей перед стартом.
+        // Из-за асинхронности модели могут оказаться невалидными.
+        var models = {
+            valid: [],
+            invalid: []
+        };
+        var modelHasErrors = false;
+        for (var i = 0, j = this._models.length; i < j; i++) {
+            var model = this._models[i];
+            if (model.isValid()) {
+                models.valid.push(model);
+
+            } else {
+                models.invalid.push(model);
+                if (model.status === model.STATUS.ERROR) {
+                    modelHasErrors = true;
+                    break;
+                }
+            }
+        }
+
+        // если все хорошо, то переходим к обновлению DOM
+        if (models.invalid.length === 0) {
+            return this._updateDOM();
+        }
+
+        // если в моделях есть ошибки или мы превысили лимит перезапусков, то фейлимся
+        if (modelHasErrors || this._restartCount >= this.RESTART_LIMIT) {
+            // имитируем ошибку "Невалидные модели"
+            return this._onRequestModelsError(models)
+                // если ns.Update.handleError решит, что все ок, то запускаем обновление DOM
+                .then(this._updateDOM, null, this);
+
+        } else {
+            // если модели невалидные, но в них нет ошибок, то пробуем перезапуститься
+            this._restartCount++;
+            return this._requestModels(this._models)
+                .then(this._startUpdateDOM, null, this);
+        }
+    };
+
+    ns.Update.prototype._updateDOM = function() {
         var html = this._renderUpdateTree();
         var node = ns.html2node(html || '');
         return this._insertNodes(node);
@@ -409,7 +471,7 @@
         // начинаем цепочку с промиса, чтобы ловить ошибки в том числе и из _requestAllModels
         Vow.invoke(this._requestAllModels.bind(this))
             .then(saveAsyncPromises, null, this)
-            .then(this._updateDOM, null, this)
+            .then(this._startUpdateDOM, null, this)
             .then(fulfillWithAsyncPromises, this._reject, this);
 
         return this.promise;

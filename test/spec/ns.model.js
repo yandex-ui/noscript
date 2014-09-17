@@ -875,14 +875,14 @@ describe('ns.Model', function() {
                 this.nsModelDestroySpy = sinon.spy();
                 this.nsModelBeforeDestroySpy = sinon.spy();
 
-                ns.Model.define('test-before-destroy-model', {
+                ns.Model.define('test-destroy-model', {
                     events: {
                         'ns-model-destroyed': this.nsModelDestroySpy,
                         'ns-model-before-destroyed': this.nsModelBeforeDestroySpy
                     }
                 });
 
-                this.model = ns.Model.get('test-before-destroy-model');
+                this.model = ns.Model.get('test-destroy-model');
                 this.model._reset = sinon.spy();
 
                 var trigger = this.model.trigger;
@@ -918,7 +918,6 @@ describe('ns.Model', function() {
             });
 
             it('ns-model-before-destroyed вызывается до ns-model-destroyed', function() {
-                expect(this.nsModelBeforeDestroySpy.calledBefore(this.nsModelDestroySpy)).to.be.equal(true);
                 expect(this.nsModelDestroySpy.calledAfter(this.nsModelBeforeDestroySpy)).to.be.equal(true);
             });
         });

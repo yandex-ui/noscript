@@ -90,7 +90,7 @@ describe('ns.Model', function() {
                 expect(proto)
                     .to.have.property('foo', bar);
 
-                expect(proto.__proto__)
+                expect(Object.getPrototypeOf(proto))
                     .to.have.keys(Object.keys(ns.Model.prototype));
             });
 
@@ -245,7 +245,7 @@ describe('ns.Model', function() {
             });
 
             it('should return pNames property', function() {
-                var key = ns.Model.key('m1', { p1: 1, p3: 2 });
+                ns.Model.key('m1', { p1: 1, p3: 2 }); // init pNames
                 expect( ns.Model.info('m1').pNames )
                     .to.eql(['p1', 'p2', 'p3', 'p4']);
             });
@@ -929,7 +929,7 @@ describe('ns.Model', function() {
 
             it('should throw error if tried to call with undefined model', function() {
                 expect(function() {
-                    return ns.Model.traverse('undefinedModel')
+                    return ns.Model.traverse('undefinedModel');
                 }).to.throw();
             });
 

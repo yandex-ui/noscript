@@ -113,8 +113,6 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestModels = function(models) {
-        var promise = new Vow.Promise();
-
         this.log('started models request', models);
 
         var allModelsValid = true;
@@ -130,36 +128,31 @@
             return Vow.fulfill(models);
         }
 
-        ns.request.models(models)
-            .then(function(models) {
-                if (this._expired()) {
-                    promise.reject({
-                        error: this.STATUS.EXPIRED,
-                        models: models
-                    });
-                    return;
-                }
+        return ns.request.models(models)
+            .then(this._onRequestModelsOK, this._onRequestModelsError, this);
+    };
 
-                promise.fulfill(models);
+    ns.Update.prototype._onRequestModelsOK = function(models) {
+        this.log('received models', models);
+        return models;
+    };
 
-                this.log('received models', models);
-            }, function(err) {
-                var error = {
-                    error: this.STATUS.MODELS,
-                    invalidModels: err.invalid,
-                    validModels: err.valid
-                };
-                if (ns.Update.handleError(error, this)) {
-                    promise.fulfill([].concat(err.invalid, err.valid));
+    ns.Update.prototype._onRequestModelsError = function(err) {
+        this.log('failed to receive models', err);
 
-                } else {
-                    promise.reject(error);
-                }
+        var error = {
+            error: this.STATUS.MODELS,
+            invalidModels: err.invalid,
+            validModels: err.valid
+        };
 
-                this.log('failed to receive models', models, err);
-            }, this);
+        if (ns.Update.handleError(error, this)) {
+            return [].concat(err.invalid, err.valid);
 
-        return promise;
+        } else {
+            return Vow.reject(error);
+        }
+
     };
 
     /**

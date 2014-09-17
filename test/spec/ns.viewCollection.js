@@ -260,8 +260,8 @@ describe('ns.ViewCollection', function() {
         });
 
         it('должен вызвать функцию из intoViews для каждого элемента', function() {
-            // по 2 раза для каждого элемента
-            expect(this.viewSplitter).to.have.callCount(6);
+            // по 3 раза для каждого элемента (getDescView / beforeUpdateHTML / updateHTML )
+            expect(this.viewSplitter).to.have.callCount(9);
         });
 
         it('должен вызвать функцию из intoViews в контексте коллекции', function() {

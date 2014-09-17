@@ -155,6 +155,38 @@ ns.Box.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
+ns.Box.prototype.beforeUpdateHTML = function(layout, params, events) {
+    var newLayout = {};
+    for (var id in layout) {
+        var selfLayout = layout[id];
+        var key = this._getViewKey(id, params, selfLayout.type);
+        newLayout[id] = key;
+
+        //  Достаем ранее созданный блок (в _getRequestViews).
+        /** @type {ns.View} */
+        var view = this.views[key];
+        view.beforeUpdateHTML(layout[view.id].views, params, events);
+    }
+
+    // Пройдёмся по всем вложенным видам, чтобы кинуть hide, которым не попали в newLayout
+    for (var key in this.views) {
+        var view = this.views[key];
+        // Если вид не входит в новый active
+        if (newLayout[view.id] !== view.key) {
+
+            // Скроем виды, не попавшие в layout
+            var descs = view._getDescendantsAndSelf( [] );
+            for (var i = 0, l = descs.length; i < l; i++) {
+                var desc = descs[i];
+                // если view был скрыт
+                if (desc.node && desc._visible === true && !desc.isLoading() && desc.trigger) {
+                    events['ns-view-hide'].push(desc);
+                }
+            }
+        }
+    }
+};
+
 /**
  * Обновляем бокс.
  * @param {HTMLElement} node

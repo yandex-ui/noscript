@@ -364,6 +364,17 @@ ns.ViewCollection.prototype._getViewTree = function(layout, params) {
     return tree;
 };
 
+ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) {
+    this._selfBeforeUpdateHTML(events);
+
+    // проходимся по элементам коллекции
+    if (!this.isLoading()) {
+        this._forEachCollectionItem(function(view) {
+            view.beforeUpdateHTML(null, params, events);
+        });
+    }
+};
+
 /**
  *
  * @param {HTMLElement} node

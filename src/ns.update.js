@@ -291,6 +291,13 @@
 
         this.startTimer('insertNodes');
 
+        var hideViewEvents = {
+            'ns-view-hide': [],
+            'ns-view-htmldestroy': []
+        };
+        this.view.beforeUpdateHTML(this.layout.views, this.params, hideViewEvents);
+        this._triggerViewEvents(hideViewEvents);
+
         var viewEvents = {
             'ns-view-async': [],
             'ns-view-hide': [],
@@ -307,16 +314,23 @@
         }, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
+        // убираем события hide/htmldestroy, потому что мы их уже кинули в первом проходе
+        viewEvents['ns-view-hide'] = [];
+        viewEvents['ns-view-htmldestroy'] = [];
+        this._triggerViewEvents(viewEvents);
+        this.stopTimer('triggerEvents');
+
+        return Vow.fulfill();
+    };
+
+    ns.Update.prototype._triggerViewEvents = function(viewEvents) {
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
             var event = this._EVENTS_ORDER[i];
-            var views = viewEvents[event];
+            var views = viewEvents[event] || [];
             for (var k = views.length - 1; k >= 0; k--) {
                 views[k].trigger(event, this.params);
             }
         }
-        this.stopTimer('triggerEvents');
-
-        return Vow.fulfill();
     };
 
     /**

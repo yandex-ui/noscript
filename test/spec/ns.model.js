@@ -438,7 +438,7 @@ describe('ns.Model', function() {
 
         });
 
-        describe('setData', function() {
+        describe('#setData', function() {
 
             beforeEach(function() {
                 this.model = ns.Model.get('m1', {p1: 1, p3: Math.random()});
@@ -518,6 +518,14 @@ describe('ns.Model', function() {
                     .to.be.equal(true);
             });
 
+            it('should increment model._version', function() {
+                var v1 = this.model.getVersion();
+                this.model.setData(this.data);
+                var v2 = this.model.getVersion();
+
+                expect(v2).to.be.equal(v1 + 1);
+            });
+
             it('should not trigger \'ns-model-changed\' event when {silent: true}', function() {
                 this.sinon.spy(this.model, 'trigger');
 
@@ -525,6 +533,23 @@ describe('ns.Model', function() {
 
                 expect(this.model.trigger.calledWith('ns-model-changed'))
                     .not.to.be.equal(true);
+            });
+
+            it('should not trigger \'ns-model-touched\' event when {silent: true}', function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.setData(this.data, {silent: true});
+
+                expect(this.model.trigger.calledWith('ns-model-touched'))
+                    .not.to.be.equal(true);
+            });
+
+            it('should not increment model._version', function() {
+                var v1 = this.model.getVersion();
+                this.model.setData(this.data, { silent: true });
+                var v2 = this.model.getVersion();
+
+                expect(v2).to.be.equal(v1);
             });
 
         });

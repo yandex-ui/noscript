@@ -371,7 +371,7 @@ ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) 
     if (!this.isLoading()) {
         this._forEachCollectionItem(function(view) {
             view.beforeUpdateHTML(null, params, events);
-        });
+        }, params);
     }
 };
 

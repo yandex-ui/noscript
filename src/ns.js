@@ -64,16 +64,23 @@ ns.parseQuery = function(s) {
 };
 
 /**
- * Performs json templating.
+ * Накладывает шаблон.
  * @param {*} json
- * @param {string} mode
- * @param {string} [module='main']
- * @returns {Element}
+ * @param {string} mode Модификатор.
+ * @param {string} [module='main'] Название модуля.
+ * @returns {string}
  */
 ns.renderString = function(json, mode, module) {
     return yr.run(module || 'main', json, mode);
 };
 
+/**
+ * Накладывает шаблон и возвращает полученную ноду.
+ * @param {*} json Данные
+ * @param {string} mode Модификатор.
+ * @param {string} [module='main'] Название модуля.
+ * @returns {HTMLElement}
+ */
 ns.renderNode = function(json, mode, module) {
     return ns.html2node(ns.renderString(json, mode, module));
 };

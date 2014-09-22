@@ -95,6 +95,8 @@
                         
                             <li data-name="ns.removeNode"><a href="ns.html#removeNode">removeNode</a></li>
                         
+                            <li data-name="ns.renderNode"><a href="ns.html#renderNode">renderNode</a></li>
+                        
                             <li data-name="ns.renderString"><a href="ns.html#renderString">renderString</a></li>
                         
                             <li data-name="ns.replaceNode"><a href="ns.html#replaceNode">replaceNode</a></li>
@@ -1832,7 +1834,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 113
+            ns.js, line 120
         </div>
         
     </div>
@@ -2497,190 +2499,6 @@
     <div class="nameContainer">
         <h4 class="name" id="http">
             
-            <span class="type-signature static">static</span>ns.http<span class="signature">(url, params, <span class="optional">options</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.http.client.js, line 8
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Creates and executes ajax request (a POST request with json return data type by default).</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>url</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                <p>Request parameters.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Standart jQuery.ajax settings object.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="http">
-            
             <span class="type-signature static">static</span>ns.http<span class="signature">(uri, params, <span class="optional">options</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
         </h4>
     
@@ -2863,6 +2681,190 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="http">
+            
+            <span class="type-signature static">static</span>ns.http<span class="signature">(url, params, <span class="optional">options</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.http.client.js, line 8
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates and executes ajax request (a POST request with json return data type by default).</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                <p>Request parameters.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Standart jQuery.ajax settings object.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="init">
             
             <span class="type-signature static">static</span>ns.init<span class="signature">()</span>
@@ -2870,7 +2872,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 84
+            ns.js, line 91
         </div>
         
     </div>
@@ -2941,7 +2943,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 94
+            ns.js, line 101
         </div>
         
     </div>
@@ -3012,7 +3014,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 139
+            ns.js, line 146
         </div>
         
     </div>
@@ -3160,7 +3162,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 153
+            ns.js, line 160
         </div>
         
     </div>
@@ -3511,9 +3513,209 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="renderNode">
+            
+            <span class="type-signature static">static</span>ns.renderNode<span class="signature">(json, mode, <span class="optional">module</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{HTMLElement}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.js, line 84
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Накладывает шаблон и возвращает полученную ноду.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                <p>Данные</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>mode</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                    
+                        
+                    
+                
+                <p>Модификатор.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>module</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="default">
+                
+                    'main'
+                
+                </td>
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Название модуля.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="renderString">
             
-            <span class="type-signature static">static</span>ns.renderString<span class="signature">(json, mode, <span class="optional">module</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Element}</span>
+            <span class="type-signature static">static</span>ns.renderString<span class="signature">(json, mode, <span class="optional">module</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
         </h4>
     
         
@@ -3529,7 +3731,7 @@
     
     
     <div class="description">
-        <p>Performs json templating.</p>
+        <p>Накладывает шаблон.</p>
     </div>
     
 
@@ -3619,7 +3821,7 @@
                         
                     
                 
-                </td>
+                <p>Модификатор.</p></td>
         </tr>
 	
 	
@@ -3655,7 +3857,7 @@
                         
                     
                 
-                </td>
+                <p>Название модуля.</p></td>
         </tr>
 	
 	
@@ -3862,7 +4064,7 @@
     
         
         <div class="tag-source">
-            ns.js, line 175
+            ns.js, line 182
         </div>
         
     </div>
@@ -4016,7 +4218,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Sep 16 2014 13:05:29 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Sep 22 2014 15:58:35 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

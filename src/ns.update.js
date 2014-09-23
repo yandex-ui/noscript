@@ -113,6 +113,7 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestModels = function(models) {
+        this.startTimer('requestModels');
         this.log('started models request', models);
 
         var allModelsValid = true;
@@ -128,7 +129,12 @@
             return Vow.fulfill(models);
         }
 
-        return ns.request.models(models)
+        var promise = ns.request.models(models);
+        promise.always(function() {
+            this.stopTimer('requestModels');
+        }, this);
+
+        return promise
             .then(this._onRequestModelsOK, this._onRequestModelsError, this);
     };
 
@@ -170,14 +176,9 @@
 
         var models = views2models(views);
         this.log('collected needed models', models);
-        this.switchTimer('collectModels', 'requestSyncModels');
+        this.stopTimer('collectModels');
 
-        var modelsPromise = this._requestModels(models);
-        modelsPromise.always(function() {
-            this.stopTimer('requestSyncModels');
-        }, this);
-
-        return modelsPromise;
+        return this._requestModels(models);
     };
 
     /**
@@ -202,12 +203,9 @@
 
         var models = views2models(views.sync);
         this.log('collected needed models', models);
-        this.switchTimer('collectModels', 'requestSyncModels');
+        this.stopTimer('collectModels');
 
         var syncPromise = this._requestModels(models);
-        syncPromise.always(function() {
-            this.stopTimer('requestSyncModels');
-        }, this);
 
         /*
          Каждому async-view передаем главный Promise из Update

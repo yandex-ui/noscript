@@ -395,14 +395,22 @@
 
         // если в моделях есть ошибки или мы превысили лимит перезапусков, то фейлимся
         if (modelHasErrors || this._restartCount >= this.RESTART_LIMIT) {
+            this.log('update has models', this._restartCount, models);
             // имитируем ошибку "Невалидные модели"
-            return this._onRequestModelsError(models)
+            var promise = this._onRequestModelsError(models);
+            // делаем это синхронно
+            if (promise.isFulfilled()) {
                 // если ns.Update.handleError решит, что все ок, то запускаем обновление DOM
-                .then(this._updateDOM, null, this);
+                return this._updateDOM();
+
+            } else {
+                return promise;
+            }
 
         } else {
             // если модели невалидные, но в них нет ошибок, то пробуем перезапуститься
             this._restartCount++;
+            this.log('restart request models', this._restartCount);
             return this._requestModels(this._models)
                 .then(this._startUpdateDOM, null, this);
         }

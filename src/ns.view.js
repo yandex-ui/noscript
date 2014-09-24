@@ -1139,14 +1139,17 @@
     /**
      * Запускает собственный ns.Update после завершения promise.
      * @param {Vow.Promise} promise Промис, после которого запустить ns.Update
+     * @param {ns.Update} updateInstance
      * @returns {Vow.Promise}
      */
-    ns.View.prototype.updateAfter = function(promise) {
+    ns.View.prototype.updateAfter = function(promise, updateInstance) {
         this._asyncPromise = new Vow.Promise();
 
         var that = this;
         promise.then(function() {
-            that.update();
+            that.update(null, {
+                timers: updateInstance.getTimers()
+            });
         });
 
         return this._asyncPromise;

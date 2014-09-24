@@ -47,7 +47,7 @@
          * @type {number}
          * @private
          */
-        this._restartCount = 1;
+        this._restartCount = 0;
 
         options = options || {};
 
@@ -58,6 +58,12 @@
         this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
 
         this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
+
+        this.startTimer('full');
+        // добавляем родительский таймер, если есть
+        if (options.timers) {
+            this._profileTimes['__parent'] = options.timers;
+        }
 
         if (!ns.Update._addToQueue(this)) {
             this.abort();
@@ -127,7 +133,8 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestModels = function(models) {
-        this.startTimer('requestModels');
+        var name = 'requestModels.' + this._restartCount;
+        this.startTimer(name);
         this.log('started models request', models);
 
         var allModelsValid = true;
@@ -139,13 +146,14 @@
         }
 
         if (allModelsValid) {
+            this.stopTimer(name);
             this.log('received models', models);
             return Vow.fulfill(models);
         }
 
         var promise = ns.request.models(models);
         promise.always(function() {
-            this.stopTimer('requestModels');
+            this.stopTimer(name);
         }, this);
 
         return promise
@@ -236,7 +244,7 @@
          Обратная сторона медали - в браузере могут кончиться коннекты :)
          */
         var asyncPromises = views.async.map(function(/** ns.View */view) {
-            return view.updateAfter(this.promise);
+            return view.updateAfter(this.promise, this);
         }, this);
 
         syncPromise.then(function() {
@@ -307,8 +315,7 @@
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
-        this.startTimer('insertNodes');
-
+        this.startTimer('triggerHideEvents');
         var hideViewEvents = {
             'ns-view-hide': [],
             'ns-view-htmldestroy': []
@@ -325,6 +332,7 @@
             'ns-view-touch': []
         };
 
+        this.switchTimer('triggerHideEvents', 'insertNodes');
         this.view._updateHTML(node, this.layout.views, this.params, {
             toplevel: true,
             //TODO: надо понять по истории зачем этот флаг
@@ -346,7 +354,7 @@
             var event = this._EVENTS_ORDER[i];
             var views = viewEvents[event] || [];
             for (var k = views.length - 1; k >= 0; k--) {
-                views[k].trigger(event, this.params);
+                views[k].trigger(event, this.params, this.getTimers());
             }
         }
     };
@@ -416,7 +424,9 @@
 
     ns.Update.prototype._updateDOM = function() {
         var html = this._renderUpdateTree();
+        this.startTimer('html2node');
         var node = ns.html2node(html || '');
+        this.stopTimer('html2node');
         return this._insertNodes(node);
     };
 
@@ -566,7 +576,12 @@
      * @param {*} result Result data.
      */
     ns.Update.prototype._fulfill = function(result) {
+        if (this.promise.isResolved()) {
+            return;
+        }
+
         ns.Update._removeFromQueue(this);
+        this.stopTimer('full');
         this.promise.fulfill(result);
         this.perf(this.getTimers());
         this.log('successfully finished scenario');
@@ -577,7 +592,12 @@
      * @param {*} reason Error data.
      */
     ns.Update.prototype._reject = function(reason) {
+        if (this.promise.isResolved()) {
+            return;
+        }
+
         ns.Update._removeFromQueue(this);
+        this.stopTimer('full');
         this.promise.reject(reason);
         this.log('scenario was rejected with reason', reason);
     };

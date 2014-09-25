@@ -248,6 +248,9 @@
      * @private
      */
     ns.View.prototype._hideNode = function() {
+        if (window['debug']) {
+            debugger;
+        }
         this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
     };
 
@@ -282,6 +285,9 @@
      * @private
      */
     ns.View.prototype._showNode = function() {
+        if (window['debug']) {
+            debugger;
+        }
         this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
     };
 

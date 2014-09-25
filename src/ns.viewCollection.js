@@ -382,6 +382,9 @@ ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) 
  * @private
  */
 ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
+    if (window['nsdebug']) {
+        debugger;
+    }
     // Для VC нам всегда прийдёт новая нода
     var newNode = this._extractNode(node);
     var isOuterPlaceholder = $(newNode).hasClass('ns-view-placeholder');
@@ -493,6 +496,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
         this._forEachCollectionItem(function(view) {
+            if (window['nsdebug']) {
+                debugger;
+            }
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {
                 // 1. html внешнего вида не менялся. Это значит, что вместо корневого html

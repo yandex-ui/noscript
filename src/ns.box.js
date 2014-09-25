@@ -223,6 +223,8 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     //  активных (видимых) в данный момент блоков.
     var layoutActive = {};
 
+    var viewToUpdate = [];
+
     //  Строим новый active согласно layout'у.
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
     //  (включая синхронную и все асинхронные подапдейты).
@@ -236,16 +238,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         var view = views[key];
 
         var viewWasNone = view.isNone();
-
-        //  Обновляем его.
-        view._updateHTML(node, selfLayout.views, params, options, events);
-
-        // вставляем view в DOM, только если ноды раньше не было (view.status === NONE)
-        // если нода была, то view._updateHTML() сделаем сам все свои обновления
-        // NOTE: с такой логикой порядок view никак не гарантируется! Возможно это проблема...
-        if (viewWasNone && ( view.isOk() || view.isLoading() ) ) {
-            this.node.appendChild(view.node);
-        }
+        viewToUpdate.push(view);
     }
 
     //  Строим новый active, но уже не по layout'у, а по актуальным блокам.
@@ -275,6 +268,19 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
                 // Перенесём её в новую ноду бокса
                 this.node.appendChild(view.node);
             }
+        }
+    }
+
+    for (var i = 0, j = viewToUpdate.length; i < j; i++) {
+        var view = viewToUpdate[i];
+        //  Обновляем его.
+        view._updateHTML(node, selfLayout.views, params, options, events);
+
+        // вставляем view в DOM, только если ноды раньше не было (view.status === NONE)
+        // если нода была, то view._updateHTML() сделаем сам все свои обновления
+        // NOTE: с такой логикой порядок view никак не гарантируется! Возможно это проблема...
+        if (viewWasNone && ( view.isOk() || view.isLoading() )) {
+            this.node.appendChild(view.node);
         }
     }
 

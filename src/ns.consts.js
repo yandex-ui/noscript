@@ -120,7 +120,12 @@ ns.U.STATUS = {
     /**
      * Updater failed because it expired (new Updater is running)
      */
-    'EXPIRED': 'expired'
+    'EXPIRED': 'expired',
+
+    /**
+     * Обновление было заблокировано, потому что вид не виден на странице
+     */
+    'HIDDEN_VIEW': 'stop_hidden_view_udpate'
 };
 
 /**

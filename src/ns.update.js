@@ -61,6 +61,13 @@
         if (!ns.Update._addToQueue(this)) {
             this.abort();
         }
+
+        // надо именно false, если вид ни разу не рисовался, то будет null
+        if (this.view._visible === false && !this.view.isLoading()) {
+            this._reject({
+                error: ns.U.STATUS.HIDDEN_VIEW
+            });
+        }
     };
 
     no.extend(ns.Update.prototype, ns.profile);

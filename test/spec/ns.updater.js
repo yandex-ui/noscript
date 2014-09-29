@@ -111,10 +111,10 @@ describe('ns.Updater', function() {
                 expect(ns.Update.prototype.perf).to.have.been.calledOnce;
             });
 
-            it('should have had profiled stages `collectModels`, `requestSyncModels`', function() {
+            it('should have had profiled stages `collectModels`, `requestModels`', function() {
                 var arg = ns.Update.prototype.perf.getCall(0).args[0];
                 expect(arg).to.have.property('collectModels').that.is.at.least(0);
-                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestModels').that.is.at.least(0);
             });
         });
 
@@ -157,10 +157,10 @@ describe('ns.Updater', function() {
                 expect(ns.Update.prototype.perf).to.have.been.calledOnce;
             });
 
-            it('should have had profiled stages `collectModels`, `requestSyncModels`, `collectViews`, `generateHTML`', function() {
+            it('should have had profiled stages `collectModels`, `requestModels`, `collectViews`, `generateHTML`', function() {
                 var arg = ns.Update.prototype.perf.getCall(0).args[0];
                 expect(arg).to.have.property('collectModels').that.is.at.least(0);
-                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestModels').that.is.at.least(0);
                 expect(arg).to.have.property('collectViews').that.is.at.least(0);
                 expect(arg).to.have.property('generateHTML').that.is.at.least(0);
             });
@@ -195,10 +195,10 @@ describe('ns.Updater', function() {
                 expect(ns.Update.prototype.perf).to.have.been.calledOnce;
             });
 
-            it('should have had profiled stages `collectModels`, `requestSyncModels`, `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents`', function() {
+            it('should have had profiled stages `collectModels`, `requestModels`, `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents`', function() {
                 var arg = ns.Update.prototype.perf.getCall(0).args[0];
                 expect(arg).to.have.property('collectModels').that.is.at.least(0);
-                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestModels').that.is.at.least(0);
                 expect(arg).to.have.property('collectViews').that.is.at.least(0);
                 expect(arg).to.have.property('generateHTML').that.is.at.least(0);
                 expect(arg).to.have.property('insertNodes').that.is.at.least(0);
@@ -283,10 +283,10 @@ describe('ns.Updater', function() {
                 expect(ns.Update.prototype.perf).to.have.been.calledThrise;
             });
 
-            it('should have had profiled stages `collectModels`, `requestSyncModels`, `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents` of first update', function() {
+            it('should have had profiled stages `collectModels`, `requestModels`, `collectViews`, `generateHTML`, `insertNodes`, `triggerEvents` of first update', function() {
                 var arg = ns.Update.prototype.perf.getCall(0).args[0];
                 expect(arg).to.have.property('collectModels').that.is.at.least(0);
-                expect(arg).to.have.property('requestSyncModels').that.is.at.least(0);
+                expect(arg).to.have.property('requestModels').that.is.at.least(0);
                 expect(arg).to.have.property('collectViews').that.is.at.least(0);
                 expect(arg).to.have.property('generateHTML').that.is.at.least(0);
                 expect(arg).to.have.property('insertNodes').that.is.at.least(0);

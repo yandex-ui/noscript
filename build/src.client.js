@@ -27,6 +27,7 @@
     /* borschik:include:../src/ns.page.block.js */
     /* borschik:include:../src/ns.page.history.js */
     /* borschik:include:../src/ns.request.js */
+    /* borschik:include:../src/ns.request.manager.js */
     /* borschik:include:../src/ns.router.js */
     /* borschik:include:../src/ns.update.js */
     /* borschik:include:../src/ns.view.js */

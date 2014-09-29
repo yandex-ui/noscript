@@ -87,6 +87,32 @@ describe('ns.Events', function() {
 
     });
 
+    describe('#on', function() {
+
+        it('должен бросить исключение, если не передан обработчик', function() {
+            this.foo = {};
+            no.extend(this.foo, ns.Events);
+
+            var fn = function() {
+                ns.Events.on('event');
+            };
+
+            expect(fn).to.throw();
+        });
+
+        it('должен бросить исключение, если передана не функция', function() {
+            this.foo = {};
+            no.extend(this.foo, ns.Events);
+
+            var fn = function() {
+                ns.Events.on('event', {});
+            };
+
+            expect(fn).to.throw();
+        });
+
+    });
+
     describe('#once', function() {
 
         beforeEach(function() {

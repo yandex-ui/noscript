@@ -20,6 +20,8 @@ ns.Events = {};
 ns.Events.on = function(name, handler) {
     var handlers = this._nsevents_handlers || (( this._nsevents_handlers = {} ));
 
+    ns.assert(typeof handler === 'function', 'ns.Events', 'Handler for event "%s" in not a function.', name);
+
     ( handlers[name] || (( handlers[name] = [] )) ).push(handler);
 
     return this;

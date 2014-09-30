@@ -509,7 +509,9 @@ describe('ns.request.js', function() {
                     ]
                 });
 
-                expect(promiseIsResolved(this.request1)).to.be.equal(false);
+                return this.promises[0].then(function() {
+                    expect(this.request1.isFulfilled()).to.be.equal(false);
+                }, null, this);
             });
 
             it('should not resolve second promise after first response', function() {
@@ -519,7 +521,9 @@ describe('ns.request.js', function() {
                     ]
                 });
 
-                expect(promiseIsResolved(this.request2)).to.be.equal(false);
+                return this.promises[0].then(function() {
+                    expect(this.request2.isFulfilled()).to.be.equal(false);
+                }, null, this);
             });
 
             it('should resolve first promise after second response', function(finish) {
@@ -603,12 +607,4 @@ describe('ns.request.js', function() {
     //TODO: STATUS.INVALID
     //TODO: xhr response parsing
 
-    function promiseIsResolved(promise) {
-        var res = false;
-        promise.then(function() {
-            res = true;
-        });
-
-        return res;
-    }
 });

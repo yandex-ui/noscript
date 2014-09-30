@@ -331,7 +331,7 @@ describe('ns.ViewСollection ns-view-* events', function() {
             return new ns.Update(this.APP, layout1, {}).render().then(function() {
                 return new ns.Update(this.APP, layout2, {}).render().then(function() {
                     var mc = ns.Model.get('model-collection');
-                    mc.set('.test', 1, {silent: true});
+                    mc.set('.test', 1);
                     return new ns.Update(this.APP, layout1, {}).render()
 
                 }, null, this);

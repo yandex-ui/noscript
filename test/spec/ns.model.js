@@ -90,7 +90,7 @@ describe('ns.Model', function() {
                 expect(proto)
                     .to.have.property('foo', bar);
 
-                expect(proto.__proto__)
+                expect(Object.getPrototypeOf(proto))
                     .to.have.keys(Object.keys(ns.Model.prototype));
             });
 
@@ -245,7 +245,7 @@ describe('ns.Model', function() {
             });
 
             it('should return pNames property', function() {
-                var key = ns.Model.key('m1', { p1: 1, p3: 2 });
+                ns.Model.key('m1', { p1: 1, p3: 2 }); // init pNames
                 expect( ns.Model.info('m1').pNames )
                     .to.eql(['p1', 'p2', 'p3', 'p4']);
             });
@@ -438,7 +438,7 @@ describe('ns.Model', function() {
 
         });
 
-        describe('setData', function() {
+        describe('#setData', function() {
 
             beforeEach(function() {
                 this.model = ns.Model.get('m1', {p1: 1, p3: Math.random()});
@@ -505,7 +505,7 @@ describe('ns.Model', function() {
 
                 this.model.setData(this.data);
 
-                expect(this.model.trigger.calledWith('ns-model-changed'))
+                expect(this.model.trigger.calledWith('ns-model-changed', ''))
                     .to.be.equal(true);
             });
 
@@ -518,6 +518,14 @@ describe('ns.Model', function() {
                     .to.be.equal(true);
             });
 
+            it('should increment model._version', function() {
+                var v1 = this.model.getVersion();
+                this.model.setData(this.data);
+                var v2 = this.model.getVersion();
+
+                expect(v2).to.be.equal(v1 + 1);
+            });
+
             it('should not trigger \'ns-model-changed\' event when {silent: true}', function() {
                 this.sinon.spy(this.model, 'trigger');
 
@@ -525,6 +533,151 @@ describe('ns.Model', function() {
 
                 expect(this.model.trigger.calledWith('ns-model-changed'))
                     .not.to.be.equal(true);
+            });
+
+            it('should not trigger \'ns-model-touched\' event when {silent: true}', function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.setData(this.data, {silent: true});
+
+                expect(this.model.trigger.calledWith('ns-model-touched'))
+                    .not.to.be.equal(true);
+            });
+
+            it('should not increment model._version', function() {
+                var v1 = this.model.getVersion();
+                this.model.setData(this.data, { silent: true });
+                var v2 = this.model.getVersion();
+
+                expect(v2).to.be.equal(v1);
+            });
+
+        });
+
+        describe('#set', function() {
+
+            beforeEach(function() {
+                this.model = ns.Model.get('m1', {p1: 1, p3: Math.random()});
+                this.jpath = '.flags.good';
+                this.val = true;
+
+                this.dataBefore = {};
+                this.dataAfter = { flags: { good: true } };
+
+                this.model.setData(this.dataBefore);
+            });
+
+            it('should touch model', function() {
+                this.sinon.spy(this.model, 'touch');
+
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.touch.calledOnce)
+                    .to.be.equal(true);
+            });
+
+            it('should set model data by jpath', function() {
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.getData())
+                    .to.be.eql(this.dataAfter);
+            });
+
+            it('should trigger only 4 events', function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.trigger.callCount)
+                    .to.be.equal(4);
+            });
+
+            it("should trigger 'ns-model-changed.flags.good' event", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.trigger.calledWith('ns-model-changed.flags.good', '.flags.good', '.flags.good'))
+                    .to.be.equal(true);
+            });
+
+            it("should trigger 'ns-model-changed.flags' event", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.trigger.calledWith('ns-model-changed.flags', '.flags', '.flags.good'))
+                    .to.be.equal(true);
+            });
+
+            it("should trigger 'ns-model-changed' event", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.trigger.calledWith('ns-model-changed', '.flags.good'))
+                    .to.be.equal(true);
+            });
+
+            it("should trigger 'ns-model-touched' event", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val);
+
+                expect(this.model.trigger.calledWith('ns-model-touched'))
+                    .to.be.equal(true);
+            });
+
+            it('should increment model._version', function() {
+                var v1 = this.model.getVersion();
+                this.model.set(this.jpath, this.val);
+                var v2 = this.model.getVersion();
+
+                expect(v2).to.be.equal(v1 + 1);
+            });
+
+            it("should not trigger 'ns-model-changed.flags.good' event when called with { silent: true }", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val, { silent: true });
+
+                expect(this.model.trigger.calledWith('ns-model-changed.flags.good'))
+                    .not.to.be.equal(true);
+            });
+
+            it("should not trigger 'ns-model-changed.flags' event when called with { silent: true }", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val, { silent: true });
+
+                expect(this.model.trigger.calledWith('ns-model-changed.flags'))
+                    .not.to.be.equal(true);
+            });
+
+            it("should not trigger 'ns-model-changed' event when called with { silent: true }", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val, { silent: true });
+
+                expect(this.model.trigger.calledWith('ns-model-changed'))
+                    .not.to.be.equal(true);
+            });
+
+            it("should not trigger 'ns-model-touched' event when called with { silent: true }", function() {
+                this.sinon.spy(this.model, 'trigger');
+
+                this.model.set(this.jpath, this.val, { silent: true });
+
+                expect(this.model.trigger.calledWith('ns-model-touched'))
+                    .not.to.be.equal(true);
+            });
+
+            it('should not increment model._version when called with { silent: true }', function() {
+                var v1 = this.model.getVersion();
+                this.model.setData(this.data, { silent: true });
+                var v2 = this.model.getVersion();
+
+                expect(v2).to.be.equal(v1);
             });
 
         });
@@ -776,7 +929,7 @@ describe('ns.Model', function() {
 
             it('should throw error if tried to call with undefined model', function() {
                 expect(function() {
-                    return ns.Model.traverse('undefinedModel')
+                    return ns.Model.traverse('undefinedModel');
                 }).to.throw();
             });
 

@@ -1023,27 +1023,55 @@ describe('ns.Model', function() {
 
         });
 
-        describe('ns-model-destroy', function() {
+        describe('ns-model-destroyed, ns-model-before-destroyed', function() {
             beforeEach(function() {
                 this.nsModelDestroySpy = sinon.spy();
+                this.nsModelBeforeDestroySpy = sinon.spy();
 
                 ns.Model.define('test-destroy-model', {
                     events: {
-                        'ns-model-destroyed': this.nsModelDestroySpy
+                        'ns-model-destroyed': this.nsModelDestroySpy,
+                        'ns-model-before-destroyed': this.nsModelBeforeDestroySpy
                     }
                 });
 
                 this.model = ns.Model.get('test-destroy-model');
+                this.model._reset = sinon.spy();
+
+                var trigger = this.model.trigger;
+                this.model.trigger = sinon.spy(function() {
+                    trigger.apply(this, arguments);
+                });
+
                 this.model.destroy();
             });
 
             afterEach(function() {
                 delete this.model;
                 delete this.nsModelDestroySpy;
+                delete this.nsModelBeforeDestroySpy;
             });
 
-            it('вызывается однократно при уничтожении модели', function() {
+            it('ns-model-destroyed вызывается однократно при уничтожении модели', function() {
                 expect(this.nsModelDestroySpy.calledOnce).to.be.equal(true);
+            });
+
+            it('ns-model-destroyed вызывается после сброса модели', function() {
+                expect(this.model.trigger.calledWith('ns-model-destroyed')).to.be.equal(true);
+                expect(this.model.trigger.calledAfter(this.model._reset)).to.be.equal(true);
+            });
+
+            it('ns-model-before-destroyed вызывается однократно при уничтожении модели', function() {
+                expect(this.nsModelBeforeDestroySpy.calledOnce).to.be.equal(true);
+            });
+
+            it('ns-model-before-destroyed вызывается до сброса модели', function() {
+                expect(this.model.trigger.calledWith('ns-model-before-destroyed')).to.be.equal(true);
+                expect(this.model.trigger.calledBefore(this.model._reset)).to.be.equal(true);
+            });
+
+            it('ns-model-before-destroyed вызывается до ns-model-destroyed', function() {
+                expect(this.nsModelDestroySpy.calledAfter(this.nsModelBeforeDestroySpy)).to.be.equal(true);
             });
         });
 

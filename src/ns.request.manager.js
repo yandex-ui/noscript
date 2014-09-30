@@ -57,18 +57,43 @@ ns.request.manager = {
 
                 } else {
                     model.status = model.STATUS.ERROR;
-                    model.retries = 0;
                     // убираем этот запрос, он больше не будет запрашиваться
                     this.done(model, true);
                     return false;
                 }
 
             } else {
+                // сюда приходят уже запрошенные модели, у которых request.status === DONE
+                // может быть два варианта
 
-                // FIXME chestozo: тут бывает так, что модель в статусе ошибка, а мы ей затираем статус и делаем её ок.
-                // model.status = model.STATUS.OK;
-                model.retries = 0;
-                return false;
+                if (model.isValid()) {
+                    // модель запросилась, данные положились, все хорошо
+                    // говорим, что модель запрашивать не надо
+                    return false;
+
+                } else {
+                    /*
+                     Кто-то успел инвалидировать модель.
+                     Такое возможно, если этот запрос ждал другого.
+
+                     Например,
+                     запрос1: m1, m2
+                     запрос2: m1, m3
+
+                     Запрос2 завершился раньше и ждет Запрос1.
+                     В это время что-то случается, что приводит к инвалидации m3.
+                     Тогда мы попадем в эту ветку и перезапросим модель.
+                     */
+
+                    // модель не валидна, но запрашивать её нельзя - ничего не делаем
+                    if (!model.canRequest()) {
+                        return false;
+                    }
+
+                    request.status = this.STATUS.LOADING;
+                    // надо ее перезапросить
+                    return true;
+                }
             }
 
         } else {
@@ -123,7 +148,12 @@ ns.request.manager = {
      */
     clean: function(models) {
         for (var i = 0, j = models.length; i < j; i++) {
-            delete this._keys[models[i].key];
+            var model = models[i];
+
+            // обнуляем попытки после завершения запроса
+            model.retries = 0;
+            // удаляем модель из списка запрашиваемых
+            delete this._keys[model.key];
         }
     },
 

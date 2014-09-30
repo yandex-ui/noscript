@@ -604,7 +604,89 @@ describe('ns.request.js', function() {
 
     });
 
-    //TODO: STATUS.INVALID
-    //TODO: xhr response parsing
+    describe('Запрос одинаковых моделей и инвалидация во время запроса ->', function() {
+
+        /*
+         Тест на следующую ситуацию:
+         Запрос0: m1 (invalid), m2 (invalid)
+         Запрос1: m1 (invalid), m3 (invalid)
+
+         Запрос0 запрашивает только модель m3 и завершается быстрее Запрос1.
+         После завершения запроса Запрос0 инвалидируем m3
+
+         Правильное поведение:
+         Запрос0 резолвится после получения данных для m1,m2
+         Запрос1 еще раз перезапрашивает m3 и резолвится с m1,m3
+         */
+
+        beforeEach(function() {
+            this.respond = [
+                200,
+                {"Content-Type": "application/json"},
+                JSON.stringify({
+                    models: [
+                        { data: {} }
+                    ]
+                })
+            ];
+
+            ns.Model.define('m1');
+            ns.Model.define('m2');
+            ns.Model.define('m3');
+
+            this.sinon.spy(ns, 'http');
+
+            // Запрос0
+            this.request0 = ns.request(['m1', 'm2']);
+            // Запрос1
+            this.request1 = ns.request(['m1', 'm3']);
+
+
+            // завершаем Запрос1
+            var xhr1 = this.sinon.server.requests[1];
+            xhr1.respond.apply(xhr1, this.respond);
+
+            // после завершения обработки Запрос2 инвалидируем m3
+            return ns.http.getCall(1).returnValue
+                .then(function() {
+                    // инвалидируем m3 из Запрос1
+                    ns.Model.get('m3').invalidate();
+
+                    // завершаем Запрос0
+                    var xhr0 = this.sinon.server.requests[0];
+                    xhr0.respond.apply(xhr0, this.respond);
+                }, null, this)
+        });
+
+        it('должен завершить Запрос0 с m1,m2', function() {
+            // ждем завершения Запрос2 и проверяем, что модели валидные
+            return this.request0.then(function(models) {
+                models.forEach(function(model) {
+                    expect(model.isValid(), model.id).to.be.equal(true);
+                });
+
+                try {
+                    var xhr2 = this.sinon.server.requests[2];
+                    xhr2.respond.apply(xhr2, this.respond);
+                } catch(e){}
+            }, null, this);
+        });
+
+        it('должен перезапросить m3 и завершить Запрос1 с m1,m3', function() {
+            return this.request0.then(function() {
+                // завершаем перезапрос Запрос0
+                var xhr2 = this.sinon.server.requests[2];
+                expect(xhr2, 'NO_REQUEST_FOR_M3').to.be.an('object');
+                xhr2.respond.apply(xhr2, this.respond);
+
+                return this.request1.then(function(models) {
+                    models.forEach(function(model) {
+                        expect(model.isValid(), model.id).to.be.equal(true);
+                    });
+                });
+            }, null, this);
+        });
+
+    });
 
 });

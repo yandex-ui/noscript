@@ -58,7 +58,7 @@
         try {
             return action(id, params, node, event);
         } catch(e) {
-            ns.log.exception('action', e);
+            ns.log.exception('ns.action', e);
         }
     };
 

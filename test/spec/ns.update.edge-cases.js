@@ -88,6 +88,102 @@ describe('ns.Update. Синтетические случаи', function() {
 
     });
 
+    describe('Инвалидация валидного вида во время запроса моделей для невалидных видов ->', function() {
+
+        /*
+         Дано:
+         Есть вид v1, он зависит от модель m1. Он валиден.
+         Есть вид v2, он зависит от модели m2. Он невалиден.
+
+         Старое поведение:
+         v1 не сообщает свои модели, а v2 сообщает.
+         В ns.request уходят знания только про m2.
+
+         Допустим в процессе запроса m2 кто-то инвалидировал модель m1.
+         Про ее необходимость никто не знает,
+         соответственно дело нормальным способом дойдет до отрисовки,
+         где m1 будет перерисован как error-content (это проблема)
+         */
+
+        beforeEach(function() {
+            ns.Model.define('m1');
+            ns.Model.define('m2');
+
+            ns.Model.get('m1').setData({});
+            ns.Model.get('m2').setData({});
+
+            ns.View.define('v1', {models: ['m1']});
+            ns.View.define('v2', {models: ['m2']});
+            ns.View.define('app');
+
+            ns.layout.define('app', {
+                'app': {
+                    'v1': {
+                        'v2': {}
+                    }
+                }
+            });
+
+            this.view = ns.View.create('app');
+            this.layout = ns.layout.page('app');
+            return new ns.Update(this.view, this.layout, {}).render()
+                .then(function() {
+                    this.v1Node = this.view.node.querySelector('.ns-view-v1');
+                    this.v2Node = this.view.node.querySelector('.ns-view-v2');
+
+                    // заставляем перерисоваться v2 и сделать http-запрос
+                    ns.Model.get('m2').invalidate();
+
+                    this.sinon.server.autoRespond = true;
+                    this.sinon.server.respond(function(xhr) {
+                        if (xhr.url.indexOf('m1') === -1) {
+                            // пытаемся заставить уйти v1 в error-content
+                            // если все ок, то будет перезапрос модели m1
+                            ns.Model.get('m1').invalidate();
+                        }
+
+                        xhr.respond(
+                            200,
+                            {"Content-Type": "application/json"},
+                            JSON.stringify({
+                                models: [
+                                    { data: true }
+                                ]
+                            })
+                        );
+                    });
+                }, null, this);
+        });
+
+        it('должен нормально завершить отрисовку', function() {
+            return new ns.Update(this.view, this.layout, {}).render();
+        });
+
+        it('должен запросить m2 и m1', function() {
+            return new ns.Update(this.view, this.layout, {}).render()
+                .then(function() {
+                    expect(this.sinon.server.requests).to.have.length(2);
+                }, null, this);
+        });
+
+        it('должен перерисовать v1', function() {
+            return new ns.Update(this.view, this.layout, {}).render()
+                .then(function() {
+                    var newNode = this.view.node.querySelector('.ns-view-v1');
+                    expect(newNode.getAttribute('data-random')).to.not.equal(this.v1Node.getAttribute('data-random'));
+                }, null, this);
+        });
+
+        it('должен перерисовать v2', function() {
+            return new ns.Update(this.view, this.layout, {}).render()
+                .then(function() {
+                    var newNode = this.view.node.querySelector('.ns-view-v2');
+                    expect(newNode.getAttribute('data-random')).to.not.equal(this.v2Node.getAttribute('data-random'));
+                }, null, this);
+        });
+
+    });
+
     it('Не должен вызывать ns.request.models, если все модели валидные', function() {
         /*
          Этот тест решает следующую задачу:

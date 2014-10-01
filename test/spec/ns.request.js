@@ -658,33 +658,72 @@ describe('ns.request.js', function() {
                 }, null, this)
         });
 
-        it('должен завершить Запрос0 с m1,m2', function() {
-            // ждем завершения Запрос2 и проверяем, что модели валидные
-            return this.request0.then(function(models) {
-                models.forEach(function(model) {
-                    expect(model.isValid(), model.id).to.be.equal(true);
-                });
+        describe('Запросы завершаются удачно -> ', function() {
 
-                try {
-                    var xhr2 = this.sinon.server.requests[2];
-                    xhr2.respond.apply(xhr2, this.respond);
-                } catch(e){}
-            }, null, this);
-        });
-
-        it('должен перезапросить m3 и завершить Запрос1 с m1,m3', function() {
-            return this.request0.then(function() {
-                // завершаем перезапрос Запрос0
-                var xhr2 = this.sinon.server.requests[2];
-                expect(xhr2, 'NO_REQUEST_FOR_M3').to.be.an('object');
-                xhr2.respond.apply(xhr2, this.respond);
-
-                return this.request1.then(function(models) {
+            it('должен завершить Запрос0 с m1,m2', function() {
+                // ждем завершения Запрос2 и проверяем, что модели валидные
+                return this.request0.then(function(models) {
                     models.forEach(function(model) {
                         expect(model.isValid(), model.id).to.be.equal(true);
                     });
-                });
-            }, null, this);
+
+                    try {
+                        var xhr2 = this.sinon.server.requests[2];
+                        xhr2.respond.apply(xhr2, this.respond);
+                    } catch(e){}
+                }, null, this);
+            });
+
+            it('должен перезапросить m3 и завершить Запрос1 с m1,m3', function() {
+                return this.request0.then(function() {
+                    // завершаем перезапрос Запрос0
+                    var xhr2 = this.sinon.server.requests[2];
+                    expect(xhr2, 'NO_REQUEST_FOR_M3').to.be.an('object');
+                    xhr2.respond.apply(xhr2, this.respond);
+
+                    return this.request1.then(function(models) {
+                        models.forEach(function(model) {
+                            expect(model.isValid(), model.id).to.be.equal(true);
+                        });
+                    });
+                }, null, this);
+            });
+
+        });
+
+        describe('Перезапрос m3 завершается неудачно', function() {
+
+            it('должен перезапросить m3 не больше чем RETRY_LIMIT и отреджектить промис', function() {
+                return this.request0.then(function() {
+
+                    this.sinon.server.autoRespond = true;
+                    this.sinon.server.respond(function(xhr) {
+                        if (xhr.readyState !== 1) {
+                            return;
+                        }
+                        xhr.respond(
+                            500,
+                            {"Content-Type": "application/json"},
+                            JSON.stringify({
+                                models: [
+                                    { error: 'unknown error' }
+                                ]
+                            })
+                        );
+                    });
+
+                    return this.request1.then(function() {
+                        return Vow.reject('RESOLVED');
+                    }, function() {
+                        var m3Requests = this.sinon.server.requests.filter(function(xhr) {
+                            // фильтруем неудачные запросы за m3
+                            return xhr.url.indexOf('?_m=m3') > -1 && xhr.status === 500;
+                        });
+                        expect(m3Requests).to.have.length(3 /* RETRY_LIMIT */);
+                    }, this);
+                }, null, this);
+            })
+
         });
 
     });

@@ -85,14 +85,15 @@ ns.request.manager = {
                      Тогда мы попадем в эту ветку и перезапросим модель.
                      */
 
-                    // модель не валидна, но запрашивать её нельзя - ничего не делаем
-                    if (!model.canRequest()) {
+                    if (model.canRequest()) {
+                        // надо ее перезапросить
+                        this._createRequest(model, requestId);
+                        return true;
+
+                    } else {
+                        // модель не валидна, но запрашивать её нельзя - ничего не делаем
                         return false;
                     }
-
-                    request.status = this.STATUS.LOADING;
-                    // надо ее перезапросить
-                    return true;
                 }
             }
 

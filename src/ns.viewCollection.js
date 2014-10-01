@@ -302,8 +302,11 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
         } else {
             // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
             // элементы коллекции. Невалидные - полностью, а валидные в виде placeholder'ов
-            if (view.isValid()) {
+            if (view.isValidSelf()) {
+                // если view - обычный вид, то isValidSelf === isValid
+                // если view - коллекция, то она проверит себя (isValidSelf) и сделаем дерево для детей
                 decl = view._getPlaceholderTree(layout, params);
+
             } else {
                 decl = view._getViewTree(layout, params);
             }
@@ -385,7 +388,20 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         options_next = updateOptions;
     }
 
-    if (!this.isValidSelf()) {
+    if (this.isValidSelf()) {
+        // Если не toplevel и placeholder, то нужно взять placeholder (newNode) и заменить его на актуальную ноду (this.node)
+        if (!updateOptions.toplevel && isOuterPlaceholder) {
+            // Эта ситуация, когда родитель коллекции перерисовался,
+            // а эта коллекция рисуется как placeholder
+            ns.replaceNode(newNode, this.node);
+
+            // ставим toplevel, чтобы дети себя вставили
+            options_next = no.extend({}, updateOptions);
+            options_next.toplevel = true;
+            options_next.parent_added = true;
+        }
+
+    } else {
 
         var hadOldNode = !!this.node;
 

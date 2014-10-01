@@ -1225,16 +1225,12 @@ describe('ns.Updater', function() {
 
             ns.MAIN_VIEW = ns.View.create('app');
 
-            sinon.stub(ns.request, 'models', function(models) {
+            this.sinon.stub(ns.request, 'models', function(models) {
                 for (var i = 0; i < models.length; i++) {
                     models[i].setData({ data: true });
                 }
                 return Vow.fulfill(models);
             });
-        });
-
-        afterEach(function() {
-            ns.request.models.restore();
         });
 
         it('Когда асинхронный вид отрисовался как синхронный повторный ns.page.go() не вызывает перерисовку асинхронного вида', function(done) {

@@ -1,5 +1,3 @@
-var request = require('request');
-
 /**
  * Creates and executes http request (a POST request with json return data type by default).
  * @param {string} uri
@@ -8,6 +6,7 @@ var request = require('request');
  * @returns {Vow.Promise}
  */
 ns.http = function(uri, params, options) {
+    var request = require('request');
 
     options = no.extend(ns.H.DEFAULTS, options || {});
 

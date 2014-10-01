@@ -1248,7 +1248,7 @@ describe('ns.Updater', function() {
                     ns.page.go(ns.page.currentUrl, 'preserve')
                         .then(function() {
                             expect(that.spy1.callCount).to.equal(1);
-                            expect(that.spy1.firstCall.returnValue.sync.length).to.equal(0);
+                            expect(that.sinon.server.requests).to.have.length(0);
                             done();
                         });
                 })
@@ -1268,7 +1268,6 @@ describe('ns.Updater', function() {
         */
         it('Когда асинхронный вид отрисовался асинхронно повторный ns.page.go() не вызывает перерисовку асинхронного вида', function() {
             var that = this;
-            var promise = new Vow.Promise();
 
             ns.Model.get('my_model1').setData({ data: true });
 
@@ -1281,7 +1280,7 @@ describe('ns.Updater', function() {
                             .then(function() {
                                 expect(that.spy1.callCount).to.equal(1);
                                 expect(ns.MAIN_VIEW.views.box.views['view=photo'].views.ads.isValid()).to.be.ok;
-                                expect(that.spy1.firstCall.returnValue.sync.length).to.equal(0);
+                                expect(that.sinon.server.requests).to.have.length(0);
                             });
                     });
                 });

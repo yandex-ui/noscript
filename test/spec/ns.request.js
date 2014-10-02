@@ -554,6 +554,51 @@ describe('ns.request.js', function() {
                 });
             });
         });
+
+        describe('Обычный запрос валидный модели + force запрос той же модели ->', function() {
+
+            beforeEach(function() {
+                ns.Model.define('test-model');
+
+                // делаем модель валидной
+                ns.Model.get('test-model').setData({type: 'old'});
+
+                this.request1 = ns.forcedRequest('test-model');
+                this.request2 = ns.request('test-model');
+            });
+
+            it('должен зарезолвить обычный запрос не дожидаясь force-запроса', function() {
+                return this.request2;
+            });
+
+            it('должен зарезолвить обычный запрос cо старыми данными', function() {
+                return this.request2.then(function(models) {
+                    expect(models[0].get('.type')).to.be.equal('old');
+                });
+            });
+
+            it('должен зарезолвить force-запрос после ответа сервера', function() {
+                this.sinon.server.autoRespond = true;
+                this.sinon.server.respond(function(xhr) {
+                    xhr.respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            models: [
+                                {
+                                    data: {
+                                        'type': 'new'
+                                    }
+                                }
+                            ]
+                        })
+                    );
+                });
+
+                return this.request1;
+            });
+
+        });
     });
 
     describe('do not reset model status to ok if it was in error status', function() {

@@ -31,6 +31,13 @@ ns.request.manager = {
 
         // если уже кто-то запрашивает такой ключ
         if (request) {
+            // если кто-то уже запрашивает модель, но сама модель валидна (обычно это бывает при forceRequest)
+            // и это не force-запрос
+            if (model.isValid() && !forced) {
+                // говорим, что запрашивать ее не надо
+                return false;
+            }
+
             if (request.status === REQUEST_STATUS.LOADING) {
                 if (model.isDo()) {
                     // если do-запрос с статусе loading, то request.model !== model, потому что do-модели не сохраняются

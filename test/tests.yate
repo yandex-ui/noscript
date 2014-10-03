@@ -66,3 +66,12 @@ match .vc-mixed-item1 ns-view-content {
 match .vc-mixed-item2 ns-view-content {
     <div>vc-mixed-item2</div>
 }
+
+match .view-delay ns-view-content {
+    <div class="m1">
+        model('m1').data
+    </div>
+    <div class="m2">
+        model('m2').data
+    </div>
+}

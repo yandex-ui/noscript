@@ -138,6 +138,11 @@
      * @private
      */
     ns.View.prototype._initModels = function() {
+        /**
+         * Объект с зависимыми моделями
+         * @type {object.<string, ns.Model>}
+         * @private
+         */
         this.models = {};
 
         /**

@@ -126,6 +126,13 @@
         this.models = {};
 
         /**
+         * Объект с зависимыми отложенными моделями
+         * @type {object.<string, ns.Model>}
+         * @private
+         */
+        this._modelsDelayed = {};
+
+        /**
          * Обработчики событий моделей
          * @type {object}
          * @private
@@ -136,7 +143,12 @@
         for (var id in this.info.models) {
             if (!this.models[id]) {
                 var model = ns.Model.get(id, this.params);
-                this.models[id] = model;
+
+                if (id in this.info.delayed) {
+                    this._modelsDelayed[id] = model;
+                } else {
+                    this.models[id] = model;
+                }
                 this._modelsHandlers[model.key] = {};
             }
         }
@@ -275,28 +287,30 @@
      */
     ns.View.prototype._bindModels = function() {
         var models = this.models;
-        var decls = this.info.models;
-
         for (var idModel in models) {
             var model = models[idModel];
 
-            var decl = decls[idModel];
-            for (var eventName in decl) {
-                var handlerName = decl[eventName];
-                var handler = this[handlerName] || decl[eventName];
-                if ('function' === typeof handler) {
+            this.__bindModel(model);
+        }
+    };
 
-                    // сам keepValid биндить не надо,
-                    // потому что _invokeModelHandler и так синхронизирует версию
-                    if (handler === this.keepValid) {
-                        // заменяем его на пустую функцию
-                        handler = no.nop;
-                    }
+    ns.View.prototype.__bindModel = function(model) {
+        var decl = this.info.models[model.id];
+        for (var eventName in decl) {
+            var handlerName = decl[eventName];
+            var handler = this[handlerName] || decl[eventName];
+            if ('function' === typeof handler) {
 
-                    this._bindModel(model, eventName,
-                        this._invokeModelHandler.bind(this, handler, model)
-                    );
+                // сам keepValid биндить не надо,
+                // потому что _invokeModelHandler и так синхронизирует версию
+                if (handler === this.keepValid) {
+                    // заменяем его на пустую функцию
+                    handler = no.nop;
                 }
+
+                this._bindModel(model, eventName,
+                    this._invokeModelHandler.bind(this, handler, model)
+                );
             }
         }
     };
@@ -336,12 +350,21 @@
         var models = this.models;
         for (var model_id in models) {
             var model = models[model_id];
-            var events = this._modelsHandlers[model.key];
+            this.__unbindModel(model);
+        }
+    };
 
-            for (var eventName in events) {
-                model.off(eventName, events[eventName]);
-                delete events[eventName];
-            }
+    /**
+     * Отписываемся от изменений модели.
+     * @param {ns.Model} model
+     * @private
+     */
+    ns.View.prototype.__unbindModel = function(model) {
+        var events = this._modelsHandlers[model.key];
+
+        for (var eventName in events) {
+            model.off(eventName, events[eventName]);
+            delete events[eventName];
         }
     };
 
@@ -1184,6 +1207,32 @@
         return updatePromise;
     };
 
+    ns.View.prototype.enableModel = function(modelID) {
+        var model = this._modelsDelayed[modelID];
+        if (model) {
+            this.models[modelID] = model;
+            delete this._modelsDelayed[modelID];
+
+            this.__bindModel(model);
+            return true;
+        }
+
+        return false;
+    };
+
+    ns.View.prototype.disableModel = function(modelID) {
+        var model = this.models[modelID];
+        if (model) {
+            this._modelsDelayed[modelID] = model;
+            delete this.models[modelID];
+
+            this.__unbindModel(model);
+            return true;
+        }
+
+        return false;
+    };
+
     var _infos = {};
     var _ctors = {};
 
@@ -1228,7 +1277,9 @@
         // Нужно унаследоваться от ns.View и добавить в прототип info.methods.
         ctor = no.inherit(ctor, baseClass, info.methods);
 
-        info.models = this._formatModelsDecl( info.models || {} );
+        var modelsDecl = this._formatModelsDecl( info.models || {} );
+        info.models = modelsDecl.models;
+        info.delayed = modelsDecl.delayed;
         info.events = info.events || {};
 
         // часть дополнительной обработки производится в ns.View.info
@@ -1623,9 +1674,14 @@
      */
     ns.View._formatModelsDecl = function(decls) {
         var declsFormated = this._expandModelsDecl(decls);
+        var modelsDelayed = {};
 
         // Разрвернём краткий вариант декларации в полный
         for (var idModel in declsFormated) {
+            if (declsFormated[idModel] === 'DELAY') {
+                // запоминаем, что модель модель быть отложеной
+                modelsDelayed[idModel] = null;
+            }
             var declFull = getFullMethodDecl(declsFormated[idModel]);
 
             // общий обработчик для всех событий
@@ -1655,7 +1711,10 @@
             declsFormated[idModel] = declFull;
         }
 
-        return declsFormated;
+        return {
+            models: declsFormated,
+            delayed: modelsDelayed
+        };
     };
 
     /**
@@ -1665,7 +1724,7 @@
      *  - false -> keepValid
      */
     var getFullMethodDecl = function(decl) {
-        if (true === decl) {
+        if (true === decl || 'DELAY' === decl) {
             return 'invalidate';
         } else if (false === decl) {
             return 'keepValid';

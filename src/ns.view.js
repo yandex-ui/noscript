@@ -935,7 +935,18 @@
      * @returns {ns.Model}
      */
     ns.View.prototype.getModel = function(id) {
-        return this.models[id];
+        //TODO: test
+        return this.models[id] || this._modelsDelayed[id];
+    };
+
+    /**
+     * Returns model.
+     * @param {string} id Model ID
+     * @returns {boolean}
+     */
+    ns.View.prototype.isModelDelayed = function(id) {
+        //TODO: test
+        return id in this._modelsDelayed;
     };
 
     /**

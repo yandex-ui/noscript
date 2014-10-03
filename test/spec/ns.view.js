@@ -272,18 +272,21 @@ describe('ns.View', function() {
             it('должна преобразоваться в правильную полную декларацию', function() {
                 var source = ['m1', 'm2'];
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -292,18 +295,21 @@ describe('ns.View', function() {
             it('должна преобразоваться в правильную полную декларацию', function() {
                 var source = {'m1': true, 'm2': false};
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'keepValid',
+                            'ns-model-remove': 'keepValid',
+                            'ns-model-changed': 'keepValid',
+                            'ns-model-destroyed': 'keepValid'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'keepValid',
-                        'ns-model-remove': 'keepValid',
-                        'ns-model-changed': 'keepValid',
-                        'ns-model-destroyed': 'keepValid'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -315,18 +321,21 @@ describe('ns.View', function() {
                     'm2': 'keepValid'
                 };
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'keepValid',
+                            'ns-model-remove': 'keepValid',
+                            'ns-model-changed': 'keepValid',
+                            'ns-model-destroyed': 'keepValid'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'keepValid',
-                        'ns-model-remove': 'keepValid',
-                        'ns-model-changed': 'keepValid',
-                        'ns-model-destroyed': 'keepValid'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -344,19 +353,22 @@ describe('ns.View', function() {
                     }
                 };
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'keepValid',
-                        'ns-model-changed.prop': 'keepValid',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'keepValid',
+                            'ns-model-changed.prop': 'keepValid',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'keepValid',
+                            'ns-model-remove': 'keepValid',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'keepValid',
-                        'ns-model-remove': 'keepValid',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
-                    }
+                    delayed: {}
                 });
             });
         });

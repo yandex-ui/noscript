@@ -69,6 +69,13 @@
     ns.View.prototype.id = null;
 
     /**
+     * Флаг навешивания обработчиков событий моделей.
+     * @type {boolean}
+     * @private
+     */
+    ns.View.prototype.__modelsEventsBinded = false;
+
+    /**
      * Инициализирует экземпляр вида
      * @param {string} id
      * @param {object} params
@@ -201,12 +208,6 @@
      */
     ns.View.prototype._hide = function(events) {
         if (!this.isLoading() && this._visible === true) {
-
-            // FIXME если unbind-ить view от моделей - view не invalidate-ится и не будет перерисовано.
-            // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
-            // Написал тест кейс, чтобы это опять не сломать.
-            // this.__unbindModelsEvents();
-
             this._unbindEvents('show');
             this._hideNode();
             this._visible = false;
@@ -245,12 +246,11 @@
     ns.View.prototype._show = function(events) {
         // При создании блока у него this._visible === undefined.
         if (!this.isLoading() && this._visible !== true) {
-            //  FIXME: Почему это делается на show?
-            //  chestozo: думаю, потому что события от моделей вызывают перерисовку.
-            //  Если view скрыто - перерисоввывать ничего не надо.
-            //  NOTE: вначале делаем _unbindModels, чтобы не подписываться дважды.
-            this.__unbindModelsEvents();
-            this.__bindModelsEvents();
+            if (!this.__modelsEventsBinded) {
+                // События моделей навешиваются один раз и снимаются только при уничтожении блока
+                // События специально навешиваются только после первого показа вида, чтобы избежать различных спецэффектов.
+                this.__bindModelsEvents();
+            }
             this._bindEvents('show');
             this._showNode();
             this._visible = true;
@@ -275,6 +275,7 @@
      * @private
      */
     ns.View.prototype.__bindModelsEvents = function() {
+        this.__modelsEventsBinded = true;
         var models = this.models;
         for (var idModel in models) {
             var model = models[idModel];

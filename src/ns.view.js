@@ -1,12 +1,6 @@
 (function() {
 
     /**
-     * Uniq View ID counter
-     * @type {number}
-     */
-    var VIEW_ID = 0;
-
-    /**
      * Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.
      * @classdesc Класс, реализующий View
      * @tutorial ns.view
@@ -112,20 +106,6 @@
          * @private
          */
         this.status = this.STATUS.NONE;
-
-        /**
-         * Uniq View ID
-         * @type {number}
-         * @private
-         */
-        this._uniqID = VIEW_ID++;
-
-        /**
-         * Uniq namespace for events so view can bind/unbind events properly.
-         * @type {string}
-         * @private
-         */
-        this._eventNS = '.ns-view-' + this.id + '-' + this._uniqID;
 
         // события, которые надо забиндить сразу при создании блока
         this._bindCreateEvents();
@@ -439,9 +419,6 @@
         var event;
         var events = this._getEvents(type);
 
-        // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
-        var eventNS = this._eventNS + '-' + type;
-
         var delegateEvents = events['delegate'];
         for (i = 0, j = delegateEvents.length; i < j; i++) {
             event = delegateEvents[i];
@@ -449,14 +426,14 @@
             if (event[1] === 'window' || event[1] === 'document') {
                 // this._$window
                 // this._$document
-                this['_$' + event[1]].on(event[0] + eventNS, event[2]);
+                this['_$' + event[1]].on(event[0], event[2]);
 
             } else {
 
                 if (event[1]) { //selector
-                    $node.on(event[0] + eventNS, event[1], event[2]);
+                    $node.on(event[0], event[1], event[2]);
                 } else {
-                    $node.on(event[0] + eventNS, event[2]);
+                    $node.on(event[0], event[2]);
                 }
             }
         }
@@ -464,7 +441,7 @@
         var bindEvents = events['bind'];
         for (i = 0, j = bindEvents.length; i < j; i++) {
             event = bindEvents[i];
-            $node.find(event[1]).on(event[0] + eventNS, event[2]);
+            $node.find(event[1]).on(event[0], event[2]);
         }
 
         var nsEvents = events['nsevents'];
@@ -495,18 +472,31 @@
         var j;
         var event;
 
-        // добавляем тип к namespace, чтобы при unbind не убить все события (и show и init)
-        var eventNS = this._eventNS + '-' + type;
         var events = this._getEvents(type);
 
-        $node.off(eventNS);
-        this._$document.off(eventNS);
-        this._$window.off(eventNS);
+        var delegateEvents = events['delegate'];
+        for (i = 0, j = delegateEvents.length; i < j; i++) {
+            event = delegateEvents[i];
+
+            if (event[1] === 'window' || event[1] === 'document') {
+                // this._$window
+                // this._$document
+                this['_$' + event[1]].off(event[0], event[2]);
+
+            } else {
+
+                if (event[1]) { //selector
+                    $node.off(event[0], event[1], event[2]);
+                } else {
+                    $node.off(event[0], event[2]);
+                }
+            }
+        }
 
         var bindEvents = events['bind'];
         for (i = 0, j = bindEvents.length; i < j; i++) {
             event = bindEvents[i];
-            $node.find(event[1]).off(eventNS);
+            $node.find(event[1]).off(event[0], event[2]);
         }
 
         var nsEvents = events['nsevents'];

@@ -221,12 +221,6 @@
      */
     ns.View.prototype._hide = function(events) {
         if (!this.isLoading() && this._visible === true) {
-
-            // FIXME если unbind-ить view от моделей - view не invalidate-ится и не будет перерисовано.
-            // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
-            // Написал тест кейс, чтобы это опять не сломать.
-            // this._unbindModels();
-
             this._unbindEvents('show');
             this._hideNode();
             this._visible = false;
@@ -265,12 +259,6 @@
     ns.View.prototype._show = function(events) {
         // При создании блока у него this._visible === undefined.
         if (!this.isLoading() && this._visible !== true) {
-            //  FIXME: Почему это делается на show?
-            //  chestozo: думаю, потому что события от моделей вызывают перерисовку.
-            //  Если view скрыто - перерисоввывать ничего не надо.
-            //  NOTE: вначале делаем _unbindModels, чтобы не подписываться дважды.
-            this._unbindModels();
-            this._bindModels();
             this._bindEvents('show');
             this._showNode();
             this._visible = true;
@@ -291,6 +279,7 @@
     };
 
     /**
+     * Навешивает обработчики на события моделей.
      * @private
      */
     ns.View.prototype._bindModels = function() {
@@ -483,6 +472,9 @@
             var event = this.info.createEvents[i];
             this.on(event[0], this._prepareCallback(event[1]));
         }
+
+        // События моделей биндятся один раз и снимаются только при уничтожении блока
+        this._bindModels();
     };
 
     /**

@@ -272,18 +272,21 @@ describe('ns.View', function() {
             it('должна преобразоваться в правильную полную декларацию', function() {
                 var source = ['m1', 'm2'];
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -292,18 +295,21 @@ describe('ns.View', function() {
             it('должна преобразоваться в правильную полную декларацию', function() {
                 var source = {'m1': true, 'm2': false};
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'keepValid',
+                            'ns-model-remove': 'keepValid',
+                            'ns-model-changed': 'keepValid',
+                            'ns-model-destroyed': 'keepValid'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'keepValid',
-                        'ns-model-remove': 'keepValid',
-                        'ns-model-changed': 'keepValid',
-                        'ns-model-destroyed': 'keepValid'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -315,18 +321,21 @@ describe('ns.View', function() {
                     'm2': 'keepValid'
                 };
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'keepValid',
+                            'ns-model-remove': 'keepValid',
+                            'ns-model-changed': 'keepValid',
+                            'ns-model-destroyed': 'keepValid'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'keepValid',
-                        'ns-model-remove': 'keepValid',
-                        'ns-model-changed': 'keepValid',
-                        'ns-model-destroyed': 'keepValid'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -344,19 +353,22 @@ describe('ns.View', function() {
                     }
                 };
                 expect(ns.View._formatModelsDecl(source)).to.eql({
-                    m1: {
-                        'ns-model-insert': 'invalidate',
-                        'ns-model-remove': 'invalidate',
-                        'ns-model-changed': 'keepValid',
-                        'ns-model-changed.prop': 'keepValid',
-                        'ns-model-destroyed': 'invalidate'
+                    models: {
+                        m1: {
+                            'ns-model-insert': 'invalidate',
+                            'ns-model-remove': 'invalidate',
+                            'ns-model-changed': 'keepValid',
+                            'ns-model-changed.prop': 'keepValid',
+                            'ns-model-destroyed': 'invalidate'
+                        },
+                        m2: {
+                            'ns-model-insert': 'keepValid',
+                            'ns-model-remove': 'keepValid',
+                            'ns-model-changed': 'invalidate',
+                            'ns-model-destroyed': 'invalidate'
+                        }
                     },
-                    m2: {
-                        'ns-model-insert': 'keepValid',
-                        'ns-model-remove': 'keepValid',
-                        'ns-model-changed': 'invalidate',
-                        'ns-model-destroyed': 'invalidate'
-                    }
+                    delayed: {}
                 });
             });
         });
@@ -948,10 +960,23 @@ describe('ns.View', function() {
             };
 
             beforeEach(function() {
-                this.spies = {};
+                this.spies = {
+                    view1Invalidate: this.sinon.spy()
+                };
+                var that = this;
 
                 ns.View.define('app');
-                ns.View.define('view', { models: [ 'model' ] });
+                ns.View.define('view', {
+                    models: [ 'model' ],
+                    methods: {
+                        invalidate: function() {
+                            if (this.params.id === 1) {
+                                that.spies.view1Invalidate();
+                            }
+                            ns.View.prototype.invalidate.call(this);
+                        }
+                    }
+                });
 
                 // Модель и сразу два экземляра создаём заранее
                 ns.Model.define('model', { params: { id: null } });
@@ -977,7 +1002,6 @@ describe('ns.View', function() {
                 goToPage(app, { id: 1 }, function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
-                    spies.view1Invalidate = this.sinon.spy(view1, 'invalidate');
                     spies.view1SetNode = this.sinon.spy(view1, '_setNode');
                     spies.view1Hide = this.sinon.spy(view1, '_hide');
 
@@ -1011,7 +1035,7 @@ describe('ns.View', function() {
                 goToPage(app, { id: 1 }, function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
-                    spies.view1Invalidate = this.sinon.spy(view1, 'invalidate');
+                    spies.view1Invalidate.reset();
 
                     goToPage(app, { id: 2 }, function() {
                         goToPage(app, { id: 1 }, function() {

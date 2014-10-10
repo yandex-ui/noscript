@@ -47,17 +47,6 @@ describe('ns.Update: ловля ошибок на разных стадиях.',
                     })
             });
 
-            it('должен поймать ошибку и отреджектить промис, если #' + method + '() реджектит свой промис.', function() {
-                this.sinon.stub(ns.Update.prototype, method).returns(Vow.reject('oops'));
-
-                return this.update[updateMethodToCall]()
-                    .then(function() {
-                        return Vow.reject('fulfilled');
-                    }, function() {
-                        return Vow.fulfill();
-                    })
-            });
-
         });
 
     }

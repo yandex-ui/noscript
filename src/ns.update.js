@@ -280,7 +280,6 @@
      * @private
      * @param {HTMLElement} node
      * @param {boolean} async
-     * @returns {Vow.Promise}
      */
     ns.Update.prototype._insertNodes = function(node, async) {
         if (this._expired()) {
@@ -313,8 +312,6 @@
             }
         }
         this.stopTimer('triggerEvents');
-
-        return Vow.fulfill();
     };
 
     /**
@@ -333,7 +330,7 @@
 
         var html = this._renderUpdateTree();
         var node = ns.html2node(html || '');
-        return this._insertNodes(node);
+        this._insertNodes(node);
     };
 
     /**
@@ -395,20 +392,14 @@
 
         this.log('started `render` scenario');
 
-        var asyncViewPromises;
-        var saveAsyncPromises = function(result) {
-            // сохраняем результат
-            asyncViewPromises = result;
-        };
-        var fulfillWithAsyncPromises = function() {
-            this._fulfill(asyncViewPromises);
-        };
-
         // начинаем цепочку с промиса, чтобы ловить ошибки в том числе и из _requestAllModels
         Vow.invoke(this._requestAllModels.bind(this))
-            .then(saveAsyncPromises, null, this)
-            .then(this._updateDOM, null, this)
-            .then(fulfillWithAsyncPromises, this._reject, this);
+            .then(function(result) {
+                this._updateDOM();
+                this._fulfill(result);
+            }, this._reject, this)
+            // еще один reject, чтобы ловить ошибки из #_updateDOM
+            .then(null, this._reject, this);
 
         return this.promise;
     };

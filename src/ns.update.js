@@ -181,13 +181,15 @@
             validModels: err.valid
         };
 
+        var promise = new Vow.Promise();
         if (ns.Update.handleError(error, this)) {
-            return Vow.resolve([].concat(err.invalid, err.valid));
+            promise.fulfill([].concat(err.invalid, err.valid));
 
         } else {
-            return Vow.reject(error);
+            promise.reject(error);
         }
 
+        return promise;
     };
 
     /**
@@ -450,8 +452,7 @@
      */
     ns.Update.prototype.prefetch = function() {
         this.log('started `prefetch` scenario');
-        this.promise = this._requestSyncModels();
-        this.promise.then(this._fulfill, this._reject, this);
+        this._requestSyncModels().then(this._fulfill, this._reject, this);
         return this.promise;
     };
 

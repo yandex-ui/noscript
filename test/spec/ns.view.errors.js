@@ -38,11 +38,11 @@ describe('ns.View error handling', function() {
         it('render .ns-view-error-content template', function() {
             var that = this;
             var update = this.update;
-            ns.Update.handleError = function(_error, _update) {
+            this.sinon.stub(ns.Update, 'handleError', function(_error, _update) {
                 expect(_update).to.be.equal(update);
                 expect(_error.error).to.be.equal('models');
                 return true;
-            };
+            });
             return this.update.start().then(function() {
                 expect($('.ns-view-letter', that.APP.node).html()).to.be.equal('test ns-view-error-content');
             });

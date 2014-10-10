@@ -315,7 +315,6 @@
      * @private
      * @param {HTMLElement} node
      * @param {boolean} async
-     * @returns {Vow.Promise}
      */
     ns.Update.prototype._insertNodes = function(node, async) {
         if (this._expired()) {
@@ -440,7 +439,7 @@
         this.startTimer('html2node');
         var node = ns.html2node(html || '');
         this.stopTimer('html2node');
-        return this._insertNodes(node);
+        this._insertNodes(node);
     };
 
     /**

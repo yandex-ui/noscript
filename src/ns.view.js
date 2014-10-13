@@ -631,8 +631,8 @@
      * @private
      */
     ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
-        // При необходимости добавим текущий вид в список "запрашиваемых"
-        this._tryPushToRequest(updated);
+        // Добавляем себя в обновляемые виды
+        this._addSelfToUpdate(updated);
 
         this._saveLayout(pageLayout);
 
@@ -649,42 +649,57 @@
     };
 
     /**
-     * Добавляет вид в соответствующий список "запрашиваемых" видов в случае,
-     * если запрос необходим
+     * Добавляет себя в соответствующий список "обновляемых" видов
+     * @param {object} updated
      * @private
      */
-    ns.View.prototype._tryPushToRequest = function(updated) {
+    ns.View.prototype._addSelfToUpdate = function(updated) {
         /**
          * Флаг, означающий, что view грузится асинхронно.
          * @type {Boolean}
          */
         this.asyncState = false;
 
-        if (this.async) {
-            var hasValidModels = this.isModelsValid();
-            var hasValidStatus = this.isOk();
+        /*
+         Логика такая: все виды должны себя ВСЕГДА добавлять.
+         Иначе может получиться странная ситуация:
+         Есть вид v1, он зависит от модель m1. Он валиден.
+         Есть вид v2, он зависит от модели m2. Он невалиден.
 
-            // shouldBeSync - специальный флаг, чтобы вид отрисовался
-            // раньше это работало так,
-            // update параллельно запрашивал модели для синхронных видов и асинхронных
-            // поэтому когда запускался update для асинхронных модели уже были готовы и hasValidModels === true
-            if (this.shouldBeSync || (hasValidModels && !hasValidStatus)) {
-                // если асинхронный блок имеет валидные модели, но невалидный статус - рисуем его синхронно
+         v1 не сообщает себя (и свои модели), а v2 сообщает.
+         В ns.request уходят знания только про m2.
+
+         Допустим в процессе запроса m2 кто-то инвалидировал модель m1.
+         Про ее необходимость никто не знает,
+         соответственно дело нормальным способом дойдет до отрисовки,
+         где m1 будет перерисован как error-content
+         */
+
+        // вид может быть асинхронным
+        if (this.async) {
+            // shouldBeSync - специальный флаг, чтобы вид async-вид отрисовался в этом Update,
+            // его выставляет #update перед запуском ns.Update
+            if (this.shouldBeSync || this.isModelsValid()) {
+                // async-вид попадает в отрисовку, если
+                // - настал его черед (this.shouldBeSync === true)
+                // - имеет валидные модели (this.isModelsValid() === true)
                 updated.sync.push(this);
 
-            } else if (!hasValidModels) {
+            } else {
+                // ставим флаг, что вид будет отрисован асинхронно
                 this.asyncState = true;
-                // если асинхронный блок имеет невалидные модели, то его не надо рисовать сразу
-                updated.async.push(this);
-                // прекращаем обработку
-                return updated;
-            }
-        } else if (!this.isValidSelf()) {
-            // реинвалидируем дочерние виды,
-            // потому что их тоже придется перерисовать вместе с родителем
-            this.invalidate();
 
-            // если обычный блок не валиден
+                updated.async.push(this);
+            }
+        } else {
+
+            if (!this.isValidSelf()) {
+                // реинвалидируем дочерние виды,
+                // потому что их тоже придется перерисовать вместе с родителем
+                this.invalidate();
+            }
+
+            // обычный блок добавляем всегда
             updated.sync.push(this);
         }
 

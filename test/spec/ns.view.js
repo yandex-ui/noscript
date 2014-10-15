@@ -167,7 +167,7 @@ describe('ns.View', function() {
             );
 
             var view = ns.View.create('test-view', {});
-            view._bindModels();
+            view.__bindModelsEvents();
             model.setData({a : 2});
         });
 
@@ -193,7 +193,7 @@ describe('ns.View', function() {
             );
 
             var view = ns.View.create('test-view', {});
-            view._bindModels();
+            view.__bindModelsEvents();
             model.setData({a : 2});
         });
     });

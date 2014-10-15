@@ -205,7 +205,7 @@
             // FIXME если unbind-ить view от моделей - view не invalidate-ится и не будет перерисовано.
             // https://github.com/yandex-ui/noscript/pull/192#issuecomment-33148362
             // Написал тест кейс, чтобы это опять не сломать.
-            // this._unbindModels();
+            // this.__unbindModelsEvents();
 
             this._unbindEvents('show');
             this._hideNode();
@@ -249,8 +249,8 @@
             //  chestozo: думаю, потому что события от моделей вызывают перерисовку.
             //  Если view скрыто - перерисоввывать ничего не надо.
             //  NOTE: вначале делаем _unbindModels, чтобы не подписываться дважды.
-            this._unbindModels();
-            this._bindModels();
+            this.__unbindModelsEvents();
+            this.__bindModelsEvents();
             this._bindEvents('show');
             this._showNode();
             this._visible = true;
@@ -271,32 +271,39 @@
     };
 
     /**
+     * Навешивает обработчики на события моделей вида.
      * @private
      */
-    ns.View.prototype._bindModels = function() {
+    ns.View.prototype.__bindModelsEvents = function() {
         var models = this.models;
-        var decls = this.info.models;
-
         for (var idModel in models) {
             var model = models[idModel];
+            this.__bindModelEvents(model);
+        }
+    };
 
-            var decl = decls[idModel];
-            for (var eventName in decl) {
-                var handlerName = decl[eventName];
-                var handler = this[handlerName] || decl[eventName];
-                if ('function' === typeof handler) {
+    /**
+     * Навешивает обработчики на события модели.
+     * @param {ns.Model} model
+     * @private
+     */
+    ns.View.prototype.__bindModelEvents = function(model) {
+        var decl = this.info.models[model.id];
+        for (var eventName in decl) {
+            var handlerName = decl[eventName];
+            var handler = this[handlerName] || decl[eventName];
+            if ('function' === typeof handler) {
 
-                    // сам keepValid биндить не надо,
-                    // потому что _invokeModelHandler и так синхронизирует версию
-                    if (handler === this.keepValid) {
-                        // заменяем его на пустую функцию
-                        handler = no.nop;
-                    }
-
-                    this._bindModel(model, eventName,
-                        this._invokeModelHandler.bind(this, handler, model)
-                    );
+                // сам keepValid биндить не надо,
+                // потому что _invokeModelHandler и так синхронизирует версию
+                if (handler === this.keepValid) {
+                    // заменяем его на пустую функцию
+                    handler = no.nop;
                 }
+
+                this.__bindModelEvent(model, eventName,
+                    this._invokeModelHandler.bind(this, handler, model)
+                );
             }
         }
     };
@@ -323,25 +330,34 @@
      * @param {function} handler
      * @private
      */
-    ns.View.prototype._bindModel = function(model, eventName, handler) {
+    ns.View.prototype.__bindModelEvent = function(model, eventName, handler) {
         model.on(eventName, handler);
         this._modelsHandlers[model.key][eventName] = handler;
     };
 
     /**
-     * Отписываемся от изменений моделей.
+     * Отписывает обработчики событий моделей вида.
      * @private
      */
-    ns.View.prototype._unbindModels = function() {
+    ns.View.prototype.__unbindModelsEvents = function() {
         var models = this.models;
         for (var model_id in models) {
             var model = models[model_id];
-            var events = this._modelsHandlers[model.key];
+            this.__unbindModelEvent(model);
+        }
+    };
 
-            for (var eventName in events) {
-                model.off(eventName, events[eventName]);
-                delete events[eventName];
-            }
+    /**
+     * Отписывает обработчики событий модели.
+     * @param {ns.Model} model
+     * @private
+     */
+    ns.View.prototype.__unbindModelEvent = function(model) {
+        var events = this._modelsHandlers[model.key];
+
+        for (var eventName in events) {
+            model.off(eventName, events[eventName]);
+            delete events[eventName];
         }
     };
 

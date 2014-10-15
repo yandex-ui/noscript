@@ -21,8 +21,6 @@ ns.Box = function(id, params) {
     this._visible = false;
 };
 
-ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
-
 /**
  * Возвращает ключ вида
  * @param {string} id Название вида
@@ -283,30 +281,20 @@ ns.Box.prototype._hide = function() {
 };
 
 /**
- * @private
- */
-ns.Box.prototype._hideNode = function() {
-    this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
-};
-
-/**
- *
- * @private
- */
-ns.Box.prototype._showNode = function() {
-    this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
-};
-
-ns.Box.prototype.isOk = no.true;
-ns.Box.prototype.isLoading = no.false;
-
-/**
  * Returns true if box has status NONE
  * @returns {boolean}
  */
 ns.Box.prototype.isNone = function() {
     return !this.node;
 };
+
+// копируем нужные методы из ns.View
+ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
+ns.Box.prototype._hideNode = ns.View.prototype._hideNode;
+ns.Box.prototype._showNode = ns.View.prototype._showNode;
+
+ns.Box.prototype.isOk = no.true;
+ns.Box.prototype.isLoading = no.false;
 
 /**
  * Создает ключ для ns.Box.

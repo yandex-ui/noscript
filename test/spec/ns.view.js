@@ -948,10 +948,23 @@ describe('ns.View', function() {
             };
 
             beforeEach(function() {
-                this.spies = {};
+                this.spies = {
+                    view1Invalidate: this.sinon.spy()
+                };
+                var that = this;
 
                 ns.View.define('app');
-                ns.View.define('view', { models: [ 'model' ] });
+                ns.View.define('view', {
+                    models: [ 'model' ],
+                    methods: {
+                        invalidate: function() {
+                            if (this.params.id === 1) {
+                                that.spies.view1Invalidate();
+                            }
+                            ns.View.prototype.invalidate.call(this);
+                        }
+                    }
+                });
 
                 // Модель и сразу два экземляра создаём заранее
                 ns.Model.define('model', { params: { id: null } });
@@ -977,7 +990,6 @@ describe('ns.View', function() {
                 goToPage(app, { id: 1 }, function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
-                    spies.view1Invalidate = this.sinon.spy(view1, 'invalidate');
                     spies.view1SetNode = this.sinon.spy(view1, '_setNode');
                     spies.view1Hide = this.sinon.spy(view1, '_hide');
 
@@ -1011,7 +1023,7 @@ describe('ns.View', function() {
                 goToPage(app, { id: 1 }, function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
-                    spies.view1Invalidate = this.sinon.spy(view1, 'invalidate');
+                    spies.view1Invalidate.reset();
 
                     goToPage(app, { id: 2 }, function() {
                         goToPage(app, { id: 1 }, function() {

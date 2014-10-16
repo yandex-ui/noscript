@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Философия работы noscript Node.js v0.10.29 Manual &amp; Documentation</title>
+  <title>Философия работы noscript Node.js v0.10.32 Manual &amp; Documentation</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/sh.css">
   <link rel="canonical" href="http://nodejs.org/api/index.md.html">
@@ -30,7 +30,7 @@
         </div> -->
         <div id="column1" class="interior">
           <header>
-            <!-- <h1>Node.js v0.10.29 Manual &amp; Documentation</h1> -->
+            <!-- <h1>Node.js v0.10.32 Manual &amp; Documentation</h1> -->
             <h1>Noscript документация одной страницей</h1>
             <!-- <div id="gtoc">
               <p>
@@ -928,12 +928,12 @@ ns.View.define(&apos;my-view&apos;, {
 <pre><code class="js">ns.events.trigger(&apos;my-custom-event&apos;);</code></pre>
 <h4>Встроенные события<span><a class="mark" href="#index_md_19" id="index_md_19">#</a></span></h4>
 <p>Список событий:
-<em> <code>ns-view-hide</code> - вида был скрыт и больше не виден на странице
-</em> <code>ns-view-htmldestroy</code> - старая нода у вида была уничтожена
-<em> <code>ns-view-htmlinit</code> - у вида появилась новая нода
+<em> <code>ns-view-hide</code> - вида сейчас виден на странице и будет скрыт. Нода вида находится в DOM.
+</em> <code>ns-view-htmldestroy</code> - вид сейчас виден на странице, но его нода будет заменена на новую. Нода вида находится в DOM.
+<em> <code>ns-view-htmlinit</code> - у вида появилась новая нода, при этом не гарантируется, что она находится в DOM.
 </em> <code>ns-view-async</code> - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view
-<em> <code>ns-view-show</code> - view был показан и теперь виден на странице
-</em> <code>ns-view-touch</code> - view виден и был затронут в процессе обновления страницы
+<em> <code>ns-view-show</code> - view был показан и теперь виден на странице. Нода вида находится в DOM.
+</em> <code>ns-view-touch</code> - view виден и был затронут в процессе обновления страницы. Нода вида находится в DOM.
 
 </p>
 <ol>
@@ -1382,6 +1382,7 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 <div class="signature"><ul>
 <li><code>ns-model-changed</code> - модель изменилась. В аргументах приходит jpath, по которому было сделано изменение. Если он пустой, то изменилась вся модель (обычно методом <code>#setData()</code>)</li>
 <li><code>ns-model-changed&lt;.jpath&gt;</code> - изменились данные по указанному jpath. В аргументах приходит jpath, по которому было сделано изменение. События кидаются иерархично, т.о. для <code>.for.bar</code> будет три события: <code>ns-model-changed.foo.bar</code>, <code>ns-model-changed.foo</code>, <code>ns-model-changed</code></li>
+<li><code>ns-model-before-destroyed</code> - модель будет инвалидирована и уничтожена.</li>
 <li><code>ns-model-destroyed</code> - модель была инвалидированна и уничтожена.</li>
 <li><code>ns-model-init</code> - модель создана и проинициализованна</li>
 <li><code>ns-model-touched</code> - у модели изменилась версия. Такое событие будет как результатом изменения данных через <code>#set</code> или <code>#setData</code>, так и прямым вызовом метода <code>#touch()</code></li>
@@ -1885,7 +1886,7 @@ ns.layout.define(&apos;main&apos;, {
           <li><a href="http://twitter.com/nodejs" class="twitter">@nodejs</a></li>
       </ul>
 
-      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.29/LICENSE">license</a>.</p>
+      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.32/LICENSE">license</a>.</p>
     </div> -->
 
   <script src="assets/sh_main.js"></script>

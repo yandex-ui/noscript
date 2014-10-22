@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Namespace: log</title>
+    <title>Tutorial: ns.viewyate</title>
     
     
     
@@ -1345,750 +1345,124 @@
 
     <div class="main">
         
-            <h1 class="page-title" data-filename="ns.log.html">Namespace: log</h1>
+            <h1 class="page-title">Tutorial: ns.viewyate</h1>
         
 
-        
-
-
-
-<section>
+        <section>
     
 <header>
-    <h2>
-        <span class="ancestors"><a href="ns.html">ns</a>.</span>
     
-    log
-    </h2>
-    
+
+    <h2>ns.viewyate</h2>
 </header>  
 
 <article>
-    <div class="container-overview">
-    
-    
-    
-        
-            <div class="description"><p>Модуль логирования ошибок.</p></div>
-        
-        
-        
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-        
-        
-    
+    <h1>Шаблонизация ns.View в yate</h1><p>Каждый вид отрисовывается изолированно. Корнем является JSON-структура описанная ниже.</p>
+<p>Исходя из сменя контекста для каждого вида, не стоит увлекаться созданием ключей и глобальных переменных в yate, т.к. они будут перевычислять для каждого вида.
+Более правильным способом является вынос таких данных в external-функции.</p>
+<h2>Создание View</h2><p>За создание DOM-обертки и содержимого отвечает мода <code>ns-view</code>.
+Ее стоит использовать только для управления местом отрисовки дочерних View.</p>
+<p><strong>Не стоит переопределять эту моду без крайней необходимости!</strong></p>
+<h2>Атрибуты обертки View</h2><ul>
+<li><code>ns-view-add-attrs</code> - с помощью этой моды можно дописать собственные атрибуты в DOM-обертку. Например,</li>
+</ul>
+<pre class="prettyprint source"><code>match .my-view2 ns-view-add-attrs {
+    @data-id = 'my-id'
+}</code></pre><ul>
+<li><code>ns-view-add-class</code> - с помощью этой моды можно дописать собственные классы в DOM-обертку. Например,</li>
+</ul>
+<pre class="prettyprint source"><code>match .my-view2 ns-view-add-class {
+    // пробел в начале обязателен
+    &quot; my-class&quot;
+}</code></pre><h2>Содержимое View</h2><h3>ns-view-content и ns-view-desc</h3><p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.</p>
+<pre class="prettyprint source"><code>match .my-view1 ns-view-content {
+    <div class=&quot;view1-content&quot;>
+        // в этом месте отрисуются все дочерние view с помощью хелпера ns-view-desc
+        apply . ns-view-desc
     </div>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        <h3 class="subsection-title">Methods</h3>
-        
-        <dl>
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="debug">
-            
-            <span class="type-signature static">static</span>ns.log.debug<span class="signature">(str)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.log.js, line 12
+}</code></pre><p>Если надо расставить виды по разным местам:</p>
+<pre class="prettyprint source"><code>match .my-view2 ns-view-content {
+    <div class=&quot;view2-content&quot;>
+        <div class=&quot;view2-content__child&quot;>
+            // в этом месте отрисуются дочерний вид my-child1
+            apply /.views.my-child1 ns-view
         </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>str</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                        <span class="repeatable">repeatable</span>
-                    
-                
-                </td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="error">
-            
-            <span class="type-signature static">static</span>ns.log.error<span class="signature">(name, <span class="optional">data</span>, <span class="optional">longText</span>)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.log.js, line 33
+        <div class=&quot;view2-content__child&quot;>
+            // в этом месте отрисуются дочерний вид my-child2
+            apply /.views.my-child2 ns-view
         </div>
-        
     </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Логирует ошибку.</p>
+}</code></pre><h3>ns-view-async-content</h3><p><code>ns-view-async-content</code> - мода отвечает за содержимое View в режиме async.
+В большинстве случаев тут стоит рисовать лоадер пока грузятся данные.
+В async-режиме у view не бывает дочерних элементов. Они появляются в нормальной отрисовке, когда используется <code>ns-view-content</code></p>
+<pre class="prettyprint source"><code>match .my-view1 ns-view-async-content {
+    <div class=&quot;view1-content&quot;>
+        <img src=&quot;loader.gif&quot;/>
     </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                <p>Название ошибки.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Данные</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>longText</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Дополнительные данные. Длинная строка, которую надо разбить на части.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="exception">
-            
-            <span class="type-signature static">static</span>ns.log.exception<span class="signature">(name, exception, <span class="optional">data</span>)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.log.js, line 43
+}</code></pre><h3>ns-view-error-content</h3><p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.</p>
+<h2>Элементы ViewСollection</h2><p>В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: <code>ns-view-content</code> и <code>ns-view-async-content</code>.
+Для управления местом вставки элементов коллекции есть мода <code>ns-view-collection</code>.
+Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.</p>
+<p>Если вы используете эту моду, то родительскую ноду для элементов коллекции надо пометить специальных классом <code>ns-view-container-desc</code></p>
+<pre class="prettyprint source"><code>match .my-view-collection ns-view-content {
+    <div class=&quot;my-view-collection__wrapper&quot;>
+        <div class=&quot;my-view-collection__text&quot;>My View Collection</div>
+        <div class=&quot;my-view-collection__items ns-view-container-desc&quot;>
+            // сюда будут отрисованы элементы коллекции
+            // не забывайте добавлять класс &quot;ns-view-container-desc&quot; для родителя элементов коллекции
+            apply . ns-view-collection
         </div>
-        
     </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Логирует JS-исключение.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                <p>Название ошибки.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>exception</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                <p>Пойманное исключение.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Дополнительные данные.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="info">
-            
-            <span class="type-signature static">static</span>ns.log.info<span class="signature">(name, <span class="optional">data</span>, <span class="optional">longText</span>)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.log.js, line 23
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Логирует сообщение.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                
-                <p>Название сообщение.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Данные</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>longText</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Дополнительные данные. Длинная строка, которую надо разбить на части.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        </dl>
-    
-    
-    
-    
-    
+}</code></pre><p>Помните, что элементы коллекции невозможно отрисовать модой <code>ns-view-desc</code> или через <code>apply /.views.* ns-view</code>.
+Элементы коллекции отрисует только мода <code>ns-view-collection</code>!</p>
+<h2>Yate-хелперы</h2><ul>
+<li><code>model('model-name')</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath <code>/.models.model-name.model-name</code></li>
+<li><code>modelError('model-name')</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.model-name.model-name</code></li>
+<li><code>ns-url</code> - external-функция для <code>ns.router.url</code></li>
+<li><code>ns-generate-url</code> - external-функция для <code>ns.router.generateUrl</code></li>
+</ul>
+<h2>Структура JSON для отрисовки</h2><pre class="prettyprint source lang-js"><code>{
+    box: false,
+    collection: false,
+    key: 'view=app',
+    models: {
+        model1: {
+            'model1': {},
+            'status': 'ok'
+        },
+        model2: {
+            'model2': {},
+            'status': 'ok'
+        },
+        model3: {
+            'model3': 'http_timeout',
+            'status': 'error'
+        }
+    },
+    params: {},
+    state: 'ok',
+    views: {}
+}</code></pre><p><strong>Публичные свойства</strong>:</p>
+<ul>
+<li><code>key</code>: string. Ключ вида.</li>
+<li><code>params</code>: object. Собственные параметры вида.</li>
+<li><code>views</code>: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:<pre class="prettyprint source"><code>{
+ &quot;views&quot;: {
+     &quot;view1Name&quot;: view1Tree
+     &quot;view2Name&quot;: view2Tree
+ }
+}</code></pre></li>
+</ul>
+<p><strong>Приватные свойства</strong>:</p>
+<ul>
+<li><code>box</code>: boolean. Флаг того, что это бокс.</li>
+<li><code>collection</code>: boolean. Флаг того, что это вид-коллекция.</li>
+<li><code>models</code>: object. Объект с данными моделей. Не предназначен для прямого использования. Для получения моделей всегда используйте yate-хелперы <code>model()</code> и <code>modelError()</code>.</li>
+<li><code>state</code>: Текущее состояние вида. ok/error/loading/placeholder</li>
+</ul>
 </article>
 
 </section>  
-
-
-
 
 
         
@@ -2100,7 +1474,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Oct 22 2014 22:34:06 GMT+0400 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Wed Oct 22 2014 22:34:07 GMT+0400 (MSK)
         </footer>
     </div>
 </div>

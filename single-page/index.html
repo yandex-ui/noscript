@@ -123,6 +123,20 @@
 <li><a href="#index_md_async">async</a></li>
 </ul>
 </li>
+<li><a href="#index_md_ns_view_yate">Шаблонизация ns.View в yate</a><ul>
+<li><a href="#index_md_view">Создание View</a></li>
+<li><a href="#index_md_view_1">Атрибуты обертки View</a></li>
+<li><a href="#index_md_view_2">Содержимое View</a><ul>
+<li><a href="#index_md_ns_view_content_ns_view_desc">ns-view-content и ns-view-desc</a></li>
+<li><a href="#index_md_ns_view_async_content">ns-view-async-content</a></li>
+<li><a href="#index_md_ns_view_error_content">ns-view-error-content</a></li>
+</ul>
+</li>
+<li><a href="#index_md_view_ollection">Элементы ViewСollection</a></li>
+<li><a href="#index_md_yate_1">Yate-хелперы</a></li>
+<li><a href="#index_md_json">Структура JSON для отрисовки</a></li>
+</ul>
+</li>
 <li><a href="#index_md_ns_model">ns.Model</a><ul>
 <li><a href="#index_md_23">Декларация</a><ul>
 <li><a href="#index_md_ctor_1">ctor</a></li>
@@ -928,12 +942,17 @@ ns.View.define(&apos;my-view&apos;, {
 <pre><code class="js">ns.events.trigger(&apos;my-custom-event&apos;);</code></pre>
 <h4>Встроенные события<span><a class="mark" href="#index_md_19" id="index_md_19">#</a></span></h4>
 <p>Список событий:
-<em> <code>ns-view-hide</code> - вида сейчас виден на странице и будет скрыт. Нода вида находится в DOM.
-</em> <code>ns-view-htmldestroy</code> - вид сейчас виден на странице, но его нода будет заменена на новую. Нода вида находится в DOM.
-<em> <code>ns-view-htmlinit</code> - у вида появилась новая нода, при этом не гарантируется, что она находится в DOM.
-</em> <code>ns-view-async</code> - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view
-<em> <code>ns-view-show</code> - view был показан и теперь виден на странице. Нода вида находится в DOM.
-</em> <code>ns-view-touch</code> - view виден и был затронут в процессе обновления страницы. Нода вида находится в DOM.
+
+</p>
+<ul>
+<li><code>ns-view-hide</code> - вида сейчас виден на странице и будет скрыт. Нода вида находится в DOM.</li>
+<li><code>ns-view-htmldestroy</code> - вид сейчас виден на странице, но его нода будет заменена на новую. Нода вида находится в DOM.</li>
+<li><code>ns-view-htmlinit</code> - у вида появилась новая нода, при этом не гарантируется, что она находится в DOM.</li>
+<li><code>ns-view-async</code> - у async-view появилась заглушка. Это единственное событие, которое генерируется для заглушки async-view</li>
+<li><code>ns-view-show</code> - view был показан и теперь виден на странице. Нода вида находится в DOM.</li>
+<li><code>ns-view-touch</code> - view виден и был затронут в процессе обновления страницы. Нода вида находится в DOM.</li>
+</ul>
+<p>Правила:
 
 </p>
 <ol>
@@ -942,13 +961,15 @@ ns.View.define(&apos;my-view&apos;, {
 <li>События генерируются в строго определенном порядке, указанном выше</li>
 </ol>
 <p>Примеры последовательностей событий:
-<em> инициализация view: <code>ns-view-htmlinit -&gt; ns-view-show -&gt; ns-view-touch</code>
-</em> перерисовка страница, если view валиден: <code>ns-view-touch</code>
-<em> view был скрыт: <code>ns-view-hide</code> (без <code>ns-view-touch</code>)
-</em> view был показан: <code>ns-view-show -&gt; ns-view-touch</code>
-* view был перерисован: <code>ns-view-hide -&gt; ns-view-htmldestroy -&gt; ns-view-htmlinit -&gt; ns-view-show -&gt; ns-view-touch</code> (<code>ns-view-hide</code> тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на <code>ns-view-show/ns-view-hide</code> и при обновлении ноды, они должны быть переинициализированы)
 
 </p>
+<ul>
+<li>инициализация view: <code>ns-view-htmlinit -&gt; ns-view-show -&gt; ns-view-touch</code></li>
+<li>перерисовка страница, если view валиден: <code>ns-view-touch</code></li>
+<li>view был скрыт: <code>ns-view-hide</code> (без <code>ns-view-touch</code>)</li>
+<li>view был показан: <code>ns-view-show -&gt; ns-view-touch</code></li>
+<li>view был перерисован: <code>ns-view-hide -&gt; ns-view-htmldestroy -&gt; ns-view-htmlinit -&gt; ns-view-show -&gt; ns-view-touch</code> (<code>ns-view-hide</code> тут вызывается из тех соображений, что могут быть обработчики, которые вешаются на <code>ns-view-show/ns-view-hide</code> и при обновлении ноды, они должны быть переинициализированы)</li>
+</ul>
 <h3>methods<span><a class="mark" href="#index_md_methods" id="index_md_methods">#</a></span></h3>
 <p><code>methods</code> - объект с методами вида. По сути является прототипом объекта.
 
@@ -1163,6 +1184,152 @@ ns.View.define(&apos;super-view&apos;, {
  3. После получения данных вид будет перерисован с обычной модой <code>ns-view-content</code> и поведет себя как обычно
 
 </p>
+<h1>Шаблонизация ns.View в yate<span><a class="mark" href="#index_md_ns_view_yate" id="index_md_ns_view_yate">#</a></span></h1>
+<p>Каждый вид отрисовывается изолированно. Корнем является JSON-структура описанная ниже.
+
+</p>
+<p>Исходя из сменя контекста для каждого вида, не стоит увлекаться созданием ключей и глобальных переменных в yate, т.к. они будут перевычислять для каждого вида.
+Более правильным способом является вынос таких данных в external-функции.
+
+</p>
+<h2>Создание View<span><a class="mark" href="#index_md_view" id="index_md_view">#</a></span></h2>
+<p>За создание DOM-обертки и содержимого отвечает мода <code>ns-view</code>.
+Ее стоит использовать только для управления местом отрисовки дочерних View.
+
+</p>
+<p><strong>Не стоит переопределять эту моду без крайней необходимости!</strong>
+
+</p>
+<h2>Атрибуты обертки View<span><a class="mark" href="#index_md_view_1" id="index_md_view_1">#</a></span></h2>
+<div class="signature"><ul>
+<li><code>ns-view-add-attrs</code> - с помощью этой моды можно дописать собственные атрибуты в DOM-обертку. Например,</li>
+</div></ul>
+<pre><code>match .my-view2 ns-view-add-attrs {
+    @data-id = &apos;my-id&apos;
+}</code></pre>
+<ul>
+<li><code>ns-view-add-class</code> - с помощью этой моды можно дописать собственные классы в DOM-обертку. Например,</li>
+</ul>
+<pre><code>match .my-view2 ns-view-add-class {
+    // пробел в начале обязателен
+    &quot; my-class&quot;
+}</code></pre>
+<h2>Содержимое View<span><a class="mark" href="#index_md_view_2" id="index_md_view_2">#</a></span></h2>
+<h3>ns-view-content и ns-view-desc<span><a class="mark" href="#index_md_ns_view_content_ns_view_desc" id="index_md_ns_view_content_ns_view_desc">#</a></span></h3>
+<p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.
+
+</p>
+<pre><code>match .my-view1 ns-view-content {
+    &lt;div class=&quot;view1-content&quot;&gt;
+        // в этом месте отрисуются все дочерние view с помощью хелпера ns-view-desc
+        apply . ns-view-desc
+    &lt;/div&gt;
+}</code></pre>
+<p>Если надо расставить виды по разным местам:
+</p>
+<pre><code>match .my-view2 ns-view-content {
+    &lt;div class=&quot;view2-content&quot;&gt;
+        &lt;div class=&quot;view2-content__child&quot;&gt;
+            // в этом месте отрисуются дочерний вид my-child1
+            apply /.views.my-child1 ns-view
+        &lt;/div&gt;
+        &lt;div class=&quot;view2-content__child&quot;&gt;
+            // в этом месте отрисуются дочерний вид my-child2
+            apply /.views.my-child2 ns-view
+        &lt;/div&gt;
+    &lt;/div&gt;
+}</code></pre>
+<h3>ns-view-async-content<span><a class="mark" href="#index_md_ns_view_async_content" id="index_md_ns_view_async_content">#</a></span></h3>
+<p><code>ns-view-async-content</code> - мода отвечает за содержимое View в режиме async.
+В большинстве случаев тут стоит рисовать лоадер пока грузятся данные.
+В async-режиме у view не бывает дочерних элементов. Они появляются в нормальной отрисовке, когда используется <code>ns-view-content</code>
+
+</p>
+<pre><code>match .my-view1 ns-view-async-content {
+    &lt;div class=&quot;view1-content&quot;&gt;
+        &lt;img src=&quot;loader.gif&quot;/&gt;
+    &lt;/div&gt;
+}</code></pre>
+<h3>ns-view-error-content<span><a class="mark" href="#index_md_ns_view_error_content" id="index_md_ns_view_error_content">#</a></span></h3>
+<p><code>ns-view-error-content</code> - мода отвечается за состояние, когда часть моделей не удалось получить или для них вернулась ошибка.
+
+</p>
+<h2>Элементы ViewСollection<span><a class="mark" href="#index_md_view_ollection" id="index_md_view_ollection">#</a></span></h2>
+<p>В вопросе отрисовки коллеция не отличается от обычных View и рисуется теми же модами: <code>ns-view-content</code> и <code>ns-view-async-content</code>.
+Для управления местом вставки элементов коллекции есть мода <code>ns-view-collection</code>.
+Ее смысл в том, чтобы давать возможность ViewСollection иметь собственную обертку над элементами.
+
+</p>
+<p>Если вы используете эту моду, то родительскую ноду для элементов коллекции надо пометить специальных классом <code>ns-view-container-desc</code>
+
+</p>
+<pre><code>match .my-view-collection ns-view-content {
+    &lt;div class=&quot;my-view-collection__wrapper&quot;&gt;
+        &lt;div class=&quot;my-view-collection__text&quot;&gt;My View Collection&lt;/div&gt;
+        &lt;div class=&quot;my-view-collection__items ns-view-container-desc&quot;&gt;
+            // сюда будут отрисованы элементы коллекции
+            // не забывайте добавлять класс &quot;ns-view-container-desc&quot; для родителя элементов коллекции
+            apply . ns-view-collection
+        &lt;/div&gt;
+    &lt;/div&gt;
+}</code></pre>
+<p>Помните, что элементы коллекции невозможно отрисовать модой <code>ns-view-desc</code> или через <code>apply /.views.* ns-view</code>.
+Элементы коллекции отрисует только мода <code>ns-view-collection</code>!
+
+</p>
+<h2>Yate-хелперы<span><a class="mark" href="#index_md_yate_1" id="index_md_yate_1">#</a></span></h2>
+<div class="signature"><ul>
+<li><code>model(&apos;model-name&apos;)</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath <code>/.models.model-name.model-name</code></li>
+<li><code>modelError(&apos;model-name&apos;)</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.model-name.model-name</code></li>
+<li><code>ns-url</code> - external-функция для <code>ns.router.url</code></li>
+<li><code>ns-generate-url</code> - external-функция для <code>ns.router.generateUrl</code></li>
+</div></ul>
+<h2>Структура JSON для отрисовки<span><a class="mark" href="#index_md_json" id="index_md_json">#</a></span></h2>
+<pre><code class="js">{
+    box: false,
+    collection: false,
+    key: &apos;view=app&apos;,
+    models: {
+        model1: {
+            &apos;model1&apos;: {},
+            &apos;status&apos;: &apos;ok&apos;
+        },
+        model2: {
+            &apos;model2&apos;: {},
+            &apos;status&apos;: &apos;ok&apos;
+        },
+        model3: {
+            &apos;model3&apos;: &apos;http_timeout&apos;,
+            &apos;status&apos;: &apos;error&apos;
+        }
+    },
+    params: {},
+    state: &apos;ok&apos;,
+    views: {}
+}</code></pre>
+<p><strong>Публичные свойства</strong>:
+
+</p>
+<ul>
+<li><code>key</code>: string. Ключ вида.</li>
+<li><code>params</code>: object. Собственные параметры вида.</li>
+<li><code>views</code>: object. Объект с дочерними видами, используется для дальнейшего наложения шаблонов через ns-view-content. Имеет следующий вид:<pre><code>{
+ &quot;views&quot;: {
+     &quot;view1Name&quot;: view1Tree
+     &quot;view2Name&quot;: view2Tree
+ }
+}</code></pre>
+</li>
+</ul>
+<p><strong>Приватные свойства</strong>:
+
+</p>
+<ul>
+<li><code>box</code>: boolean. Флаг того, что это бокс.</li>
+<li><code>collection</code>: boolean. Флаг того, что это вид-коллекция.</li>
+<li><code>models</code>: object. Объект с данными моделей. Не предназначен для прямого использования. Для получения моделей всегда используйте yate-хелперы <code>model()</code> и <code>modelError()</code>.</li>
+<li><code>state</code>: Текущее состояние вида. ok/error/loading/placeholder</li>
+</ul>
 <h1>ns.Model<span><a class="mark" href="#index_md_ns_model" id="index_md_ns_model">#</a></span></h1>
 <p>Модель представляет собой данные.
 Она однозначно идентифицируется своим ключом, который строится во время инициализации.
@@ -1503,12 +1670,13 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 </p>
 <p>Опция <code>models</code>, как и в ns.View определяет зависимость от моделей и подписки на их события.
 По умолчанию ViewCollection делает следующие подписки:
- - обработчиком собственных событий <code>ns-model-changed</code> и <code>ns-model-destroyed</code> любых моделей устанавливается <code>invalidate</code>. Эти события наступают при изменении данных, по которым рисуется собственная html-разметка viewCollection&apos;а, поэтому вид по умолчанию становится невалидным, чтобы перерисоваться.
- - обработчиком <code>ns-model-insert</code> и <code>ns-model-remove</code> модели-коллекции устанавливается <code>keepValid</code>. Эти события наступают при изменении состава модели-коллекции, по которой рисуются вложенные виды viewCollection&apos;а. Собственная html-разметка при этом не затрагивается, поэтому вид по умолчанию остаётся валидным.
-События моделей, вложенных в коллекцию игнорируются и подписаться на них через декларацию нельзя.
-
 
 </p>
+<ul>
+<li>обработчиком собственных событий <code>ns-model-changed</code> и <code>ns-model-destroyed</code> любых моделей устанавливается <code>invalidate</code>. Эти события наступают при изменении данных, по которым рисуется собственная html-разметка viewCollection&apos;а, поэтому вид по умолчанию становится невалидным, чтобы перерисоваться.</li>
+<li>обработчиком <code>ns-model-insert</code> и <code>ns-model-remove</code> модели-коллекции устанавливается <code>keepValid</code>. Эти события наступают при изменении состава модели-коллекции, по которой рисуются вложенные виды viewCollection&apos;а. Собственная html-разметка при этом не затрагивается, поэтому вид по умолчанию остаётся валидным.
+События моделей, вложенных в коллекцию игнорируются и подписаться на них через декларацию нельзя.</li>
+</ul>
 <p>Декларация элемента <code>ns.ViewCollection</code> выглядит так:
 </p>
 <pre><code class="js">ns.View.define(&apos;my-view-collection-item&apos;, {
@@ -1558,11 +1726,13 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 
 </p>
 <p><code>ns.ModelCollection</code> наследуется от <code>ns.Model</code> и добавляет к ней некоторые методы:
- - <code>#clear()</code> - очищает коллекцию
- - <code>#insert(models[, index = last])</code> - добавляет <code>models</code> в коллекцию на позицию <code>index</code>.
- - <code>#remove(models)</code> - удаляет <code>models</code> из коллекции.
 
 </p>
+<ul>
+<li><code>#clear()</code> - очищает коллекцию</li>
+<li><code>#insert(models[, index = last])</code> - добавляет <code>models</code> в коллекцию на позицию <code>index</code>.</li>
+<li><code>#remove(models)</code> - удаляет <code>models</code> из коллекции.</li>
+</ul>
 <p>При добавлении элементов бросает событие <code>ns-model-insert</code> со списком новых моделей.
 
 </p>

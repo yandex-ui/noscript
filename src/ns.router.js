@@ -593,8 +593,7 @@ ns.router._reset = function() {
 ns.router._reset();
 
 /**
- * @typedef ns.router~route
- * @type {object}
+ * @typedef {object} ns.router~route
  * @property {string} page Название layout.
  * @property {object} params Параметры паршрута.
  */

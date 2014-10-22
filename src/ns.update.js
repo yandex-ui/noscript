@@ -544,8 +544,7 @@
     };
 
     /**
-     * @typedef ns.Update~PerformanceTimings
-     * @type {object}
+     * @typedef {object} ns.Update~PerformanceTimings
      * @property {number} prepare Время подготовки запроса.
      * @property {number} request Время запроса данных.
      * @property {number} tree Время подготовки дерева шаблонизации.
@@ -660,8 +659,7 @@
 
     /**
      * Опции исполнения.
-     * @typedef ns.Update~options
-     * @type {object}
+     * @typedef {object} ns.Update~options
      * @property {ns.U.EXEC} [execFlag=ns.U.EXEC.GLOBAL] Флаг выполнения.
      */
 

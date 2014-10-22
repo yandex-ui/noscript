@@ -1716,8 +1716,7 @@
 
     /**
      * Дерево для шаблонизации вида.
-     * @typedef ns.View~UpdateTree
-     * @type {object}
+     * @typedef {object} ns.View~UpdateTree
      * @property {boolean} box - Флаг указывающий, что это бокс.
      * @property {boolean} collection - Флаг указывающий, что это вид-коллекция.
      * @property {string} key - Ключ вида.

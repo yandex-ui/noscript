@@ -833,8 +833,7 @@
 
     /**
      * Опции изменения модели.
-     * @typedef ns.Model~setOptions
-     * @type {object}
+     * @typedef {object} ns.Model~setOptions
      * @property {boolean} [silent = false] Не генерировать событие об изменении (ns-model-changed).
      * @property {string} [jpath] jpath, по которому произошло изменение
      */

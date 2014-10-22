@@ -6,6 +6,7 @@
 @include ns.layout
 @include ns.page
 @include ns.view
+@include ns.viewyate
 @include ns.model
 @include ns.update
 @include ns.updatelogic

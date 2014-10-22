@@ -25,7 +25,7 @@ ns.Box = function(id, params) {
  * Возвращает ключ вида
  * @param {string} id Название вида
  * @param {object} params Параметры для ключа
- * @param {ns.L.TYPE} type Тип
+ * @param {ns.L} type Тип
  * @returns {string}
  * @private
  */

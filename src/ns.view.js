@@ -164,7 +164,7 @@
      * @param {string} id
      * @param {object} params
      * @param {ns.L} type
-     * @returns {*}
+     * @returns {ns.View}
      * @private
      */
     ns.View.prototype._addView = function(id, params, type) {

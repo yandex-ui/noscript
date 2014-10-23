@@ -1469,18 +1469,19 @@ if (params.flag) {
 });</code></pre>
 <h2>Работа с данными<span><a class="mark" href="#index_md_27" id="index_md_27">#</a></span></h2>
 <p><strong>Методы для получения данных</strong>:
- - <code>#getData()</code> - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.
- - <code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.
+
 </p>
-<pre><code class="js">{
-    &quot;foo&quot;: &quot;1&quot;,
-    &quot;bar&quot;: [
-        { &quot;id&quot;: 1 }
-    ]
+<ul>
+<li><code>#getData()</code> - возвращает весь объект данных модели. Этот метод можно переопределять для доп. обработки данных. Например, для коллекции этот метод собирает актуальные данных из всех элементов.</li>
+<li><code>#get(jpath)</code> - выбирает данные по jpath и приводит результат к упрощенному виду. Результат приведения зависит как от самих данных, так и от jpath. Поэтому при изменениях формат результата может меняться.<pre><code class="js">{
+ &quot;foo&quot;: &quot;1&quot;,
+ &quot;bar&quot;: [
+     { &quot;id&quot;: 1 }
+ ]
 }
 this.get(&apos;.foo&apos;) -&gt; &quot;1&quot;
 this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
-<ul>
+</li>
 <li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre><code class="js">{
  &quot;foo&quot;: &quot;1&quot;,
  &quot;bar&quot;: [
@@ -1492,10 +1493,11 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 </li>
 </ul>
 <p><strong>Методы для изменения данных</strong>:
- - <code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.
+
 </p>
-<pre><code class="js">this.set(&apos;.foo&apos;, 2);</code></pre>
 <ul>
+<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.<pre><code class="js">this.set(&apos;.foo&apos;, 2);</code></pre>
+</li>
 <li><code>#setData(data)</code> - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.</li>
 </ul>
 <h2>Пре- и постобработка данных<span><a class="mark" href="#index_md_28" id="index_md_28">#</a></span></h2>

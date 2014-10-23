@@ -997,11 +997,15 @@ ns.View.define(&apos;my-view&apos;, {
 <li>некоторые методы вида будут подписаны на события связанных моделей</li>
 </ol>
 <p>По умолчанию вид подписывается на следующие стандартные события модели:
- - <code>ns-model-changed</code>
- - <code>ns-model-insert</code>
- - <code>ns-model-remove</code>
- - <code>ns-model-destroyed</code>
-и не подписывается на событие <code>ns-model-touched</code>.
+
+</p>
+<ul>
+<li><code>ns-model-changed</code></li>
+<li><code>ns-model-insert</code></li>
+<li><code>ns-model-remove</code></li>
+<li><code>ns-model-destroyed</code></li>
+</ul>
+<p>и не подписывается на событие <code>ns-model-touched</code>.
 
 </p>
 <p>Если обработчики явно не указаны, то в качестве обработчика стандартных событий устанавливается метод <code>invalidate</code>.

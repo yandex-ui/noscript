@@ -299,7 +299,7 @@
              * @private
              * @type {*}
              */
-            this.data = this._beforeSetData(this.preprocessData(data));
+            this.data = this._beforeSetData(this.preprocessData(data), options);
 
             this.status = this.STATUS.OK;
             this.error = null;

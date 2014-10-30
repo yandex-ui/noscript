@@ -88,14 +88,45 @@
      * на составные модели
      * @private
      */
-    ns.ModelCollection.prototype._beforeSetData = function(data) {
-        this.clear();
+    ns.ModelCollection.prototype._beforeSetData = function(data, options) {
 
         var splitInfo = this.info.split;
         if (splitInfo) {
             var items = no.jpath(splitInfo.items, data);
-            var models = this._splitModels(items);
-            this.insert(models);
+            var models = this._splitModels(items, options);
+
+            if (models && this.models && this.models.length) {
+
+                var remove = [];
+                var insert = [];
+                var i = 0;
+                var length = 0;
+
+                // Ищем новые модели
+                for (i = 0, length = models.length; i < length; i++) {
+                    if (this.models.indexOf(models[i]) ===  -1) {
+                        insert.push(models[i]);
+                    }
+                }
+
+                // Ищем удаленные модели
+                for (i = 0, length = this.models.length; i < length; i++) {
+                    if (models.indexOf(this.models[i]) === -1) {
+                        remove.push(this.models[i]);
+                    }
+                }
+
+                this.__removeModels(remove);
+                this.__insertModels(insert);
+
+                this.models = models;
+
+            } else {
+                this.insert(models);
+            }
+
+        } else {
+            this.clear();
         }
 
         // TODO может быть стоит удалять данные split-а?
@@ -110,7 +141,7 @@
      * @returns { ns.Model[] } – массив полученных подмоделей
      * @private
      */
-    ns.ModelCollection.prototype._splitModels = function(items) {
+    ns.ModelCollection.prototype._splitModels = function(items, options) {
         var splitInfo = this.info.split;
 
         return items.map(function(item) {
@@ -130,7 +161,7 @@
             }
 
             if (modelId) {
-                return ns.Model.get(modelId, params).setData(item);
+                return ns.Model.get(modelId, params).setData(item, options);
             }
         });
     };
@@ -330,13 +361,24 @@
             }
         }
 
-        insertion.forEach(function(model, i) {
-            this.models.splice(index + i, 0, model);
-            this._subscribeSplit(model);
-        }, this);
+        return this.__insertModels(insertion, index);
+    };
+
+    /**
+     * Вставляет модели в коллекцию
+     *
+     * @param {ns.Model[]} models – массив моделей
+     * @param {Number} index – индекс позиции, на которую вставить подмодели.
+     * @private
+     */
+    ns.ModelCollection.prototype.__insertModels = function(models, index) {
+        for (var i = 0, length = models.length; i < length; i++) {
+            this.models.splice(index + i, 0, models[i]);
+            this._subscribeSplit(models[i]);
+        }
 
         // оповестим всех, что вставили подмодели
-        if (insertion.length > 0) {
+        if (models.length > 0) {
             // если вставка данных состоялась, считаем модель валидной
             this.status = this.STATUS.OK;
 
@@ -345,7 +387,7 @@
              * @event ns.ModelCollection#ns-model-insert
              * @param {array} insertion Массов вставленных элементов.
              */
-            this.trigger('ns-model-insert', insertion);
+            this.trigger('ns-model-insert', models);
 
             return true;
         }
@@ -377,22 +419,38 @@
 
             // если модель есть в списке на удаление
             if (itemToRemoveIndex > -1) {
-                // отписываем ее
-                this._unsubscribeSplit(itemToRemove);
+                itemToRemove._itemToRemoveIndex = itemToRemoveIndex;
                 removedItems.push(itemToRemove);
-                this.models.splice(itemToRemoveIndex, 1);
-
             }
         }
 
-        if (removedItems.length) {
+        return this.__removeModels(removedItems);
+    };
 
+    /**
+     * Удаляет моедли из коллекции
+     *
+     * @param {ns.Model[]} models – список моделей
+     * @private
+     */
+    ns.ModelCollection.prototype.__removeModels = function(models) {
+
+        // Надо отсортировать модели по убыванию индекса в this.models и удалять их с конца
+        models = models.sort(function(a, b) {return b._itemToRemoveIndex - a._itemToRemoveIndex;});
+
+        for (var i = 0, length = models.length; i < length; i++) {
+            // отписываем ее
+            this._unsubscribeSplit(models[i]);
+            this.models.splice(models[i]._itemToRemoveIndex, 1);
+        }
+
+        if (models.length) {
             /**
              * Сообщает об удалении элементов коллекции.
              * @event ns.ModelCollection#ns-model-remove
              * @param {array} modelsRemoved Массив удаленных моделей.
              */
-            this.trigger('ns-model-remove', removedItems);
+            this.trigger('ns-model-remove', models);
             return true;
         }
 

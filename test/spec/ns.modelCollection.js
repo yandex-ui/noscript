@@ -104,6 +104,7 @@ describe('ns.ModelCollection', function() {
 
             beforeEach(function() {
                 this.data = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split1));
+                this.newData = JSON.parse(JSON.stringify(ns.Model.TESTDATA.split2));
 
                 this.model = ns.Model.get('mc0', { id: Math.random() });
 
@@ -218,6 +219,36 @@ describe('ns.ModelCollection', function() {
                 expect(this.modelCollection.models[0].data).to.eql(this.data.item[0]);
                 expect(this.modelCollection.models[1].data).to.eql(this.data.item[1]);
                 expect(this.modelCollection.models[2].data).to.eql(this.data.item[2]);
+            });
+
+            it('should trigger ns-model-insert & ns-model-remove on setData', function() {
+                var removed;
+                var inserted;
+
+                this.model.on('ns-model-insert', function(name, models){ inserted = models[0].getData(); });
+                this.model.on('ns-model-remove', function(name, models){ removed = models[0].getData(); });
+                this.model.setData(this.newData);
+
+                expect(removed).to.eql({id: '3', value: 'baz'});
+                expect(inserted).to.eql({id: '4', value: 'zzap'});
+            });
+
+            it('should not trigger ns-model-insert or ns-model-remove on setData with old data', function() {
+                var collection = ns.Model.get('mc0', {id : Math.random()});
+                var insertCallback = this.sinon.spy();
+                var removeCallback = this.sinon.spy();
+
+                collection.on('ns-model-insert', insertCallback);
+                collection.on('ns-model-remove', removeCallback);
+
+                collection.setData(this.data);
+                expect(insertCallback.callCount).to.eql(1);
+                expect(removeCallback.callCount).to.eql(0);
+
+                // Повторно вставляем старые данные. Не должно быть ns-model-insert
+                collection.setData(this.data);
+                expect(insertCallback.callCount).to.eql(1);
+                expect(removeCallback.callCount).to.eql(0);
             });
         });
 

@@ -740,6 +740,60 @@ describe('ns.View', function() {
 
     });
 
+    describe('#isVisible', function() {
+
+        beforeEach(function() {
+            ns.layout.define('page1', {
+                app: {
+                    'box@': {
+                        'view1': {}
+                    }
+                }
+            });
+
+            ns.layout.define('page2', {
+                'app box@': {
+                    'view2': {}
+                }
+            }, 'page1');
+
+            var that = this;
+            this.view1 = null;
+            ns.View.define('app');
+            ns.View.define('view1', {
+                events: {
+                    'ns-view-init': function() {
+                        that.view1 = this;
+                    }
+                }
+            });
+            ns.View.define('view2');
+
+            this.viewAPP = ns.View.create('app');
+
+            return new ns.Update(
+                this.viewAPP,
+                ns.layout.page('page1'),
+                {}
+            ).render();
+        });
+
+        it('должен вернуть true, если вид виден', function() {
+            expect(this.view1.isVisible()).to.be.equal(true);
+        });
+
+        it('должен вернуть false, если вид скрыт', function() {
+            return new ns.Update(
+                this.viewAPP,
+                ns.layout.page('page2'),
+                {}
+            ).render().then(function() {
+                expect(this.view1.isVisible()).to.be.equal(false);
+            }, null, this);
+        });
+
+    });
+
     describe('Реинвалидация дочерних видов во время обновления', function() {
 
         /*

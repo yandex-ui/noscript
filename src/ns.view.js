@@ -611,6 +611,14 @@
     };
 
     /**
+     * Возвращает true, если вид сейчас виден на странице.
+     * @returns {boolean}
+     */
+    ns.View.prototype.isVisible = function() {
+        return this._visible;
+    };
+
+    /**
      * Вызываем callback для всех подблоков.
      * Это плоский метод. Он работает только с подблоками и не уходит рекурсивно вглубь by design.
      * @param {function} callback

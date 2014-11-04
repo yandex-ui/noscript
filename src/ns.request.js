@@ -223,7 +223,8 @@
                         that.promise.reject({
                             error: 'CANT_PROCESS',
                             invalid: that.models,
-                            valid: []
+                            valid: [],
+                            response: r
                         });
 
                     } else {

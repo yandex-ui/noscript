@@ -88,6 +88,15 @@
             return true;
         }
 
+        // если ссылка ведет в другой baseDir, то она внешняя и ее обрабатывать не надо
+        if (ns.router.baseDir) {
+            var linkPath = target.pathname;
+            var baseDir = ns.router.baseDir;
+            if (linkPath.substr(0, baseDir.length) !== baseDir) {
+                return true;
+            }
+        }
+
         var href = target.getAttribute('href');
         if (!href) {
             return true;

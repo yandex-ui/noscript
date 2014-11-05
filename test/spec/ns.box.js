@@ -598,4 +598,69 @@ describe('ns.Box', function() {
 
     });
 
+    describe('views inside box keep sequence', function() {
+
+        beforeEach(function(finish) {
+
+            var that = this;
+
+            ns.router.routes = {
+                route: {
+                    '/{t=zero}': 'index'
+                }
+            };
+            ns.router.init();
+
+            ns.layout.define('index', {
+                'app': {
+                    'content@': {
+                        'a': null,
+                        'b': null
+                    }
+                }
+            });
+
+            ns.View.define('a', { params: { 't': null } });
+            ns.View.define('b');
+
+            var that = this;
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            ns.page.go('/')
+                .then(function() {
+                    ns.page.go('/one')
+                        .then(function() {
+                            that.children = ns.MAIN_VIEW.$node.find('.ns-view-content')[0].childNodes;
+                            finish();
+                        }, function() {
+                            finish('ns.Update fails');
+                        });
+
+                }, function() {
+                    finish('ns.Update fails');
+                });
+        });
+
+        afterEach(function() {
+            ns.reset();
+        });
+
+        it('total of 3 views are inside .ns-view-content', function() {
+            expect(this.children.length).to.be.equal(3);
+        });
+
+        it('first view is "a" and it is hidden', function() {
+            expect($(this.children[0]).is('.ns-view-a.ns-view-hidden')).to.be.ok;
+        });
+
+        it('second view is also "a" and it is visible', function() {
+            expect($(this.children[1]).is('.ns-view-a.ns-view-visible')).to.be.ok;
+        });
+
+        it('third one is "b" view and it is visible', function() {
+            expect($(this.children[2]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        });
+
+    });
+
 });

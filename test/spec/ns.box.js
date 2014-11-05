@@ -148,7 +148,7 @@ describe('ns.Box', function() {
                         ns.layout.page('content1', page2Params),
                         page2Params
                     ).start().then(function() {
-                        done()
+                        done();
                     });
                 });
             });
@@ -248,21 +248,21 @@ describe('ns.Box', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
-                    ).to.have.length(2)
+                    ).to.have.length(2);
                 });
 
                 it('should hide first "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
                 it('should show second "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-async')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
             });
@@ -291,21 +291,21 @@ describe('ns.Box', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
-                    ).to.have.length(2)
+                    ).to.have.length(2);
                 });
 
                 it('should hide first "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
                 it('should show second "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-view-visible')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
             });
@@ -581,19 +581,19 @@ describe('ns.Box', function() {
         it('should have two boxes in "content@"', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-content').childNodes
-            ).to.have.length(2)
+            ).to.have.length(2);
         });
 
         it('should set "box1@" as hidden', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-box1').classList.contains('ns-view-hidden')
-            ).to.equal(true)
+            ).to.equal(true);
         });
 
         it('should set "box2@" as visible', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-box2').classList.contains('ns-view-visible')
-            ).to.equal(true)
+            ).to.equal(true);
         });
 
     });

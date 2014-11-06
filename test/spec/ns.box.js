@@ -148,7 +148,7 @@ describe('ns.Box', function() {
                         ns.layout.page('content1', page2Params),
                         page2Params
                     ).start().then(function() {
-                        done()
+                        done();
                     });
                 });
             });
@@ -248,21 +248,21 @@ describe('ns.Box', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
-                    ).to.have.length(2)
+                    ).to.have.length(2);
                 });
 
                 it('should hide first "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
                 it('should show second "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-async')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
             });
@@ -291,21 +291,21 @@ describe('ns.Box', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
-                    ).to.have.length(2)
+                    ).to.have.length(2);
                 });
 
                 it('should hide first "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
                 it('should show second "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3.ns-view-visible')
-                    ).to.have.length(1)
+                    ).to.have.length(1);
                 });
 
             });
@@ -581,19 +581,170 @@ describe('ns.Box', function() {
         it('should have two boxes in "content@"', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-content').childNodes
-            ).to.have.length(2)
+            ).to.have.length(2);
         });
 
         it('should set "box1@" as hidden', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-box1').classList.contains('ns-view-hidden')
-            ).to.equal(true)
+            ).to.equal(true);
         });
 
         it('should set "box2@" as visible', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-box2').classList.contains('ns-view-visible')
-            ).to.equal(true)
+            ).to.equal(true);
+        });
+
+    });
+
+    describe('views inside box keep sequence', function() {
+
+        beforeEach(function(finish) {
+
+            var that = this;
+
+            ns.router.routes = {
+                route: {
+                    '/{t=zero}': 'index'
+                }
+            };
+            ns.router.init();
+
+            ns.layout.define('index', {
+                'app': {
+                    'content@': {
+                        'a': null,
+                        'b': null
+                    }
+                }
+            });
+
+            ns.View.define('a', { params: { 't': null } });
+            ns.View.define('b');
+
+            var that = this;
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            ns.page.go('/')
+                .then(function() {
+                    ns.page.go('/one')
+                        .then(function() {
+                            that.children = ns.MAIN_VIEW.$node.find('.ns-view-content')[0].childNodes;
+                            finish();
+                        }, function() {
+                            finish('ns.Update fails');
+                        });
+
+                }, function() {
+                    finish('ns.Update fails');
+                });
+        });
+
+        afterEach(function() {
+            ns.reset();
+        });
+
+        it('total of 3 views are inside .ns-view-content', function() {
+            expect(this.children.length).to.be.equal(3);
+        });
+
+        it('first view is "a" and it is hidden', function() {
+            expect($(this.children[0]).is('.ns-view-a.ns-view-hidden')).to.be.ok;
+        });
+
+        it('second view is also "a" and it is visible', function() {
+            expect($(this.children[1]).is('.ns-view-a.ns-view-visible')).to.be.ok;
+        });
+
+        it('third one is "b" view and it is visible', function() {
+            expect($(this.children[2]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        });
+
+    });
+
+    /*
+        For url '/' we get:
+            app
+                content
+                    a
+                    b
+
+        for url '/2' we get:
+            app
+                content
+                    b
+                    a
+
+        a and b are just sorted in a new way.
+    */
+    describe('sorting views inside box', function() {
+
+        beforeEach(function(finish) {
+
+            var that = this;
+
+            ns.router.routes = {
+                route: {
+                    '/':  'index1',
+                    '/2': 'index2'
+                }
+            };
+            ns.router.init();
+
+            ns.layout.define('index1', {
+                'app': {
+                    'content@': {
+                        'a': null,
+                        'b': null
+                    }
+                }
+            });
+
+            ns.layout.define('index2', {
+                'app': {
+                    'content@': {
+                        'b': null,
+                        'a': null
+                    }
+                }
+            });
+
+            ns.View.define('a');
+            ns.View.define('b');
+
+            var that = this;
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            ns.page.go('/')
+                .then(function() {
+                    ns.page.go('/2')
+                        .then(function() {
+                            that.children = ns.MAIN_VIEW.$node.find('.ns-view-content')[0].childNodes;
+                            finish();
+                        }, function() {
+                            finish('ns.Update fails');
+                        });
+
+                }, function() {
+                    finish('ns.Update fails');
+                });
+        });
+
+        afterEach(function() {
+            ns.reset();
+        });
+
+        it('total of 2 views are inside .ns-view-content', function() {
+            expect(this.children.length).to.be.equal(2);
+        });
+
+        it('first view is "b" and it is visible', function() {
+            expect($(this.children[0]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        });
+
+        it('second view is "a" and it is visible', function() {
+            expect($(this.children[1]).is('.ns-view-a.ns-view-visible')).to.be.ok;
         });
 
     });

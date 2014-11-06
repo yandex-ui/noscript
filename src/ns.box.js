@@ -233,15 +233,11 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         /** @type {ns.View} */
         var view = views[key];
 
-        var viewWasNone = view.isNone();
-
         //  Обновляем его.
         view._updateHTML(node, selfLayout.views, params, options, events);
 
-        // вставляем view в DOM, только если ноды раньше не было (view.status === NONE)
-        // если нода была, то view._updateHTML() сделаем сам все свои обновления
-        // NOTE: с такой логикой порядок view никак не гарантируется! Возможно это проблема...
-        if (viewWasNone && ( view.isOk() || view.isLoading() ) ) {
+        // вставляем view в DOM в любом случае, чтобы сохранить правильную последовательность видов #499
+        if ( view.isOk() || view.isLoading() ) {
             this.node.appendChild(view.node);
         }
     }

@@ -20,6 +20,7 @@ match .* ns-view-async-content {
 
 match .* ns-view-error-content {
     "test ns-view-error-content"
+    apply . ns-view-content
 }
 
 // Это шаблон для проверки того, что yate сбилжен для тестов.

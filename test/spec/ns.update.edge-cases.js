@@ -206,4 +206,85 @@ describe('ns.Update. Синтетические случаи', function() {
                 expect(ns.request.models).to.have.callCount(0);
             });
     });
+
+    describe('Инвалидация моделей в момент запроса приводит к перезапросу моделей', function() {
+
+        beforeEach(function() {
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            { data: true }
+                        ]
+                    })
+                );
+            });
+
+
+            ns.layout.define('page', {
+                'view1': {
+                    'view2': {}
+                }
+            });
+
+            ns.Model.define('model1');
+            ns.Model.define('model2');
+
+            ns.View.define('view1', { models: ['model1'] });
+            ns.View.define('view2', { models: ['model2'] });
+
+            ns.Model.get('model1').setData({});
+
+            // имитируем, что приходим в _updateDOM с невалидными моделями
+            var that = this;
+            this.restartLimit = 1;
+            var restartCount = 0;
+            ns.Update.prototype.__stubStartUpdateDOM = ns.Update.prototype._startUpdateDOM;
+            this.sinon.stub(ns.Update.prototype, '_startUpdateDOM', function() {
+                if (restartCount < that.restartLimit) {
+                    ns.Model.get('model1').invalidate({});
+                    restartCount++;
+                }
+
+                return this.__stubStartUpdateDOM();
+            });
+
+            this.view = ns.View.create('view1');
+            this.layout = ns.layout.page('page');
+        });
+
+        afterEach(function() {
+            delete ns.Update.prototype.__stubStartUpdateDOM;
+        });
+
+        it('должен перезапросить и отрисовать виды', function() {
+            return new ns.Update(this.view, this.layout).render();
+        });
+
+        it('должен завершить update с ошибкой при превышении лимита', function() {
+            this.restartLimit = 2;
+            return new ns.Update(this.view, this.layout)
+                .render()
+                .then(function() {
+                    throw new Error('fulfilled');
+                }, function(err) {
+                    expect(err.error).to.be.equal(ns.U.STATUS.MODELS);
+                });
+        });
+
+        it('должен отрисовать виды с ошибкой при превышении лимита, если разрешил handleError', function() {
+            this.restartLimit = 2;
+            this.sinon.stub(ns.Update, 'handleError').returns(true);
+
+            return new ns.Update(this.view, this.layout)
+                .render()
+                .then(function() {
+                    expect(this.view.node.outerHTML).to.contain('test ns-view-error-content');
+                }, null, this);
+        });
+
+    });
 });

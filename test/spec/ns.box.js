@@ -669,14 +669,16 @@ describe('ns.Box', function() {
                 content
                     a
                     b
+                    c
 
         for url '/2' we get:
             app
                 content
+                    c
                     b
                     a
 
-        a and b are just sorted in a new way.
+        a, b and c are just sorted in a new way.
     */
     describe('sorting views inside box', function() {
 
@@ -696,7 +698,8 @@ describe('ns.Box', function() {
                 'app': {
                     'content@': {
                         'a': null,
-                        'b': null
+                        'b': null,
+                        'c': null
                     }
                 }
             });
@@ -704,6 +707,7 @@ describe('ns.Box', function() {
             ns.layout.define('index2', {
                 'app': {
                     'content@': {
+                        'c': null,
                         'b': null,
                         'a': null
                     }
@@ -712,6 +716,7 @@ describe('ns.Box', function() {
 
             ns.View.define('a');
             ns.View.define('b');
+            ns.View.define('c');
 
             var that = this;
             ns.MAIN_VIEW = ns.View.create('app');
@@ -735,16 +740,131 @@ describe('ns.Box', function() {
             ns.reset();
         });
 
-        it('total of 2 views are inside .ns-view-content', function() {
-            expect(this.children.length).to.be.equal(2);
+        it('total of 3 views are inside .ns-view-content', function() {
+            expect(this.children.length).to.be.equal(3);
         });
 
-        it('first view is "b" and it is visible', function() {
-            expect($(this.children[0]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        it('first view is "c" and it is visible', function() {
+            expect($(this.children[0]).is('.ns-view-c.ns-view-visible')).to.be.ok;
         });
 
-        it('second view is "a" and it is visible', function() {
-            expect($(this.children[1]).is('.ns-view-a.ns-view-visible')).to.be.ok;
+        it('second view is "b" and it is visible', function() {
+            expect($(this.children[1]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        });
+
+        it('finally third view is "a" and it is visible', function() {
+            expect($(this.children[2]).is('.ns-view-a.ns-view-visible')).to.be.ok;
+        });
+
+    });
+
+    describe('do not sort view nodes when nothing have changed', function() {
+
+        beforeEach(function(finish) {
+            var that = this;
+
+            ns.router.routes = {
+                route: {
+                    '/':  'index1'
+                }
+            };
+            ns.router.init();
+
+            ns.layout.define('index1', {
+                'app': {
+                    'content@': {
+                        'a': null,
+                        'b': null
+                    }
+                }
+            });
+
+            ns.View.define('a');
+            ns.View.define('b');
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            // Create mutation observer to listen to DOM mutations.
+            var observerConfig = { attributes: true, childList: true, characterData: true };
+            this.domSpy = sinon.spy();
+            this.observer = new MutationObserver(this.domSpy);
+
+            ns.page.go('/')
+                .then(function() {
+                    // Start observing DOM mutations.
+                    that.observer.observe(ns.MAIN_VIEW.node, observerConfig);
+
+                    // Redraw current page.
+                    ns.page.go(ns.page.currentUrl, 'preserve')
+                        .then(function() {
+                            finish();
+                        }, function() {
+                            finish('ns.Update fails');
+                        });
+
+                }, function() {
+                    finish('ns.Update fails');
+                });
+        });
+
+        afterEach(function() {
+            this.observer.disconnect();
+            ns.reset();
+        });
+
+        it('No DOM mutations are performed when page is redrawn and all views a valid', function(finish) {
+            var that = this;
+
+            // MutationObserver is called in async way.
+            setTimeout(function() {
+                expect(that.domSpy.called).to.be.equal(false);
+                finish();
+            }, 100);
+        });
+
+    });
+
+    describe('Box should sort only sibling view nodes', function() {
+
+        beforeEach(function(finish) {
+            ns.router.routes = {
+                route: {
+                    '/':  'index'
+                }
+            };
+            ns.router.init();
+
+            ns.layout.define('index', {
+                'app content@': {
+                    'a': {
+                        'b-box@': {
+                            'b': true,
+                        }
+                    },
+                    'c': true,
+                }
+            }, 'app');
+
+            ns.View.define('a');
+            ns.View.define('b');
+            ns.View.define('c');
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            ns.page.go('/')
+                .then(function() {
+                    finish();
+                }, function() {
+                    finish('it was failing on first render because if was trying to sort c and b while they are in different boxes');
+                });
+        });
+
+        afterEach(function() {
+            ns.reset();
+        });
+
+        it('If you get here - everything is fine', function() {
+            expect(true).to.be.ok;
         });
 
     });

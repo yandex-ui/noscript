@@ -12,7 +12,7 @@ describe('ns.Update.perf', function() {
             return ns.View.create('app').update().then(function() {
                 var log = ns.Update.prototype.perf.getCall(0).args[0];
 
-                expect(log.requestModels).to.be.equal(0);
+                expect(log['requestModels.0']).to.be.equal(0);
             });
         });
 
@@ -37,7 +37,7 @@ describe('ns.Update.perf', function() {
 
             return ns.View.create('app').update().then(function() {
                 var log = ns.Update.prototype.perf.getCall(0).args[0];
-                expect(log.requestModels).to.be.above(0);
+                expect(log['requestModels.0']).to.be.above(0);
             });
         });
 

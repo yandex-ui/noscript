@@ -676,39 +676,82 @@
      * @param {ns.View[]} updated.sync Sync views.
      * @param {ns.View[]} updated.async Sync views.
      * @param {object} pageLayout Currently processing layout.
-     * @param {object} params Params.
+     * @param {object} updateParams Params.
      * @returns {object}
      * @private
      */
-    ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+    ns.View.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
         // Добавляем себя в обновляемые виды
-        this._addSelfToUpdate(updated);
+        var syncState = this._getSelfState();
+
+        // для асинков не ходим в patchLayout совсем
+        if (syncState) {
+            updated.sync.push(this);
+
+            // если еще не нашли patchLayout и у нас есть такая функция
+            if (typeof this.patchLayout === 'function') {
+
+                // Не надо патчить layout пока нет всех моделей
+                // После того, как модели будут запрошены, мы все равно сюда придем еще раз и получим правильный результат
+                if (this.isModelsValid()) {
+                    var patchLayoutId = this.patchLayout(updateParams);
+                    // нового layout может и не быть
+                    if (patchLayoutId) {
+                        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
+                        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
+                        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
+                        for (var oldViewId in pageLayout) {
+                            delete pageLayout[oldViewId];
+
+                            //FIXME: надо уничтожать виды, которых больше не в новом layout
+                            // view.destroy()
+                        }
+                        // компилим новый layout
+                        // FIXME: а какие параметры передавать???
+                        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+                        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
+                        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+                        // заменяем внутренности на обновленный layout
+                        no.extend(pageLayout, newViewLayout);
+                    }
+
+                } else {
+                    // ставим флаг, что у нас есть patchLayout, но моделей нет, поэтому состояние неопределено
+                    updated.hasPatchLayout = true;
+                }
+            }
+
+        } else {
+            updated.async.push(this);
+        }
 
         this._saveLayout(pageLayout);
 
         // Создаем подблоки
         for (var view_id in pageLayout) {
-            this._addView(view_id, params, pageLayout[view_id].type);
+            this._addView(view_id, updateParams, pageLayout[view_id].type);
         }
 
         this._apply(function(view, id) {
-            view._getRequestViews(updated, pageLayout[id].views, params);
+            view._getRequestViews(updated, pageLayout[id].views, updateParams);
         });
 
         return updated;
     };
 
     /**
-     * Добавляет себя в соответствующий список "обновляемых" видов
-     * @param {object} updated
+     * Возвращает статус, в котором надо рисовать вид.
+     * @returns {boolean}
      * @private
      */
-    ns.View.prototype._addSelfToUpdate = function(updated) {
+    ns.View.prototype._getSelfState = function() {
         /**
          * Флаг, означающий, что view грузится асинхронно.
          * @type {Boolean}
          */
         this.asyncState = false;
+
+        var syncState = true;
 
         /*
          Логика такая: все виды должны себя ВСЕГДА добавлять.
@@ -733,13 +776,12 @@
                 // async-вид попадает в отрисовку, если
                 // - настал его черед (this.shouldBeSync === true)
                 // - имеет валидные модели (this.isModelsValid() === true)
-                updated.sync.push(this);
+                syncState = true;
 
             } else {
                 // ставим флаг, что вид будет отрисован асинхронно
                 this.asyncState = true;
-
-                updated.async.push(this);
+                syncState = false;
             }
         } else {
 
@@ -750,13 +792,13 @@
             }
 
             // обычный блок добавляем всегда
-            updated.sync.push(this);
+            syncState = true;
         }
 
         // сбрасываем флаг, чтобы вид оставался асинхронным
         this.shouldBeSync = false;
 
-        return updated;
+        return syncState;
     };
 
     /**

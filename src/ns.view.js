@@ -659,17 +659,26 @@
         // Добавляем себя в обновляемые виды
         var syncState = this._getSelfState();
 
+        // для асинков не ходим в patchLayout совсем
         if (syncState) {
             updated.sync.push(this);
+
             // если еще не нашли patchLayout и у нас есть такая функция
             if (typeof this.patchLayout === 'function') {
                 if (this.isModelsValid()) {
                     var patchLayoutId = this.patchLayout(updateParams);
+                    // нового layout может и не быть
                     if (patchLayoutId) {
-                        // чистим старый layout
+                        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
+                        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
+                        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
                         for (var oldViewId in pageLayout) {
                             delete pageLayout[oldViewId];
                         }
+                        // компилим новый layout
+                        // FIXME: а какие параметры передавать???
+                        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+                        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
                         var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
                         // заменяем внутренности на обновленный layout
                         no.extend(pageLayout, newViewLayout);
@@ -680,6 +689,7 @@
                     updated.hasPatchLayout = true;
                 }
             }
+
         } else {
             updated.async.push(this);
         }

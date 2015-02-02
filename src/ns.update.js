@@ -224,6 +224,8 @@
         }, this);
 
         syncPromise.then(function() {
+            // если есть патченный layout, то идем в рекурсивный перезапрос
+            // FIXME: хорошо бы поставить предел на всякий случай
             if (views.hasPatchLayout) {
                 requestPromise.sync(this._requestAllModels());
 

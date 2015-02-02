@@ -700,28 +700,77 @@
      * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
      * @param {ns.Update~updateViews} updated Hash for sync and async views.
      * @param {object} pageLayout Currently processing layout.
-     * @param {object} params Params.
+     * @param {object} updateParams Params.
      * @returns {object}
      * @private
      */
-    ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+    ns.View.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
         var syncState = this.__evaluateState();
         // Добавляем себя в обновляемые виды
         this.__registerInUpdate(syncState, updated);
+
+        /**
+         * Флаг, что можно идти по детям.
+         * @type {boolean}
+         */
+        var canGoFather = false;
+
+        // для асинков не ходим в patchLayout совсем
+        if (syncState) {
+            canGoFather = true;
+
+            // если еще не нашли patchLayout и у нас есть такая функция
+            if (typeof this.patchLayout === 'function') {
+
+                // Не надо патчить layout пока нет всех моделей
+                // После того, как модели будут запрошены, мы все равно сюда придем еще раз и получим правильный результат
+                if (this.isModelsValid()) {
+                    var patchLayoutId = this.patchLayout(updateParams);
+                    // нового layout может и не быть
+                    if (patchLayoutId) {
+                        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
+                        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
+                        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
+                        for (var oldViewId in pageLayout) {
+                            delete pageLayout[oldViewId];
+
+                            //FIXME: надо уничтожать виды, которых больше не в новом layout
+                            // view.destroy()
+                        }
+                        // компилим новый layout
+                        // FIXME: а какие параметры передавать???
+                        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+                        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
+                        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+                        // заменяем внутренности на обновленный layout
+                        no.extend(pageLayout, newViewLayout);
+                    }
+
+                } else {
+                    // т.к. patchLayout всегда что-то возвращает, то не имеет смысла идти по детям,
+                    // пока patchLayout не отработал
+                    canGoFather = false;
+
+                    // ставим флаг, что у нас есть patchLayout, но моделей нет, поэтому состояние неопределено
+                    updated.hasPatchLayout = true;
+                }
+            }
+
+        }
 
         this._saveLayout(pageLayout);
 
         // Создаем детей и идем вниз только если находимся в синхронном состоянии
         // Иначе получится странная ситуация,
         // что дети асинхронного вида добавят себя как синхронные и для них будут запрошены модели.
-        if (syncState) {
+        if (canGoFather) {
             // Создаем подблоки
             for (var view_id in pageLayout) {
-                this._addView(view_id, params, pageLayout[view_id].type);
+                this._addView(view_id, updateParams, pageLayout[view_id].type);
             }
 
             this._apply(function(view, id) {
-                view._getRequestViews(updated, pageLayout[id].views, params);
+                view._getRequestViews(updated, pageLayout[id].views, updateParams);
             });
         }
 

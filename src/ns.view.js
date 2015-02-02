@@ -665,6 +665,9 @@
 
             // если еще не нашли patchLayout и у нас есть такая функция
             if (typeof this.patchLayout === 'function') {
+
+                // Не надо патчить layout пока нет всех моделей
+                // После того, как модели будут запрошены, мы все равно сюда придем еще раз и получим правильный результат
                 if (this.isModelsValid()) {
                     var patchLayoutId = this.patchLayout(updateParams);
                     // нового layout может и не быть

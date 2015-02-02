@@ -34,7 +34,7 @@ beforeEach(function() {
     this.sinon.spy(ns, 'renderNode');
 
     this.createDocument = function(html) {
-        return jsdom.jsdom(html, jsdom.level(2, "core"), {features: {QuerySelector: true}});
+        return jsdom.jsdom(html, {features: {QuerySelector: true}});
     };
 });
 

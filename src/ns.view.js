@@ -651,39 +651,66 @@
      * @param {ns.View[]} updated.sync Sync views.
      * @param {ns.View[]} updated.async Sync views.
      * @param {object} pageLayout Currently processing layout.
-     * @param {object} params Params.
+     * @param {object} updateParams Params.
      * @returns {object}
      * @private
      */
-    ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+    ns.View.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
         // Добавляем себя в обновляемые виды
-        this._addSelfToUpdate(updated);
+        var syncState = this._getSelfState();
+
+        if (syncState) {
+            updated.sync.push(this);
+            // если еще не нашли patchLayout и у нас есть такая функция
+            if (typeof this.patchLayout === 'function') {
+                if (this.isModelsValid()) {
+                    var patchLayoutId = this.patchLayout(updateParams);
+                    if (patchLayoutId) {
+                        // чистим старый layout
+                        for (var oldViewId in pageLayout) {
+                            delete pageLayout[oldViewId];
+                        }
+                        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+                        // заменяем внутренности на обновленный layout
+                        no.extend(pageLayout, newViewLayout);
+                    }
+
+                } else {
+                    // ставим флаг, что у нас есть patchLayout, но моделей нет, поэтому состояние неопределено
+                    updated.hasPatchLayout = true;
+                }
+            }
+        } else {
+            updated.async.push(this);
+        }
 
         this._saveLayout(pageLayout);
 
         // Создаем подблоки
         for (var view_id in pageLayout) {
-            this._addView(view_id, params, pageLayout[view_id].type);
+            this._addView(view_id, updateParams, pageLayout[view_id].type);
         }
 
         this._apply(function(view, id) {
-            view._getRequestViews(updated, pageLayout[id].views, params);
+            view._getRequestViews(updated, pageLayout[id].views, updateParams);
         });
 
         return updated;
     };
 
     /**
-     * Добавляет себя в соответствующий список "обновляемых" видов
-     * @param {object} updated
+     * Возвращает статус, в котором надо рисовать вид.
+     * @returns {boolean}
      * @private
      */
-    ns.View.prototype._addSelfToUpdate = function(updated) {
+    ns.View.prototype._getSelfState = function() {
         /**
          * Флаг, означающий, что view грузится асинхронно.
          * @type {Boolean}
          */
         this.asyncState = false;
+
+        var syncState = true;
 
         /*
          Логика такая: все виды должны себя ВСЕГДА добавлять.
@@ -708,13 +735,12 @@
                 // async-вид попадает в отрисовку, если
                 // - настал его черед (this.shouldBeSync === true)
                 // - имеет валидные модели (this.isModelsValid() === true)
-                updated.sync.push(this);
+                syncState = true;
 
             } else {
                 // ставим флаг, что вид будет отрисован асинхронно
                 this.asyncState = true;
-
-                updated.async.push(this);
+                syncState = false;
             }
         } else {
 
@@ -725,13 +751,13 @@
             }
 
             // обычный блок добавляем всегда
-            updated.sync.push(this);
+            syncState = true;
         }
 
         // сбрасываем флаг, чтобы вид оставался асинхронным
         this.shouldBeSync = false;
 
-        return updated;
+        return syncState;
     };
 
     /**

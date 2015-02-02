@@ -228,7 +228,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout) {
     this._saveLayout(pageLayout);
 
     // При необходимости добавим текущий вид в список "запрашиваемых"
-    return this._addSelfToUpdate(updated);
+    return this._getSelfState(updated);
 };
 
 /**

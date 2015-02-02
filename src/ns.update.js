@@ -113,7 +113,7 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestModels = function(models) {
-        this.startTimer('requestModels');
+        //this.startTimer('requestModels');
         this.log('started models request', models);
 
         var allModelsValid = true;
@@ -131,7 +131,7 @@
 
         var promise = ns.request.models(models);
         promise.always(function() {
-            this.stopTimer('requestModels');
+            //this.stopTimer('requestModels');
         }, this);
 
         return promise
@@ -191,19 +191,23 @@
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
-        this.startTimer('collectModels');
+        //this.startTimer('collectModels');
 
         var requestPromise = new Vow.Promise();
 
         var views = this.view._getRequestViews({
             sync: [],
-            async: []
+            async: [],
+            // Флаг, что layout остался в неопределенном состоянии
+            // Надо запросить модели и пройтись еще раз
+            hasPatchLayout: false
         }, this.layout.views, this.params);
+
         this.log('collected incomplete views', views);
 
         var models = views2models(views.sync);
         this.log('collected needed models', models);
-        this.stopTimer('collectModels');
+        //this.stopTimer('collectModels');
 
         var syncPromise = this._requestModels(models);
 
@@ -220,12 +224,17 @@
         }, this);
 
         syncPromise.then(function() {
-            requestPromise.fulfill({
-                async: asyncPromises
-            });
+            if (views.hasPatchLayout) {
+                requestPromise.sync(this._requestAllModels());
+
+            } else {
+                requestPromise.fulfill({
+                    async: asyncPromises
+                });
+            }
         }, function(e) {
             requestPromise.reject(e);
-        });
+        }, this);
 
         return requestPromise;
     };

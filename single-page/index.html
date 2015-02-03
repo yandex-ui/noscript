@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Философия работы noscript Node.js v0.10.32 Manual &amp; Documentation</title>
+  <title>Философия работы noscript Node.js v0.10.36 Manual &amp; Documentation</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/sh.css">
   <link rel="canonical" href="http://nodejs.org/api/index.md.html">
@@ -30,7 +30,7 @@
         </div> -->
         <div id="column1" class="interior">
           <header>
-            <!-- <h1>Node.js v0.10.32 Manual &amp; Documentation</h1> -->
+            <!-- <h1>Node.js v0.10.36 Manual &amp; Documentation</h1> -->
             <h1>Noscript документация одной страницей</h1>
             <!-- <div id="gtoc">
               <p>
@@ -1755,6 +1755,10 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 <p>При удалении элементов бросает событие <code>ns-model-remove</code> со списком удаленных моделей.
 
 </p>
+<p>Если мы делаем setData() у коллекции, то коллекция при необходимости бросает события <code>ns-model-remove</code>, <code>ns-model-insert</code>. 
+В случае, если в setData() передали текущий список моделей, то события бросаться не будут.
+
+</p>
 <h2>Декларация<span><a class="mark" href="#index_md_34" id="index_md_34">#</a></span></h2>
 <p>Декларация отличается наличием поля <code>split</code>
 
@@ -2072,7 +2076,7 @@ ns.layout.define(&apos;main&apos;, {
           <li><a href="http://twitter.com/nodejs" class="twitter">@nodejs</a></li>
       </ul>
 
-      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.32/LICENSE">license</a>.</p>
+      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.36/LICENSE">license</a>.</p>
     </div> -->
 
   <script src="assets/sh_main.js"></script>

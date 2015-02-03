@@ -677,6 +677,9 @@
                         // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
                         for (var oldViewId in pageLayout) {
                             delete pageLayout[oldViewId];
+
+                            //FIXME: надо уничтожать виды, которых больше не в новом layout
+                            // view.destroy()
                         }
                         // компилим новый layout
                         // FIXME: а какие параметры передавать???

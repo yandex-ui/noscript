@@ -26,7 +26,18 @@ ns.ViewCollection.define = function(id, info, baseClass) {
     var ctor = ns.View.define.call(this, id, info, baseClass);
 
     ns.assert(info.split, 'ns.ViewCollection', "'%s'  must define 'split' section", id);
-    ns.assert(info.split.intoViews, 'ns.ViewCollection', "'%s'  must define 'split.intoViews' section", id);
+
+    // TODO: test
+    ns.assert(!(info.split.intoViews && info.split.intoLayouts), 'ns.ViewCollection', "'%s' can't define 'split.intoViews' and 'split.intoLayouts' sections at same time", id);
+
+    // FIXME: что делать есть intoViews === function ??
+    if (info.split.intoViews) {
+        var autogenerateLayout = id + '-ns-auto-layout-' + info.split.intoViews;
+        ns.layout.define(autogenerateLayout);
+        delete info.split.intoViews;
+        info.split.intoLayouts = new Function('', 'return ' + autogenerateLayout);
+    }
+    ns.assert(info.split.intoLayouts, 'ns.ViewCollection', "'%s'  must define 'split.intoLayouts' section", id);
     ns.assert(info.split.byModel, 'ns.ViewCollection', "'%s'  must define 'split.byModel' section", id);
 
     var isValidModelCollection = (info.split.byModel in info.models) && ns.Model.infoLite(info.split.byModel).isCollection;
@@ -218,7 +229,58 @@ ns.ViewCollection.prototype._apply = function(callback) {
     }
 };
 
-ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout) {
+ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
+    // Добавляем себя в обновляемые виды
+    var syncState = this._getSelfState();
+
+    // для асинков не ходим вниз по layout совсем
+    if (syncState) {
+        updated.sync.push(this);
+
+        //FIXME: копипаста из ns.View
+
+        // ModelCollection
+        var MC = this.models[this.info.modelCollectionId];
+
+        // Какие элементы коллекции рендерить, мы можем понять только по модели
+        // Поэтому, полезем внутрь, только если в ней есть данные
+        if (MC.isValid()) {
+
+            var modelItems = MC.models;
+            var infoViewId = this.info.split.intoLayouts;
+
+            var itemsContainer = [];
+
+            // Проходом по элементам MC определим, какие виды нужно срендерить
+            for (var i = 0, j = modelItems.length; i < j; i++) {
+                var modelItem = modelItems[i];
+                var viewItemParams = no.extend({}, updateParams, modelItem.params);
+
+                var viewItemLayout = infoViewId.call(this, modelItem, viewItemParams);
+
+                var newViewLayout = ns.layout.page(viewItemLayout, viewItemParams);
+                itemsContainer.push(newViewLayout);
+
+                // FIXME: нужен контроль потери детей. Удаление и чистка.
+                // Создаем подблоки
+                for (var view_id in newViewLayout) {
+                    var newView = this._addView(view_id, viewItemParams);
+                    newView._getRequestViews(updated, newViewLayout[view_id].views, updateParams);
+                }
+            }
+
+            pageLayout['ns-view-container'] = itemsContainer;
+
+        } else {
+            // ставим флаг, что у нас есть дети, но моделей нет, поэтому состояние неопределено
+            updated.hasPatchLayout = true;
+        }
+
+    } else {
+        updated.async.push(this);
+    }
+
+    // FIXME: вот это уже все неактуально
     // у ViewCollection нет детей в обычном понимании,
     // поэтому не нужно хождение вниз по дереву как в ns.View#_getRequestViews
 
@@ -228,7 +290,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout) {
     this._saveLayout(pageLayout);
 
     // При необходимости добавим текущий вид в список "запрашиваемых"
-    return this._getSelfState(updated);
+    return updated;
 };
 
 /**
@@ -287,7 +349,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(params) {
     var result = {};
     result['ns-view-collection-container'] = [];
 
-    this._forEachCollectionItem(function(view) {
+    this._apply(function(view) {
         var decl = null;
         if (that.isValidSelf()) {
             // Если корневая нода не меняется, то перерендериваем
@@ -339,7 +401,7 @@ ns.ViewCollection.prototype._getDescViewTree = function(params) {
             viewItemTree[view.id] = decl;
             result['ns-view-collection-container'].push(viewItemTree);
         }
-    }, params);
+    });
 
     return result;
 };
@@ -366,9 +428,9 @@ ns.ViewCollection.prototype.beforeUpdateHTML = function(params, events) {
 
     // проходимся по элементам коллекции
     if (!this.isLoading()) {
-        this._forEachCollectionItem(function(view) {
+        this._apply(function(view) {
             view.beforeUpdateHTML(params, events);
-        }, params);
+        });
     }
 };
 
@@ -505,7 +567,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         var prev;
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        this._forEachCollectionItem(function(view) {
+        this._apply(function(view) {
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {
                 // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
@@ -516,9 +578,10 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //      1.2 view валиден, то ничего не делаем
                 var viewItemWasInValid = !view.isValid();
 
+                var layout = view.layout[view.id].views;
                 // updateHTML надо пройти в любом случае,
                 // чтобы у всех элементов коллекции сгенерились правильные события
-                view._updateHTML(newNode, null, params, options_next, events);
+                view._updateHTML(newNode, layout, params, options_next, events);
 
                 if (viewItemWasInValid) {
                     // поставим ноду в правильное место
@@ -541,9 +604,10 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
                 var viewItemWasValid = view.isValid();
 
+                var layout = view.layout[view.id].views;
                 // updateHTML надо пройти в любом случае,
                 // чтобы у всех элементов коллекции сгенерились правильные события
-                view._updateHTML(newNode, null, params, options_next, events);
+                view._updateHTML(newNode, layout, params, options_next, events);
 
                 if (viewItemWasValid) {
                     // здесь не нужно перевешивать события, т.к. они могут быть повешены
@@ -579,7 +643,7 @@ ns.ViewCollection.prototype._getViewItem = function(modelItem, updateParams) {
     var viewItemParams = no.extend({}, updateParams, modelItem.params);
 
     var viewId;
-    var infoViewId = this.info.split.intoViews;
+    var infoViewId = this.info.split.intoLayouts;
     if (typeof infoViewId === 'function') {
         // если intoViews - функция, то передаем туда модель и параметры,
         // а она должна вернуть id вида

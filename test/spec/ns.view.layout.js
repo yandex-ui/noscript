@@ -67,4 +67,102 @@ describe.only('ns.View dynamic layouts ->', function() {
 
     });
 
+    describe('Коллеция ->', function() {
+
+        beforeEach(function() {
+
+            // layouts
+            ns.layout.define('app', {
+                'app': {
+                    'vc2': {}
+                }
+            });
+
+            ns.layout.define('vc2-layout-item1', {
+                'vc2-item1': {
+                    'vc2-item1-subview': {}
+                }
+            });
+
+            ns.layout.define('vc2-layout-item2', {
+                'vc2-item2': {
+                    'vc2-item2-subview': {}
+                }
+            });
+
+            // models
+            ns.Model.define('mc2-item', {
+                params: { id: null },
+                methods: {
+                    isItem1: function() {
+                        return this.get('.value') === 1;
+                    }
+                }
+            });
+
+            ns.Model.define('mc2', {
+                split: {
+                    items: '.item',
+                    params: { id: '.id' },
+                    model_id: 'mc2-item'
+                }
+            });
+
+            // views
+            ns.View.define('app');
+            ns.ViewCollection.define('vc2', {
+                models: {
+                    'mc2': true
+                },
+                split: {
+                    byModel: 'mc2',
+                    intoLayouts: function(model) {
+                        if (model.isItem1()) {
+                            return 'vc2-layout-item1';
+                        } else {
+                            return 'vc2-layout-item2';
+                        }
+                    }
+                }
+            });
+
+            ns.View.define('vc2-item1', { models: ['mc2-item'] });
+            ns.View.define('vc2-item1-subview');
+
+            ns.View.define('vc2-item2', { models: ['mc2-item'] });
+            ns.View.define('vc2-item2-subview');
+
+            // run
+            var modelsMock = {
+                '/models/?_m=mc2': {
+                    models: [
+                        {
+                            data: {
+                                item: [
+                                    {id: 1, value: 1},
+                                    {id: 2, value: 2},
+                                    {id: 3, value: 3}
+                                ]
+                            }
+                        }
+                    ]
+                }
+            };
+            ns.test.modelsValidAutorespondByMock(this.sinon, modelsMock);
+
+            this.view = ns.View.create('app');
+            return new ns.Update(this.view, ns.layout.page('app'), {}).render();
+        });
+
+        describe('Отрисовка ->', function() {
+
+            it('Должен создать view3, если отдали такой layout', function() {
+                console.log(this.view.node);
+                console.log(this.view.node.outerHTML);
+            });
+
+        });
+
+    });
+
 });

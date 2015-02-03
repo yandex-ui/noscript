@@ -1,4 +1,4 @@
-describe.only('ns.View dynamic layouts ->', function() {
+describe('ns.View dynamic layouts ->', function() {
 
     describe('Простой случай ->', function() {
 
@@ -156,9 +156,12 @@ describe.only('ns.View dynamic layouts ->', function() {
 
         describe('Отрисовка ->', function() {
 
-            it('Должен создать view3, если отдали такой layout', function() {
-                console.log(this.view.node);
-                console.log(this.view.node.outerHTML);
+            it('Должен создать один ".vc2-item1 > .vc2-item1-subview"', function() {
+                expect(this.view.node.querySelectorAll('.ns-view-vc2-item1 > .ns-view-vc2-item1-subview')).to.have.length(1);
+            });
+
+            it('Должен создать два ".vc2-item2 > .vc2-item2-subview"', function() {
+                expect(this.view.node.querySelectorAll('.ns-view-vc2-item2 > .ns-view-vc2-item2-subview')).to.have.length(2);
             });
 
         });

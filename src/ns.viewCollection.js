@@ -361,13 +361,13 @@ ns.ViewCollection.prototype._getViewTree = function(params) {
     return tree;
 };
 
-ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) {
+ns.ViewCollection.prototype.beforeUpdateHTML = function(params, events) {
     this._selfBeforeUpdateHTML(events);
 
     // проходимся по элементам коллекции
     if (!this.isLoading()) {
         this._forEachCollectionItem(function(view) {
-            view.beforeUpdateHTML(null, params, events);
+            view.beforeUpdateHTML(params, events);
         }, params);
     }
 };

@@ -292,7 +292,7 @@
             'ns-view-hide': [],
             'ns-view-htmldestroy': []
         };
-        this.view.beforeUpdateHTML(this.layout.views, this.params, hideViewEvents);
+        this.view.beforeUpdateHTML(this.params, hideViewEvents);
         this._triggerViewEvents(hideViewEvents);
 
         var viewEvents = {

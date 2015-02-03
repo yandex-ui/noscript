@@ -588,19 +588,15 @@ describe('ns.ViewCollection', function() {
 
         describe('refresh layout after insert new model-item', function() {
 
-            beforeEach(function(finish) {
+            beforeEach(function() {
                 // insert another model-item in collection
-                ns.Model.get('m-collection').insert([ns.Model.get('m-collection-item', {p: 3})]);
+                ns.Model.get('m-collection').insert([
+                    ns.Model.get('m-collection-item', {p: 3}).setData({data: 3})
+                ]);
 
                 // start update to redraw views
                 var layout = ns.layout.page('app', {});
-                new ns.Update(this.APP, layout, {})
-                    .start()
-                    .then(function() {
-                        finish();
-                    }, function(e) {
-                        finish(e);
-                    });
+                return new ns.Update(this.APP, layout, {}).render();
             });
 
             shouldHaveNViewCollectionItemNodes(3);

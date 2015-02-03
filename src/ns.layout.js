@@ -69,6 +69,26 @@
     };
 
     /**
+     * Генерирует и регистрирует простой layout из одного вида
+     * @param {string} viewId ID вида
+     * @param {string} [prefix="ns-auto-layout-"] Префикс названия layout
+     */
+    ns.layout.generateSimple = function(viewId, prefix) {
+        prefix = prefix || 'ns-auto-layout-';
+        var layoutId = prefix + viewId;
+
+        if (layoutId in _pages) {
+            return layoutId;
+        }
+
+        var layout = {};
+        layout[viewId] = {};
+        ns.layout.define(layoutId, layout);
+
+        return layoutId;
+    };
+
+    /**
      * Компилирует layout в зависимости от параметров params.
      * Интерполируем ключи, раскрываем шоткаты, вычисляем функции и т.д.
      * @param {*} layout

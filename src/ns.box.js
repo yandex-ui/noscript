@@ -16,6 +16,12 @@ ns.Box = function(id, params) {
     this.key = ns.Box.getKey(id);
 
     this.node = null;
+
+    /**
+     * Активные (видимые) в данный момент виды.
+     * @private
+     * @type {object}
+     */
     this.active = {};
 
     this._visible = false;
@@ -102,52 +108,53 @@ ns.Box.prototype._getDescendantsAndSelf = function(descs) {
  * @private
  */
 ns.Box.prototype._getRequestViews = function(updated, layout, params) {
+    var layoutActive = {};
     for (var id in layout) {
+        var childViewLayout = layout[id];
         //  Согласно новому layout'у здесь должен быть view с id/params.
         //  Создаем его (если он уже есть, он возьмется из this.views).
-        var view = this._addView(id, params, layout[id].type);
+        var view = this._addView(id, params, childViewLayout.type);
         //  Идем вниз рекурсивно.
-        view._getRequestViews(updated, layout[id].views, params);
+        view._getRequestViews(updated, childViewLayout.views, params);
+
+        layoutActive[id] = view.key;
     }
+
+    // сохраняем новый активный layout, в дальнейшем работает с ним
+    this.active = layoutActive;
 };
 
 /**
  * Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
  * @param {object} tree
- * @param {object} layout
  * @param {object} params
  * @private
  */
-ns.Box.prototype._getUpdateTree = function(tree, layout, params) {
+ns.Box.prototype._getUpdateTree = function(tree, params) {
     if ( this.isNone() ) {
-        tree.views[this.id] = this._getViewTree(layout, params);
+        tree.views[this.id] = this._getViewTree(params);
 
     } else {
-        var views = this.views;
-        for (var id in layout) {
-            var selfLayout = layout[id];
-            var key = this._getViewKey(id, params, selfLayout.type);
-            views[key]._getUpdateTree(tree, selfLayout.views, params);
+        for (var id in this.active) {
+            var viewKey = this.active[id];
+            this.views[viewKey]._getUpdateTree(tree, params);
         }
     }
 };
 
 /**
  * Строим дерево блоков.
- * @param {object} layout
  * @param {object} params
  * @returns {object}
  * @private
  */
-ns.Box.prototype._getViewTree = function(layout, params) {
+ns.Box.prototype._getViewTree = function(params) {
     var tree = this._getCommonTree();
     tree.box = true;
 
-    var views = this.views;
-    for (var id in layout) {
-        var selfLayout = layout[id];
-        var key = this._getViewKey(id, params, selfLayout.type);
-        tree.views[id] = views[key]._getViewTree(selfLayout.views, params);
+    for (var id in this.active) {
+        var viewKey = this.active[id];
+        tree.views[id] = this.views[viewKey]._getViewTree(params);
     }
 
     return tree;
@@ -225,18 +232,12 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
     var views = this.views;
 
-    //  this.active -- это объект (упорядоченный!), в котором лежат ключи
-    //  активных (видимых) в данный момент блоков.
-    //  Строим новый active, но уже не по layout'у, а по актуальным блокам.
-    var layoutActive = {};
-
     //  Строим новый active согласно layout'у.
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
     //  (включая синхронную и все асинхронные подапдейты).
     for (var id in layout) {
         var selfLayout = layout[id];
         var key = this._getViewKey(id, params, selfLayout.type);
-        layoutActive[id] = key;
 
         //  Достаем ранее созданный блок (в _getRequestViews).
         /** @type {ns.View} */
@@ -247,9 +248,6 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
         // Вставка ноды в DOM будет выполнена во время сортировки нод в боксе (ниже).
     }
-
-    //  Запоминаем новый active.
-    this.active = layoutActive;
 
     // Пройдёмся по всем вложенным видам,
     // чтобы перенести ноды вложенных видов в новую ноду бокса (если есть)

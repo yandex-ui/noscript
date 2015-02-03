@@ -166,6 +166,16 @@ ns.Box.prototype.beforeUpdateHTML = function(layout, params, events) {
         view.beforeUpdateHTML(layout[view.id].views, params, events);
     }
 
+    this._hideInactiveViews(newLayout, events);
+};
+
+/**
+ * Скрываем все неактивные виды в боксе
+ * @param {object} newLayout
+ * @param {object} events
+ * @private
+ */
+ns.Box.prototype._hideInactiveViews = function(newLayout, events) {
     var hideEvents = events['ns-view-hide'];
     // Пройдёмся по всем вложенным видам, чтобы кинуть hide, которым не попали в newLayout
     for (var key in this.views) {

@@ -30,13 +30,23 @@ ns.ViewCollection.define = function(id, info, baseClass) {
     // TODO: test
     ns.assert(!(info.split.intoViews && info.split.intoLayouts), 'ns.ViewCollection', "'%s' can't define 'split.intoViews' and 'split.intoLayouts' sections at same time", id);
 
-    // FIXME: что делать есть intoViews === function ??
-    if (info.split.intoViews) {
-        var autogenerateLayout = id + '-ns-auto-layout-' + info.split.intoViews;
-        ns.layout.define(autogenerateLayout);
+    if (typeof info.split.intoViews === 'string') {
+        var autogenerateLayoutId = ns.layout.generateSimple(info.split.intoViews, 'ns-auto-layout-' + id);
         delete info.split.intoViews;
-        info.split.intoLayouts = new Function('', 'return ' + autogenerateLayout);
+        info.split.intoLayouts = new Function('', 'return "' + autogenerateLayoutId + '"');
+
+    } else if (typeof info.split.intoViews === 'function') {
+        info.split.intoLayouts = function(model, params) {
+            var viewId = info.split.intoViews.call(this, model, params);
+            if (viewId) {
+                // генерируем динамически layout и возвращаем его
+                return ns.layout.generateSimple(viewId, 'ns-auto-layout-' + id);
+            }
+
+            return null;
+        };
     }
+
     ns.assert(info.split.intoLayouts, 'ns.ViewCollection', "'%s'  must define 'split.intoLayouts' section", id);
     ns.assert(info.split.byModel, 'ns.ViewCollection', "'%s'  must define 'split.byModel' section", id);
 
@@ -258,6 +268,10 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
 
                 var viewItemLayout = infoViewId.call(this, modelItem, viewItemParams);
 
+                if (!viewItemLayout) {
+                    continue;
+                }
+
                 var newViewLayout = ns.layout.page(viewItemLayout, viewItemParams);
                 itemsContainer.push(newViewLayout);
 
@@ -312,30 +326,6 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, params) {
     tree.views[this.id] = decl;
 
     return tree;
-};
-
-ns.ViewCollection.prototype._forEachCollectionItem = function(cb, params) {
-    // ModelCollection
-    var MC = this.models[this.info.modelCollectionId];
-
-    // Какие элементы коллекции рендерить, мы можем понять только по модели
-    // Поэтому, полезем внутрь, только если в ней есть данные
-    if (MC.isValid()) {
-        var modelItems = MC.models;
-        // Проходом по элементам MC определим, какие виды нужно срендерить
-        for (var i = 0, j = modelItems.length; i < j; i++) {
-            var viewItem = this._getViewItem(modelItems[i], params);
-
-            // если нет viewId, то это значит, что элемент коллекции был отфильтрован
-            if (!viewItem.id) {
-                continue;
-            }
-
-            var view = this._addView(viewItem.id, viewItem.params);
-
-            cb(view);
-        }
-    }
 };
 
 /**
@@ -633,27 +623,4 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             }
         }.bind(this));
     }
-};
-
-/**
- *
- * @private
- */
-ns.ViewCollection.prototype._getViewItem = function(modelItem, updateParams) {
-    var viewItemParams = no.extend({}, updateParams, modelItem.params);
-
-    var viewId;
-    var infoViewId = this.info.split.intoLayouts;
-    if (typeof infoViewId === 'function') {
-        // если intoViews - функция, то передаем туда модель и параметры,
-        // а она должна вернуть id вида
-        viewId = infoViewId.call(this, modelItem, viewItemParams);
-    } else {
-        viewId = infoViewId;
-    }
-
-    return {
-        id: viewId,
-        params: viewItemParams
-    };
 };

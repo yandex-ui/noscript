@@ -252,6 +252,9 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
         // ModelCollection
         var MC = this.models[this.info.modelCollectionId];
 
+        // сохраняем активные элементы коллекции, чтобы потом удалить старые
+        var activeItems = {};
+
         // Какие элементы коллекции рендерить, мы можем понять только по модели
         // Поэтому, полезем внутрь, только если в ней есть данные
         if (MC.isValid()) {
@@ -280,6 +283,8 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
                 for (var view_id in newViewLayout) {
                     var newView = this._addView(view_id, viewItemParams);
                     newView._getRequestViews(updated, newViewLayout[view_id].views, updateParams);
+
+                    activeItems[newView.key] = null;
                 }
             }
 
@@ -302,6 +307,17 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
     // Все элементы коллекции в контейнере, а коллекция может иметь собственную разметку, в т.ч. с другими видами
 
     this._saveLayout(pageLayout);
+
+    this._itemsToRemove = [];
+    var that = this;
+    this._apply(function(view) {
+        // Если для view нет модели в MC, то нужно его прихлопнуть
+        if (!(view.key in activeItems)) {
+            // remove from collection
+            that._deleteView(view);
+            that._itemsToRemove.push(view);
+        }
+    });
 
     // При необходимости добавим текущий вид в список "запрашиваемых"
     return updated;
@@ -612,15 +628,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
             prev = view;
         }, params);
-
-        // Удалим те view, для которых нет моделей
-        this._apply(function(/** ns.View */view) {
-            // Если для view нет модели в MC, то нужно его прихлопнуть
-            if (!itemsExist[view.key]) {
-                // remove from collection
-                this._deleteView(view);
-                view.destroy();
-            }
-        }.bind(this));
     }
+
+    this._itemsToRemove.forEach(function(view) {
+        view.destroy();
+    });
 };

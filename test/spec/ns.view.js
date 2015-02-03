@@ -705,6 +705,82 @@ describe('ns.View', function() {
 
     });
 
+    describe('#destroy', function() {
+
+        beforeEach(function() {
+            this.onModelChangeSpy = this.sinon.spy();
+            this.onView1DestroySpy = this.sinon.spy();
+            this.onView2DestroySpy = this.sinon.spy();
+
+            ns.Model.define('model');
+            ns.Model.get('model').setData({});
+
+            ns.layout.define('app', {
+                'view1': {
+                    'view2': {}
+                }
+            });
+
+            ns.View.define('view1', {
+                events: {
+                    'ns-view-destroyed': 'onViewDestroy'
+                },
+                models: {
+                    'model': 'onModelChange'
+                },
+                methods: {
+                    onModelChange: this.onModelChangeSpy,
+                    onViewDestroy: this.onView1DestroySpy
+                }
+            });
+
+            ns.View.define('view2', {
+                events: {
+                    'ns-view-destroyed': 'onViewDestroy'
+                },
+                methods: {
+                    onViewDestroy: this.onView2DestroySpy
+                }
+            });
+
+            this.view = ns.View.create('view1');
+            var layout = ns.layout.page('app');
+
+            return new ns.Update(this.view, layout, {})
+                .render()
+                .then(function() {
+                    document.body.appendChild(this.view.node);
+                }, null, this);
+        });
+
+        it('должен удалить вид из DOM', function() {
+            this.view.destroy();
+            expect(document.getElementsByClassName('ns-view-view1')).to.have.length(0);
+        });
+
+        it('должен отписаться от изменений модели', function() {
+            this.view.destroy();
+            ns.Model.get('model').set('.foo', 'bar');
+            expect(this.onModelChangeSpy).to.have.callCount(0);
+        });
+
+        it('должен бросить событие "ns-view-destroyed"', function() {
+            this.view.destroy();
+            expect(this.onView1DestroySpy).to.have.callCount(1);
+        });
+
+        it('должен бросить событие "ns-view-destroyed" сначала дочерним видам, потом себе', function() {
+            this.view.destroy();
+            expect(this.onView2DestroySpy).to.be.calledBefore(this.onView1DestroySpy);
+        });
+
+        it('должен уничтожить дочерние виды', function() {
+            this.view.destroy();
+            expect(this.onView2DestroySpy).to.have.callCount(1);
+        });
+
+    });
+
     describe('#invalidate.', function() {
 
         beforeEach(function() {

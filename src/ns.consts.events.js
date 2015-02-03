@@ -53,6 +53,7 @@ ns.V.DOM_EVENTS = [
  */
 ns.V.NS_EVENTS = [
     'ns-view-async',
+    'ns-view-destroyed',
     'ns-view-init',
     'ns-view-htmlinit',
     'ns-view-show',

@@ -1233,6 +1233,56 @@
         return updatePromise;
     };
 
+    /**
+     * Уничтожает себя и все внутренние виды, удаляет ноду из DOM.
+     * Этот вид больше никогда не будет живым, метод используется для очистки памяти.
+     */
+    ns.View.prototype.destroy = function() {
+        this._apply(function(view) {
+            view.destroy();
+        });
+
+        // кидаем событие после прохода по потомкам, чтобы сохранить принцип событий "снизу вверх"
+        /**
+         * Вид сейчас будет уничтожен.
+         * @event ns.View#ns-view-destroyed
+         */
+        this.trigger('ns-view-destroyed');
+
+        this.views = {};
+
+        // если блок виден, то скрываем его
+        if (this.isVisible()) {
+            this._hide([]);
+            this.trigger("ns-view-hide");
+            this.trigger("ns-view-htmldestroy");
+            this._htmldestroy([]);
+        }
+
+        this.__unbindModelsEvents();
+
+        if (this.node) {
+            this.$node
+                // события
+                .off()
+                // данные
+                .removeData()
+                // удаляем из DOM
+                .remove();
+
+            this.node = null;
+            this.$node = null;
+        }
+
+        this.info = null;
+        this.layout = null;
+        this.models = null;
+        this.params = null;
+        this.status = this.STATUS.NONE;
+
+        this._modelsHandlers = null;
+    };
+
     var _infos = {};
     var _ctors = {};
 

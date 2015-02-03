@@ -15,6 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      "node_modules/mutationobserver-shim/dist/mutationobserver.min.js",
       "node_modules/jquery/dist/jquery.min.js",
       "node_modules/yate/lib/runtime.js",
 

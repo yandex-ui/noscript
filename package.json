@@ -36,7 +36,8 @@
         "mocha": "^2.1.0",
         "nock": "0.36.2",
         "request": "2.36.x",
-        "yate": "*"
+        "yate": "*",
+        "mutationobserver-shim": "~0.2.8"
     },
     "optionalDependencies": {},
     "engines": {

@@ -219,6 +219,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
 
     //  this.active -- это объект (упорядоченный!), в котором лежат ключи
     //  активных (видимых) в данный момент блоков.
+    //  Строим новый active, но уже не по layout'у, а по актуальным блокам.
     var layoutActive = {};
 
     //  Строим новый active согласно layout'у.
@@ -236,26 +237,16 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         //  Обновляем его.
         view._updateHTML(node, selfLayout.views, params, options, events);
 
-        // вставляем view в DOM в любом случае, чтобы сохранить правильную последовательность видов #499
-        if ( view.isOk() || view.isLoading() ) {
-            this.node.appendChild(view.node);
-        }
-    }
-
-    //  Строим новый active, но уже не по layout'у, а по актуальным блокам.
-    var newActive = {};
-    for (var activeId in layoutActive) {
-        var activeKey = layoutActive[activeId];
-        newActive[activeId] = activeKey;
+        // Вставка ноды в DOM будет выполнена во время сортировки нод в боксе (ниже).
     }
 
     // Пройдёмся по всем вложенным видам, чтобы
     //  1. Спрятать виды, которые не попали в layout
     //  2. Перенести ноды вложенных видов в новую ноду бокса (если есть)
-    for (var key in this.views) {
-        var view = this.views[key];
+    for (var key in views) {
+        var view = views[key];
         // Если вид не входит в новый active
-        if (newActive[view.id] !== view.key) {
+        if (layoutActive[view.id] !== view.key) {
             // Скроем виды, не попавшие в layout
             var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
@@ -266,16 +257,59 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
             }
             // Если нода вида лежит в старой ноде бокса
             if (oldNode && oldNode.contains(view.node)) {
-                // Перенесём её в новую ноду бокса
+                // Перенесём её в новую ноду бокса (сам вид скрыт).
                 this.node.appendChild(view.node);
             }
         }
     }
 
     //  Запоминаем новый active.
-    this.active = newActive;
+    this.active = layoutActive;
+
+    //  Сортируем ноды видов внутри бокса. Попутно добавляются новые ноды видов.
+    this._sortViewNodes();
 
     this._show();
+};
+
+/**
+ * Сортировка видов внутри бокса.
+ * Новые ноды видов также добавляются тут.
+ * @private
+ */
+ns.Box.prototype._sortViewNodes = function() {
+    var active = this.active;
+    var views = this.views;
+
+    // Итератор по HTMLCollection, который возвращает видимые ноды видов.
+    var viewNodesIterator = (function(children) {
+        var position = -1;
+        var childrenCount = children.length;
+        return {
+            getNext: function() {
+                for (position += 1; position < childrenCount; position++) {
+                    if (ns.hasClass(children[position], 'ns-view-visible')) {
+                        return children[position];
+                    }
+                }
+                return null;
+            }
+        };
+    })(this.node.children);
+
+    for (var viewId in active) {
+        var viewKey = active[viewId];
+        var view = views[viewKey];
+        var cursorViewNode = viewNodesIterator.getNext();
+
+        if (cursorViewNode !== view.node) {
+            if (cursorViewNode) {
+                this.node.insertBefore(view.node, cursorViewNode);
+            } else {
+                this.node.appendChild(view.node);
+            }
+        }
+    }
 };
 
 /**

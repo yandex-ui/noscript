@@ -282,7 +282,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
                 // Создаем подблоки
                 for (var view_id in newViewLayout) {
                     var newView = this._addView(view_id, viewItemParams);
-                    newView._getRequestViews(updated, newViewLayout[view_id].views, updateParams);
+                    newView._getRequestViews(updated, newViewLayout[view_id].views, viewItemParams);
 
                     activeItems[newView.key] = null;
                 }
@@ -533,7 +533,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         }
     }
 
-    // Если view валидный и не в async-режиме, то вызывается show и touch 
+    // Если view валидный и не в async-режиме, то вызывается show и touch
     // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch
 
     // Условие звучит так "(Если мы в синхнронном ns.Update и view стал валиден) или (view был не валиден и стал валиден)"

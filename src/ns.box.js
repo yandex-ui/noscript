@@ -166,6 +166,17 @@ ns.Box.prototype.beforeUpdateHTML = function(layout, params, events) {
         view.beforeUpdateHTML(layout[view.id].views, params, events);
     }
 
+    this._hideInactiveViews(newLayout, events);
+};
+
+/**
+ * Скрываем все неактивные виды в боксе
+ * @param {object} newLayout
+ * @param {object} events
+ * @private
+ */
+ns.Box.prototype._hideInactiveViews = function(newLayout, events) {
+    var hideEvents = events['ns-view-hide'];
     // Пройдёмся по всем вложенным видам, чтобы кинуть hide, которым не попали в newLayout
     for (var key in this.views) {
         var view = this.views[key];
@@ -175,11 +186,8 @@ ns.Box.prototype.beforeUpdateHTML = function(layout, params, events) {
             // Скроем виды, не попавшие в layout
             var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
-                var desc = descs[i];
-                // если view был скрыт
-                if (desc.node && desc._visible === true && !desc.isLoading() && desc.trigger) {
-                    events['ns-view-hide'].push(desc);
-                }
+                // Метод #_hide сам все сделает по правильной логике
+                descs[i]._hide(hideEvents);
             }
         }
     }
@@ -240,31 +248,12 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         // Вставка ноды в DOM будет выполнена во время сортировки нод в боксе (ниже).
     }
 
-    // Пройдёмся по всем вложенным видам, чтобы
-    //  1. Спрятать виды, которые не попали в layout
-    //  2. Перенести ноды вложенных видов в новую ноду бокса (если есть)
-    for (var key in views) {
-        var view = views[key];
-        // Если вид не входит в новый active
-        if (layoutActive[view.id] !== view.key) {
-            // Скроем виды, не попавшие в layout
-            var descs = view._getDescendantsAndSelf( [] );
-            for (var i = 0, l = descs.length; i < l; i++) {
-                // если view был скрыт
-                if (descs[i]._hide()) {
-                    events['ns-view-hide'].push(descs[i]);
-                }
-            }
-            // Если нода вида лежит в старой ноде бокса
-            if (oldNode && oldNode.contains(view.node)) {
-                // Перенесём её в новую ноду бокса (сам вид скрыт).
-                this.node.appendChild(view.node);
-            }
-        }
-    }
-
     //  Запоминаем новый active.
     this.active = layoutActive;
+
+    // Пройдёмся по всем вложенным видам,
+    // чтобы перенести ноды вложенных видов в новую ноду бокса (если есть)
+    this._transferViewsToNewNode(oldNode);
 
     //  Сортируем ноды видов внутри бокса. Попутно добавляются новые ноды видов.
     this._sortViewNodes();
@@ -307,6 +296,32 @@ ns.Box.prototype._sortViewNodes = function() {
                 this.node.insertBefore(view.node, cursorViewNode);
             } else {
                 this.node.appendChild(view.node);
+            }
+        }
+    }
+};
+
+/**
+ * Переносит неактивные виды из старой ноды в новую после перерисовки бокса.
+ * @param {HTMLElement} oldNode
+ * @private
+ */
+ns.Box.prototype._transferViewsToNewNode = function(oldNode) {
+    // если старой ноды нет, то значит бокс не перерисовывался
+    if (!oldNode) {
+        return;
+    }
+
+    var views = this.views;
+    for (var key in views) {
+        var view = views[key];
+        // Если вид не входит в новый active
+        if (this.active[view.id] !== view.key) {
+            var viewNode = view.node;
+            // Если нода вида лежит в старой ноде бокса
+            if (oldNode.contains(viewNode)) {
+                // Перенесём её в новую ноду бокса (сам вид скрыт).
+                this.node.appendChild(viewNode);
             }
         }
     }

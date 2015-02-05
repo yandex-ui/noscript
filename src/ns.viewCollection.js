@@ -566,19 +566,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         this._apply(function(/** ns.View */view) {
             // Если для view нет модели в MC, то нужно его прихлопнуть
             if (!itemsExist[view.key]) {
-                // invalidate view
-                view.invalidate();
-
-                //TODO: будет ли unbind для вложенных view?
-                // unbind events
-                view._hide(events['ns-view-hide']);
-                view._htmldestroy(events['ns-view-htmldestroy']);
-
                 // remove from collection
                 this._deleteView(view);
-
-                // remove from DOM
-                ns.removeNode(view.node);
+                view.destroy();
             }
         }.bind(this));
     }

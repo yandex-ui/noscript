@@ -234,17 +234,16 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout) {
 /**
  *
  * @param {object} tree
- * @param {object} layout
  * @param {object} params
  * @returns {ns.View~UpdateTree}
  * @private
  */
-ns.ViewCollection.prototype._getUpdateTree = function(tree, layout, params) {
+ns.ViewCollection.prototype._getUpdateTree = function(tree, params) {
     var decl;
     if (this.isValidSelf()) {
-        decl = this._getPlaceholderTree(layout, params);
+        decl = this._getPlaceholderTree(params);
     } else {
-        decl = this._getViewTree(layout, params);
+        decl = this._getViewTree(params);
     }
 
     // Добавим декларацию этого ViewCollection в общее дерево
@@ -279,12 +278,11 @@ ns.ViewCollection.prototype._forEachCollectionItem = function(cb, params) {
 
 /**
  *
- * @param {object} layout
  * @param {object} params
  * @returns {object.<string, ns.View~UpdateTree>}
  * @private
  */
-ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
+ns.ViewCollection.prototype._getDescViewTree = function(params) {
     var that = this;
     var result = {};
     result['ns-view-collection-container'] = [];
@@ -295,9 +293,9 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
             // Если корневая нода не меняется, то перерендериваем
             // только невалидные элементы коллекции
             if (view.info.isCollection && view.isValidSelf()) {
-                decl = view._getPlaceholderTree(layout, params);
+                decl = view._getPlaceholderTree(params);
             } else if (!view.isValid()) {
-                decl = view._getViewTree(layout, params);
+                decl = view._getViewTree(params);
             }
         } else {
             // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
@@ -305,10 +303,10 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
             if (view.isValidSelf()) {
                 // если view - обычный вид, то isValidSelf === isValid
                 // если view - коллекция, то она проверит себя (isValidSelf) и сделаем дерево для детей
-                decl = view._getPlaceholderTree(layout, params);
+                decl = view._getPlaceholderTree(params);
 
             } else {
-                decl = view._getViewTree(layout, params);
+                decl = view._getViewTree(params);
             }
         }
 
@@ -348,29 +346,28 @@ ns.ViewCollection.prototype._getDescViewTree = function(layout, params) {
 
 /**
  *
- * @param {object} layout
  * @param {object} params
  * @returns {ns.View~UpdateTree}
  * @private
  */
-ns.ViewCollection.prototype._getViewTree = function(layout, params) {
+ns.ViewCollection.prototype._getViewTree = function(params) {
     var tree = this._getTree();
     tree.collection = true;
     // всегда собираем данные, в том числе закешированные модели для async-view
     tree.models = this._getModelsForTree();
 
-    tree.views = this._getDescViewTree(layout, params);
+    tree.views = this._getDescViewTree(params);
 
     return tree;
 };
 
-ns.ViewCollection.prototype.beforeUpdateHTML = function(layout, params, events) {
+ns.ViewCollection.prototype.beforeUpdateHTML = function(params, events) {
     this._selfBeforeUpdateHTML(events);
 
     // проходимся по элементам коллекции
     if (!this.isLoading()) {
         this._forEachCollectionItem(function(view) {
-            view.beforeUpdateHTML(null, params, events);
+            view.beforeUpdateHTML(params, events);
         }, params);
     }
 };

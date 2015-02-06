@@ -746,12 +746,12 @@
      *  В tree.models будут все модели, требуемые для этих блоков.
      *  @private
      */
-    ns.View.prototype._getUpdateTree = function(tree, layout, params) {
+    ns.View.prototype._getUpdateTree = function(tree, params) {
         if ( !this.isValid() ) {
-            tree.views[this.id] = this._getViewTree(layout, params);
+            tree.views[this.id] = this._getViewTree(params);
         } else {
-            this._apply(function(view, id) {
-                view._getUpdateTree(tree, layout[id].views, params);
+            this._apply(function(view) {
+                view._getUpdateTree(tree, params);
             });
         }
 
@@ -812,12 +812,11 @@
 
     /**
      * Строим дерево блоков.
-     * @param {object} layout Currently processing layout.
      * @param {object} params Params.
      * @returns {ns.View~UpdateTree}
      * @private
      */
-    ns.View.prototype._getViewTree = function(layout, params) {
+    ns.View.prototype._getViewTree = function(params) {
         var tree = this._getTree();
 
         // всегда собираем данные, в том числе закешированные модели для async-view
@@ -835,12 +834,7 @@
 
         //  Сюда попадают только синхронные блоки.
 
-        //  Это блок без подблоков.
-        if (typeof layout !== 'object') {
-            return true;
-        }
-
-        tree.views = this._getDescViewTree(layout, params);
+        tree.views = this._getDescViewTree(params);
 
         return tree;
     };
@@ -871,16 +865,15 @@
 
     /**
      * Возвращает деревья для дочерних видов
-     * @param {object} layout
      * @param {object} params
      * @returns {object.<string, ns.View~UpdateTree>}
      * @private
      */
-    ns.View.prototype._getDescViewTree = function(layout, params) {
+    ns.View.prototype._getDescViewTree = function(params) {
         var views = {};
         //  Собираем дерево рекурсивно из подблоков.
         this._apply(function(view, id) {
-            views[id] = view._getViewTree(layout[id].views, params);
+            views[id] = view._getViewTree(params);
         });
 
         return views;
@@ -888,16 +881,15 @@
 
     /**
      * Возвращает декларацию вида для вставки плейсхолдера
-     * @param {object} layout Currently processing layout.
      * @param {object} params Params.
      * @returns {ns.View~UpdateTree}
      * @private
      */
-    ns.View.prototype._getPlaceholderTree = function(layout, params) {
+    ns.View.prototype._getPlaceholderTree = function(params) {
         var tree = this._getTree();
         tree.collection = true;
         tree.state = 'placeholder';
-        tree.views = this._getDescViewTree(layout, params);
+        tree.views = this._getDescViewTree(params);
 
         return tree;
     };
@@ -1022,13 +1014,13 @@
         }
     };
 
-    ns.View.prototype.beforeUpdateHTML = function(layout, params, events) {
+    ns.View.prototype.beforeUpdateHTML = function(params, events) {
         this._selfBeforeUpdateHTML(events);
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
-            this._apply(function(view, id) {
-                view.beforeUpdateHTML(layout[id].views, params, events);
+            this._apply(function(view) {
+                view.beforeUpdateHTML(params, events);
             });
         }
     };

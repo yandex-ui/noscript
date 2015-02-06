@@ -260,7 +260,7 @@
         var tree = {
             'views': {}
         };
-        this.view._getUpdateTree(tree, this.layout.views, this.params);
+        this.view._getUpdateTree(tree, this.params);
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
 
@@ -292,7 +292,7 @@
             'ns-view-hide': [],
             'ns-view-htmldestroy': []
         };
-        this.view.beforeUpdateHTML(this.layout.views, this.params, hideViewEvents);
+        this.view.beforeUpdateHTML(this.params, hideViewEvents);
         this._triggerViewEvents(hideViewEvents);
 
         var viewEvents = {

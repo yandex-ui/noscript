@@ -527,6 +527,8 @@
      * Инвалидует себя и своих потомков.
      */
     ns.View.prototype.invalidate = function() {
+        this.status = this.STATUS.INVALID;
+        /*
         // рекурсивно инвалидируем себя и потомков
         var views = this._getDescendantsAndSelf();
         for (var i = 0, j = views.length; i < j; i++) {
@@ -537,6 +539,7 @@
                 view.status = this.STATUS.INVALID;
             }
         }
+        */
     };
 
     /**
@@ -763,7 +766,9 @@
             if (!this.isValidSelf()) {
                 // реинвалидируем дочерние виды,
                 // потому что их тоже придется перерисовать вместе с родителем
+                /*
                 this.invalidate();
+                */
             }
 
             // обычный блок добавляем всегда
@@ -913,7 +918,11 @@
         var views = {};
         //  Собираем дерево рекурсивно из подблоков.
         this._apply(function(view, id) {
-            views[id] = view._getViewTree();
+            if (view.isValidSelf()) {
+                views[id] = view._getPlaceholderTree();
+            } else {
+                views[id] = view._getViewTree();
+            }
         });
 
         return views;
@@ -926,7 +935,7 @@
      */
     ns.View.prototype._getPlaceholderTree = function() {
         var tree = this._getTree();
-        tree.collection = true;
+        tree.collection = this.info.isCollection;
         tree.state = 'placeholder';
         tree.views = this._getDescViewTree();
 
@@ -1096,12 +1105,11 @@
         var syncUpdate = !updateOptions.async;
         var viewWasInvalid = !this.isValid();
 
-        var viewNode;
+        var newViewNode = this._extractNode(node);
         //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
         if ( viewWasInvalid ) {
             //  Ищем новую ноду блока.
-            viewNode = this._extractNode(node);
-            ns.assert(viewNode, 'ns.View', "Can't find node for '%s'", this.id);
+            ns.assert(newViewNode, 'ns.View', "Can't find node for '%s'", this.id);
 
             //  Обновляем весь блок.
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
@@ -1113,7 +1121,7 @@
                 //  Если старой ноды нет, то это блок, который вставляется в бокс.
 
                 if (this.node) {
-                    ns.replaceNode(this.node, viewNode);
+                    ns.replaceNode(this.node, newViewNode);
                     options_next.parent_added = true;
                 }
                 //  Все подблоки ниже уже не toplevel.
@@ -1127,11 +1135,11 @@
 
             //  новая нода должна в любом случае попасть в DOM
             if (this.node && !updateOptions.parent_added && !options_next.parent_added) {
-                ns.replaceNode(this.node, viewNode);
+                ns.replaceNode(this.node, newViewNode);
             }
 
             //  Запоминаем новую ноду.
-            this._setNode(viewNode);
+            this._setNode(newViewNode);
 
             if ( this.isOk() ) {
                 this._htmlinit(events['ns-view-htmlinit']);
@@ -1142,6 +1150,13 @@
             }
 
             this._saveModelsVersions();
+
+        } else if (newViewNode) {
+            // Если новая новая - placeholder, то надо заменить ее на текущую ноду вида
+            var viewNodeIsPlaceholder = ns.hasClass(newViewNode, 'ns-view-placeholder');
+            if (viewNodeIsPlaceholder) {
+                ns.replaceNode(newViewNode, this.node);
+            }
         }
 
         // Если view валидный и не в async-режиме, то вызывается show и touch
@@ -1156,13 +1171,13 @@
         }
 
         //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть
-        //  никаких подблоков. В этом случае, нужно брать viewNode.
-        viewNode = viewNode || node;
+        //  никаких подблоков. В этом случае, нужно брать newViewNode.
+        newViewNode = newViewNode || node;
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view, id) {
-                view._updateHTML(viewNode, layout[id].views, params, options_next, events);
+                view._updateHTML(newViewNode, layout[id].views, params, options_next, events);
             });
         }
     };

@@ -1028,8 +1028,8 @@ describe('ns.ViewCollection', function() {
         it('should correctly update', function() {
             var parent = ns.Model.get('mc');
 
-            var childA = ns.Model.get('mc-item', {id: 'A'});
-            var childB = ns.Model.get('mc-item', {id: 'B'});
+            var childA = ns.Model.get('mc-item', {id: 'A'}).setData({val: 'A'});
+            var childB = ns.Model.get('mc-item', {id: 'B'}).setData({val: 'A'});
 
             parent.insert([childA, childB]);
 

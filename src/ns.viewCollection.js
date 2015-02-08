@@ -33,6 +33,7 @@ ns.ViewCollection.define = function(id, info, baseClass) {
     if (typeof info.split.intoViews === 'string') {
         var autogenerateLayoutId = ns.layout.generateSimple(info.split.intoViews, 'ns-auto-layout-' + id);
         delete info.split.intoViews;
+        /* jshint -W054 */
         info.split.intoLayouts = new Function('', 'return "' + autogenerateLayoutId + '"');
 
     } else if (typeof info.split.intoViews === 'function') {
@@ -326,16 +327,15 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
 /**
  *
  * @param {object} tree
- * @param {object} params
  * @returns {ns.View~UpdateTree}
  * @private
  */
-ns.ViewCollection.prototype._getUpdateTree = function(tree, params) {
+ns.ViewCollection.prototype._getUpdateTree = function(tree) {
     var decl;
     if (this.isValidSelf()) {
-        decl = this._getPlaceholderTree(params);
+        decl = this._getPlaceholderTree();
     } else {
-        decl = this._getViewTree(params);
+        decl = this._getViewTree();
     }
 
     // Добавим декларацию этого ViewCollection в общее дерево
@@ -346,11 +346,10 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree, params) {
 
 /**
  *
- * @param {object} params
  * @returns {object.<string, ns.View~UpdateTree>}
  * @private
  */
-ns.ViewCollection.prototype._getDescViewTree = function(params) {
+ns.ViewCollection.prototype._getDescViewTree = function() {
     var that = this;
     var result = {};
     result['ns-view-collection-container'] = [];
@@ -361,9 +360,9 @@ ns.ViewCollection.prototype._getDescViewTree = function(params) {
             // Если корневая нода не меняется, то перерендериваем
             // только невалидные элементы коллекции
             if (view.info.isCollection && view.isValidSelf()) {
-                decl = view._getPlaceholderTree(params);
+                decl = view._getPlaceholderTree();
             } else if (!view.isValid()) {
-                decl = view._getViewTree(params);
+                decl = view._getViewTree();
             }
         } else {
             // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все
@@ -371,10 +370,10 @@ ns.ViewCollection.prototype._getDescViewTree = function(params) {
             if (view.isValidSelf()) {
                 // если view - обычный вид, то isValidSelf === isValid
                 // если view - коллекция, то она проверит себя (isValidSelf) и сделаем дерево для детей
-                decl = view._getPlaceholderTree(params);
+                decl = view._getPlaceholderTree();
 
             } else {
-                decl = view._getViewTree(params);
+                decl = view._getViewTree();
             }
         }
 
@@ -414,17 +413,16 @@ ns.ViewCollection.prototype._getDescViewTree = function(params) {
 
 /**
  *
- * @param {object} params
  * @returns {ns.View~UpdateTree}
  * @private
  */
-ns.ViewCollection.prototype._getViewTree = function(params) {
+ns.ViewCollection.prototype._getViewTree = function() {
     var tree = this._getTree();
     tree.collection = true;
     // всегда собираем данные, в том числе закешированные модели для async-view
     tree.models = this._getModelsForTree();
 
-    tree.views = this._getDescViewTree(params);
+    tree.views = this._getDescViewTree();
 
     return tree;
 };

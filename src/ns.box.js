@@ -158,14 +158,14 @@ ns.Box.prototype._getViewTree = function() {
     return tree;
 };
 
-ns.Box.prototype.beforeUpdateHTML = function(params, events) {
+ns.Box.prototype.beforeUpdateHTML = function(events) {
     var activeLayout = this.active;
     for (var viewId in activeLayout) {
         var viewKey = activeLayout[viewId];
         //  Достаем ранее созданный блок (в _getRequestViews).
         /** @type {ns.View} */
         var view = this.views[viewKey];
-        view.beforeUpdateHTML(params, events);
+        view.beforeUpdateHTML(events);
     }
 
     this._hideInactiveViews(events);

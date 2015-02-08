@@ -1053,13 +1053,13 @@
         }
     };
 
-    ns.View.prototype.beforeUpdateHTML = function(params, events) {
+    ns.View.prototype.beforeUpdateHTML = function(events) {
         this._selfBeforeUpdateHTML(events);
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view) {
-                view.beforeUpdateHTML(params, events);
+                view.beforeUpdateHTML(events);
             });
         }
     };

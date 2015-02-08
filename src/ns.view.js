@@ -788,12 +788,12 @@
      *  В tree.models будут все модели, требуемые для этих блоков.
      *  @private
      */
-    ns.View.prototype._getUpdateTree = function(tree, params) {
+    ns.View.prototype._getUpdateTree = function(tree) {
         if ( !this.isValid() ) {
-            tree.views[this.id] = this._getViewTree(params);
+            tree.views[this.id] = this._getViewTree();
         } else {
             this._apply(function(view) {
-                view._getUpdateTree(tree, params);
+                view._getUpdateTree(tree);
             });
         }
 
@@ -854,11 +854,10 @@
 
     /**
      * Строим дерево блоков.
-     * @param {object} params Params.
      * @returns {ns.View~UpdateTree}
      * @private
      */
-    ns.View.prototype._getViewTree = function(params) {
+    ns.View.prototype._getViewTree = function() {
         var tree = this._getTree();
 
         // всегда собираем данные, в том числе закешированные модели для async-view
@@ -876,7 +875,7 @@
 
         //  Сюда попадают только синхронные блоки.
 
-        tree.views = this._getDescViewTree(params);
+        tree.views = this._getDescViewTree();
 
         return tree;
     };
@@ -907,15 +906,14 @@
 
     /**
      * Возвращает деревья для дочерних видов
-     * @param {object} params
      * @returns {object.<string, ns.View~UpdateTree>}
      * @private
      */
-    ns.View.prototype._getDescViewTree = function(params) {
+    ns.View.prototype._getDescViewTree = function() {
         var views = {};
         //  Собираем дерево рекурсивно из подблоков.
         this._apply(function(view, id) {
-            views[id] = view._getViewTree(params);
+            views[id] = view._getViewTree();
         });
 
         return views;
@@ -923,15 +921,14 @@
 
     /**
      * Возвращает декларацию вида для вставки плейсхолдера
-     * @param {object} params Params.
      * @returns {ns.View~UpdateTree}
      * @private
      */
-    ns.View.prototype._getPlaceholderTree = function(params) {
+    ns.View.prototype._getPlaceholderTree = function() {
         var tree = this._getTree();
         tree.collection = true;
         tree.state = 'placeholder';
-        tree.views = this._getDescViewTree(params);
+        tree.views = this._getDescViewTree();
 
         return tree;
     };

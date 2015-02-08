@@ -418,13 +418,13 @@ ns.ViewCollection.prototype._getViewTree = function() {
     return tree;
 };
 
-ns.ViewCollection.prototype.beforeUpdateHTML = function(params, events) {
+ns.ViewCollection.prototype.beforeUpdateHTML = function(events) {
     this._selfBeforeUpdateHTML(events);
 
     // проходимся по элементам коллекции
     if (!this.isLoading()) {
         this._apply(function(view) {
-            view.beforeUpdateHTML(params, events);
+            view.beforeUpdateHTML(events);
         });
     }
 };

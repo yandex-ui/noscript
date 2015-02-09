@@ -1305,4 +1305,60 @@ describe('ns.Updater', function() {
 
     });
 
+    describe('Параметры асинхронного update', function() {
+        it('Асинхронная вьюшка должна получать дополнительные параметры из view.update()', function() {
+
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    200,
+                    {"Content-Type": "application/json"},
+                    JSON.stringify({
+                        models: [
+                            { data: true }
+                        ]
+                    })
+                );
+            });
+
+            var promise = new Vow.Promise();
+
+            ns.layout.define('layout', {
+                'app': {
+                    'async&': {}
+                }
+            });
+
+            ns.Model.define('model', {params: {id: null}});
+
+            ns.View.define('app', {});
+            ns.View.define('async', {
+                'models': ['model'],
+                'methods': {
+                    update: function(params) {
+                        if (check) {
+                            if (params.newParam) {
+                                promise.fulfill();
+                            } else {
+                                promise.reject();
+                            }
+                        }
+                    }
+                }
+            });
+
+            var check = false;
+
+            var app = ns.View.create('app');
+            new ns.Update(app, ns.layout.page('layout', {}), {id: '123'})
+                .render()
+                .then(function() {
+                    check = true;
+                    app.update({'id': '321', 'newParam': true});
+                });
+
+            return promise;
+        });
+    });
+
 });

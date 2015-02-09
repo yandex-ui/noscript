@@ -1168,12 +1168,12 @@
      * @param {Vow.Promise} promise Промис, после которого запустить ns.Update
      * @returns {Vow.Promise}
      */
-    ns.View.prototype.updateAfter = function(promise) {
+    ns.View.prototype.updateAfter = function(promise, params) {
         this._asyncPromise = new Vow.Promise();
 
         var that = this;
         promise.then(function() {
-            that.update();
+            that.update(params);
         });
 
         return this._asyncPromise;

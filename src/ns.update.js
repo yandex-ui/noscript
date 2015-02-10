@@ -216,7 +216,7 @@
          Обратная сторона медали - в браузере могут кончиться коннекты :)
          */
         var asyncPromises = views.async.map(function(/** ns.View */view) {
-            return view.updateAfter(this.promise);
+            return view.updateAfter(this.promise, this.params);
         }, this);
 
         syncPromise.then(function() {

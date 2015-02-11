@@ -131,6 +131,13 @@
         this.views = {};
 
         /**
+         * Массив видов, которые надо уничтожить на стадии _updateHTML
+         * @type {Array}
+         * @private
+         */
+        this.__itemsToRemove = [];
+
+        /**
          * Статус View.
          * @type {ns.V.STATUS}
          * @private
@@ -744,26 +751,7 @@
                 // Не надо патчить layout пока нет всех моделей
                 // После того, как модели будут запрошены, мы все равно сюда придем еще раз и получим правильный результат
                 if (this.isModelsValid()) {
-                    var patchLayoutId = this.patchLayout(updateParams);
-                    // нового layout может и не быть
-                    if (patchLayoutId) {
-                        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
-                        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
-                        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
-                        for (var oldViewId in pageLayout) {
-                            delete pageLayout[oldViewId];
-
-                            //FIXME: надо уничтожать виды, которых больше не в новом layout
-                            // view.destroy()
-                        }
-                        // компилим новый layout
-                        // FIXME: а какие параметры передавать???
-                        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
-                        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
-                        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
-                        // заменяем внутренности на обновленный layout
-                        no.extend(pageLayout, newViewLayout);
-                    }
+                    this.__patchLayout(pageLayout, updateParams);
 
                 } else {
                     // т.к. patchLayout всегда что-то возвращает, то не имеет смысла идти по детям,
@@ -794,6 +782,48 @@
         }
 
         return updated;
+    };
+
+    /**
+     * Производит манипуляции с раскладкой.
+     * @param {object} pageLayout
+     * @param {object} updateParams
+     * @private
+     */
+    ns.View.prototype.__patchLayout = function(pageLayout, updateParams) {
+        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
+        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
+
+        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
+        for (var oldViewId in pageLayout) {
+            delete pageLayout[oldViewId];
+
+            //FIXME: надо уничтожать виды, которых больше не в новом layout
+            // view.destroy()
+        }
+
+        var patchLayoutId = this.patchLayout(updateParams);
+        ns.View.assert(!!patchLayoutId, 11);
+
+        // компилим новый layout
+        // FIXME: а какие параметры передавать???
+        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
+        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+        this.__checkPatchLayout(newViewLayout);
+        // заменяем внутренности на обновленный layout
+        no.extend(pageLayout, newViewLayout);
+    };
+
+    /**
+     * Проверяет результат #patchLayout.
+     * @param {object} newLayout
+     * @private
+     */
+    ns.View.prototype.__checkPatchLayout = function(newLayout) {
+        for (var viewId in newLayout) {
+            ns.View.assert(newLayout[viewId].type === ns.L.BOX, 12);
+        }
     };
 
     /**
@@ -1889,7 +1919,9 @@
         7: 'you cannot specify params and params+ at the same time',
         8: 'you cannot specify params and params- at the same time',
         9: 'Model %s is not defined!',
-        10: 'Could not generate key for view %s'
+        10: 'Could not generate key for view %s',
+        11: '#patchLayout MUST returns valid layout ID',
+        12: '#patchLayout MUST returns layout with ns.Box at top'
     };
 
     /**

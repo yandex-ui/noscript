@@ -10,28 +10,26 @@ describe('ns.View dynamic layouts ->', function() {
                 }
             });
 
-            ns.layout.define('view2-layout', {
-                'view3': {}
-            });
-
-            this.view2ModelStateFn = this.sinon.stub();
-            ns.Model.define('view2-state', {
-                methods: {
-                    isOk: this.view2ModelStateFn
+            ns.layout.define('view-layout', {
+                'box@': {
+                    'view3': {}
                 }
             });
 
+            ns.layout.define('view-empty', {
+                'box@': {}
+            });
+
+            this.view2GetLayoutFn = this.sinon.stub();
+
             ns.View.define('view1');
             ns.View.define('view2', {
-                models: {
-                    'view2-state': true
-                },
                 methods: {
                     patchLayout: function() {
-                        if (this.getModel('view2-state').isOk()) {
-                            return 'view2-layout';
-                        }
-                    }
+                        return this.getLayout();
+                    },
+
+                    getLayout: this.view2GetLayoutFn
                 }
             });
             ns.View.define('view3');
@@ -44,25 +42,107 @@ describe('ns.View dynamic layouts ->', function() {
         describe('Отрисовка ->', function() {
 
             it('Должен создать view3, если отдали такой layout', function() {
-                this.view2ModelStateFn.returns(true);
+                this.view2GetLayoutFn.returns('view-layout');
 
                 return new ns.Update(this.view, ns.layout.page('app'), {})
                     .render()
                     .then(function() {
-                        expect(this.view.node.querySelectorAll('.ns-view-view2>.ns-view-view3')).to.have.length(1);
+                        expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3')).to.have.length(1);
                     }, null, this);
             });
 
             it('Не должен создать view3, если не отдали layout', function() {
-                this.view2ModelStateFn.returns(false);
+                this.view2GetLayoutFn.returns('view-empty');
 
                 return new ns.Update(this.view, ns.layout.page('app'), {})
                     .render()
                     .then(function() {
-                        expect(this.view.node.querySelectorAll('.ns-view-view2>.ns-view-view3')).to.have.length(0);
+                        expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3')).to.have.length(0);
                     }, null, this);
             });
 
+            it('Должен правильно перерисовывать виды при изменении layout', function() {
+                this.view2GetLayoutFn.returns('view-empty');
+
+                return new ns.Update(this.view, ns.layout.page('app'), {})
+                    .render()
+                    .then(function() {
+                        this.view2GetLayoutFn.returns('view-layout');
+                        return this.view.update();
+                    }, null, this)
+                    .then(function() {
+                        expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3.ns-view-visible')).to.have.length(1);
+
+                        this.view2GetLayoutFn.returns('view-empty');
+                        return this.view.update();
+                    }, null, this)
+                    .then(function() {
+                        expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3.ns-view-hidden')).to.have.length(1);
+
+                        this.view2GetLayoutFn.returns('view-layout');
+                        return this.view.update();
+                    }, null, this)
+                    .then(function() {
+                        expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3.ns-view-visible')).to.have.length(1);
+                    }, null, this);
+            });
+
+        });
+
+    });
+
+    describe('Ограничения ->', function() {
+
+        beforeEach(function() {
+            ns.layout.define('app', {
+                'view1': {}
+            });
+
+            ns.layout.define('view-layout', {
+                'view3': {}
+            });
+
+            this.sinon.spy(ns.View, 'assert');
+
+            ns.test.disableExceptionLogger(this.sinon);
+        });
+
+        it('должен бросить исключение, если верхушка дерева не box', function() {
+            ns.View.define('view1', {
+                methods: {
+                    patchLayout: function() {
+                        return 'view-layout';
+                    }
+                }
+            });
+
+            var view = ns.View.create('view1');
+            return new ns.Update(view, ns.layout.page('app'), {}).render()
+                .then(function() {
+                    return Vow.reject('resolved');
+                }, function() {
+                    expect(ns.View.assert).to.be.calledWith(false, 12);
+                    return Vow.resolve();
+                });
+        });
+
+        it('должен бросить исключение, если #patchLayout ничего не вернул', function() {
+            ns.View.define('view1', {
+                methods: {
+                    patchLayout: function() {
+                        return null;
+                    }
+                }
+            });
+
+            var view = ns.View.create('view1');
+            return new ns.Update(view, ns.layout.page('app'), {}).render()
+                .then(function() {
+                    return Vow.reject('resolved');
+                }, function() {
+                    expect(ns.View.assert).to.be.calledWith(false, 11);
+                    return Vow.resolve();
+                });
         });
 
     });

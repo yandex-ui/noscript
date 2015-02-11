@@ -283,6 +283,9 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
 
             pageLayout['ns-view-container'] = itemsContainer;
 
+            // собираем неактивные виды, только когда создали реальное представление
+            this.__collectInactiveViews(activeItems);
+
         } else {
             // ставим флаг, что у нас есть дети, но моделей нет, поэтому состояние неопределено
             updated.hasPatchLayout = true;
@@ -292,28 +295,31 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
         updated.async.push(this);
     }
 
-    // FIXME: вот это уже все неактуально
-    // у ViewCollection нет детей в обычном понимании,
-    // поэтому не нужно хождение вниз по дереву как в ns.View#_getRequestViews
-
     // TODO: вроде бы ничего не мешает не переопределять этот метод и дать возможность коллекции иметь детей
     // Все элементы коллекции в контейнере, а коллекция может иметь собственную разметку, в т.ч. с другими видами
 
     this._saveLayout(pageLayout);
 
-    this._itemsToRemove = [];
+    // При необходимости добавим текущий вид в список "запрашиваемых"
+    return updated;
+};
+
+/**
+ * Уничтожает виды не вошедшие в пропатченный layout
+ * @param {object} activeItems
+ * @private
+ */
+ns.ViewCollection.prototype.__collectInactiveViews = function(activeItems) {
     var that = this;
     this._apply(function(view) {
         // Если для view нет модели в MC, то нужно его прихлопнуть
         if (!(view.key in activeItems)) {
             // remove from collection
             that._deleteView(view);
-            that._itemsToRemove.push(view);
+            that.__itemsToRemove.push(view);
         }
     });
 
-    // При необходимости добавим текущий вид в список "запрашиваемых"
-    return updated;
 };
 
 /**
@@ -599,9 +605,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         }, params);
     }
 
-    this._itemsToRemove.forEach(function(view) {
-        view.destroy();
-    });
+    this.__destroyInactiveViews();
 };
 
 /**

@@ -124,6 +124,13 @@
         this.views = {};
 
         /**
+         * Массив видов, которые надо уничтожить на стадии _updateHTML
+         * @type {Array}
+         * @private
+         */
+        this.__itemsToRemove = [];
+
+        /**
          * Статус View.
          * @type {ns.V.STATUS}
          * @private
@@ -694,26 +701,7 @@
                 // Не надо патчить layout пока нет всех моделей
                 // После того, как модели будут запрошены, мы все равно сюда придем еще раз и получим правильный результат
                 if (this.isModelsValid()) {
-                    var patchLayoutId = this.patchLayout(updateParams);
-                    // нового layout может и не быть
-                    if (patchLayoutId) {
-                        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
-                        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
-                        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
-                        for (var oldViewId in pageLayout) {
-                            delete pageLayout[oldViewId];
-
-                            //FIXME: надо уничтожать виды, которых больше не в новом layout
-                            // view.destroy()
-                        }
-                        // компилим новый layout
-                        // FIXME: а какие параметры передавать???
-                        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
-                        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
-                        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
-                        // заменяем внутренности на обновленный layout
-                        no.extend(pageLayout, newViewLayout);
-                    }
+                    this.__patchLayout(pageLayout, updateParams);
 
                 } else {
                     // ставим флаг, что у нас есть patchLayout, но моделей нет, поэтому состояние неопределено
@@ -737,6 +725,57 @@
         });
 
         return updated;
+    };
+
+    /**
+     * Производит манипуляции с раскладкой.
+     * @param {object} pageLayout
+     * @param {object} updateParams
+     * @private
+     */
+    ns.View.prototype.__patchLayout = function(pageLayout, updateParams) {
+        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
+        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
+
+        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
+        for (var oldViewId in pageLayout) {
+            delete pageLayout[oldViewId];
+
+            //FIXME: надо уничтожать виды, которых больше не в новом layout
+            // view.destroy()
+        }
+
+        var patchLayoutId = this.patchLayout(updateParams);
+        // нового layout может и не быть
+        if (patchLayoutId) {
+            // компилим новый layout
+            // FIXME: а какие параметры передавать???
+            // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+            // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
+            var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+            // заменяем внутренности на обновленный layout
+            no.extend(pageLayout, newViewLayout);
+        }
+
+        // уничтожаем неактуальные виды
+        this.__collectInactiveViews(pageLayout);
+    };
+
+    /**
+     * Уничтожает виды не вошедшие в пропатченный layout
+     * @param {object} pageLayout
+     * @private
+     */
+    ns.View.prototype.__collectInactiveViews = function(pageLayout) {
+        var that = this;
+        this._apply(function(view) {
+            var viewId = view.id;
+            // Если вида нет в раскладке, то его надо грохнуть
+            if (!(viewId in pageLayout)) {
+                delete that.views[viewId];
+                that.__itemsToRemove.push(view);
+            }
+        });
     };
 
     /**
@@ -1189,12 +1228,37 @@
         //  никаких подблоков. В этом случае, нужно брать viewNode.
         viewNode = viewNode || node;
 
+        this.__destroyInactiveViews();
+
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view, id) {
                 view._updateHTML(viewNode, layout[id].views, params, options_next, events);
             });
         }
+    };
+
+    /**
+     * Уничтожает виды, не попавшие в раскладку.
+     * @private
+     */
+    ns.View.prototype.__destroyInactiveViews = function() {
+        var views = this.__itemsToRemove;
+        for (var i = 0, j = views.length; i < j; i++) {
+            views[i].destroy();
+        }
+
+        /*
+         Почему важно очищать массив тут?
+
+         Массив должен постоянно накапливать виды "на удаление",
+         но удалять их не сразу, а вместе с общим обновлением DOM (#_updateHTML).
+         Т.о. манипуляции с DOM будут происходит за один тик, а не будут размазаны по времени.
+
+         Еще процесс обновления может прерваться, но вид должен остаться в массиве,
+         чтобы его потом не забыть уничтожить.
+        */
+        this.__itemsToRemove = [];
     };
 
     /**

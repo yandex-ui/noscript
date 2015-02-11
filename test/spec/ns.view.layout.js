@@ -34,7 +34,13 @@ describe('ns.View dynamic layouts ->', function() {
                     }
                 }
             });
-            ns.View.define('view3');
+
+            this.view3DestroyFn = this.sinon.stub();
+            ns.View.define('view3', {
+                methods: {
+                    destroy: this.view3DestroyFn
+                }
+            });
 
             this.view = ns.View.create('view1');
 
@@ -61,6 +67,27 @@ describe('ns.View dynamic layouts ->', function() {
                     .then(function() {
                         expect(this.view.node.querySelectorAll('.ns-view-view2>.ns-view-view3')).to.have.length(0);
                     }, null, this);
+            });
+
+        });
+
+        describe('Удаление вложенных видов ->', function() {
+
+            beforeEach(function() {
+                this.view2ModelStateFn.returns(true);
+
+                // сначала рисуем сначал раскладку, в которой есть view3
+                return new ns.Update(this.view, ns.layout.page('app'), {})
+                    .render()
+                    .then(function() {
+                        // потом рисуем раскладку, в которой нет view3
+                        this.view2ModelStateFn.returns(false);
+                        return new ns.Update(this.view, ns.layout.page('app'), {}).render();
+                    }, null, this);
+            });
+
+            it('должен вызвать #destroy у удаленного вида', function() {
+                expect(this.view3DestroyFn).to.have.callCount(1);
             });
 
         });

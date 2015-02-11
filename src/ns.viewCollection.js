@@ -75,14 +75,6 @@ ns.ViewCollection._expandModelsDecl = function(decls) {
 };
 
 /**
- * Инициализирует экземпляр вида
- * @private
- */
-ns.ViewCollection.prototype._init = function() {
-    ns.View.prototype._init.apply(this, arguments);
-};
-
-/**
  * Вызывает обработчик события модели
  */
 ns.ViewCollection.prototype._invokeModelHandler = function(handler, model, e, o) {

@@ -1568,6 +1568,11 @@
             keyParams = ns.View._getKeyParams(id, params, info);
         }
 
+        // динамическая доработа параметров напильником
+        if ('function' === typeof info.paramsRewrite) {
+            keyParams = info.paramsRewrite(keyParams);
+        }
+
         ns.View.assert(!!keyParams, 10, [id]);
 
         return {
@@ -1832,6 +1837,7 @@
      * @property {Function|object|array} [params] - Декларация для вычисления параметров вида.
      * @property {object} [params+] - Объект с дополнительными параметрами для вида.
      * @property {array} [params-] - Массив с параметрами, которые надо убрать из ключа.
+     * @property {Function} [paramsRewrite] - Функция, изменяющая параметры после создания стандартными способами.
      */
 
 })();

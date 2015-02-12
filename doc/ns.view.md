@@ -332,6 +332,24 @@ ns.View.define('view', {
 })
 ```
 
+### paramsRewrite
+
+`paramsRewrite` - функция в декларации, изменяющая параметры после их создания стандартными способами.
+Она вызывается всегда и ее стоит использовать для динамического изменения параметров перед созданием вида.
+ 
+```
+ns.View.define('myView', {
+    "models": [ 'album', 'photo' ],
+    "paramsRewrite": function(params) {
+        if (someConditions) {
+            params.newParam = 1;
+        }
+
+        return params;
+    }
+});
+```
+
 ## Валидность
 
 Валидность view считается по двум факторам:

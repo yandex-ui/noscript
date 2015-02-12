@@ -1292,11 +1292,7 @@
      *   - если eventName === "scroll", то обработчик регистрируется по событию htmlinit с помощью $viewNode.find(selector).on(eventName, handler)
      *   - иначе обработчик регистрируется по событию htmlinit с помощью $viewNode.on(eventName, selector, handler)
      * @param {string} id Название View.
-     * @param {object} [info={}] Декларация View.
-     * @param {Function} [info.ctor] Конструтор.
-     * @param {object} [info.methods] Методы, переопределяющие стандартные методы View.
-     * @param {Object|Array} [info.models] Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
-     * @param {object} [info.events] DOM-события, на которые подписывается View.
+     * @param {ns.View~declaration} [info] Декларация вида.
      * @param {Function|String} [base=ns.View] Базовый View для наследования
      * @returns {Function} Созданный View.
      */
@@ -1343,7 +1339,7 @@
     /**
      * Возвращает сохраненную декларацию ns.View без обработки.
      * @param {string} id Название вида.
-     * @returns {object}
+     * @returns {ns.View~declaration}
      * @throws Бросает исключения, если вид не определен
      */
     ns.View.infoLite = function(id) {
@@ -1355,7 +1351,7 @@
     /**
      * Возвращает обработанную информацию о View.
      * @param {string} id Название вида.
-     * @returns {object}
+     * @returns {ns.View~declaration}
      * @throws Бросает исключения, если вид не определен
      */
     ns.View.info = function(id) {
@@ -1370,7 +1366,7 @@
 
     /**
      *
-     * @param {object} info
+     * @param {ns.View~declaration} info
      * @private
      */
     ns.View._initInfoParams = function(info) {
@@ -1446,7 +1442,7 @@
 
     /**
      *
-     * @param {object} info
+     * @param {ns.View~declaration} info
      * @private
      */
     ns.View._initInfoEvents = function(info) {
@@ -1585,7 +1581,7 @@
      *
      * @param {string} id
      * @param {object} params
-     * @param {object} info
+     * @param {ns.View~declaration} info
      * @returns {*}
      * @private
      */
@@ -1774,6 +1770,18 @@
      * @property {object.<string, *>} params - Собственные параметры вида.
      * @property {string} state - Текущее состояние вида. ok/error/loading/placeholder
      * @property {object.<string, ns.View~UpdateTree>} views - Объект с дочерними видами, используется для дальнейшего наложения шаблонов через `ns-view-content`.
+     */
+
+    /**
+     * Декларация вида
+     * @typedef {object} ns.View~declaration
+     * @property {Function} [ctor] - Конструтор.
+     * @property {object} [methods] - Методы, дополняющие прототип класса.
+     * @property {object|array} [models] - Массив или объект с моделями, от которых зависит View. Для объекта: true означает модель должна быть валидной для отрисовки view.
+     * @property {object} [events] - События, на которые подписывается View.
+     * @property {Function|object|array} [params] - Декларация для вычисления параметров вида.
+     * @property {object} [params+] - Объект с дополнительными параметрами для вида.
+     * @property {array} [params-] - Массив с параметрами, которые надо убрать из ключа.
      */
 
 })();

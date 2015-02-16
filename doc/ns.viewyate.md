@@ -103,8 +103,8 @@ match .my-view-collection ns-view-content {
 
 ## Yate-хелперы
 
-* `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath `/.models.model-name.model-name`
-* `modelError('model-name')` - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath `/.models.model-name.model-name`
+* `model('model-name')` - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath `/.models.modelName[ .status = 'ok'].modelName`
+* `modelError('model-name')` - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath `/.models.modelName[ .status = 'error'].modelName`
 * `ns-url` - external-функция для `ns.router.url`
 * `ns-generate-url` - external-функция для `ns.router.generateUrl`
 

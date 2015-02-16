@@ -232,13 +232,9 @@ ns.Model.define('my-model', {
 ```js
 ns.Model.define('my-model', {
     methods: {
-        _index: null,
         preprocessData: function(newData) {
-            var that = this;
-            // строим индекс для быстрого поиска
-            newData.forEach(function(item) {
-                that._index[item.id] = item;
-            });
+            // например, проверяем формат поля в данных
+            newData.field = Array.isArray(newData.field) ? newData.field : [];
             return newData;
         }
     }

@@ -703,6 +703,24 @@ describe('ns.View', function() {
 
         });
 
+        describe('При наличии в значениях параметров строк с управляющими символами', function() {
+
+            it('должен построить ключ с заэкранированными управляющими символами', function() {
+                ns.Model.define('model1', {
+                    params: function() {
+                        return {
+                            id: 'hello\n\r'
+                        }
+                    }
+                });
+                ns.View.define('view', {
+                    models: ['model1']
+                });
+                expect(ns.View.getKeyAndParams('view', {}).key).to.be.eql('view=view&id=hello\\n\\r');
+            });
+
+        });
+
     });
 
     describe('#destroy', function() {

@@ -703,24 +703,6 @@ describe('ns.View', function() {
 
         });
 
-        describe('При наличии в значениях параметров строк с управляющими символами', function() {
-
-            it('должен построить ключ с заэкранированными управляющими символами', function() {
-                ns.Model.define('model1', {
-                    params: function() {
-                        return {
-                            id: 'hello\n\r'
-                        }
-                    }
-                });
-                ns.View.define('view', {
-                    models: ['model1']
-                });
-                expect(ns.View.getKeyAndParams('view', {}).key).to.be.eql('view=view&id=hello%0A%0D');
-            });
-
-        });
-
     });
 
     describe('#destroy', function() {
@@ -1295,6 +1277,31 @@ describe('ns.View', function() {
 
         it('should have 1 node for view vSimple', function() {
             expect(this.APP.node.querySelectorAll('.ns-view-vSimple').length).to.be.equal(1);
+        });
+
+    });
+
+    describe('При наличии в значениях параметров строк с управляющими символами', function() {
+
+        it('должен построить ключ с заэкранированными управляющими символами', function() {
+            ns.View.define('view', {
+                params: { id: null }
+            });
+            var view = ns.View.create('view', {id: 'foo\n\r'});
+
+            expect(view.key).to.be.eql('view=view&id=foo%0A%0D');
+        });
+
+        it('значение атрибута data-key ноды вьюшки должен совпадать с ключом вьюшки', function(done) {
+            ns.View.define('view', {
+                params: { id: null }
+            });
+            var view = ns.View.create('view', {id: 'foo\n\r'});
+            
+            view.update().then(function() {
+                expect(view.node.getAttribute('data-key')).to.be.eql(view.key);
+                done();
+            });
         });
 
     });

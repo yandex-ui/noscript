@@ -147,42 +147,9 @@ ns.key = function(prefix, params) {
     var key = prefix;
     params = params || {};
     for (var pName in params) {
-        key += '&' + pName + '=' + ns.key._getStrWithEscapedSpecialChars(params[pName]);
+        key += '&' + pName + '=' + encodeURIComponent(params[pName]);
     }
     return key;
-};
-
-/**
- * Массив управляющих символов
- * @private
- * @type {array}
- */
-ns.key._unescapedChars = ['\0', '\b', '\t', '\r', '\n', '\v', '\f'];
-
-/**
- * Массив заэкранированных управляющих символов
- * @private
- * @type {array}
- */
-ns.key._escapedChars = ['\\0', '\\b', '\\t', '\\r', '\\n', '\\v', '\\f'];
-
-/**
- * Экранирует управляющие символы в строке
- * @private
- * @param  {string} str исходная строка
- * @return {string} строка с заэкранированными символами
- */
-ns.key._getStrWithEscapedSpecialChars =  function(str) {
-    var source = str.toString().split('');
-
-    for (var i = 0, l = source.length; i < l; i++) {
-        var k = ns.key._unescapedChars.indexOf(source[i]);
-
-        if (k >= 0) {
-            source[i] = ns.key._escapedChars[k];
-        }
-    }
-    return source.join('');
 };
 
 /**

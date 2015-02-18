@@ -716,7 +716,7 @@ describe('ns.View', function() {
                 ns.View.define('view', {
                     models: ['model1']
                 });
-                expect(ns.View.getKeyAndParams('view', {}).key).to.be.eql('view=view&id=hello\\n\\r');
+                expect(ns.View.getKeyAndParams('view', {}).key).to.be.eql('view=view&id=hello%0A%0D');
             });
 
         });

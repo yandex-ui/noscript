@@ -14,8 +14,7 @@ describe('ns.Updater', function() {
                 'vSync0': ['vSync1', 'vSync2'],
                 'vSync3': {},
                 'vSync4': {},
-                'vCollection': true,
-                'vSync5': {}
+                'vCollection': true
             }
         });
 
@@ -31,7 +30,6 @@ describe('ns.Updater', function() {
         });
 
         ns.Model.define('mSync1'); ns.Model.define('mSync2'); ns.Model.define('mSync3');
-        ns.Model.define('mSync4', { params: {id: 'foo\n\r'} });
         ns.Model.define('mAsync1'); ns.Model.define('mAsync2');
 
         ns.View.define('app');
@@ -42,7 +40,6 @@ describe('ns.Updater', function() {
         ns.View.define('vSync2', {models: ['mSync2']});
         ns.View.define('vSync3', {models: ['mSync3']});
         ns.View.define('vSync4');
-        ns.View.define('vSync5', {models: ['mSync4']});
 
         ns.View.define('vAsync1', {models: ['mAsync1']});
         ns.View.define('vAsync2', {models: ['mAsync2']});
@@ -61,8 +58,7 @@ describe('ns.Updater', function() {
                 {"data": {"sync1": true}},
                 {"data": {"sync2": true}},
                 {"data": {"sync3": true}},
-                {"data": {"items": [{id: 1}, {id: 2}, {id: 3}]}},
-                {"data": {}},
+                {"data": {"items": [{id: 1}, {id: 2}, {id: 3}]}}
             ]
         };
 
@@ -185,7 +181,6 @@ describe('ns.Updater', function() {
                 expect(ns.Model.get('mSync1').isValid()).to.be.ok;
                 expect(ns.Model.get('mSync2').isValid()).to.be.ok;
                 expect(ns.Model.get('mSync3').isValid()).to.be.ok;
-                expect(ns.Model.get('mSync4').isValid()).to.be.ok;
             });
 
             it('should create correctly nested nodes of views', function() {
@@ -194,7 +189,6 @@ describe('ns.Updater', function() {
                 expect(this.view.$node.find('.ns-view-vSync0 .ns-view-vSync2').length).to.equal(1);
                 expect(this.view.$node.find('.ns-view-vSync3').length).to.equal(1);
                 expect(this.view.$node.find('.ns-view-vSync4').length).to.equal(1);
-                expect(this.view.$node.find('.ns-view-vSync5').length).to.equal(1);
             });
 
             it('should call perf once', function() {

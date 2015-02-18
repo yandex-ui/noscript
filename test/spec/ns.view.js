@@ -1280,4 +1280,29 @@ describe('ns.View', function() {
         });
 
     });
+
+    describe('При наличии в значениях параметров строк с управляющими символами', function() {
+
+        it('должен построить ключ с заэкранированными управляющими символами', function() {
+            ns.View.define('view', {
+                params: { id: null }
+            });
+            var view = ns.View.create('view', {id: 'foo\n\r'});
+
+            expect(view.key).to.be.eql('view=view&id=foo%0A%0D');
+        });
+
+        it('значение атрибута data-key ноды вьюшки должен совпадать с ключом вьюшки', function(done) {
+            ns.View.define('view', {
+                params: { id: null }
+            });
+            var view = ns.View.create('view', {id: 'foo\n\r'});
+            
+            view.update().then(function() {
+                expect(view.node.getAttribute('data-key')).to.be.eql(view.key);
+                done();
+            });
+        });
+
+    });
 });

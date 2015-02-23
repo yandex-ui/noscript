@@ -147,7 +147,7 @@ ns.key = function(prefix, params) {
     var key = prefix;
     params = params || {};
     for (var pName in params) {
-        key += '&' + pName + '=' + params[pName];
+        key += '&' + pName + '=' + encodeURIComponent(params[pName]);
     }
     return key;
 };

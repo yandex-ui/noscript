@@ -1280,4 +1280,64 @@ describe('ns.View', function() {
         });
 
     });
+
+    describe('При наличии в значениях параметров строк с управляющими символами', function() {
+
+        it('должен построить ключ с заэкранированными управляющими символами', function() {
+            ns.View.define('view', {
+                params: { id: null }
+            });
+            var view = ns.View.create('view', {id: 'foo\n\r'});
+
+            expect(view.key).to.be.eql('view=view&id=foo%0A%0D');
+        });
+
+        it('значение атрибута data-key ноды вьюшки должен совпадать с ключом вьюшки', function() {
+            ns.layout.define('test', {
+                'view1': 'vc'
+            });
+
+            ns.Model.define('mc', {
+                split: {
+                    items: '.items',
+                    params: {
+                        'id': '.id'
+                    },
+                    model_id: 'mc-item'
+                }
+            });
+            ns.Model.define('mc-item', {
+                params: {
+                    id: null
+                }
+            });
+
+            ns.Model.get('mc').setData({
+                items: [
+                    {id: '1'},
+                    {id: 'foo\n\r'}
+                ]
+            });
+
+            ns.View.define('view1');
+            ns.ViewCollection.define('vc', {
+                models: ['mc'],
+                split: {
+                    byModel: 'mc',
+                    intoViews: 'vc-item'
+                }
+            });
+            ns.View.define('vc-item', {
+                models: ['mc-item']
+            });
+
+            var view = ns.View.create('view1');
+            var page = ns.layout.page('test');
+            
+            return new ns.Update(view, page, {id: 'foo\n\r'}).render().then(function() {
+                expect(view.node.querySelectorAll('div[data-key="view=vc-item&id=foo%0A%0D"]')).to.have.length(1);
+            });
+        });
+
+    });
 });

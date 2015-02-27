@@ -48,32 +48,38 @@ match .* ns-view {
 // Содержимое view определяется модой ns-view-content
 // @private
 match .* ns-build-view {
-    <div class="ns-view-{ name() }" data-key="{ /.key }">
-        state = scalar(/.state)
+    <div>
+        apply . ns-build-view-content
+    </div>
+}
 
-        if state == 'placeholder' {
-            @class += ' ns-view-placeholder'
-            if (/.collection) {
-                apply . ns-view-collection
-            } else {
-                apply . ns-view-desc
-            }
+match .* ns-build-view-content {
+    @class="ns-view-{ name() }"
+    @data-key="{ /.key }"
+    state = scalar(/.state)
+
+    if state == 'placeholder' {
+        @class += ' ns-view-placeholder'
+        if (/.collection) {
+            apply . ns-view-collection
+        } else {
+            apply . ns-view-desc
+        }
+
+    } else {
+        @class += apply . ns-view-add-class
+        apply . ns-view-add-attrs
+
+        if state == 'loading' {
+            apply . ns-view-async-content
+
+        } else if state == 'error' {
+            apply . ns-view-error-content
 
         } else {
-            @class += apply . ns-view-add-class
-            apply . ns-view-add-attrs
-
-            if state == 'loading' {
-                apply . ns-view-async-content
-
-            } else if state == 'error' {
-                apply . ns-view-error-content
-
-            } else {
-                apply . ns-view-content
-            }
+            apply . ns-view-content
         }
-    </div>
+    }
 }
 
 // Возможность добавить к блоку view какой-либо класс

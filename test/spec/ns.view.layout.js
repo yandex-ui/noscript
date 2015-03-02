@@ -154,7 +154,11 @@ describe('ns.View dynamic layouts ->', function() {
             });
 
             ns.View.define('vc2-item1', { models: ['mc2-item'] });
-            ns.View.define('vc2-item1-subview');
+            ns.View.define('vc2-item1-subview', {
+                events: {
+                    'do-invalidate': 'invalidate'
+                }
+            });
 
             ns.View.define('vc2-item2', { models: ['mc2-item'] });
             ns.View.define('vc2-item2-subview');
@@ -189,6 +193,41 @@ describe('ns.View dynamic layouts ->', function() {
 
             it('Должен создать два ".vc2-item2 > .vc2-item2-subview"', function() {
                 expect(this.view.node.querySelectorAll('.ns-view-vc2-item2 > .ns-view-vc2-item2-subview')).to.have.length(2);
+            });
+
+        });
+
+        describe('Перерисовки внутри детей ->', function() {
+
+            function getSubView(node) {
+                return node.querySelector('.ns-view-vc2-item1 .ns-view-vc2-item1-subview');
+            }
+
+            /*
+             Следующий случай:
+             VC
+                VC-item1
+                    VC-item1-subview (invalid)
+                    VC-item1-subview2 (valid)
+                VC-item2
+                    VC-item1-subview (valid)
+             */
+
+            beforeEach(function() {
+                this.subview = getSubView(this.view.node);
+
+                // инвалидирует дочерний вид элемента коллекции
+                ns.events.trigger('do-invalidate');
+                // запускаем апдейт, он должен перерисоваться
+                return new ns.Update(this.view, ns.layout.page('app'), {}).render();
+            });
+
+            it('должен отрисовать вид "vc2-item1-subview"', function() {
+                expect(getSubView(this.view.node)).to.be.an.instanceof(Node);
+            });
+
+            it('должен перерисовать вид "vc2-item1-subview"', function() {
+                expect(getSubView(this.view.node)).to.not.equal(this.subview);
             });
 
         });

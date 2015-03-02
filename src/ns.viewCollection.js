@@ -361,6 +361,10 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
                 decl = view._getPlaceholderTree();
             } else if (!view.isValid()) {
                 decl = view._getViewTree();
+            } else if (!view.isValidWithDesc()) {
+                decl = view._getDescViewTree();
+                result['ns-view-collection-container'].push(decl);
+                return;
             }
         } else {
             // Если же мы решили перерендеривать корневую ноду, то придётся рендерить все

@@ -631,6 +631,25 @@
     ns.View.prototype.isValidSelf = ns.View.prototype.isValid;
 
     /**
+     *
+     * @returns {boolean}
+     */
+    ns.View.prototype.isValidWithDesc = function() {
+        //FIXME: надо привести в порядок всю логику вокруг
+        // isValid, isValidSelf, isValidWithDesc
+        if (!this.isValid()) {
+            return false;
+        }
+
+        for (var key in this.views) {
+            if (!this.views[key].isValidWithDesc()) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
      * Returns true if models are valid and not be updated after last view update.
      * @returns {boolean}
      */

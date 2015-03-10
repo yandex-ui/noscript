@@ -30,6 +30,22 @@ describe('рендеринг ns.View через yate', function() {
         expect(this.view.node.innerHTML).to.contain('<div>test-view-matcher key view=view-test-matcher</div>');
     });
 
+    it('должен переопределить корневой тэг для вьюхи span-tag-view', function() {
+        ns.View.define('span-tag-view');
+        ns.layout.define('span-test', {
+            'span-tag-view': {}
+        });
+
+        var vSpanTagView = ns.View.create('span-tag-view');
+        var layout = ns.layout.page('span-test', {});
+
+        return new ns.Update(vSpanTagView, layout, {})
+            .render()
+            .then(function() {
+                expect(vSpanTagView.node.tagName).to.be.equal('SPAN');
+            });
+    });
+
 });
 
 describe('рендеринг ns.ViewCollection через yate', function() {

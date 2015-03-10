@@ -30,6 +30,15 @@ match .my-view2 ns-view-add-class {
 }
 ```
 
+* `ns-build-view` - с помощью этой моды можно поменять корневой узел у вьюхи. Например,
+```
+match .my-span-view ns-build-view {
+    <span>
+        apply . ns-build-view-content
+    </span>
+}
+```
+
 ## Содержимое View
 
 ### ns-view-content и ns-view-desc

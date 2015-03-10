@@ -370,7 +370,7 @@
     ns.View.prototype._prepareCallback = function(fn) {
         if (typeof fn === 'string') {
             var method = this[fn];
-            ns.assert(method, 'ns.View', "Can't find method '%s' in '%s'", fn, this.id);
+            ns.View.assert(!!method, 5, [fn, this.id]);
             return method;
         }
 
@@ -1061,7 +1061,7 @@
         if ( viewWasInvalid ) {
             //  Ищем новую ноду блока.
             viewNode = this._extractNode(node);
-            ns.assert(viewNode, 'ns.View', "Can't find node for '%s'", this.id);
+            ns.View.assert(!!viewNode, 6, [this.id]);
 
             //  Обновляем весь блок.
             //  toplevel-блок -- это невалидный блок, выше которого все блоки валидны.
@@ -1296,7 +1296,7 @@
      * @returns {Function} Созданный View.
      */
     ns.View.define = function(id, info, base) {
-        ns.assert(!(id in _infos), 'ns.View', "Can't redefine '%s'", id);
+        ns.View.assert(!(id in _infos), 1, [id]);
 
         info = info || {};
 
@@ -1304,7 +1304,7 @@
         if (typeof base === 'string') {
             // если указана строка, то берем декларацию ns.View
             baseClass = _ctors[base];
-            ns.assert(baseClass, 'ns.View', "Can't find '%s' to extend '%s'", base, id);
+            ns.View.assert(!!baseClass, 2, [base, id]);
 
         } else if (typeof base === 'function') {
             baseClass = base;
@@ -1343,7 +1343,7 @@
      */
     ns.View.infoLite = function(id) {
         var info = _infos[id];
-        ns.assert(info, 'ns.View', "'%s' is not defined", id);
+        ns.View.assert(!!info, 3, [id]);
         return info;
     };
 
@@ -1370,8 +1370,8 @@
      */
     ns.View._initInfoParams = function(info) {
         if (info.params) {
-            ns.assert(!info['params+'], 'ns.View', 'you cannot specify params and params+ at the same time');
-            ns.assert(!info['params-'], 'ns.View', 'you cannot specify params and params- at the same time');
+            ns.View.assert(!info['params+'], 7);
+            ns.View.assert(!info['params-'], 8);
 
             var groups;
             var pGroups = [];
@@ -1399,7 +1399,7 @@
             var params = {};
             for (var model_id in info.models) {
                 var modelInfo = ns.Model.info(model_id);
-                ns.assert(modelInfo, ns.View, 'Model %s is not defined!', model_id);
+                ns.View.assert(!!modelInfo, 9, [model_id]);
 
                 if (typeof modelInfo.params === 'object') {
                     no.extend( params, modelInfo.params );
@@ -1568,7 +1568,7 @@
             keyParams = ns.View._getKeyParams(id, params, info);
         }
 
-        ns.assert(keyParams, 'ns.View', 'Could not generate key for view %s', id);
+        ns.View.assert(!!keyParams, 10, [id]);
 
         return {
             params: keyParams,
@@ -1657,7 +1657,7 @@
      */
     ns.View.create = function(id, params, async) {
         var Ctor = _ctors[id];
-        ns.assert(Ctor, 'ns.View', "'%s' is not defined", id);
+        ns.View.assert(!!Ctor, 3, [id]);
 
         /**
          * @type {ns.View}
@@ -1671,13 +1671,15 @@
     /**
      * Ассертер.
      * @param {boolean} truthy Любое значение, которое проверяется на истинность.
-     * @param {number} errorCode Код бросаемого исключения.
+     * @param {ns.View.ERROR_CODES} errorCode Код бросаемого исключения.
      * @param {array} [args] Массив аргументов.
      */
     ns.View.assert = function(truthy, errorCode, args) {
         if (truthy) {
             return;
         }
+
+        args = Array.isArray(args) ? args : [];
 
         var logArgs = [
             'ns.View',
@@ -1692,10 +1694,29 @@
      * @enum {number}
      */
     ns.View.ERROR_CODES = {
+        1: "Can't redefine '%s'",
+        2: "Can't find '%s' to extend '%s'",
+        3: "'%s' is not defined",
+
         /**
          * Не найден обработчик события модели.
          */
-        4: "'%s' can't find handler '%s' for model '%s'"
+        4: "'%s' can't find handler '%s' for model '%s'",
+
+        /**
+         * Не найден обработчик события.
+         */
+        5: "Can't find method '%s' in '%s'",
+
+        /**
+         * Не найдена нода вида.
+         */
+        6: "Can't find node for '%s'",
+
+        7: 'you cannot specify params and params+ at the same time',
+        8: 'you cannot specify params and params- at the same time',
+        9: 'Model %s is not defined!',
+        10: 'Could not generate key for view %s'
     };
 
     /**

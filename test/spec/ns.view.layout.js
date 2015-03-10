@@ -85,7 +85,7 @@ describe('ns.View dynamic layouts ->', function() {
 
     });
 
-    describe.only('Ограничения ->', function() {
+    describe('Ограничения ->', function() {
 
         beforeEach(function() {
             ns.layout.define('app', {
@@ -97,6 +97,8 @@ describe('ns.View dynamic layouts ->', function() {
             });
 
             this.sinon.spy(ns.View, 'assert');
+
+            ns.test.disableExceptionLogger(this.sinon);
         });
 
         it('должен бросить исключение, если верхушка дерева не box', function() {

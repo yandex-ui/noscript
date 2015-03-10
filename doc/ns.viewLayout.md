@@ -37,9 +37,11 @@ ns.View.define('view', {
 ```
 
 Описание и ограничение API `#patchLayout`:
- * должен вернуть предопредленный `layoutID`, а не вид. Если не хочется создавать layout, то можно воспользоваться хелпером `ns.layout.generateSimple('myView')`.
+ * должен вернуть предопредленный `layoutID`, а не вид.
  * должен всегда возвращать `layoutID`, причем он должен начинаться с `box`. Это связано с проблемами из [#533](https://github.com/yandex-ui/noscript/issues/533).
 
 ## split.intoLayouts для ns.ViewCollection
 
 API схоже с `ns.View#patchLyaout` и находится в стадии проработки.
+
+По сути `intoLayouts` позволяет иметь неограниченно сложные элементы коллекции.

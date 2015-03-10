@@ -305,7 +305,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
 };
 
 /**
- * Уничтожает виды не вошедшие в пропатченный layout
+ * Собирает виды старые виды для уничтожения.
  * @param {object} activeItems
  * @private
  */
@@ -320,6 +320,29 @@ ns.ViewCollection.prototype.__collectInactiveViews = function(activeItems) {
         }
     });
 
+};
+
+/**
+ * Уничтожает старые виды.
+ * @private
+ */
+ns.View.prototype.__destroyInactiveViews = function() {
+    var views = this.__itemsToRemove;
+    for (var i = 0, j = views.length; i < j; i++) {
+        views[i].destroy();
+    }
+
+    /*
+     Почему важно очищать массив тут?
+
+     Массив должен постоянно накапливать виды "на удаление",
+     но удалять их не сразу, а вместе с общим обновлением DOM (#_updateHTML).
+     Т.о. манипуляции с DOM будут происходит за один тик, а не будут размазаны по времени.
+
+     Еще процесс обновления может прерваться, но вид должен остаться в массиве,
+     чтобы его потом не забыть уничтожить.
+     */
+    this.__itemsToRemove = [];
 };
 
 /**

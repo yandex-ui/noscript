@@ -775,9 +775,6 @@
         this.__checkPatchLayout(newViewLayout);
         // заменяем внутренности на обновленный layout
         no.extend(pageLayout, newViewLayout);
-
-        // уничтожаем неактуальные виды
-        this.__collectInactiveViews(pageLayout);
     };
 
     /**
@@ -789,23 +786,6 @@
         for (var viewId in newLayout) {
             ns.View.assert(newLayout[viewId].type === ns.L.BOX, 12);
         }
-    };
-
-    /**
-     * Уничтожает виды не вошедшие в пропатченный layout
-     * @param {object} pageLayout
-     * @private
-     */
-    ns.View.prototype.__collectInactiveViews = function(pageLayout) {
-        var that = this;
-        this._apply(function(view) {
-            var viewId = view.id;
-            // Если вида нет в раскладке, то его надо грохнуть
-            if (!(viewId in pageLayout)) {
-                delete that.views[viewId];
-                that.__itemsToRemove.push(view);
-            }
-        });
     };
 
     /**
@@ -1258,37 +1238,12 @@
         //  никаких подблоков. В этом случае, нужно брать viewNode.
         viewNode = viewNode || node;
 
-        this.__destroyInactiveViews();
-
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view, id) {
                 view._updateHTML(viewNode, layout[id].views, params, options_next, events);
             });
         }
-    };
-
-    /**
-     * Уничтожает виды, не попавшие в раскладку.
-     * @private
-     */
-    ns.View.prototype.__destroyInactiveViews = function() {
-        var views = this.__itemsToRemove;
-        for (var i = 0, j = views.length; i < j; i++) {
-            views[i].destroy();
-        }
-
-        /*
-         Почему важно очищать массив тут?
-
-         Массив должен постоянно накапливать виды "на удаление",
-         но удалять их не сразу, а вместе с общим обновлением DOM (#_updateHTML).
-         Т.о. манипуляции с DOM будут происходит за один тик, а не будут размазаны по времени.
-
-         Еще процесс обновления может прерваться, но вид должен остаться в массиве,
-         чтобы его потом не забыть уничтожить.
-        */
-        this.__itemsToRemove = [];
     };
 
     /**

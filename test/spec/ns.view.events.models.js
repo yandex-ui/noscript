@@ -42,6 +42,34 @@ describe('ns.View. Подписка на события моделей.', functi
         };
     });
 
+    describe('Декларация ->', function() {
+
+        it('должен бросить исключение, если не найден обработчик событий модели', function() {
+            ns.log.exception.restore();
+            // блокируем вывод ошибок, он нам не нужен
+            this.sinon.stub(ns.log, 'exception');
+            this.sinon.spy(ns.View, 'assert');
+
+            ns.Model.define('superModel');
+            ns.Model.get('superModel').setData({});
+
+            ns.View.define('myView', {
+                models: {
+                    superModel: 'iDoNotExistButNobodyCares'
+                }
+            });
+
+            var view = ns.View.create('myView');
+            return view.update().then(function() {
+                return Vow.reject('resolved');
+            }, function() {
+                expect(ns.View.assert).to.be.calledWith(false, 4);
+                return Vow.resolve();
+            });
+        });
+
+    });
+
     describe('Игнорирование событий модели ("keepValid" | false).', function() {
 
         beforeEach(function(done) {

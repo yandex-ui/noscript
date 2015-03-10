@@ -293,19 +293,18 @@
         for (var eventName in decl) {
             var handlerName = decl[eventName];
             var handler = this[handlerName] || decl[eventName];
-            if ('function' === typeof handler) {
+            ns.View.assert('function' === typeof handler, 4, [this.id, handlerName, model.id]);
 
-                // сам keepValid биндить не надо,
-                // потому что _invokeModelHandler и так синхронизирует версию
-                if (handler === this.keepValid) {
-                    // заменяем его на пустую функцию
-                    handler = no.nop;
-                }
-
-                this.__bindModelEvent(model, eventName,
-                    this._invokeModelHandler.bind(this, handler, model)
-                );
+            // сам keepValid биндить не надо,
+            // потому что _invokeModelHandler и так синхронизирует версию
+            if (handler === this.keepValid) {
+                // заменяем его на пустую функцию
+                handler = no.nop;
             }
+
+            this.__bindModelEvent(model, eventName,
+                this._invokeModelHandler.bind(this, handler, model)
+            );
         }
     };
 
@@ -1667,6 +1666,36 @@
         view._init(id, params, async);
 
         return view;
+    };
+
+    /**
+     * Ассертер.
+     * @param {boolean} truthy Любое значение, которое проверяется на истинность.
+     * @param {number} errorCode Код бросаемого исключения.
+     * @param {array} [args] Массив аргументов.
+     */
+    ns.View.assert = function(truthy, errorCode, args) {
+        if (truthy) {
+            return;
+        }
+
+        var logArgs = [
+            'ns.View',
+            ns.View.ERROR_CODES[errorCode]
+        ].concat(args);
+
+        ns.assert.fail.apply(ns, logArgs);
+    };
+
+    /**
+     * Объект с описанием бросаемых исключений.
+     * @enum {number}
+     */
+    ns.View.ERROR_CODES = {
+        /**
+         * Не найден обработчик события модели.
+         */
+        4: "'%s' can't find handler '%s' for model '%s'"
     };
 
     /**

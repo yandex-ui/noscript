@@ -78,6 +78,12 @@ describe('ns.View dynamic layouts ->', function() {
                     }, null, this)
                     .then(function() {
                         expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3.ns-view-hidden')).to.have.length(1);
+
+                        this.view2GetLayoutFn.returns('view-layout');
+                        return this.view.update();
+                    }, null, this)
+                    .then(function() {
+                        expect(this.view.node.querySelectorAll('.ns-view-view2 .ns-view-view3.ns-view-visible')).to.have.length(1);
                     }, null, this);
             });
 

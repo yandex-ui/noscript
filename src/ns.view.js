@@ -765,19 +765,30 @@
         }
 
         var patchLayoutId = this.patchLayout(updateParams);
-        // нового layout может и не быть
-        if (patchLayoutId) {
-            // компилим новый layout
-            // FIXME: а какие параметры передавать???
-            // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
-            // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
-            var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
-            // заменяем внутренности на обновленный layout
-            no.extend(pageLayout, newViewLayout);
-        }
+        ns.View.assert(!!patchLayoutId, 11);
+
+        // компилим новый layout
+        // FIXME: а какие параметры передавать???
+        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
+        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+        this.__checkPatchLayout(newViewLayout);
+        // заменяем внутренности на обновленный layout
+        no.extend(pageLayout, newViewLayout);
 
         // уничтожаем неактуальные виды
         this.__collectInactiveViews(pageLayout);
+    };
+
+    /**
+     * Проверяет результат #patchLayout.
+     * @param {object} newLayout
+     * @private
+     */
+    ns.View.prototype.__checkPatchLayout = function(newLayout) {
+        for (var viewId in newLayout) {
+            ns.View.assert(newLayout[viewId].type === ns.L.BOX, 12);
+        }
     };
 
     /**
@@ -1877,7 +1888,9 @@
         7: 'you cannot specify params and params+ at the same time',
         8: 'you cannot specify params and params- at the same time',
         9: 'Model %s is not defined!',
-        10: 'Could not generate key for view %s'
+        10: 'Could not generate key for view %s',
+        11: '#patchLayout MUST returns valid layout ID',
+        12: '#patchLayout MUST returns layout with ns.Box at top'
     };
 
     /**

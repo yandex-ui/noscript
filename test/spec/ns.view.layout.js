@@ -1,4 +1,4 @@
-describe.only('ns.View dynamic layouts ->', function() {
+describe('ns.View dynamic layouts ->', function() {
 
     describe('Простой случай ->', function() {
 
@@ -81,6 +81,60 @@ describe.only('ns.View dynamic layouts ->', function() {
                     }, null, this);
             });
 
+        });
+
+    });
+
+    describe.only('Ограничения ->', function() {
+
+        beforeEach(function() {
+            ns.layout.define('app', {
+                'view1': {}
+            });
+
+            ns.layout.define('view-layout', {
+                'view3': {}
+            });
+
+            this.sinon.spy(ns.View, 'assert');
+        });
+
+        it('должен бросить исключение, если верхушка дерева не box', function() {
+            ns.View.define('view1', {
+                methods: {
+                    patchLayout: function() {
+                        return 'view-layout';
+                    }
+                }
+            });
+
+            var view = ns.View.create('view1');
+            return new ns.Update(view, ns.layout.page('app'), {}).render()
+                .then(function() {
+                    return Vow.reject('resolved');
+                }, function() {
+                    expect(ns.View.assert).to.be.calledWith(false, 12);
+                    return Vow.resolve();
+                });
+        });
+
+        it('должен бросить исключение, если #patchLayout ничего не вернул', function() {
+            ns.View.define('view1', {
+                methods: {
+                    patchLayout: function() {
+                        return null;
+                    }
+                }
+            });
+
+            var view = ns.View.create('view1');
+            return new ns.Update(view, ns.layout.page('app'), {}).render()
+                .then(function() {
+                    return Vow.reject('resolved');
+                }, function() {
+                    expect(ns.View.assert).to.be.calledWith(false, 11);
+                    return Vow.resolve();
+                });
         });
 
     });

@@ -601,6 +601,57 @@ describe('ns.request.js', function() {
         });
     });
 
+    describe('requests errors ->', function() {
+
+        describe('вернули неправильное количество моделей', function() {
+
+            beforeEach(function() {
+                this.sinon.server.autoRespond = true;
+                this.sinon.server.respond(function(xhr) {
+                    xhr.respond(
+                        200,
+                        {"Content-Type": "application/json"},
+                        JSON.stringify({
+                            // возвращаем одну модель, хотя запрошено 2
+                            models: [
+                                {
+                                    data: {
+                                        'type': 'new'
+                                    }
+                                }
+                            ]
+                        })
+                    );
+                });
+
+                // убираем перезапрос
+                this.sinon.stub(ns.Model.prototype, 'RETRY_LIMIT', 1);
+
+                ns.Model.define('m1');
+                ns.Model.define('m2');
+            });
+
+            it('должен отреджектить промис', function() {
+                return ns.request(['m1', 'm2']).then(function() {
+                    return Vow.reject('ns.request MUST reject promise');
+                }, function() {
+                    return Vow.resolve();
+                });
+            });
+
+            it('должен вернуть ошибку NO_DATA', function() {
+                return ns.request(['m1', 'm2']).then(function() {
+                    return Vow.reject('ns.request MUST reject promise');
+                }, function(result) {
+                    expect(result.invalid[0].getError()).to.have.property('id', 'NO_DATA');
+                    return Vow.resolve();
+                });
+            });
+
+        });
+
+    });
+
     describe('do not reset model status to ok if it was in error status', function() {
 
         beforeEach(function() {
@@ -656,7 +707,7 @@ describe('ns.request.js', function() {
          Запрос0: m1 (invalid), m2 (invalid)
          Запрос1: m1 (invalid), m3 (invalid)
 
-         Запрос0 запрашивает только модель m3 и завершается быстрее Запрос1.
+         Запрос1 запрашивает только модель m3 и завершается быстрее Запрос0.
          После завершения запроса Запрос0 инвалидируем m3
 
          Правильное поведение:
@@ -675,6 +726,17 @@ describe('ns.request.js', function() {
                 })
             ];
 
+            this.respond2 = [
+                200,
+                {"Content-Type": "application/json"},
+                JSON.stringify({
+                    models: [
+                        { data: { 'r1': true } },
+                        { data: { 'r2': true } }
+                    ]
+                })
+            ];
+
             ns.Model.define('m1');
             ns.Model.define('m2');
             ns.Model.define('m3');
@@ -685,7 +747,6 @@ describe('ns.request.js', function() {
             this.request0 = ns.request(['m1', 'm2']);
             // Запрос1
             this.request1 = ns.request(['m1', 'm3']);
-
 
             // завершаем Запрос1
             var xhr1 = this.sinon.server.requests[1];
@@ -699,8 +760,8 @@ describe('ns.request.js', function() {
 
                     // завершаем Запрос0
                     var xhr0 = this.sinon.server.requests[0];
-                    xhr0.respond.apply(xhr0, this.respond);
-                }, null, this)
+                    xhr0.respond.apply(xhr0, this.respond2);
+                }, null, this);
         });
 
         describe('Запросы завершаются удачно -> ', function() {

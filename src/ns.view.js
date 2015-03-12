@@ -131,18 +131,13 @@
         this.views = {};
 
         /**
-         * Массив видов, которые надо уничтожить на стадии _updateHTML
-         * @type {Array}
-         * @private
-         */
-        this.__itemsToRemove = [];
-
-        /**
          * Статус View.
          * @type {ns.V.STATUS}
          * @private
          */
         this.status = this.STATUS.NONE;
+
+        this.__customInit();
 
         // события, которые надо забиндить сразу при создании блока
         this._bindCreateEvents();
@@ -159,6 +154,12 @@
             this.__uniqueId =  'ns-view-id-' + (++uniqueViewId);
         }
     };
+
+    /**
+     * Специальная функция - точка расширения, в которой можно дополнить стандартный #_init.
+     * @private
+     */
+    ns.View.prototype.__customInit = no.nop;
 
     /**
      *

@@ -92,6 +92,39 @@
         ns.request.manager._keys = {};
     };
 
+    /**
+     * Обрабатывает ответ модели от сервера.
+     * @param {ns.Model} model
+     * @param {*} result
+     */
+    ns.request.extractModel = function(model, result) {
+        var data;
+        var error;
+        if (!result) {
+            error = {
+                id: 'NO_DATA',
+                reason: 'Server returned no data'
+            };
+        } else {
+            data = model.extractData(result);
+            if (!data) {
+                error = model.extractError(result);
+                if (!error) {
+                    error = {
+                        id: 'INVALID_FORMAT',
+                        reason: 'response should contain result or error'
+                    };
+                }
+            }
+        }
+
+        if (data) {
+            model.setData(data);
+        } else {
+            model.setError(error);
+        }
+    };
+
     var REQUEST_ID = 0;
 
     var Request = function(models, options) {
@@ -289,31 +322,7 @@
                 continue;
             }
 
-            var data;
-            var error;
-            if (!result) {
-                error = {
-                    id: 'NO_DATA',
-                    reason: 'Server returned no data'
-                };
-            } else {
-                data = model.extractData(result);
-                if (!data) {
-                    error = model.extractError(result);
-                    if (!error) {
-                        error = {
-                            id: 'INVALID_FORMAT',
-                            reason: 'response should contain result or error'
-                        };
-                    }
-                }
-            }
-
-            if (data) {
-                model.setData(data);
-            } else {
-                model.setError(error);
-            }
+            ns.request.extractModel(model, result);
 
             // сообщаем менеджеру о завершении запроса этой модели
             // это не означает, что завершится весь ns.request

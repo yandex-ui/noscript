@@ -60,6 +60,31 @@ ns.ViewCollection.define = function(id, info, baseClass) {
     return ctor;
 };
 
+ns.ViewCollection.prototype.__customInit = function() {
+    /**
+     * Массив видов, которые надо уничтожить на стадии _updateHTML.
+     * @type {array}
+     * @private
+     */
+    this.__itemsToRemove = [];
+
+    // эти два хеша нужны, чтобы по modelItem быстро найти его viewItem
+
+    /**
+     * Хеш modelItem.key: viewItem
+     * @type {object}
+     * @private
+     */
+    this.__model2View = {};
+
+    /**
+     * Хеш viewItem.key: modelItem.key
+     * @type {object}
+     * @private
+     */
+    this.__view2ModelKey = {};
+};
+
 /**
  * События моделей, обрабатываемые видом по умолчанию
  */
@@ -193,10 +218,11 @@ ns.ViewCollection.prototype._getViewByKey = function(key) {
  *
  * @param {string} id
  * @param {object} params
+ * @param {ns.Model} modelItem Элемент коллекции, для которой был создан вид.
  * @returns {ns.View}
  * @private
  */
-ns.ViewCollection.prototype._addView = function(id, params) {
+ns.ViewCollection.prototype._addView = function(id, params, modelItem) {
     var view = this._getView(id, params);
     if (!view) {
         view = ns.View.create(id, params);
@@ -205,7 +231,12 @@ ns.ViewCollection.prototype._addView = function(id, params) {
         view._showNode = no.nop;
         view._hideNode = no.nop;
 
-        this.views[view.key] = view;
+        var viewKey = view.key;
+        var modelKey = modelItem.key;
+
+        this.views[viewKey] = view;
+        this.__model2View[modelKey] = view;
+        this.__view2ModelKey[viewKey] = modelKey;
     }
 
     return view;
@@ -217,7 +248,12 @@ ns.ViewCollection.prototype._addView = function(id, params) {
  * @private
  */
 ns.ViewCollection.prototype._deleteView = function(view) {
-    delete this.views[view.key];
+    var viewKey = view.key;
+    var correspondingModelKey = this.__view2ModelKey[viewKey];
+
+    delete this.views[viewKey];
+    delete this.__model2View[correspondingModelKey];
+    delete this.__view2ModelKey[viewKey];
 };
 
 /**
@@ -274,7 +310,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
                 // FIXME: нужен контроль потери детей. Удаление и чистка.
                 // Создаем подблоки
                 for (var view_id in newViewLayout) {
-                    var newView = this._addView(view_id, viewItemParams);
+                    var newView = this._addView(view_id, viewItemParams, modelItem);
                     newView._getRequestViews(updated, newViewLayout[view_id].views, viewItemParams);
 
                     activeItems[newView.key] = null;
@@ -375,7 +411,7 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
     var result = {};
     result['ns-view-collection-container'] = [];
 
-    this._apply(function(view) {
+    this._forEachCollectionItem(function(view) {
         var decl = null;
         if (that.isValidSelf()) {
             // Если корневая нода не меняется, то перерендериваем
@@ -575,7 +611,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         var prev;
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        this._apply(function(view) {
+        this._forEachCollectionItem(function(view) {
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {
                 // 1. html внешнего вида не менялся. Это значит, что вместо корневого html
@@ -629,7 +665,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             itemsExist[view.key] = view;
 
             prev = view;
-        }, params);
+        });
     }
 
     this.__destroyInactiveViews();

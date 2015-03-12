@@ -440,10 +440,11 @@ describe('ns.ViewCollection', function() {
             });
         }
 
-        function shouldSaveNVCollectionItemNode(n) {
-            it('should save view-collection-item[' + n + '] node', function() {
-                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[n];
-                expect(newVCollectionItemNode).to.be.equal(this.vCollectionItemNodeList[n])
+        function shouldSaveNVCollectionItemNode(newPosition, oldPosition) {
+            it('should save view-collection-item[' + oldPosition + '] node', function() {
+                oldPosition = typeof oldPosition === 'number' ? oldPosition : newPosition;
+                var newVCollectionItemNode = this.APP.node.getElementsByClassName('ns-view-v-collection-item')[newPosition];
+                expect(newVCollectionItemNode).to.be.equal(this.vCollectionItemNodeList[oldPosition]);
             });
         }
 
@@ -586,23 +587,49 @@ describe('ns.ViewCollection', function() {
 
         });
 
-        describe('refresh layout after insert new model-item', function() {
+        describe('refresh layout after insert new model-item ->', function() {
 
-            beforeEach(function() {
-                // insert another model-item in collection
-                ns.Model.get('m-collection').insert([
-                    ns.Model.get('m-collection-item', {p: 3}).setData({data: 3})
-                ]);
+            describe('вставка в конец списка ->', function() {
 
-                // start update to redraw views
-                var layout = ns.layout.page('app', {});
-                return new ns.Update(this.APP, layout, {}).render();
+                beforeEach(function() {
+                    // insert another model-item in collection
+                    ns.Model.get('m-collection').insert([
+                        ns.Model.get('m-collection-item', {p: 3}).setData({data: 3})
+                    ]);
+
+                    // start update to redraw views
+                    var layout = ns.layout.page('app', {});
+                    return new ns.Update(this.APP, layout, {}).render();
+                });
+
+                shouldHaveNViewCollectionItemNodes(3);
+                shouldSaveVCollectionNode();
+                shouldSaveNVCollectionItemNode(0);
+                shouldSaveNVCollectionItemNode(1);
+
             });
 
-            shouldHaveNViewCollectionItemNodes(3);
-            shouldSaveVCollectionNode();
-            shouldSaveNVCollectionItemNode(0);
-            shouldSaveNVCollectionItemNode(1);
+            describe('вставка в начало списка ->', function() {
+
+                beforeEach(function() {
+                    // insert another model-item in collection
+                    ns.Model.get('m-collection').insert([
+                        ns.Model.get('m-collection-item', {p: 3}).setData({data: 3})
+                    ], 0);
+
+                    // start update to redraw views
+                    var layout = ns.layout.page('app', {});
+                    return new ns.Update(this.APP, layout, {}).render();
+                });
+
+                shouldHaveNViewCollectionItemNodes(3);
+                shouldSaveVCollectionNode();
+                // первый элемент списка стал вторым
+                shouldSaveNVCollectionItemNode(1, 0);
+                // второй элемент списка стал третьим
+                shouldSaveNVCollectionItemNode(2, 1);
+
+            });
 
         });
 

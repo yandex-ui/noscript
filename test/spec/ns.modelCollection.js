@@ -866,4 +866,28 @@ describe('ns.ModelCollection', function() {
 
     });
 
+    describe('split моделей без явного указания items', function() {
+        beforeEach(function() {
+            ns.Model.define('test-mc', {
+                split: {
+                    model_id: 'test-mc-item',
+                    params: { id: '.id' }
+                }
+            });
+            ns.Model.define('test-mc-item', {
+                params: {
+                    id: null
+                }
+            });
+
+            this.collection = ns.Model.get('test-mc');
+            this.collection.setData({
+                items: [{id: 1}, {id: 2}, {id: 3}]
+            });
+        });
+
+        it('должен разбить коллекцию на три элемента', function() {
+            expect(this.collection.models).to.have.length(3);
+        })
+    })
 });

@@ -12,6 +12,13 @@
     no.inherit(ns.ModelCollection, ns.Model);
 
     /**
+     * Дефолтное значение jpath
+     * по которому сплит будет искать коллекцию
+     * @type {String}
+     */
+    ns.ModelCollection.prototype.DEFAULT_ITEMS_SPLIT = '.items';
+
+    /**
      *
      * @private
      */
@@ -35,7 +42,7 @@
 
         // это составная модель —
         // нужно склеить все данные
-        // из моделей её состовляющих
+        // из моделей её составляющих
         if (this.isValid()) {
             var jpathItems;
 
@@ -44,7 +51,7 @@
             } else if (this.info.jpathItems) {
                 jpathItems = this.info.jpathItems;
             } else {
-                jpathItems = '.items';
+                jpathItems = this.DEFAULT_ITEMS_SPLIT;
             }
 
             // если нет поля data сделаем его
@@ -89,10 +96,11 @@
      * @private
      */
     ns.ModelCollection.prototype._beforeSetData = function(data, options) {
-
         var splitInfo = this.info.split;
+
         if (splitInfo) {
-            var items = no.jpath(splitInfo.items, data);
+            // по умолчанию будем искать коллекцию в поле items
+            var items = no.jpath(splitInfo.items || this.DEFAULT_ITEMS_SPLIT, data);
             var models = this._splitModels(items, options);
 
             if (models && this.models && this.models.length) {

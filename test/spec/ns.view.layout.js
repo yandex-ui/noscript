@@ -287,4 +287,180 @@ describe('ns.View dynamic layouts ->', function() {
 
     });
 
+    describe('Коллеция (истории) ->', function() {
+
+        describe('Элемент коллекции имеет #patchLayout ->', function() {
+
+            beforeEach(function() {
+                // layouts
+                ns.layout.define('app-vc1', {
+                    'app': {
+                        'vc1': {}
+                    }
+                });
+
+                ns.layout.define('app-vc2', {
+                    'app': {
+                        'vc2': {}
+                    }
+                });
+
+                ns.layout.define('vc2-item-layout', {
+                    'vc2-item-box@': {
+                        'vc2-item1': {},
+                        'vc2-item2': {}
+                    }
+                });
+
+                // models
+                ns.Model.define('mc2-item', {
+                    params: { id: null }
+                });
+
+                ns.Model.define('mc2', {
+                    split: {
+                        items: '.item',
+                        params: { id: '.id' },
+                        model_id: 'mc2-item'
+                    }
+                });
+
+                // views
+                ns.View.define('app');
+                ns.ViewCollection.define('vc1', {
+                    models: {
+                        'mc2': false
+                    },
+                    split: {
+                        byModel: 'mc2',
+                        intoViews: 'vc2-item'
+                    }
+                });
+                ns.ViewCollection.define('vc2', {
+                    models: {
+                        'mc2': true
+                    },
+                    split: {
+                        byModel: 'mc2',
+                        intoViews: 'vc2-item'
+                    }
+                });
+
+                ns.View.define('vc2-item', {
+                    models: {
+                        'mc2-item': false
+                    },
+                    methods: {
+                        patchLayout: function() {
+                            return 'vc2-item-layout';
+                        }
+                    }
+                });
+
+                ns.View.define('vc2-item1', {
+                    models: ['mc2-item']
+                });
+                ns.View.define('vc2-item2', {
+                    models: ['mc2-item']
+                });
+
+                ns.Model.get('mc2').setData({
+                    item: [
+                        {id: 1, value: 1}
+                    ]
+                });
+            });
+
+            describe('Перерисовка после изменений всей коллекции, коллекция перерисовывается, элементы нет ->', function() {
+
+                beforeEach(function() {
+                    this.view = ns.View.create('app');
+                    return new ns.Update(this.view, ns.layout.page('app-vc2'), {})
+                        .render()
+                        .then(function() {
+                            this.vc2Item1 = this.view.node.querySelector('.ns-view-vc2-item1');
+                            this.vc2Item2 = this.view.node.querySelector('.ns-view-vc2-item2');
+
+                            // ставим новые данные
+                            ns.Model.get('mc2').setData({
+                                item: [
+                                    {id: 1, value: 1}
+                                ]
+                            });
+
+                            // перерисовываем
+                            return new ns.Update(this.view, ns.layout.page('app-vc2'), {}).render();
+                        }, null, this);
+                });
+
+                it('должен перерисовать вид внутри элемента коллекции (vc2-item1)', function() {
+                    var vc2Item1 = this.view.node.querySelector('.ns-view-vc2-item1');
+
+                    expect(vc2Item1)
+                        .to.be.an.instanceof(Node)
+                        .and.to.not.be.equal(this.vc2Item1);
+                });
+
+                it('должен перерисовать вид внутри элемента коллекции (vc2-item2)', function() {
+                    var vc2Item2 = this.view.node.querySelector('.ns-view-vc2-item2');
+
+                    expect(vc2Item2)
+                        .to.be.an.instanceof(Node)
+                        .and.to.not.be.equal(this.vc2Item2);
+                });
+
+                it('не должен образовать скрытых видов', function() {
+                    expect(this.view.node.querySelectorAll('.ns-view-hidden')).to.have.length(0);
+                });
+
+            });
+
+            describe('Перерисовка после изменений всей коллекции, коллекция и элементы не перерисовываются ->', function() {
+
+                beforeEach(function() {
+                    this.view = ns.View.create('app');
+                    return new ns.Update(this.view, ns.layout.page('app-vc1'), {})
+                        .render()
+                        .then(function() {
+                            this.vc2Item1 = this.view.node.querySelector('.ns-view-vc2-item1');
+                            this.vc2Item2 = this.view.node.querySelector('.ns-view-vc2-item2');
+
+                            // ставим новые данные
+                            ns.Model.get('mc2').setData({
+                                item: [
+                                    {id: 1, value: 1}
+                                ]
+                            });
+
+                            // перерисовываем
+                            return new ns.Update(this.view, ns.layout.page('app-vc1'), {}).render();
+                        }, null, this);
+                });
+
+                it('должен перерисовать вид внутри элемента коллекции (vc2-item1)', function() {
+                    var vc2Item1 = this.view.node.querySelector('.ns-view-vc2-item1');
+
+                    expect(vc2Item1)
+                        .to.be.an.instanceof(Node)
+                        .and.to.not.be.equal(this.vc2Item1);
+                });
+
+                it('должен перерисовать вид внутри элемента коллекции (vc2-item2)', function() {
+                    var vc2Item2 = this.view.node.querySelector('.ns-view-vc2-item2');
+
+                    expect(vc2Item2)
+                        .to.be.an.instanceof(Node)
+                        .and.to.not.be.equal(this.vc2Item2);
+                });
+
+                it('не должен образовать скрытых видов', function() {
+                    expect(this.view.node.querySelectorAll('.ns-view-hidden')).to.have.length(0);
+                });
+
+            });
+
+        });
+
+    });
+
 });

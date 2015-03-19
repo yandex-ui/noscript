@@ -1228,6 +1228,14 @@ ns.View.define(&apos;super-view&apos;, {
     // пробел в начале обязателен
     &quot; my-class&quot;
 }</code></pre>
+<ul>
+<li><code>ns-build-view</code> - с помощью этой моды можно поменять корневой узел у вьюхи. Например,<pre><code>match .my-span-view ns-build-view {
+  &lt;span&gt;
+      apply . ns-build-view-content
+  &lt;/span&gt;
+}</code></pre>
+</li>
+</ul>
 <h2>Содержимое View<span><a class="mark" href="#index_md_view_2" id="index_md_view_2">#</a></span></h2>
 <h3>ns-view-content и ns-view-desc<span><a class="mark" href="#index_md_ns_view_content_ns_view_desc" id="index_md_ns_view_content_ns_view_desc">#</a></span></h3>
 <p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.
@@ -1293,8 +1301,8 @@ ns.View.define(&apos;super-view&apos;, {
 </p>
 <h2>Yate-хелперы<span><a class="mark" href="#index_md_yate_1" id="index_md_yate_1">#</a></span></h2>
 <div class="signature"><ul>
-<li><code>model(&apos;model-name&apos;)</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath <code>/.models.model-name.model-name</code></li>
-<li><code>modelError(&apos;model-name&apos;)</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.model-name.model-name</code></li>
+<li><code>model(&apos;model-name&apos;)</code> - хелпер для быстрого получения данных модели. Внутри использует ключи, поэтому быстрее, чем jpath <code>/.models.modelName[ .status = &apos;ok&apos;].modelName</code></li>
+<li><code>modelError(&apos;model-name&apos;)</code> - хелпер для получения ошибки модели. Внутри использует ключи, поэтому быстрее jpath <code>/.models.modelName[ .status = &apos;error&apos;].modelName</code></li>
 <li><code>ns-url</code> - external-функция для <code>ns.router.url</code></li>
 <li><code>ns-generate-url</code> - external-функция для <code>ns.router.generateUrl</code></li>
 </div></ul>
@@ -1550,13 +1558,9 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 </p>
 <pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
     methods: {
-        _index: null,
         preprocessData: function(newData) {
-            var that = this;
-            // строим индекс для быстрого поиска
-            newData.forEach(function(item) {
-                that._index[item.id] = item;
-            });
+            // например, проверяем формат поля в данных
+            newData.field = Array.isArray(newData.field) ? newData.field : [];
             return newData;
         }
     }

@@ -505,6 +505,8 @@
                         
                             <li data-name="ns.request.canProcessResponse"><a href="ns.request.html#canProcessResponse">canProcessResponse</a></li>
                         
+                            <li data-name="ns.request.extractModel"><a href="ns.request.html#extractModel">extractModel</a></li>
+                        
                             <li data-name="ns.request.models"><a href="ns.request.html#models">models</a></li>
                         
                     </ul>
@@ -843,6 +845,8 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#DEFAULT_ITEMS_SPLIT"><a href="ns.ModelCollection.html#DEFAULT_ITEMS_SPLIT">DEFAULT_ITEMS_SPLIT</a></li>
+                
                     <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
                 
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
@@ -1117,12 +1121,16 @@
                         
                         <li data-name="ns.View.defaultModelEvents"><a href="ns.View.html#defaultModelEvents">defaultModelEvents</a></li>
                         
+                        <li data-name="ns.View.ERROR_CODES"><a href="ns.View.html#ERROR_CODES">ERROR_CODES</a></li>
+                        
                     </ul>
                 
 
                 
                     <ul class="methods itemMembers">
                         <span class="subtitle">Static methods</span>
+                        
+                            <li data-name="ns.View.assert"><a href="ns.View.html#assert">assert</a></li>
                         
                             <li data-name="ns.View.create"><a href="ns.View.html#create">create</a></li>
                         
@@ -1183,6 +1191,8 @@
                 
                     <li data-name="ns.View#_show"><a href="ns.View.html#_show">_show</a></li>
                 
+                    <li data-name="ns.View#destroy"><a href="ns.View.html#destroy">destroy</a></li>
+                
                     <li data-name="ns.View#getModel"><a href="ns.View.html#getModel">getModel</a></li>
                 
                     <li data-name="ns.View#getModelData"><a href="ns.View.html#getModelData">getModelData</a></li>
@@ -1218,11 +1228,17 @@
             
             <span class="subtitle">Typedefs</span>
             
+                <li data-name="ns.View~declaration"><a href="ns.View.html#declaration">declaration</a></li>
+            
                 <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
             <ul class="events itemMembers">
+            
+            <span class="subtitle">Events</span>
+            
+                <li data-name="ns.View#event:ns-view-destroyed"><a href="ns.View.html#event:ns-view-destroyed">ns-view-destroyed</a></li>
             
             </ul>
         </li>
@@ -1302,6 +1318,8 @@
                 
                     <li data-name="ns.ViewCollection#_show"><a href="ns.ViewCollection.html#_show">_show</a></li>
                 
+                    <li data-name="ns.ViewCollection#destroy"><a href="ns.ViewCollection.html#destroy">destroy</a></li>
+                
                     <li data-name="ns.ViewCollection#getModel"><a href="ns.ViewCollection.html#getModel">getModel</a></li>
                 
                     <li data-name="ns.ViewCollection#getModelData"><a href="ns.ViewCollection.html#getModelData">getModelData</a></li>
@@ -1340,6 +1358,10 @@
             </ul>
 
             <ul class="events itemMembers">
+            
+            <span class="subtitle">Events</span>
+            
+                <li data-name="ns.ViewCollection#event:ns-view-destroyed"><a href="ns.ViewCollection.html#event:ns-view-destroyed">ns-view-destroyed</a></li>
             
             </ul>
         </li>
@@ -1486,6 +1508,52 @@
     
     <div class="description">
         <p>Data version.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="DEFAULT_ITEMS_SPLIT">DEFAULT_ITEMS_SPLIT<span class="type-signature type string">String</span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Дефолтное значение jpath
+по которому сплит будет искать коллекцию</p>
     </div>
     
     
@@ -1670,7 +1738,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 270
+            ns.modelCollection.js, line 278
         </div>
         
     </div>
@@ -1737,7 +1805,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 198
+            ns.modelCollection.js, line 206
         </div>
         
     </div>
@@ -1977,7 +2045,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 306
+            ns.modelCollection.js, line 314
         </div>
         
     </div>
@@ -2618,7 +2686,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 33
+            ns.modelCollection.js, line 40
         </div>
         
     </div>
@@ -2838,7 +2906,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 263
+            ns.modelCollection.js, line 271
         </div>
         
     </div>
@@ -3111,7 +3179,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 338
+            ns.modelCollection.js, line 346
         </div>
         
     </div>
@@ -3500,7 +3568,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 224
+            ns.modelCollection.js, line 232
         </div>
         
     </div>
@@ -3668,7 +3736,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 255
+            ns.modelCollection.js, line 263
         </div>
         
     </div>
@@ -3807,7 +3875,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 243
+            ns.modelCollection.js, line 251
         </div>
         
     </div>
@@ -4188,7 +4256,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 405
+            ns.modelCollection.js, line 413
         </div>
         
     </div>
@@ -5002,7 +5070,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 228
+            ns.modelCollection.js, line 236
         </div>
         
     </div>
@@ -5259,7 +5327,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 385
+            ns.modelCollection.js, line 393
         </div>
         
     </div>
@@ -5375,7 +5443,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 448
+            ns.modelCollection.js, line 456
         </div>
         
     </div>
@@ -5572,7 +5640,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Feb 03 2015 14:20:55 GMT+0300 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Thu Mar 19 2015 14:49:20 GMT+0300 (MSK)
         </footer>
     </div>
 </div>

@@ -505,6 +505,8 @@
                         
                             <li data-name="ns.request.canProcessResponse"><a href="ns.request.html#canProcessResponse">canProcessResponse</a></li>
                         
+                            <li data-name="ns.request.extractModel"><a href="ns.request.html#extractModel">extractModel</a></li>
+                        
                             <li data-name="ns.request.models"><a href="ns.request.html#models">models</a></li>
                         
                     </ul>
@@ -843,6 +845,8 @@
                 
                     <li data-name="ns.ModelCollection#_version"><a href="ns.ModelCollection.html#_version">_version</a></li>
                 
+                    <li data-name="ns.ModelCollection#DEFAULT_ITEMS_SPLIT"><a href="ns.ModelCollection.html#DEFAULT_ITEMS_SPLIT">DEFAULT_ITEMS_SPLIT</a></li>
+                
                     <li data-name="ns.ModelCollection#key"><a href="ns.ModelCollection.html#key">key</a></li>
                 
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
@@ -1117,12 +1121,16 @@
                         
                         <li data-name="ns.View.defaultModelEvents"><a href="ns.View.html#defaultModelEvents">defaultModelEvents</a></li>
                         
+                        <li data-name="ns.View.ERROR_CODES"><a href="ns.View.html#ERROR_CODES">ERROR_CODES</a></li>
+                        
                     </ul>
                 
 
                 
                     <ul class="methods itemMembers">
                         <span class="subtitle">Static methods</span>
+                        
+                            <li data-name="ns.View.assert"><a href="ns.View.html#assert">assert</a></li>
                         
                             <li data-name="ns.View.create"><a href="ns.View.html#create">create</a></li>
                         
@@ -1183,6 +1191,8 @@
                 
                     <li data-name="ns.View#_show"><a href="ns.View.html#_show">_show</a></li>
                 
+                    <li data-name="ns.View#destroy"><a href="ns.View.html#destroy">destroy</a></li>
+                
                     <li data-name="ns.View#getModel"><a href="ns.View.html#getModel">getModel</a></li>
                 
                     <li data-name="ns.View#getModelData"><a href="ns.View.html#getModelData">getModelData</a></li>
@@ -1218,11 +1228,17 @@
             
             <span class="subtitle">Typedefs</span>
             
+                <li data-name="ns.View~declaration"><a href="ns.View.html#declaration">declaration</a></li>
+            
                 <li data-name="ns.View~UpdateTree"><a href="ns.View.html#UpdateTree">UpdateTree</a></li>
             
             </ul>
 
             <ul class="events itemMembers">
+            
+            <span class="subtitle">Events</span>
+            
+                <li data-name="ns.View#event:ns-view-destroyed"><a href="ns.View.html#event:ns-view-destroyed">ns-view-destroyed</a></li>
             
             </ul>
         </li>
@@ -1302,6 +1318,8 @@
                 
                     <li data-name="ns.ViewCollection#_show"><a href="ns.ViewCollection.html#_show">_show</a></li>
                 
+                    <li data-name="ns.ViewCollection#destroy"><a href="ns.ViewCollection.html#destroy">destroy</a></li>
+                
                     <li data-name="ns.ViewCollection#getModel"><a href="ns.ViewCollection.html#getModel">getModel</a></li>
                 
                     <li data-name="ns.ViewCollection#getModelData"><a href="ns.ViewCollection.html#getModelData">getModelData</a></li>
@@ -1340,6 +1358,10 @@
             </ul>
 
             <ul class="events itemMembers">
+            
+            <span class="subtitle">Events</span>
+            
+                <li data-name="ns.ViewCollection#event:ns-view-destroyed"><a href="ns.ViewCollection.html#event:ns-view-destroyed">ns-view-destroyed</a></li>
             
             </ul>
         </li>
@@ -2108,7 +2130,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 766
+            ns.view.js, line 765
         </div>
         
     </div>
@@ -2185,7 +2207,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 101
+            ns.viewCollection.js, line 93
         </div>
         
     </div>
@@ -2632,7 +2654,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 88
+            ns.viewCollection.js, line 80
         </div>
         
     </div>
@@ -2705,7 +2727,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1143
+            ns.view.js, line 1134
         </div>
         
     </div>
@@ -2778,7 +2800,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1164
+            ns.view.js, line 1155
         </div>
         
     </div>
@@ -2896,7 +2918,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 973
+            ns.view.js, line 964
         </div>
         
     </div>
@@ -3135,6 +3157,80 @@
             
 <dt>
     <div class="nameContainer inherited">
+        <h4 class="name" id="destroy">
+            
+                <span class="inherited"><a href="ns.View.html#destroy">inherited</a></span>
+            
+            destroy<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1231
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Уничтожает себя и все внутренние виды, удаляет ноду из DOM.
+Этот вид больше никогда не будет живым, метод используется для очистки памяти.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
         <h4 class="name" id="getModel">
             
                 <span class="inherited"><a href="ns.View.html#getModel">inherited</a></span>
@@ -3144,7 +3240,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 939
+            ns.view.js, line 930
         </div>
         
     </div>
@@ -3267,7 +3363,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 948
+            ns.view.js, line 939
         </div>
         
     </div>
@@ -3388,7 +3484,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 143
+            ns.viewCollection.js, line 135
         </div>
         
     </div>
@@ -3462,7 +3558,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 554
+            ns.view.js, line 553
         </div>
         
     </div>
@@ -3536,7 +3632,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 595
+            ns.view.js, line 594
         </div>
         
     </div>
@@ -3666,7 +3762,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 586
+            ns.view.js, line 585
         </div>
         
     </div>
@@ -3744,7 +3840,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 562
+            ns.view.js, line 561
         </div>
         
     </div>
@@ -3822,7 +3918,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 546
+            ns.view.js, line 545
         </div>
         
     </div>
@@ -3894,7 +3990,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 121
+            ns.viewCollection.js, line 113
         </div>
         
     </div>
@@ -3966,7 +4062,7 @@
     
         
         <div class="tag-source">
-            ns.viewCollection.js, line 129
+            ns.viewCollection.js, line 121
         </div>
         
     </div>
@@ -4040,7 +4136,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 617
+            ns.view.js, line 616
         </div>
         
     </div>
@@ -4118,7 +4214,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1172
+            ns.view.js, line 1163
         </div>
         
     </div>
@@ -4191,7 +4287,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 870
+            ns.view.js, line 863
         </div>
         
     </div>
@@ -4332,7 +4428,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1196
+            ns.view.js, line 1187
         </div>
         
     </div>
@@ -4492,7 +4588,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1179
+            ns.view.js, line 1170
         </div>
         
     </div>
@@ -4608,6 +4704,83 @@
     
     
     
+        <h3 class="subsection-title">Events</h3>
+        
+        <dl>
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="event:ns-view-destroyed">
+            
+                <span class="inherited"><a href="ns.View.html#event:ns-view-destroyed">inherited</a></span>
+            
+            ns-view-destroyed
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 1237
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Вид сейчас будет уничтожен.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        </dl>
+    
 </article>
 
 </section>  
@@ -4625,7 +4798,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Feb 03 2015 14:20:55 GMT+0300 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Thu Mar 19 2015 14:49:20 GMT+0300 (MSK)
         </footer>
     </div>
 </div>

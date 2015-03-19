@@ -1055,7 +1055,15 @@
     ns.View.prototype._getPlaceholderTree = function() {
         var tree = this._getTree();
         tree.state = 'placeholder';
-        tree.views = this._getDescViewTree();
+
+        if (this.info.isCollection) {
+            tree.views = this._getDescViewTree();
+
+        } else {
+            this._apply(function(view) {
+                view._getUpdateTree(tree);
+            });
+        }
 
         return tree;
     };

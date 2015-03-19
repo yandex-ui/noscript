@@ -678,10 +678,18 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
                 var viewItemWasValid = view.isValid();
 
+                var updateOptionsForPlaceholder = options_next;
+                if (viewItemWasValid) {
+                    // vc-item отрисовался как placeholder
+                    // но внутри него могут быть невалидные виды, они должны сами себя заменить
+                    updateOptionsForPlaceholder = no.extend({}, options_next);
+                    updateOptionsForPlaceholder.toplevel = true;
+                }
+
                 var layout = view.layout[view.id].views;
                 // updateHTML надо пройти в любом случае,
                 // чтобы у всех элементов коллекции сгенерились правильные события
-                view._updateHTML(newNode, layout, params, options_next, events);
+                view._updateHTML(newNode, layout, params, updateOptionsForPlaceholder, events);
 
                 if (viewItemWasValid) {
                     // здесь не нужно перевешивать события, т.к. они могут быть повешены

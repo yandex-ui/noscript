@@ -764,8 +764,8 @@
      */
     ns.View.prototype._getCommonTree = function() {
         var tree = {
-            collection: false,
-            box: false,
+            box: this.info.isBox,
+            collection: this.info.isCollection,
             key: this.key,
             models: {},
             params: this.params,
@@ -886,7 +886,6 @@
      */
     ns.View.prototype._getPlaceholderTree = function(params) {
         var tree = this._getTree();
-        tree.collection = true;
         tree.state = 'placeholder';
         tree.views = this._getDescViewTree(params);
 
@@ -1316,6 +1315,9 @@
 
         info.models = this._formatModelsDecl( info.models || {} );
         info.events = info.events || {};
+
+        info.isBox = false;
+        info.isCollection = false;
 
         // часть дополнительной обработки производится в ns.View.info
         // т.о. получаем lazy-определение

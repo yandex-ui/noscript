@@ -344,7 +344,6 @@ ns.ViewCollection.prototype._getDescViewTree = function(params) {
  */
 ns.ViewCollection.prototype._getViewTree = function(params) {
     var tree = this._getTree();
-    tree.collection = true;
     // всегда собираем данные, в том числе закешированные модели для async-view
     tree.models = this._getModelsForTree();
 

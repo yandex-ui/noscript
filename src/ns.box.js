@@ -25,6 +25,11 @@ ns.Box = function(id, params) {
     this.active = {};
 
     this._visible = false;
+
+    this.info = {
+        isBox: true,
+        isCollection: false
+    };
 };
 
 /**
@@ -150,7 +155,6 @@ ns.Box.prototype._getUpdateTree = function(tree, params) {
  */
 ns.Box.prototype._getViewTree = function(params) {
     var tree = this._getCommonTree();
-    tree.box = true;
 
     for (var id in this.active) {
         var viewKey = this.active[id];

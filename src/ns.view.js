@@ -711,6 +711,12 @@
         // Добавляем себя в обновляемые виды
         var syncState = this._getSelfState();
 
+        /**
+         * Флаг, что можно идти по детям.
+         * @type {boolean}
+         */
+        var canGoFather = true;
+
         // для асинков не ходим в patchLayout совсем
         if (syncState) {
             updated.sync.push(this);
@@ -724,6 +730,10 @@
                     this.__patchLayout(pageLayout, updateParams);
 
                 } else {
+                    // т.к. patchLayout всегда что-то возвращает, то не имеет смысла идти по детям,
+                    // пока patchLayout не отработал
+                    canGoFather = false;
+
                     // ставим флаг, что у нас есть patchLayout, но моделей нет, поэтому состояние неопределено
                     updated.hasPatchLayout = true;
                 }
@@ -733,16 +743,18 @@
             updated.async.push(this);
         }
 
-        this._saveLayout(pageLayout);
+        if (canGoFather) {
+            this._saveLayout(pageLayout);
 
-        // Создаем подблоки
-        for (var view_id in pageLayout) {
-            this._addView(view_id, updateParams, pageLayout[view_id].type);
+            // Создаем подблоки
+            for (var view_id in pageLayout) {
+                this._addView(view_id, updateParams, pageLayout[view_id].type);
+            }
+
+            this._apply(function(view, id) {
+                view._getRequestViews(updated, pageLayout[id].views, updateParams);
+            });
         }
-
-        this._apply(function(view, id) {
-            view._getRequestViews(updated, pageLayout[id].views, updateParams);
-        });
 
         return updated;
     };

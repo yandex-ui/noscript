@@ -740,12 +740,17 @@
             }
 
         } else {
+            canGoFather = false;
             updated.async.push(this);
         }
 
-        if (canGoFather) {
-            this._saveLayout(pageLayout);
+        //FIXME: см. message-thread& = { message-thread-list(patchLayout) }
+        // кажется async-виды ходят вниз и его дочерние виды добавляют себя как sync
 
+        // async запускает себя на сохраненном layout
+        this._saveLayout(pageLayout);
+
+        if (canGoFather) {
             // Создаем подблоки
             for (var view_id in pageLayout) {
                 this._addView(view_id, updateParams, pageLayout[view_id].type);

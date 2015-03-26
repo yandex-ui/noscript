@@ -154,6 +154,39 @@ ns.ViewCollection.prototype._getModelVersion = function(modelId) {
 };
 
 /**
+ * Проходится по всем видам-элементам коллекции в порядке модели-коллекции.
+ * @param {function} cb
+ */
+ns.ViewCollection.prototype.forEachItem = function(cb) {
+    // ModelCollection
+    var MC = this.models[this.info.modelCollectionId];
+    // Какие элементы коллекции рендерить, мы можем понять только по модели
+    // Поэтому, полезем внутрь, только если в ней есть данные
+    if (MC.isValid()) {
+        var modelItems = MC.models;
+        // Проходом по элементам MC определим, какие виды нужно срендерить
+        for (var i = 0, j = modelItems.length; i < j; i++) {
+            var view = this.getItemByModel(modelItems[i]);
+
+            // если нет view, то это значит, что элемент коллекции был отфильтрован
+            if (view) {
+                cb(view);
+            }
+        }
+    }
+};
+
+/**
+ * Возвращает вид-элемент коллекции по соответствуещей модели.
+ * @param {ns.Model} modelItem
+ * @returns {?ns.View} Eсли нет view, то это значит, что элемент коллекции был отфильтрован.
+ */
+ns.ViewCollection.prototype.getItemByModel = function(modelItem) {
+    var modelItemKey = modelItem.key;
+    return this.__model2View[modelItemKey];
+};
+
+/**
  *
  * @returns {boolean}
  */
@@ -411,7 +444,7 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
     var result = {};
     result['ns-view-collection-container'] = [];
 
-    this._forEachCollectionItem(function(view) {
+    this.forEachItem(function(view) {
         var decl = null;
         if (that.isValidSelf()) {
             // Если корневая нода не меняется, то перерендериваем
@@ -611,7 +644,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         var prev;
         // Сначала сделаем добавление новых и обновление изменённых view
         // Порядок следования элементов в MC считаем эталонным и по нему строим элементы VC
-        this._forEachCollectionItem(function(view) {
+        this.forEachItem(function(view) {
             // Здесь возможны следующие ситуации:
             if (isOuterPlaceholder) {
                 // 1. html внешнего вида не менялся. Это значит, что вместо корневого html

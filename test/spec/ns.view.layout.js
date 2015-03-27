@@ -461,6 +461,157 @@ describe('ns.View dynamic layouts ->', function() {
 
         });
 
+        describe('Баг #2 ->', function() {
+
+            /*
+            Кейс из бага
+
+            app:
+                vc1
+                    vc1-item #patchLayout
+                        vc1-item-subview1
+                            vc1-item-subview3 # перерисовывается при втором ns.Update
+                        vc1-item-subview2
+                            vc2
+                                vc2-item
+
+             */
+
+            beforeEach(function() {
+                // layouts
+                ns.layout.define('app-vc1', {
+                    'app': {
+                        'vc1': {}
+                    }
+                });
+
+                ns.layout.define('layout-vc1-item', {
+                    'vc1-item-box@': {
+                        'vc1-item-subview1': {
+                            'vc1-item-subview3': {}
+                        },
+                        'vc1-item-subview2': {}
+                    }
+                });
+
+                ns.layout.define('layout-vc1-item-subview2', {
+                    'layout-vc1-item-subview2-box@': {
+                        'vc2': {}
+                    }
+                });
+
+                // models
+                ns.Model.define('mc1-item', {
+                    params: { id: null }
+                });
+
+                ns.Model.define('mc2-item', {
+                    params: { id: null }
+                });
+
+                ns.Model.define('mc1', {
+                    split: {
+                        items: '.item',
+                        params: { id: '.id' },
+                        model_id: 'mc1-item'
+                    }
+                });
+
+                ns.Model.define('mc2', {
+                    split: {
+                        items: '.item',
+                        params: { id: '.id' },
+                        model_id: 'mc2-item'
+                    }
+                });
+
+                // views
+                ns.View.define('app');
+                ns.ViewCollection.define('vc1', {
+                    models: {
+                        'mc1': false
+                    },
+                    split: {
+                        byModel: 'mc1',
+                        intoViews: function() {
+                            return 'vc1-item';
+                        }
+                    }
+                });
+
+                ns.View.define('vc1-item', {
+                    methods: {
+                        patchLayout: function() {
+                            return 'layout-vc1-item';
+                        }
+                    }
+                });
+
+                ns.View.define('vc1-item-subview1');
+                ns.View.define('vc1-item-subview3', {
+                    events: {
+                        'vc1-item-subview3:invalidate': 'invalidate'
+                    }
+                });
+
+                ns.View.define('vc1-item-subview2', {
+                    methods: {
+                        patchLayout: function() {
+                            return 'layout-vc1-item-subview2';
+                        }
+                    }
+                });
+
+                ns.ViewCollection.define('vc2', {
+                    models: {
+                        'mc2': true
+                    },
+                    split: {
+                        byModel: 'mc2',
+                        intoViews: 'vc2-item'
+                    }
+                });
+
+                ns.View.define('vc2-item', {
+                    models: {
+                        'mc2-item': false
+                    }
+                });
+
+                ns.Model.get('mc1').setData({
+                    item: [
+                        {id: 1, value: 1}
+                    ]
+                });
+
+                ns.Model.get('mc2').setData({
+                    item: [
+                        {id: 2, value: 2}
+                    ]
+                });
+
+                this.view = ns.View.create('app');
+                return new ns.Update(this.view, ns.layout.page('app-vc1'), {}).render();
+            });
+
+            it('должен завершить обновление без ошибок', function() {
+                ns.events.trigger('vc1-item-subview3:invalidate');
+                return new ns.Update(this.view, ns.layout.page('app-vc1'), {}).render();
+            });
+
+            it('должен перерисовать "vc1-item-subview3"', function() {
+                var oldSubView3 = this.view.node.querySelector('.ns-view-vc1-item-subview3');
+                ns.events.trigger('vc1-item-subview3:invalidate');
+                return new ns.Update(this.view, ns.layout.page('app-vc1'), {}).render().then(function() {
+                    var newSubView3 = this.view.node.querySelector('.ns-view-vc1-item-subview3');
+                    expect(newSubView3)
+                        .to.be.an.instanceof(Node)
+                        .and.to.not.be.equal(oldSubView3);
+                }, null, this);
+            });
+
+        });
+
     });
 
 });

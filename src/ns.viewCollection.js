@@ -454,8 +454,12 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
             } else if (!view.isValid()) {
                 decl = view._getViewTree();
             } else if (!view.isValidWithDesc()) {
-                decl = view._getDescViewTree();
-                result['ns-view-collection-container'].push(decl);
+                var viewTree = {
+                    views: {}
+                };
+                view._getUpdateTree(viewTree);
+
+                result['ns-view-collection-container'].push(viewTree.views);
                 return;
             }
         } else {

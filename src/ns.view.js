@@ -242,7 +242,9 @@
             }
             return true;
 
-        } else if (this.isLoading() && this._visible !== false) {
+        } else {
+            // TODO: edge case. Вид может быть status === loading, visible === false и не иметь "ns-view-hidden" или "ns-view-visible"
+
             // Случай для асинхронных видов, которые отрендерили в состоянии async,
             // но `_show` для них не выполнялся. Это происходит, например, при
             // быстрой навигации по интерфейсу.
@@ -252,15 +254,23 @@
             // Чтобы не триггерились события (см ns.box).
             return false;
         }
-
-        return false;
     };
 
     /**
      * @private
      */
     ns.View.prototype._hideNode = function() {
-        this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
+        if (!this.node) {
+            return;
+        }
+
+        var oldClassName = this.node.className;
+        var newClassName = oldClassName.replace(' ns-view-visible', '').replace(' ns-view-hidden', '');
+        newClassName += ' ns-view-hidden';
+
+        if (oldClassName !== newClassName) {
+            this.node.className = newClassName;
+        }
     };
 
     /**

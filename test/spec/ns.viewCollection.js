@@ -261,7 +261,7 @@ describe('ns.ViewCollection', function() {
 
         it('должен вызвать функцию из intoViews для каждого элемента', function() {
             // по 3 раза для каждого элемента (getDescView / beforeUpdateHTML / updateHTML )
-            expect(this.viewSplitter).to.have.callCount(9);
+            expect(this.viewSplitter).to.have.callCount(12);
         });
 
         it('должен вызвать функцию из intoViews в контексте коллекции', function() {
@@ -704,6 +704,48 @@ describe('ns.ViewCollection', function() {
 
             shouldSaveNVCollectionItemNode(0);
             shouldSaveNVCollectionItemNode(1);
+
+        });
+
+        describe('refresh layout after model-item change position', function() {
+
+            beforeEach(function() {
+                var secondItem = ns.Model.get('m-collection-item', {p: 2});
+
+                ns.Model.get('m-collection').remove(secondItem);
+                ns.Model.get('m-collection').insert(secondItem, 0);
+
+                // start update to redraw views
+                var layout = ns.layout.page('app', {});
+                return new ns.Update(this.APP, layout, {}).render();
+            });
+
+            shouldHaveNViewCollectionItemNodes(2);
+            shouldSaveVCollectionNode();
+            shouldSaveNVCollectionItemNode(0, 1);
+            shouldSaveNVCollectionItemNode(1, 0);
+
+        });
+
+        describe('refresh layout after model-item change position and insert new item', function() {
+
+            beforeEach(function() {
+                var secondItem = ns.Model.get('m-collection-item', {p: 2});
+                var newItem = ns.Model.get('m-collection-item', {p: 3}).setData({data: 3});
+
+                ns.Model.get('m-collection').remove(secondItem);
+                ns.Model.get('m-collection').insert(secondItem, 0);
+                ns.Model.get('m-collection').insert(newItem);
+
+                // start update to redraw views
+                var layout = ns.layout.page('app', {});
+                return new ns.Update(this.APP, layout, {}).render();
+            });
+
+            shouldHaveNViewCollectionItemNodes(3);
+            shouldSaveVCollectionNode();
+            shouldSaveNVCollectionItemNode(0, 1);
+            shouldSaveNVCollectionItemNode(1, 0);
 
         });
 

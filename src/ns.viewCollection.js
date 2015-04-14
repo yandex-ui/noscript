@@ -547,6 +547,10 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 view.destroy();
             }
         }.bind(this));
+
+        // проверяет, что порядок видом соответствует порядку элементов коллекции
+        // этот метод нужен для обработки изменения позиции элемента
+        this.__sortViewItems(params);
     }
 };
 
@@ -569,6 +573,27 @@ ns.ViewCollection.prototype.__getContainer = function() {
     ns.assert(containerDesc, 'ns.ViewCollection', "Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
 
     return containerDesc;
+};
+
+ns.ViewCollection.prototype.__sortViewItems = function(params) {
+
+    // Контейнер потомков.
+    var containerDesc = this.__getContainer();
+
+    // Итератор по HTMLCollection, который возвращает видимые ноды видов.
+    var viewNodesIterator = ns.childrenIterator(containerDesc);
+
+    this._forEachCollectionItem(function(view) {
+        var cursorViewNode = viewNodesIterator.getNext();
+
+        if (cursorViewNode !== view.node) {
+            if (cursorViewNode) {
+                containerDesc.insertBefore(view.node, cursorViewNode);
+            } else {
+                containerDesc.appendChild(view.node);
+            }
+        }
+    }, params);
 };
 
 /**

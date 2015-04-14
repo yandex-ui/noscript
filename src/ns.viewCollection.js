@@ -581,7 +581,7 @@ ns.ViewCollection.prototype.__sortViewItems = function(params) {
     var containerDesc = this.__getContainer();
 
     // Итератор по HTMLCollection, который возвращает видимые ноды видов.
-    var viewNodesIterator = ns.childrenIterator(containerDesc);
+    var viewNodesIterator = ns.childrenIterator(containerDesc, false);
 
     this._forEachCollectionItem(function(view) {
         var cursorViewNode = viewNodesIterator.getNext();

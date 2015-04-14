@@ -45,11 +45,12 @@
     };
 
     /**
-     * Возвращает итератор по видимым (в понятии ns) детям ноды.
-     * @param {HTMLElement} node
+     * Возвращает итератор детям ноды.
+     * @param {HTMLElement} node Нода-контейнер.
+     * @param {boolean} doVisibleCheck Делать проверку на видимость (в понятии ns) вида.
      * @returns {{getNext: function}}
      */
-    ns.childrenIterator = function(node) {
+    ns.childrenIterator = function(node, doVisibleCheck) {
         // Итератор по HTMLCollection, который возвращает видимые ноды видов.
         return (function(children) {
             var position = -1;
@@ -58,7 +59,7 @@
                 getNext: function() {
                     for (position += 1; position < childrenCount; position++) {
                         var child = children[position];
-                        if (ns.hasClass(child, 'ns-view-visible')) {
+                        if (!doVisibleCheck || ns.hasClass(child, 'ns-view-visible')) {
                             return child;
                         }
                     }

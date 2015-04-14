@@ -474,19 +474,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         var itemsExist = {};
 
         // Контейнер потомков.
-        var containerDesc;
-        if (this.$node.is('.ns-view-container-desc')) {
-            containerDesc = this.node;
-        } else {
-            containerDesc = ns.byClass('ns-view-container-desc', this.node)[0];
-        }
-
-        // Без него нельзя, т.к. если например при предыдущей отрисовке
-        // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
-        // в какое место их вставлять
-        if (!containerDesc) {
-            throw new Error("[ns.ViewCollection] Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
-        }
+        var containerDesc = this.__getContainer();
 
         // Коллекции могут быть вложенны рекурсивно,
         // но плейсхолдер отрисуется только для самых верних,
@@ -560,6 +548,27 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
             }
         }.bind(this));
     }
+};
+
+/**
+ * Возвращает контейнер для элементов коллекции.
+ * @private
+ */
+ns.ViewCollection.prototype.__getContainer = function() {
+    // Контейнер потомков.
+    var containerDesc;
+    if (ns.hasClass(this.node, 'ns-view-container-desc')) {
+        containerDesc = this.node;
+    } else {
+        containerDesc = ns.byClass('ns-view-container-desc', this.node)[0];
+    }
+
+    // Без него нельзя, т.к. если например при предыдущей отрисовке
+    // ни один потомок не был отрендерен, а при текущей добавляются новые, непонятно,
+    // в какое место их вставлять
+    ns.assert(containerDesc, 'ns.ViewCollection', "Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
+
+    return containerDesc;
 };
 
 /**

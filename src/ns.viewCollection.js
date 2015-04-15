@@ -587,11 +587,13 @@ ns.ViewCollection.prototype.__sortViewItems = function(params) {
         var cursorViewNode = viewNodesIterator.getNext();
 
         if (cursorViewNode !== view.node) {
+            view.trigger('ns-view-before-move');
             if (cursorViewNode) {
                 containerDesc.insertBefore(view.node, cursorViewNode);
             } else {
                 containerDesc.appendChild(view.node);
             }
+            view.trigger('ns-view-after-move');
         }
     }, params);
 };

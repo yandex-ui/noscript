@@ -198,6 +198,98 @@ describe('ns.View', function() {
         });
     });
 
+    describe('#_extractNodeByKey', function() {
+
+        beforeEach(function() {
+            ns.View.define('some-view', {});
+            this.view = ns.View.create('some-view');
+            this.testHtml =
+                '<div class="ns-root">' +
+                    '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>' +
+                '</div>';
+            this.testNode = $(this.testHtml)[0];
+            this.resultNode = $(this.testNode).children()[0];
+        });
+
+        it('должен найти элемент по ключу', function() {
+            var node = this.view._extractNodeByKey(this.testNode);
+
+            expect(node).to.be.equal(this.resultNode);
+        });
+
+        it('должен заменить класс уникальности view на соответствующий экземпляру', function() {
+            var node = this.view._extractNodeByKey(this.testNode);
+
+            expect($(node).hasClass(this.view.__uniqueId)).to.be.equal(true);
+        });
+
+    });
+
+    describe('#_extractNode', function() {
+
+        beforeEach(function() {
+            ns.View.define('some-view', {});
+
+            this.view = ns.View.create('some-view');
+            this.testHtml =
+                '<div class="ns-root">' +
+                    '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>' +
+                '</div>';
+            this.testNode = $(this.testHtml)[0];
+            this.resultNode = $(this.testNode).children()[0];
+
+            this.sinon.spy(this.view, '_extractNodeByKey');
+        });
+
+        afterEach(function() {
+            delete this.view;
+        });
+
+        it('должен найти элемент по уникальному идентификатору', function() {
+            var node = this.view._extractNode(this.testNode);
+
+            expect(this.view._extractNodeByKey.notCalled).to.be.equal(true);
+            expect(node).to.be.equal(this.resultNode);
+        });
+
+        describe('не удается найти элемент по уникальному идентификатору ->', function() {
+
+            beforeEach(function() {
+                $(this.resultNode)
+                    .removeClass(this.view.__uniqueId)
+                    .addClass(this.view.__uniqueId + '123');
+            });
+
+            it('должен найти элемент по ключу', function() {
+                var node = this.view._extractNode(this.testNode);
+
+                expect(this.view._extractNodeByKey.called).to.be.equal(true);
+                expect(node).to.be.equal(this.resultNode);
+            });
+
+        });
+
+        describe('элемент находится, но ключ у него не соответствует ключу view ->', function() {
+            beforeEach(function() {
+                var $secondViewNode = $('<div >', {
+                    'class': 'ns-view-some-view ' + this.view.__uniqueId + '123',
+                    'data-key': this.view.key
+                });
+                $(this.testNode).append($secondViewNode);
+                $(this.resultNode).attr('data-key', 'view=some-view&some-param=2');
+                this.resultNode = $secondViewNode[0];
+            });
+
+            it('должен найти элемент по ключу', function() {
+                var node = this.view._extractNode(this.testNode);
+
+                expect(this.view._extractNodeByKey.called).to.be.equal(true);
+                expect(node).to.be.equal(this.resultNode);
+            });
+        });
+
+    });
+
     describe('Наследование от другого view', function() {
 
         beforeEach(function() {

@@ -8,6 +8,7 @@
  */
 ns.Box = function(id, params) {
     this.id = id;
+    this._setUniqueId();
     this.params = params;
 
     this.views = {};
@@ -364,6 +365,7 @@ ns.Box.prototype.isNone = function() {
 };
 
 // копируем нужные методы из ns.View
+ns.Box.prototype._setUniqueId = ns.View.prototype._setUniqueId;
 ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
 ns.Box.prototype._hideNode = ns.View.prototype._hideNode;
 ns.Box.prototype._showNode = ns.View.prototype._showNode;

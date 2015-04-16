@@ -125,6 +125,7 @@
         }
 
         if (allModelsValid) {
+            this.stopTimer('requestModels');
             this.log('received models', models);
             return Vow.fulfill(models);
         }

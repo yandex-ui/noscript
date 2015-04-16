@@ -3,6 +3,12 @@
     var uniqueViewId = 0;
 
     /**
+     * Закешированная регулярка для поиска __uniqueId
+     * @type {RegExp}
+     */
+    var RE_UNIQ_VIEW_ID = /ns-view-id-\d+/;
+
+    /**
      * Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.
      * @classdesc Класс, реализующий View
      * @tutorial ns.view
@@ -1006,7 +1012,7 @@
         // Корректировка className для будущего поиска элемента
         var viewClassName = viewNode.className;
         if (viewClassName.indexOf(this.__uniqueId) === -1) {
-            viewNode.className = viewClassName.replace(/ns-view-id-\d+/, this.__uniqueId);
+            viewNode.className = viewClassName.replace(RE_UNIQ_VIEW_ID, this.__uniqueId);
         }
 
         return viewNode;

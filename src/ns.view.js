@@ -1,5 +1,7 @@
 (function() {
 
+    var uniqueViewId = 0;
+
     /**
      * Создает View. Конструктор не используется напрямую, View создаются через ns.View.create.
      * @classdesc Класс, реализующий View
@@ -69,6 +71,13 @@
     ns.View.prototype.id = null;
 
     /**
+     * Уникальный идентификатор вида
+     * @type {string}
+     * @private
+     */
+    ns.View.prototype.__uniqueId = null;
+
+    /**
      * Флаг навешивания обработчиков событий моделей.
      * @type {boolean}
      * @private
@@ -84,6 +93,7 @@
      */
     ns.View.prototype._init = function(id, params, async) {
         this.id = id;
+        this._setUniqueId();
 
         /**
          * Флаг того, что view может быть асинхронным.
@@ -118,6 +128,16 @@
         this._bindCreateEvents();
 
         this.trigger('ns-view-init');
+    };
+
+    /**
+     * Формирует и устанавливает уникальный идентификатор вида
+     * @private
+     */
+    ns.View.prototype._setUniqueId = function() {
+        if (!this.__uniqueId) {
+            this.__uniqueId =  'ns-view-id-' + (++uniqueViewId);
+        }
     };
 
     /**
@@ -779,6 +799,7 @@
 
             // фейковое дерево, чтобы удобно матчится в yate
             tree: {},
+            uniqueId: this.__uniqueId,
             views: {}
         };
 
@@ -974,26 +995,36 @@
     };
 
     /**
+     * Ищет элемент для вида по его ключу
+     * @param {HTMLElement} node
+     * @returns {Node}
+     * @private
+     */
+    ns.View.prototype._extractNodeByKey = function(node) {
+        var viewNode = node.querySelector('[data-key="' + this.key + '"]');
+
+        // Корректировка className для будущего поиска элемента
+        var viewClassName = viewNode.className;
+        if (viewClassName.indexOf(this.__uniqueId) === -1) {
+            viewNode.className = viewClassName.replace(/ns-view-id-\d+/, this.__uniqueId);
+        }
+
+        return viewNode;
+    };
+
+    /**
      *
      * @param {HTMLElement} node
-     * @returns {HTMLElement}
+     * @returns {Node}
      * @private
      */
     ns.View.prototype._extractNode = function(node) {
-        var viewNode;
         // Найдём ноду по классу
-        var viewNodes = ns.byClass('ns-view-' + this.id, node);
+        var viewNode = ns.byClass(this.__uniqueId, node)[0];
 
-        // Если такая одна, то это то, что нам нужно
-        if (1 === viewNodes.length) {
-            viewNode = viewNodes[0];
-        } else {
-            // Если этих нод много, придётся заjQuerить
-            for (var i = 0; i < viewNodes.length; i++) {
-                if (viewNodes[i].getAttribute('data-key') === this.key) {
-                    viewNode = viewNodes[i];
-                }
-            }
+        // Случай, когда DOM дерево было сформировано из вне
+        if (!viewNode || viewNode.getAttribute('data-key') !== this.key) {
+            viewNode = this._extractNodeByKey(node);
         }
 
         return viewNode;

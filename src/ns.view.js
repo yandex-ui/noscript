@@ -99,7 +99,7 @@
      */
     ns.View.prototype._init = function(id, params, async) {
         this.id = id;
-        this._setUniqueId();
+        this.__setUniqueId();
 
         /**
          * Флаг того, что view может быть асинхронным.
@@ -140,7 +140,7 @@
      * Формирует и устанавливает уникальный идентификатор вида
      * @private
      */
-    ns.View.prototype._setUniqueId = function() {
+    ns.View.prototype.__setUniqueId = function() {
         if (!this.__uniqueId) {
             this.__uniqueId =  'ns-view-id-' + (++uniqueViewId);
         }

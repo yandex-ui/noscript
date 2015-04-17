@@ -1193,14 +1193,19 @@
     /**
      * Запускает собственный ns.Update после завершения promise.
      * @param {Vow.Promise} promise Промис, после которого запустить ns.Update
+     * @param {object} params Параметры для запуска ns.Update.
+     * @param {ns.Update} updateInstance
      * @returns {Vow.Promise}
      */
-    ns.View.prototype.updateAfter = function(promise, params) {
+    ns.View.prototype.updateAfter = function(promise, params, updateInstance) {
         this._asyncPromise = new Vow.Promise();
 
         var that = this;
         promise.then(function() {
-            that.update(params);
+            that.update(params, {
+                // тайминги можно снять только после завершения работы
+                timers: updateInstance.getTimers()
+            });
         });
 
         return this._asyncPromise;

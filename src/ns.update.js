@@ -52,6 +52,12 @@
 
         this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
 
+        this.startTimer('full');
+        // добавляем родительский таймер, если есть
+        if (options.timers) {
+            this._profileTimes['__parent'] = options.timers;
+        }
+
         if (!ns.Update._addToQueue(this)) {
             this.abort();
         }
@@ -220,7 +226,7 @@
          Обратная сторона медали - в браузере могут кончиться коннекты :)
          */
         var asyncPromises = views.async.map(function(/** ns.View */view) {
-            return view.updateAfter(this.promise, this.params);
+            return view.updateAfter(this.promise, this.params, this);
         }, this);
 
         syncPromise.then(function() {
@@ -289,8 +295,7 @@
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
-        this.startTimer('insertNodes');
-
+        this.startTimer('triggerHideEvents');
         var hideViewEvents = {
             'ns-view-hide': [],
             'ns-view-htmldestroy': []
@@ -307,6 +312,7 @@
             'ns-view-touch': []
         };
 
+        this.switchTimer('triggerHideEvents', 'insertNodes');
         this.view._updateHTML(node, this.layout.views, this.params, {
             toplevel: true
         }, viewEvents);
@@ -322,11 +328,13 @@
     };
 
     ns.Update.prototype._triggerViewEvents = function(viewEvents) {
+        // таймеры нужно взять один раз
+        var perfTimers = this.getTimers();
         for (var i = 0, j = this._EVENTS_ORDER.length; i < j; i++) {
             var event = this._EVENTS_ORDER[i];
             var views = viewEvents[event] || [];
             for (var k = views.length - 1; k >= 0; k--) {
-                views[k].trigger(event, this.params);
+                views[k].trigger(event, this.params, perfTimers);
             }
         }
     };
@@ -346,7 +354,9 @@
         }
 
         var html = this._renderUpdateTree();
+        this.startTimer('html2node');
         var node = ns.html2node(html || '');
+        this.stopTimer('html2node');
         this._insertNodes(node);
     };
 
@@ -358,8 +368,7 @@
      */
     ns.Update.prototype.prefetch = function() {
         this.log('started `prefetch` scenario');
-        this.promise = this._requestSyncModels();
-        this.promise.then(this._fulfill, this._reject, this);
+        this._requestSyncModels().then(this._fulfill, this._reject, this);
         return this.promise;
     };
 
@@ -490,7 +499,12 @@
      * @param {*} result Result data.
      */
     ns.Update.prototype._fulfill = function(result) {
+        if (this.promise.isResolved()) {
+            return;
+        }
+
         ns.Update._removeFromQueue(this);
+        this.stopTimer('full');
         this.promise.fulfill(result);
         this.perf(this.getTimers());
         this.log('successfully finished scenario');
@@ -501,7 +515,12 @@
      * @param {*} reason Error data.
      */
     ns.Update.prototype._reject = function(reason) {
+        if (this.promise.isResolved()) {
+            return;
+        }
+
         ns.Update._removeFromQueue(this);
+        this.stopTimer('full');
         this.promise.reject(reason);
         this.log('scenario was rejected with reason', reason);
     };
@@ -539,10 +558,14 @@
 
     /**
      * @typedef {object} ns.Update~PerformanceTimings
+     * @property {ns.Update~PerformanceTimings} __parent Таймеры родительского экземпляра. Появляются в случае, если текущий экземпляр обновляет async-вид.
+     * @property {number} full Общее время работы. Считается отдельно и не является суммой метрик.
      * @property {number} collectModels Время подготовки запроса.
      * @property {number} requestModels Время запроса данных.
      * @property {number} collectViews Время подготовки дерева шаблонизации.
      * @property {number} generateHTML Время шаблонизации.
+     * @property {number} html2node Время преобразования HTML-строки в DOM.
+     * @property {number} triggerHideEvents Время выполнения событий "вид скрылся" в видах.
      * @property {number} insertNodes Время обновления DOM.
      * @property {number} triggerEvents Время выполнения событий в видах.
      */
@@ -655,6 +678,7 @@
      * Опции исполнения.
      * @typedef {object} ns.Update~options
      * @property {ns.U.EXEC} [execFlag=ns.U.EXEC.GLOBAL] Флаг выполнения.
+     * @property {ns.Update~PerformanceTimings} [timers] Тайминги родительского ns.Update.
      */
 
 })();

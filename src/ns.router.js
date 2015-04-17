@@ -333,9 +333,22 @@ ns.router._generateUrl = function(def, params) {
     while (rewrote) {
         rewrote = false;
         for (var srcUrl in rewrites) {
-            if (url === rewrites[srcUrl]) {
-                url = srcUrl;
-                rewrote = true;
+            var rewriteTo = rewrites[srcUrl];
+            var rewriteToLength = rewriteTo.length;
+            var rewriteFrom = url.substr(0, rewriteToLength);
+
+            // ищем не полное совпадение, а в начале строки,
+            // например,
+            // реврайт "/shortcut" -> "/page/1"
+            // урл "/page/1/subpage/2" должен превратится в "/shortcut/subpage/2"
+            if (rewriteFrom === rewriteTo) {
+                var nextSymbol = url.charAt(rewriteToLength);
+                // следующим за реврайченной строкой должен быть "/", "?" или ничего,
+                // чтобы реврайт "/page/1" не реврайтил сгенеренный урл "/page/11"
+                if (nextSymbol === '/' || nextSymbol === '?' || !nextSymbol) {
+                    url = srcUrl + url.substr(rewriteTo.length);
+                    rewrote = true;
+                }
             }
         }
     }

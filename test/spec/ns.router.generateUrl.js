@@ -160,6 +160,7 @@ describe('generate url', function() {
                     '/shortcut': '/page/1'
                 },
                 route: {
+                    '/page/{id:int}/{sid:int}': 'page',
                     '/page/{id:int}': 'page',
                     '/folder/{name}': 'folder'
                 }
@@ -175,8 +176,16 @@ describe('generate url', function() {
             expect(ns.router.generateUrl('page', { id: 1 })).to.be.eql('/shortcut');
         });
 
+        it('/page/1/2 -> /shortcut/2', function() {
+            expect(ns.router.generateUrl('page', { id: 1, sid: 2 })).to.be.equal('/shortcut/2');
+        });
+
+        it('/page/11/2 -> /page/11/2', function() {
+            expect(ns.router.generateUrl('page', { id: 11, sid: 2 })).to.be.equal('/page/11/2');
+        });
+
         it('multiple matching rewrites', function() {
-            expect(ns.router.generateUrl('folder', { name: 'inbox' })).to.be.eql('/');
+            expect(ns.router.generateUrl('folder', { name: 'inbox' })).to.be.equal('/');
         });
     });
 

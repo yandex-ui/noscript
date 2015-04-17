@@ -711,6 +711,10 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
 
             prev = view;
         });
+
+        // проверяет, что порядок видом соответствует порядку элементов коллекции
+        // этот метод нужен для обработки изменения позиции элемента
+        this.__sortViewItems();
     }
 
     this.__destroyInactiveViews();
@@ -735,4 +739,27 @@ ns.ViewCollection.prototype.__getContainer = function() {
     ns.assert(containerDesc, 'ns.ViewCollection', "Can't find descendants container (.ns-view-container-desc element) for '" + this.id + "'");
 
     return containerDesc;
+};
+
+ns.ViewCollection.prototype.__sortViewItems = function() {
+
+    // Контейнер потомков.
+    var containerDesc = this.__getContainer();
+
+    // Итератор по HTMLCollection, который возвращает видимые ноды видов.
+    var viewNodesIterator = ns.childrenIterator(containerDesc, false);
+
+    this.forEachItem(function(view) {
+        var cursorViewNode = viewNodesIterator.getNext();
+
+        if (cursorViewNode !== view.node) {
+            view.trigger('ns-view-before-move');
+            if (cursorViewNode) {
+                containerDesc.insertBefore(view.node, cursorViewNode);
+            } else {
+                containerDesc.appendChild(view.node);
+            }
+            view.trigger('ns-view-after-move');
+        }
+    });
 };

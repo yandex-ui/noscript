@@ -735,6 +735,44 @@ describe('ns.View', function() {
             });
         });
 
+        describe('ns.View: paramsRewrite ->', function() {
+
+            beforeEach(function() {
+                ns.Model.define('model', {
+                    params: {
+                        'foo': null
+                    }
+                });
+            });
+
+            it('должен кинуть исключение, если paramsRewrite ничего не вернул', function() {
+                ns.View.define('view', {
+                    models: ['model'],
+                    paramsRewrite: function() {
+                        return null;
+                    }
+                });
+
+                expect(function() {
+                    ns.View.create('view', {foo: 1});
+                }).to.throw();
+            });
+
+            it('должен создать ключ из параметров от paramsRewrite', function() {
+                ns.View.define('view', {
+                    models: ['model'],
+                    paramsRewrite: function(params) {
+                        params['bar'] = 2;
+                        return params;
+                    }
+                });
+
+                var view = ns.View.create('view', {foo: 1});
+                expect(view.key).to.be.equal('view=view&foo=1&bar=2');
+            });
+
+        });
+
         describe('Когда ключ view строится по части параметров - this.params у view должны хранить набор, который используется в ключе', function() {
 
             beforeEach(function() {

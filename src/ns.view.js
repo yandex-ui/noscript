@@ -1086,7 +1086,6 @@
             options_next = updateOptions;
         }
 
-        var syncUpdate = !updateOptions.async;
         var viewWasInvalid = !this.isValid();
 
         var viewNode;
@@ -1137,12 +1136,8 @@
             this._saveModelsVersions();
         }
 
-        // Если view валидный и не в async-режиме, то вызывается show и touch
-        // Для валидных view при втором проходе (когда отрисовываются asynс-view) не надо второй раз кидать touch
-
-        // Условие звучит так "(Если мы в синхнронном ns.Update и view стал валиден) или (view был не валиден и стал валиден)"
-        // Второе условие относится как к перерисованным view, так и к async-view, которые полностью отрисовались
-        if ( (syncUpdate || viewWasInvalid) && this.isOk() ) {
+        // Если view валидный, то надо стриггерить ns-view-show и ns-view-touch
+        if ( this.isOk() ) {
             // событие show будет вызвано, если у view поменяется this._visible
             this._show(events['ns-view-show']);
             events['ns-view-touch'].push(this);

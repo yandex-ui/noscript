@@ -281,11 +281,10 @@
 
     /**
      * Раскладывает html-узлы по видам и триггерит события
-     * @private
      * @param {HTMLElement} node
-     * @param {boolean} async
+     * @private
      */
-    ns.Update.prototype._insertNodes = function(node, async) {
+    ns.Update.prototype._insertNodes = function(node) {
         if (this._expired()) {
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
@@ -309,9 +308,7 @@
         };
 
         this.view._updateHTML(node, this.layout.views, this.params, {
-            toplevel: true,
-            //TODO: надо понять по истории зачем этот флаг
-            async: async
+            toplevel: true
         }, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 

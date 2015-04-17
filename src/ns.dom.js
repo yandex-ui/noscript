@@ -38,6 +38,10 @@
      * @returns {Element}
      */
     ns.html2node = function(html) {
+        if (!html) {
+            return null;
+        }
+
         var div = document.createElement('div');
         div.innerHTML = html;
 

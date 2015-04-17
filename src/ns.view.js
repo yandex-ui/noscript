@@ -1132,6 +1132,10 @@
      */
     ns.View.prototype._extractNodeByKey = function(node) {
         var viewNode = node.querySelector('[data-key="' + this.key + '"]');
+        // ноды может не быть, тогда кто-то кинет ошибку
+        if (!viewNode) {
+            return null;
+        }
 
         // Корректировка className для будущего поиска элемента
         var viewClassName = viewNode.className;

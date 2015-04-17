@@ -75,7 +75,7 @@ describe('ns.Updater', function() {
         };
     };
 
-    describe('scenario', function() {
+    xdescribe('scenario', function() {
         beforeEach(function() {
             this.createTestApp = createTestApp;
             this.createTestApp();

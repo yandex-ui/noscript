@@ -137,8 +137,10 @@
         if (action === 'push') {
             ns.history.pushState(url);
             ns.page.history.push(url);
+
         } else if (action === 'replace') {
             ns.history.replaceState(url);
+            ns.page.history.replace(url);
         }
     };
 

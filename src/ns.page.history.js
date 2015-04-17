@@ -48,6 +48,21 @@
     };
 
     /**
+     * Replace url in history.
+     * @param {string} url
+     */
+    ns.page.history.replace = function(url) {
+        var nsHistory = ns.page.history;
+
+        // remove prev
+        nsHistory._history.pop();
+        // insert new
+        nsHistory._history.push(url);
+        // save current
+        nsHistory._current = url;
+    };
+
+    /**
      * Go to previous page and delete it from history.
      * @returns {Vow.Promise}
      */

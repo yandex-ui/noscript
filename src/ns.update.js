@@ -163,21 +163,33 @@
     };
 
     /**
+     * Проходит по layout и собирает список активных видов.
+     * Для этих видов надо запросить модели.
+     * @private
+     * @returns {{sync: ns.View[], async: ns.View[]}}
+     */
+    ns.Update.prototype._getActiveViews = function() {
+        this.startTimer('collectModels');
+        var views = this.view._getRequestViews({
+            sync: [],
+            async: []
+        }, this.layout.views, this.params);
+        this.stopTimer('collectModels');
+
+        this.log('collected incomplete views', views);
+
+        return views;
+    };
+
+    /**
      * Запрашивает модели синхронных видов
      * @private
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestSyncModels = function() {
-        this.startTimer('collectModels');
-        var views = this.view._getRequestViews({
-            sync: [],
-            async: []
-        }, this.layout.views, this.params).sync;
-        this.log('collected incomplete views', views);
-
+        var views = this._getActiveViews().sync;
         var models = views2models(views);
         this.log('collected needed models', models);
-        this.stopTimer('collectModels');
 
         return this._requestModels(models);
     };
@@ -192,19 +204,10 @@
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
-        this.startTimer('collectModels');
-
         var requestPromise = new Vow.Promise();
-
-        var views = this.view._getRequestViews({
-            sync: [],
-            async: []
-        }, this.layout.views, this.params);
-        this.log('collected incomplete views', views);
-
+        var views = this._getActiveViews();
         var models = views2models(views.sync);
         this.log('collected needed models', models);
-        this.stopTimer('collectModels');
 
         var syncPromise = this._requestModels(models);
 
@@ -238,7 +241,7 @@
      */
     ns.Update.prototype._applyLayout = function() {
         // FIXME: методы продублированы специально с заделом на будущий рефакторинг
-        this.view._getRequestViews({sync: [], async: []}, this.layout.views, this.params);
+        this._getActiveViews();
     };
 
     /**

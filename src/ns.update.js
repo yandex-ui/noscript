@@ -539,12 +539,12 @@
 
     /**
      * @typedef {object} ns.Update~PerformanceTimings
-     * @property {number} prepare Время подготовки запроса.
-     * @property {number} request Время запроса данных.
-     * @property {number} tree Время подготовки дерева шаблонизации.
-     * @property {number} template Время шаблонизации.
-     * @property {number} dom Время обновления DOM.
-     * @property {number} events Время выполнения событий в видах.
+     * @property {number} collectModels Время подготовки запроса.
+     * @property {number} requestModels Время запроса данных.
+     * @property {number} collectViews Время подготовки дерева шаблонизации.
+     * @property {number} generateHTML Время шаблонизации.
+     * @property {number} insertNodes Время обновления DOM.
+     * @property {number} triggerEvents Время выполнения событий в видах.
      */
 
     /**

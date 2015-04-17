@@ -261,7 +261,7 @@
         var tree = {
             'views': {}
         };
-        this.view._getUpdateTree(tree, this.params);
+        this.view._getUpdateTree(tree);
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
 

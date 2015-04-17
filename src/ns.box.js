@@ -133,33 +133,31 @@ ns.Box.prototype._getRequestViews = function(updated, layout, params) {
 /**
  * Боксы всегда валидные, т.е. не toplevel, поэтому просто идем вниз по дереву.
  * @param {object} tree
- * @param {object} params
  * @private
  */
-ns.Box.prototype._getUpdateTree = function(tree, params) {
+ns.Box.prototype._getUpdateTree = function(tree) {
     if ( this.isNone() ) {
-        tree.views[this.id] = this._getViewTree(params);
+        tree.views[this.id] = this._getViewTree();
 
     } else {
         for (var id in this.active) {
             var viewKey = this.active[id];
-            this.views[viewKey]._getUpdateTree(tree, params);
+            this.views[viewKey]._getUpdateTree(tree);
         }
     }
 };
 
 /**
  * Строим дерево блоков.
- * @param {object} params
  * @returns {object}
  * @private
  */
-ns.Box.prototype._getViewTree = function(params) {
+ns.Box.prototype._getViewTree = function() {
     var tree = this._getCommonTree();
 
     for (var id in this.active) {
         var viewKey = this.active[id];
-        tree.views[id] = this.views[viewKey]._getViewTree(params);
+        tree.views[id] = this.views[viewKey]._getViewTree();
     }
 
     return tree;

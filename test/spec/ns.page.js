@@ -210,6 +210,22 @@ describe('ns.page', function() {
 
             });
 
+            describe('Запись в историю ns.page._fillHistory', function() {
+                beforeEach(function() {
+                    this.sinon.spy(ns.page.history, 'push');
+                });
+
+                it('ns.page._fillHistory должен записывать историю с параметром push ', function() {
+                    ns.page._fillHistory('/new', 'push');
+                    expect(ns.page.history.push).to.be.calledWith('/new');
+                });
+
+                it('ns.page._fillHistory не должен записывать историю при вызове с параметром preserve ', function() {
+                    ns.page._fillHistory('/new', 'preserve');
+                    expect(ns.page.history.push.called).to.be.eql(false);
+                });
+            });
+
         });
 
     });

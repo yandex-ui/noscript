@@ -1357,6 +1357,12 @@
         info.isBox = false;
         info.isCollection = false;
 
+        /**
+         * Флаг, что info уже подготовили
+         * @type {boolean}
+         */
+        info.ready = false;
+
         // часть дополнительной обработки производится в ns.View.info
         // т.о. получаем lazy-определение
 
@@ -1395,10 +1401,11 @@
      */
     ns.View.info = function(id) {
         var info = ns.View.infoLite(id);
-        // если есть декларация, но еще нет pGroups, то надо завершить определение View
-        if (info && !info.pGroups) {
+        if (!info.ready) {
             ns.View._initInfoParams(info);
             ns.View._initInfoEvents(info);
+
+            info.ready = true;
         }
         return info;
     };

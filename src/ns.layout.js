@@ -127,8 +127,13 @@
         var result = {};
 
         for (var raw_key in layout) {
-            //  Ключ может быть с интерполяцией, так что вычисляем его.
-            var key = no.jpath.string(raw_key)(params);
+            var key = raw_key;
+
+            // быстро проверяем возможность интерполяции, чтобы зря не вызывать компиляцию
+            if (raw_key.indexOf('{') > -1) {
+                //  Ключ может быть с интерполяцией, так что вычисляем его.
+                key = no.jpath.string(raw_key)(params);
+            }
 
             var raw_value = layout[raw_key];
             var value;

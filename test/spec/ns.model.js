@@ -70,7 +70,7 @@ describe('ns.Model', function() {
                 ns.Model.define('dm1', {foo: 'bar'});
 
                 expect(ns.Model.infoLite('dm1'))
-                    .to.eql({foo: 'bar', isCollection: false});
+                    .to.eql({foo: 'bar', isCollection: false, ready: false});
             });
 
             it('should create a constructor', function() {

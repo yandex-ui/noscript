@@ -606,6 +606,12 @@
         // Нужно унаследоваться от base и добавить в прототип info.methods.
         ctor = no.inherit(ctor, baseClass, info.methods);
 
+        /**
+         * Флаг, что info уже подготовили
+         * @type {boolean}
+         */
+        info.ready = false;
+
         // часть дополнительной обработки производится в ns.Model.info
         // т.о. получаем lazy-определение
 
@@ -647,7 +653,7 @@
     ns.Model.info = function(id) {
         var info = ns.Model.infoLite(id);
 
-        if (info && !info.ready) {
+        if (!info.ready) {
             /**
              * Параметры моделей.
              * @type {object}
@@ -707,8 +713,6 @@
     ns.Model.getKeyAndParams = function(id, params, info) {
         info = info || ns.Model.info(id);
 
-        ns.assert(info, 'ns.Model', 'Unknown model type "%s"', id);
-
         //  Для do-моделей ключ строим особым образом.
         if (info.isDo) {
             return {
@@ -737,8 +741,6 @@
     ns.Model._getKeyParams = function(id, params, info) {
         params = params || {};
         info = info || ns.Model.info(id);
-
-        ns.assert(info, 'ns.Model', 'Unknown model type "%s"', id);
 
         if (typeof info.params === 'function') {
             return info.params(params);

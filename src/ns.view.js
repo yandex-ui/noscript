@@ -1413,6 +1413,12 @@
             ns.View.assert(!info['params+'], 7);
             ns.View.assert(!info['params-'], 8);
 
+            // если ключ вычисляет функция, то не надо вычислять группы
+            if (typeof info.params === 'function') {
+                info.pGroups = [];
+                return;
+            }
+
             var groups;
             var pGroups = [];
             if ( !Array.isArray(info.params) ) {

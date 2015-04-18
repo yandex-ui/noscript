@@ -681,6 +681,13 @@ describe('ns.View', function() {
                     mode: 'rewrite'
                 });
             });
+
+            it('не должен вычислять info.pGroups', function() {
+                expect(ns.View.info('slider').pGroups)
+                    .to.be.an('Array')
+                    .and.have.length(0);
+            });
+
         });
 
         describe('ns.View: params+ / params-', function() {

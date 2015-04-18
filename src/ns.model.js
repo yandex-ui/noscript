@@ -606,6 +606,12 @@
         // Нужно унаследоваться от base и добавить в прототип info.methods.
         ctor = no.inherit(ctor, baseClass, info.methods);
 
+        /**
+         * Флаг, что info уже подготовили
+         * @type {boolean}
+         */
+        info.ready = false;
+
         // часть дополнительной обработки производится в ns.Model.info
         // т.о. получаем lazy-определение
 

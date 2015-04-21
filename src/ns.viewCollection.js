@@ -440,13 +440,14 @@ ns.ViewCollection.prototype._getUpdateTree = function(tree) {
  * @private
  */
 ns.ViewCollection.prototype._getDescViewTree = function() {
-    var that = this;
     var result = {};
     result['ns-view-collection-container'] = [];
 
+    var vcIsValidSelf = this.isValidSelf();
+
     this.forEachItem(function(view) {
         var decl = null;
-        if (that.isValidSelf()) {
+        if (vcIsValidSelf) {
             // Если корневая нода не меняется, то перерендериваем
             // только невалидные элементы коллекции
             if (view.info.isCollection && view.isValidSelf()) {

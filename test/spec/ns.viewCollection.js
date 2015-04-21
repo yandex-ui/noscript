@@ -358,6 +358,55 @@ describe('ns.ViewCollection', function() {
 
     });
 
+    describe('#isValidSelf', function() {
+
+        describe('Контроль количества вызовов', function() {
+
+            beforeEach(function() {
+                ns.Model.define('m-collection', {
+                    isCollection: true
+                });
+
+                ns.Model.define('m-collection-item', {
+                    params: {
+                        p: null
+                    }
+                });
+
+                var mc = ns.Model.get('m-collection');
+                // insert first item
+                mc.insert([
+                    ns.Model.get('m-collection-item', {p: 1}).setData({data: 1}),
+                    ns.Model.get('m-collection-item', {p: 2}).setData({data: 2}),
+                    ns.Model.get('m-collection-item', {p: 3}).setData({data: 3})
+                ]);
+
+                ns.ViewCollection.define('v-collection', {
+                    models: [ 'm-collection' ],
+                    split: {
+                        byModel: 'm-collection',
+                        intoViews: 'v-collection-item'
+                    }
+                });
+                ns.View.define('v-collection-item', {
+                    models: [ 'm-collection-item' ]
+                });
+
+                this.VC = ns.View.create('v-collection');
+                this.sinon.spy(this.VC, 'isValidSelf');
+
+                return this.VC.update();
+            });
+
+            it('должен сделать 5 вызовов при первой отрисовке', function() {
+                // проверка бага, что VC.isValidSelf вызывался при приходе по каждому ребенку
+                expect(this.VC.isValidSelf).to.have.callCount(5);
+            });
+
+        });
+
+    });
+
     describe('redraw ViewCollection within parent view', function() {
 
         beforeEach(function(finish) {

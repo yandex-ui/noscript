@@ -275,13 +275,14 @@ ns.ViewCollection.prototype._forEachCollectionItem = function(cb, params) {
  * @private
  */
 ns.ViewCollection.prototype._getDescViewTree = function(params) {
-    var that = this;
     var result = {};
     result['ns-view-collection-container'] = [];
 
+    var vcIsValidSelf = this.isValidSelf();
+
     this._forEachCollectionItem(function(view) {
         var decl = null;
-        if (that.isValidSelf()) {
+        if (vcIsValidSelf) {
             // Если корневая нода не меняется, то перерендериваем
             // только невалидные элементы коллекции
             if (view.info.isCollection && view.isValidSelf()) {

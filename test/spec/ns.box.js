@@ -92,6 +92,35 @@ describe('ns.Box', function() {
         delete this.APP;
     });
 
+    describe('#invalidate', function() {
+
+        beforeEach(function() {
+            var layout = ns.layout.page('content2', {});
+            return new ns.Update(this.APP, layout, {}).render().then(function() {
+                this.sinon.spy(ns.View.prototype, 'invalidate');
+                var layout = ns.layout.page('content1', {p: 1});
+                return new ns.Update(this.APP, layout, {p: 1}).render();
+            }, this);
+        });
+
+        it('должен вызывать invalidate для всех видов в ns.Box', function() {
+            this.APP.invalidate();
+
+            // не знаю другого способа проверить, что все виды в дереве невалидны
+
+            // app + box + 2 вида внутри
+            expect(this.APP._getDescendantsAndSelf()).to.have.length(4);
+
+            this.APP._getDescendantsAndSelf().forEach(function(view) {
+                if (view instanceof ns.Box) {
+                    return;
+                }
+                expect(view.isValid()).to.be.equal(false);
+            });
+        });
+
+    });
+
     describe('view select', function() {
 
         describe('regular view', function() {

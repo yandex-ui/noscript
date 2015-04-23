@@ -94,12 +94,11 @@ ns.Box.prototype._addView = function(id, params, type) {
  */
 ns.Box.prototype._getDescendantsAndSelf = function(descs) {
     var views = this.views;
-    var active = this.active;
 
     descs.push(this);
 
-    for (var id in active) {
-        var view = views[ active[id] ];
+    for (var id in views) {
+        var view = views[id];
         view._getDescendantsAndSelf(descs);
     }
 

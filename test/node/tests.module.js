@@ -93,14 +93,14 @@ describe('app rendering in node.js', function() {
             "models": [
                 {"data": {"sync1": true}},
                 {"data": {"sync2": true}},
-                {"data": {"sync3": true}},
                 {"data": {"items": [{id: 1}, {id: 2}, {id: 3}]}}
             ]
         });
 
         this.response1 = JSON.stringify({
             "models": [
-                {"data": {"async1": true}}
+                {"data": {"async1": true}},
+                {"data": {"sync3": true}}
             ]
         });
 
@@ -114,7 +114,7 @@ describe('app rendering in node.js', function() {
     describe('generateHTML', function() {
         beforeEach(function(done) {
 
-            this.nockScope = nock(appRoot).post(modelsPath + '?_m=mSync1,mSync2,mSync3,mCollection').reply(
+            this.nockScope = nock(appRoot).post(modelsPath + '?_m=mSync1,mSync2,mCollection').reply(
                 200, this.response0, {"Content-Type": "application/json"}
             );
 

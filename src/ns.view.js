@@ -685,14 +685,19 @@
 
         this._saveLayout(pageLayout);
 
-        // Создаем подблоки
-        for (var view_id in pageLayout) {
-            this._addView(view_id, params, pageLayout[view_id].type);
-        }
+        // Создаем детей и идем вниз только если находимся в синхронном состоянии
+        // Иначе получится странная ситуация,
+        // что дети асинхронного вида добавят себя как синхронные и для них будут запрошены модели.
+        if (syncState) {
+            // Создаем подблоки
+            for (var view_id in pageLayout) {
+                this._addView(view_id, params, pageLayout[view_id].type);
+            }
 
-        this._apply(function(view, id) {
-            view._getRequestViews(updated, pageLayout[id].views, params);
-        });
+            this._apply(function(view, id) {
+                view._getRequestViews(updated, pageLayout[id].views, params);
+            });
+        }
 
         return updated;
     };

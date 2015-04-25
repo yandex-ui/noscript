@@ -62,9 +62,23 @@ describe('ns.Updater', function() {
             ]
         };
 
+        this.responseAsync0 = {
+            "models": [
+                {"data": {"sync1": true}},
+                {"data": {"sync2": true}}
+            ]
+        };
+
         this.response1 = {
             "models": [
                 {"data": {"async1": true}}
+            ]
+        };
+
+        this.responseAsync1 = {
+            "models": [
+                {"data": {"async1": true}},
+                {"data": {"sync3": true}}
             ]
         };
 
@@ -99,7 +113,6 @@ describe('ns.Updater', function() {
             it('should make all models of sync views valid', function() {
                 expect(ns.Model.get('mSync1').isValid()).to.be.ok;
                 expect(ns.Model.get('mSync2').isValid()).to.be.ok;
-                expect(ns.Model.get('mSync3').isValid()).to.be.ok;
             });
 
             it('should leave all models of async views invalid', function() {
@@ -218,10 +231,10 @@ describe('ns.Updater', function() {
                         }, this);
                         this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response2));
                     }, this);
-                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response1));
+                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.responseAsync1));
                 }, this);
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.responseAsync0));
             });
 
             afterEach(function() {
@@ -235,9 +248,10 @@ describe('ns.Updater', function() {
 
                 expect(modelsFirst[0]).to.equal(ns.Model.get('mSync1'));
                 expect(modelsFirst[1]).to.equal(ns.Model.get('mSync2'));
-                expect(modelsFirst[2]).to.equal(ns.Model.get('mSync3'));
 
                 expect(modelsSecond[0]).to.equal(ns.Model.get('mAsync1'));
+                expect(modelsSecond[1]).to.equal(ns.Model.get('mSync3'));
+
                 expect(modelsThird[0]).to.equal(ns.Model.get('mAsync2'));
             });
 
@@ -374,7 +388,6 @@ describe('ns.Updater', function() {
 
                         var data1 = ns.Model.get('mSync1').getData();
                         var data2 = ns.Model.get('mSync2').getData();
-                        var data3 = ns.Model.get('mSync3').getData();
 
                         // This is a way to emulate switch of environment
                         ns.reset();
@@ -385,7 +398,6 @@ describe('ns.Updater', function() {
                         // Let's imagine, that we've transfered models data from server
                         ns.Model.get('mSync1').setData(data1);
                         ns.Model.get('mSync2').setData(data2);
-                        ns.Model.get('mSync3').setData(data3);
 
                         // Firstly let's reconstruct our app, prerendered on a server
                         this.clientUpdate = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
@@ -402,13 +414,13 @@ describe('ns.Updater', function() {
                                         }, this);
                                         this.sinon.server.requests[2].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response2));
                                     }, this);
-                                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response1));
+                                    this.sinon.server.requests[1].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.responseAsync1));
                                 }, this);
 
                             }, this);
                     }, this);
 
-                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.response0));
+                this.sinon.server.requests[0].respond(200, {"Content-Type": "application/json"}, JSON.stringify(this.responseAsync0));
             });
 
             afterEach(function() {

@@ -672,17 +672,16 @@
     /**
      * Рекурсивно проходимся по дереву блоков (построенному по layout) и выбираем новые блоки или
      * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
-     * @param {object} updated Hash for sync and async views.
-     * @param {ns.View[]} updated.sync Sync views.
-     * @param {ns.View[]} updated.async Sync views.
+     * @param {ns.Update~updateViews} updated Hash for sync and async views.
      * @param {object} pageLayout Currently processing layout.
      * @param {object} params Params.
      * @returns {object}
      * @private
      */
     ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+        var syncState = this.__evaluateState();
         // Добавляем себя в обновляемые виды
-        this._addSelfToUpdate(updated);
+        this.__registerInUpdate(syncState, updated);
 
         this._saveLayout(pageLayout);
 
@@ -699,16 +698,18 @@
     };
 
     /**
-     * Добавляет себя в соответствующий список "обновляемых" видов
-     * @param {object} updated
+     * Вычисляет статус (синхронный или асинхронный), в котором надо рисовать вид.
+     * @returns {boolean} true - синхронный, false - асинхронный
      * @private
      */
-    ns.View.prototype._addSelfToUpdate = function(updated) {
+    ns.View.prototype.__evaluateState = function() {
         /**
          * Флаг, означающий, что view грузится асинхронно.
          * @type {Boolean}
          */
         this.asyncState = false;
+
+        var syncState = true;
 
         /*
          Логика такая: все виды должны себя ВСЕГДА добавлять.
@@ -733,13 +734,12 @@
                 // async-вид попадает в отрисовку, если
                 // - настал его черед (this.shouldBeSync === true)
                 // - имеет валидные модели (this.isModelsValid() === true)
-                updated.sync.push(this);
+                syncState = true;
 
             } else {
                 // ставим флаг, что вид будет отрисован асинхронно
                 this.asyncState = true;
-
-                updated.async.push(this);
+                syncState = false;
             }
         } else {
 
@@ -750,13 +750,27 @@
             }
 
             // обычный блок добавляем всегда
-            updated.sync.push(this);
+            syncState = true;
         }
 
         // сбрасываем флаг, чтобы вид оставался асинхронным
         this.shouldBeSync = false;
 
-        return updated;
+        return syncState;
+    };
+
+    /**
+     * Добавляем себя в обновляемые виды.
+     * @param {boolean} syncState Вычисленный статус из #__evaluateState
+     * @param {ns.Update~updateViews} updatedViews Обновляемые виды.
+     * @private
+     */
+    ns.View.prototype.__registerInUpdate = function(syncState, updatedViews) {
+        if (syncState) {
+            updatedViews.sync.push(this);
+        } else {
+            updatedViews.async.push(this);
+        }
     };
 
     /**

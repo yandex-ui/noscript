@@ -681,4 +681,11 @@
      * @property {ns.Update~PerformanceTimings} [timers] Тайминги родительского ns.Update.
      */
 
+    /**
+     * Список обновляемых видов
+     * @typedef {object} ns.Update~updateViews
+     * @property {ns.View[]} sync Массив видов, которые надо обновить синхронно.
+     * @property {ns.View[]} async Массив видов, которые надо обновить асинхронно.
+     */
+
 })();

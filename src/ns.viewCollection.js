@@ -219,8 +219,10 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout) {
 
     this._saveLayout(pageLayout);
 
+    var syncState = this.__evaluateState();
+    this.__registerInUpdate(syncState, updated);
     // При необходимости добавим текущий вид в список "запрашиваемых"
-    return this._addSelfToUpdate(updated);
+    return updated;
 };
 
 /**

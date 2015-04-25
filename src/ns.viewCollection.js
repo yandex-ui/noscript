@@ -520,13 +520,11 @@ ns.ViewCollection.prototype.beforeUpdateHTML = function(events) {
 /**
  *
  * @param {HTMLElement} node
- * @param {object} layout
- * @param {object} params
  * @param {object} updateOptions
  * @param {object} events
  * @private
  */
-ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
+ns.ViewCollection.prototype._updateHTML = function(node, updateOptions, events) {
     // Для VC нам всегда прийдёт новая нода
     var newNode = this._extractNode(node);
     var isOuterPlaceholder = $(newNode).hasClass('ns-view-placeholder');
@@ -641,10 +639,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                 //      1.2 view валиден, то ничего не делаем
                 var viewItemWasInValid = !view.isValid();
 
-                var layout = view.layout[view.id].views;
                 // updateHTML надо пройти в любом случае,
                 // чтобы у всех элементов коллекции сгенерились правильные события
-                view._updateHTML(newNode, layout, params, options_next, events);
+                view._updateHTML(newNode, options_next, events);
 
                 if (viewItemWasInValid) {
                     // поставим ноду в правильное место
@@ -675,10 +672,9 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
                     updateOptionsForPlaceholder.toplevel = true;
                 }
 
-                var layout = view.layout[view.id].views;
                 // updateHTML надо пройти в любом случае,
                 // чтобы у всех элементов коллекции сгенерились правильные события
-                view._updateHTML(newNode, layout, params, updateOptionsForPlaceholder, events);
+                view._updateHTML(newNode, updateOptionsForPlaceholder, events);
 
                 if (viewItemWasValid) {
                     // здесь не нужно перевешивать события, т.к. они могут быть повешены

@@ -339,12 +339,8 @@
             'ns-view-touch': []
         };
 
-        // FIXME: передача layout сюда не имеем смысла, мы его не используем
-        // FIXME: надо чтобы вид ходил не по переданному, а по тому, который получил в процессе подготовки _getRequestViews
         this.switchTimer('triggerHideEvents', 'insertNodes');
-        this.view._updateHTML(node, this.layout.views, this.params, {
-            toplevel: true
-        }, viewEvents);
+        this.view._updateHTML(node, {toplevel: true}, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
         this._triggerViewEvents(viewEvents);

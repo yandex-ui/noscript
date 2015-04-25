@@ -1216,13 +1216,11 @@
     /**
      * Обновляем (если нужно) ноду блока.
      * @param {HTMLElement} node
-     * @param {object} layout
-     * @param {object} params
      * @param {object} updateOptions
      * @param {object} events
      * @private
      */
-    ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
+    ns.View.prototype._updateHTML = function(node, updateOptions, events) {
 
         //  FIXME nop@: Велик могучим русский языка!
         //  Падежи не сходятся вообще :(
@@ -1306,8 +1304,8 @@
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
-            this._apply(function(view, id) {
-                view._updateHTML(viewNode, layout[id].views, params, options_next, events);
+            this._apply(function(view) {
+                view._updateHTML(viewNode, options_next, events);
             });
         }
     };

@@ -201,13 +201,11 @@ ns.Box.prototype._hideInactiveViews = function(events) {
 /**
  * Обновляем бокс.
  * @param {HTMLElement} node
- * @param {object} layout
- * @param {object} params
  * @param {object} options
  * @param {object} events
  * @private
  */
-ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
+ns.Box.prototype._updateHTML = function(node, options, events) {
     var oldNode;
     // Если
     //  - старой ноды не было
@@ -235,7 +233,6 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
     //  (включая синхронную и все асинхронные подапдейты).
     for (var id in boxLayout) {
-        var selfLayout = layout[id];
         var viewKey = boxLayout[id];
 
         //  Достаем ранее созданный блок (в _getRequestViews).
@@ -243,7 +240,7 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
         var view = views[viewKey];
 
         //  Обновляем его.
-        view._updateHTML(node, selfLayout.views, params, options, events);
+        view._updateHTML(node, options, events);
 
         // Вставка ноды в DOM будет выполнена во время сортировки нод в боксе (ниже).
     }

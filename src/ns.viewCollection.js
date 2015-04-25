@@ -506,21 +506,6 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
     return result;
 };
 
-/**
- *
- * @returns {ns.View~UpdateTree}
- * @private
- */
-ns.ViewCollection.prototype._getViewTree = function() {
-    var tree = this._getTree();
-    // всегда собираем данные, в том числе закешированные модели для async-view
-    tree.models = this._getModelsForTree();
-
-    tree.views = this._getDescViewTree();
-
-    return tree;
-};
-
 ns.ViewCollection.prototype.beforeUpdateHTML = function(events) {
     this._selfBeforeUpdateHTML(events);
 

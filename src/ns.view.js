@@ -997,13 +997,13 @@
         }
 
         // если у вида невалидные модели, то ставим статус 'error'
-        if (!this.isModelsValid()) {
+        if (this.isModelsValid()) {
+            //  Сюда попадают только синхронные блоки.
+            tree.views = this._getDescViewTree();
+
+        } else {
             tree.state = 'error';
         }
-
-        //  Сюда попадают только синхронные блоки.
-
-        tree.views = this._getDescViewTree();
 
         return tree;
     };

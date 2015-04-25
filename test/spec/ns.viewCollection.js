@@ -1060,61 +1060,6 @@ describe('ns.ViewCollection', function() {
         });
     });
 
-    describe('Перерисовка части валидной коллекции', function() {
-
-        beforeEach(function() {
-            ns.Model.define('invalid-model', {
-                methods: {
-                    canRequest: no.false
-                }
-            });
-
-            ns.Model.define('mc-item', {
-                params: {
-                    id: null
-                }
-            });
-
-            ns.Model.define('mc', {
-                isCollection: true
-            });
-
-            ns.View.define('vc-item', {
-                models: [ 'mc-item' ]
-            });
-
-            ns.ViewCollection.define('vc', {
-                models: [ 'mc', 'invalid-model' ],
-                split: {
-                    byModel: 'mc',
-                    intoViews: 'vc-item'
-                }
-            });
-
-            ns.View.define('app');
-            this.APP = ns.View.create('app');
-
-            ns.layout.define('app-3', {
-                'app': 'vc'
-            });
-
-            ns.Update.handleError = no.true;
-        });
-
-        it('should correctly update', function() {
-            var parent = ns.Model.get('mc');
-
-            var childA = ns.Model.get('mc-item', {id: 'A'}).setData({val: 'A'});
-            var childB = ns.Model.get('mc-item', {id: 'B'}).setData({val: 'A'});
-
-            parent.insert([childA, childB]);
-
-            var layout = ns.layout.page('app-3');
-            return new ns.Update(this.APP, layout, {id: 'A'}).render();
-        });
-
-    });
-
     describe('Перерисовка вложенных коллекций (VC1_INVALID -> VC2_VALID -> VC2_ITEM_SOME_INVALID) ->', function() {
 
         beforeEach(function() {

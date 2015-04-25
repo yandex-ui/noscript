@@ -965,6 +965,30 @@ describe('ns.Model', function() {
 
         });
 
+        describe('paramsRewrite', function() {
+
+            it('должен вызывать после создания параметров стандартным способом', function() {
+                ns.Model.define('myModel', {
+                    "params": {
+                        "p1": null,
+                        "p2": null,
+                        "p3": null,
+                        "p4": null
+                    },
+                    "paramsRewrite": function(params) {
+                        // бизнес-логика приложения предполагает, что p1 и p3 вместе быть не могут
+                        if (params.p1 && params.p3) {
+                            delete params.p3;
+                        }
+                        return params;
+                    }
+                });
+
+                expect(ns.Model.get('myModel', {p1: 1, p2: 2, p3: 3}).params).to.be.eql({p1: 1, p2: 2});
+            });
+
+        });
+
     });
 
     describe('События', function() {

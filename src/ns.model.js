@@ -763,6 +763,11 @@
             }
         }
 
+        // динамическая доработа параметров напильником
+        if ('function' === typeof info.paramsRewrite) {
+            result = info.paramsRewrite(result);
+        }
+
         return result;
     };
 

@@ -92,6 +92,38 @@ describe('ns.Box', function() {
         delete this.APP;
     });
 
+    describe('#destroy', function() {
+
+        beforeEach(function() {
+            this.sinon.spy(ns.View.prototype, 'destroy');
+            this.sinon.spy(ns.Box.prototype, 'destroy');
+
+            var that = this;
+
+            var page1Params = {};
+            var page1 = ns.layout.page('content2', page1Params);
+            var page2Params = {p: 1};
+            var page2 = ns.layout.page('content1', page2Params);
+
+            return new ns.Update(this.APP, page1, page1Params).render()
+                .then(function() {
+                    return new ns.Update(that.APP, page2, page2Params).render();
+                });
+        });
+
+        it('должен вызвать #destroy у ns.Box', function() {
+            this.APP.destroy();
+            expect(ns.Box.prototype.destroy).to.have.callCount(1);
+        });
+
+        it('должен уничтожить все виды внутри бокса', function() {
+            this.APP.destroy();
+            // app + content1 + content2
+            expect(ns.View.prototype.destroy).to.have.callCount(3);
+        });
+
+    });
+
     describe('view select', function() {
 
         describe('regular view', function() {

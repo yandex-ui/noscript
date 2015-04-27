@@ -361,6 +361,38 @@ ns.Box.prototype.isNone = function() {
     return !this.node;
 };
 
+/**
+ * Очищает себя и все внутренние блоки.
+ * Этот блок больше никогда не будет живым, этот метод используется для очистки памяти.
+ */
+ns.Box.prototype.destroy = function() {
+    // уничтожаем детей
+    var views = this.views;
+    for (var id in views) {
+        views[id].destroy();
+    }
+
+    if (this.node) {
+        $(this.node)
+            // события
+            .off()
+            // данные
+            .removeData()
+            // удаляем из DOM
+            .remove();
+
+        this.node = null;
+        this.$node = null;
+    }
+
+    this.active = null;
+    this.key = null;
+    this.params = null;
+    this.views = null;
+
+    this._visible = false;
+};
+
 // копируем нужные методы из ns.View
 ns.Box.prototype.__setUniqueId = ns.View.prototype.__setUniqueId;
 ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;

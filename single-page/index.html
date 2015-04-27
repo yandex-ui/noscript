@@ -138,6 +138,11 @@
 <li><a href="#index_md_json">Структура JSON для отрисовки</a></li>
 </ul>
 </li>
+<li><a href="#index_md_ns_view_1">Динамическое изменение детей у ns.View</a><ul>
+<li><a href="#index_md_patchlayout_ns_view">patchLayout для ns.View</a></li>
+<li><a href="#index_md_split_intolayouts_ns_viewcollection">split.intoLayouts для ns.ViewCollection</a></li>
+</ul>
+</li>
 <li><a href="#index_md_ns_model">ns.Model</a><ul>
 <li><a href="#index_md_23">Декларация</a><ul>
 <li><a href="#index_md_ctor_1">ctor</a></li>
@@ -1368,6 +1373,92 @@ ns.View.define(&apos;super-view&apos;, {
 <li><code>collection</code>: boolean. Флаг того, что это вид-коллекция.</li>
 <li><code>models</code>: object. Объект с данными моделей. Не предназначен для прямого использования. Для получения моделей всегда используйте yate-хелперы <code>model()</code> и <code>modelError()</code>.</li>
 <li><code>state</code>: Текущее состояние вида. ok/error/loading/placeholder</li>
+</ul>
+<h1>Динамическое изменение детей у ns.View<span><a class="mark" href="#index_md_ns_view_1" id="index_md_ns_view_1">#</a></span></h1>
+<p>Иногда бывают ситуации, когда возможностей менять раскладку страницы через ns.Box недостаточно.
+Например, дети вида зависят от его состояния, моделей и того, что недоступно в layout.
+Для решения этой проблемы создан метод <code>#patchLayout</code>.
+
+</p>
+<h2>patchLayout для ns.View<span><a class="mark" href="#index_md_patchlayout_ns_view" id="index_md_patchlayout_ns_view">#</a></span></h2>
+<pre><code class="js">ns.layout.define(&apos;layout1&apos;, {
+    &apos;view-box@&apos;: {
+        &apos;view1&apos;: {
+            &apos;view2&apos;: {}
+        }
+    }
+});
+
+ns.layout.define(&apos;layout2&apos;, {
+    &apos;view-box@&apos;: {
+        &apos;view3&apos;: {
+            &apos;view4&apos;: {}
+        }
+    }
+});
+
+ns.View.define(&apos;view&apos;, {
+    methods: {
+        patchLayout: function(updateParams) {
+            if (this.getModel(&apos;state&apos;).isGoodMoonPhase()) {
+                return &apos;layout1&apos;;
+            } else {
+                return &apos;layout2&apos;;
+            }
+        }
+    }
+});</code></pre>
+<p>Описание и ограничение API <code>#patchLayout</code>:
+
+</p>
+<ul>
+<li>метод вызывается только, если все модели валидны. Если это не так, то <code>ns.Update</code> запрашивает модели.</li>
+<li>должен вернуть предопредленный <code>layoutID</code>, а не вид.</li>
+<li>должен всегда возвращать <code>layoutID</code>, причем он должен начинаться с <code>box</code>. Это связано с проблемами из <a href="https://github.com/yandex-ui/noscript/issues/533">#533</a>.</li>
+</ul>
+<h2>split.intoLayouts для ns.ViewCollection<span><a class="mark" href="#index_md_split_intolayouts_ns_viewcollection" id="index_md_split_intolayouts_ns_viewcollection">#</a></span></h2>
+<p>API схоже с <code>ns.View#patchLyaout</code>. По сути <code>intoLayouts</code> позволяет иметь неограниченно сложные элементы коллекции.
+
+</p>
+<p>Вместо <code>split.intoViews</code> коллекции объявляет <code>split.intoLayouts</code>,
+где возвращает какую раскладку будет иметь каждый элемент коллекции.
+
+
+</p>
+<pre><code class="js">ns.layout.define(&apos;layout1&apos;, {
+    &apos;view-box@&apos;: {
+        &apos;view1&apos;: {
+            &apos;view2&apos;: {}
+        }
+    }
+});
+
+ns.layout.define(&apos;layout2&apos;, {
+    &apos;view-box@&apos;: {
+        &apos;view3&apos;: {
+            &apos;view4&apos;: {}
+        }
+    }
+});
+
+ns.ViewCollection.define(&apos;view-collection&apos;, {
+    split: {
+        byModel: &apos;model-collection&apos;
+        patchLayout: function(modelItem, viewItemParams) {
+            if (modelItem.isGoodMoonPhase()) {
+                return &apos;layout1&apos;;
+            } else {
+                return &apos;layout2&apos;;
+            }
+        }
+    }
+});</code></pre>
+<p>Описание и ограничение API <code>split.intoLayouts</code>:
+
+</p>
+<ul>
+<li>метод вызывается только, если все модели валидны. Если это не так, то <code>ns.Update</code> запрашивает модели.</li>
+<li>поведение идентично <code>split.intoViews</code>.</li>
 </ul>
 <h1>ns.Model<span><a class="mark" href="#index_md_ns_model" id="index_md_ns_model">#</a></span></h1>
 <p>Модель представляет собой данные.

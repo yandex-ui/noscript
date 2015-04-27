@@ -305,8 +305,6 @@
 
         var viewEvents = {
             'ns-view-async': [],
-            'ns-view-hide': [],
-            'ns-view-htmldestroy': [],
             'ns-view-htmlinit': [],
             'ns-view-show': [],
             'ns-view-touch': []
@@ -318,9 +316,6 @@
         }, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
-        // убираем события hide/htmldestroy, потому что мы их уже кинули в первом проходе
-        viewEvents['ns-view-hide'] = [];
-        viewEvents['ns-view-htmldestroy'] = [];
         this._triggerViewEvents(viewEvents);
         this.stopTimer('triggerEvents');
 

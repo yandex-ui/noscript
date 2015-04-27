@@ -1258,7 +1258,7 @@ describe('ns.View', function() {
                     view1 = app.views.box.views['view=view&id=1'];
 
                     spies.view1SetNode = this.sinon.spy(view1, '_setNode');
-                    spies.view1Hide = this.sinon.spy(view1, '_hide');
+                    spies.view1Hide = this.sinon.spy(view1, 'hideAndUnbindEvents');
 
                     goToPage(app, { id: 2 }, function() {
                         // view1 не видно.
@@ -1477,4 +1477,53 @@ describe('ns.View', function() {
         });
 
     });
+
+    describe('Проверка изменений в DOM ->', function() {
+
+        describe('Поведение при перерисовке ->', function() {
+
+            beforeEach(function() {
+                ns.layout.define('app', {
+                    'a': {
+                        'b': null
+                    }
+                });
+
+                ns.Model.define('modelB');
+
+                ns.View.define('a');
+                ns.View.define('b', {
+                    models: ['modelB']
+                });
+
+                ns.Model.get('modelB').setData({data: '1'});
+
+                this.view = ns.View.create('a');
+
+                return new ns.Update(this.view, ns.layout.page('app', {}), {}).render()
+                    .then(function() {
+
+                        // эмулируем перерисовку вида
+                        this.sinon.spy(ns.View.prototype, '_hideNode');
+                        this.sinon.spy(ns.View.prototype, '_showNode');
+
+                        ns.Model.get('modelB').setData({data: '2'});
+
+                        // Redraw current page.
+                        return this.view.update();
+                    }, this);
+            });
+
+            it('не должен прятать ноду (вызывать #_hideNode)', function() {
+                expect(ns.View.prototype._hideNode).to.have.callCount(0);
+            });
+
+            it('должен показать ноду (вызвать #_showNode)', function() {
+                expect(ns.View.prototype._showNode).to.have.callCount(1);
+            });
+
+        });
+
+    });
+
 });

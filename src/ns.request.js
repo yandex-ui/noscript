@@ -263,11 +263,9 @@
                         that.extract(regularRequests, r);
                     }
 
-                }, function(e, xhr) {
-                    ns.log.error('ns.request.http', {
-                        error: e,
-                        xhr: xhr
-                    });
+                }, function(error) {
+                    ns.log.error('ns.request.http', error);
+
                     // уходим в извлечение, чтобы пометить запрос завершенным
                     that.extract(regularRequests, {});
                 });

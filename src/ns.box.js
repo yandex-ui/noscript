@@ -114,14 +114,16 @@ ns.Box.prototype._getDescendantsAndSelf = function(descs) {
  * @private
  */
 ns.Box.prototype._getRequestViews = function(updated, layout, params) {
+    var layoutViews = layout.views;
+
     var layoutActive = {};
-    for (var id in layout) {
-        var childViewLayout = layout[id];
+    for (var id in layoutViews) {
+        var childViewLayout = layoutViews[id];
         //  Согласно новому layout'у здесь должен быть view с id/params.
         //  Создаем его (если он уже есть, он возьмется из this.views).
         var view = this._addView(id, params, childViewLayout.type);
         //  Идем вниз рекурсивно.
-        view._getRequestViews(updated, childViewLayout.views, params);
+        view._getRequestViews(updated, childViewLayout, params);
 
         layoutActive[id] = view.key;
     }

@@ -301,7 +301,9 @@ ns.ViewCollection.prototype._apply = function(callback) {
     }
 };
 
-ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
+ns.ViewCollection.prototype._getRequestViews = function(updated, layout, updateParams) {
+    var pageLayout = layout.views;
+
     var syncState = this.__evaluateState();
     this.__registerInUpdate(syncState, updated);
 
@@ -342,7 +344,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, pageLayout, upd
                 // Создаем подблоки
                 for (var view_id in newViewLayout) {
                     var newView = this._addView(view_id, viewItemParams, modelItem);
-                    newView._getRequestViews(updated, newViewLayout[view_id].views, viewItemParams);
+                    newView._getRequestViews(updated, newViewLayout[view_id], viewItemParams);
 
                     activeItems[newView.key] = null;
                 }

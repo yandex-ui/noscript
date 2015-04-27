@@ -766,19 +766,20 @@
 
         }
 
-        this._saveLayout(pageLayout);
+        var layoutViews = pageLayout.views;
+        this._saveLayout(layoutViews);
 
         // Создаем детей и идем вниз только если находимся в синхронном состоянии
         // Иначе получится странная ситуация,
         // что дети асинхронного вида добавят себя как синхронные и для них будут запрошены модели.
         if (canGoFather) {
             // Создаем подблоки
-            for (var view_id in pageLayout) {
-                this._addView(view_id, updateParams, pageLayout[view_id].type);
+            for (var view_id in layoutViews) {
+                this._addView(view_id, updateParams, layoutViews[view_id].type);
             }
 
             this._apply(function(view, id) {
-                view._getRequestViews(updated, pageLayout[id].views, updateParams);
+                view._getRequestViews(updated, layoutViews[id], updateParams);
             });
         }
 
@@ -792,16 +793,8 @@
      * @private
      */
     ns.View.prototype.__patchLayout = function(pageLayout, updateParams) {
-        // FIXME: тут проблема в том, что сюда приходит pageLayout[id].views
-        // FIXME: возможно лучше передавать pageLayout[id] и напрямую заменять views без этой пляски
-
-        // чистим старый layout, чтобы сохранить ссылки на объекты в дереве
-        for (var oldViewId in pageLayout) {
-            delete pageLayout[oldViewId];
-
-            //FIXME: надо уничтожать виды, которых больше не в новом layout
-            // view.destroy()
-        }
+        // чистим старый layout
+        pageLayout.views = {};
 
         var patchLayoutId = this.patchLayout(updateParams);
         ns.View.assert(!!patchLayoutId, 11);
@@ -813,7 +806,7 @@
         var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
         this.__checkPatchLayout(newViewLayout);
         // заменяем внутренности на обновленный layout
-        no.extend(pageLayout, newViewLayout);
+        no.extend(pageLayout.views, newViewLayout);
     };
 
     /**

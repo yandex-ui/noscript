@@ -193,7 +193,7 @@
             // Флаг, что layout остался в неопределенном состоянии
             // Надо запросить модели и пройтись еще раз
             hasPatchLayout: false
-        }, this.layout.views, this.params);
+        }, this.layout, this.params);
         this.stopTimer(timerName);
 
         this.log('collected incomplete views', views);

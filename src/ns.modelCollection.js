@@ -30,6 +30,12 @@
          */
         this._modelsEvents = {};
 
+        /**
+         * Массив элементов колелкции.
+         * @type {ns.Model[]}
+         */
+        this.models = [];
+
         ns.Model.prototype._init.apply(this, arguments);
     };
 
@@ -105,35 +111,13 @@
             var items = no.jpath(splitInfo.items || this.DEFAULT_ITEMS_SPLIT, data);
             var models = this._splitModels(items, options);
 
-            if (models && this.models && this.models.length) {
+            var insert = this.__filterExistsModels(this.models, models);
+            var remove = this.__filterExistsModels(models, this.models);
 
-                var remove = [];
-                var insert = [];
-                var i = 0;
-                var length = 0;
+            this.__removeModels(remove);
+            this.__insertModels(insert, 0);
 
-                // Ищем новые модели
-                for (i = 0, length = models.length; i < length; i++) {
-                    if (this.models.indexOf(models[i]) ===  -1) {
-                        insert.push(models[i]);
-                    }
-                }
-
-                // Ищем удаленные модели
-                for (i = 0, length = this.models.length; i < length; i++) {
-                    if (models.indexOf(this.models[i]) === -1) {
-                        remove.push(this.models[i]);
-                    }
-                }
-
-                this.__removeModels(remove);
-                this.__insertModels(insert);
-
-                this.models = models;
-
-            } else {
-                this.insert(models);
-            }
+            this.models = models;
 
         } else {
             this.clear();
@@ -154,8 +138,11 @@
      */
     ns.ModelCollection.prototype._splitModels = function(items, options) {
         var splitInfo = this.info.split;
+        var models = [];
 
-        return items.map(function(item) {
+        for (var i = 0, j = items.length; i < j; i++) {
+            var item = items[i];
+
             var params = {};
             for (var key in splitInfo.params) {
                 params[key] = no.jpath(splitInfo.params[key], item);
@@ -172,9 +159,11 @@
             }
 
             if (modelId) {
-                return ns.Model.get(modelId, params).setData(item, options);
+                models.push(ns.Model.get(modelId, params).setData(item, options));
             }
-        });
+        }
+
+        return models;
     };
 
     /**
@@ -197,6 +186,44 @@
         this.bindModel(model, 'ns-model-destroyed', function(evt) {
             that.onItemDestroyed(evt, model);
         });
+    };
+
+    /**
+     * Возвращает массив из modelsToCheck, которых нет в currentModels.
+     * @param {ns.Model[]} currentModels
+     * @param {ns.Model[]} modelsToCheck
+     * @private
+     */
+    ns.ModelCollection.prototype.__filterExistsModels = function(currentModels, modelsToCheck) {
+        var modelsHash = this.__buildModelsHash(currentModels);
+
+        var newModels = [];
+        // Ищем новые модели
+        for (var i = 0, length = modelsToCheck.length; i < length; i++) {
+            var model = modelsToCheck[i];
+
+            // hasOwnProperty чуть быстрее, чем простой поиск по ключу,
+            // потому что не ищет в прототипе
+            if (!modelsHash.hasOwnProperty(model.key)) {
+                newModels.push(model);
+            }
+        }
+
+        return newModels;
+    };
+
+    /**
+     * Возвращает хеш с ключами моделей.
+     * @param {ns.Model[]} models
+     * @private
+     */
+    ns.ModelCollection.prototype.__buildModelsHash = function(models) {
+        var modelsHash = {};
+        for (var i = 0, j = models.length; i < j; i++) {
+            modelsHash[models[i].key] = 0;
+        }
+
+        return modelsHash;
     };
 
     /**
@@ -358,19 +385,17 @@
             models = [ models ];
         }
 
-        var insertion = [];
-        var model;
-        for (var i = 0; i < models.length; i++) {
-            // В массиве может быть пустое место, если model_id - функция,
-            // которая может выкидывать элементы из коллекции.
-            // Поэтому надо писать if (model && ...)
-
-            model = models[i];
-            // Добавим только те модели, которых ещё нет ни в коллекции, ни в списке добавляемых
-            if (model && this.models.indexOf(model) < 0 && insertion.indexOf(model) < 0) {
-                insertion.push(model);
+        var deduplicatedModels = [];
+        var newModelsHash = this.__buildModelsHash(models);
+        for (var i = 0, j = models.length; i < j; i++) {
+            var model = models[i];
+            if (newModelsHash[model.key] === 0) {
+                deduplicatedModels.push(model);
+                newModelsHash[model.key]++;
             }
         }
+
+        var insertion = this.__filterExistsModels(this.models, deduplicatedModels);
 
         return this.__insertModels(insertion, index);
     };

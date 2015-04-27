@@ -93,6 +93,8 @@
     /**
      * Разбивает данные через jpath описанный в info.split
      * на составные модели
+     * @param {*} data Новые данные.
+     * @param {ns.Model~setOptions} [options] Флаги.
      * @private
      */
     ns.ModelCollection.prototype._beforeSetData = function(data, options) {
@@ -146,6 +148,7 @@
      * Создает модели из разбитых данных
      *
      * @param { Array } items – массив данных для будущих подмоделей
+     * @param {ns.Model~setOptions} [options] Флаги.
      * @returns { ns.Model[] } – массив полученных подмоделей
      * @private
      */

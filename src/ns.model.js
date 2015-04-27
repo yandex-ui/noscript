@@ -338,12 +338,13 @@
     };
 
     /**
-     *
-     * @param {*} data
+     * @param {*} data Новые данные.
+     * @param {ns.Model~setOptions} [options] Флаги.
      * @returns {*}
      * @private
      */
-    ns.Model.prototype._beforeSetData = function(data) {
+    ns.Model.prototype._beforeSetData = function(data, options) {
+        /* jshint unused: false */
         return data;
     };
 

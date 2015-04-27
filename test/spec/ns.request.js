@@ -650,6 +650,31 @@ describe('ns.request.js', function() {
 
         });
 
+        describe('запрос завершился с ошибкой', function() {
+
+            beforeEach(function() {
+                this.sinon.stub(ns, 'http').returns(Vow.reject());
+                ns.Model.define('model');
+            });
+
+            it('должен отреджектить промис для обычного запроса', function() {
+                return ns.request('model').then(function() {
+                    return Vow.reject('MUST REJECT PROMISE');
+                }, function() {
+                    return Vow.resolve();
+                });
+            });
+
+            it('должен отреджектить промис для force-запроса', function() {
+                return ns.forcedRequest('model').then(function() {
+                    return Vow.reject('MUST REJECT PROMISE');
+                }, function() {
+                    return Vow.resolve();
+                });
+            });
+
+        });
+
     });
 
     describe('do not reset model status to ok if it was in error status', function() {

@@ -114,14 +114,16 @@ ns.Box.prototype._getDescendantsAndSelf = function(descs) {
  * @private
  */
 ns.Box.prototype._getRequestViews = function(updated, layout, params) {
+    var layoutViews = layout.views;
+
     var layoutActive = {};
-    for (var id in layout) {
-        var childViewLayout = layout[id];
+    for (var id in layoutViews) {
+        var childViewLayout = layoutViews[id];
         //  Согласно новому layout'у здесь должен быть view с id/params.
         //  Создаем его (если он уже есть, он возьмется из this.views).
         var view = this._addView(id, params, childViewLayout.type);
         //  Идем вниз рекурсивно.
-        view._getRequestViews(updated, childViewLayout.views, params);
+        view._getRequestViews(updated, childViewLayout, params);
 
         layoutActive[id] = view.key;
     }
@@ -163,14 +165,14 @@ ns.Box.prototype._getViewTree = function() {
     return tree;
 };
 
-ns.Box.prototype.beforeUpdateHTML = function(params, events) {
+ns.Box.prototype.beforeUpdateHTML = function(events) {
     var activeLayout = this.active;
     for (var viewId in activeLayout) {
         var viewKey = activeLayout[viewId];
         //  Достаем ранее созданный блок (в _getRequestViews).
         /** @type {ns.View} */
         var view = this.views[viewKey];
-        view.beforeUpdateHTML(params, events);
+        view.beforeUpdateHTML(events);
     }
 
     this._hideInactiveViews(events);
@@ -201,13 +203,11 @@ ns.Box.prototype._hideInactiveViews = function(events) {
 /**
  * Обновляем бокс.
  * @param {HTMLElement} node
- * @param {object} layout
- * @param {object} params
  * @param {object} options
  * @param {object} events
  * @private
  */
-ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
+ns.Box.prototype._updateHTML = function(node, options, events) {
     var oldNode;
     // Если
     //  - старой ноды не было
@@ -229,20 +229,20 @@ ns.Box.prototype._updateHTML = function(node, layout, params, options, events) {
     }
 
     var views = this.views;
+    var boxLayout = this.active;
 
     //  Строим новый active согласно layout'у.
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта
     //  (включая синхронную и все асинхронные подапдейты).
-    for (var id in layout) {
-        var selfLayout = layout[id];
-        var key = this._getViewKey(id, params, selfLayout.type);
+    for (var id in boxLayout) {
+        var viewKey = boxLayout[id];
 
         //  Достаем ранее созданный блок (в _getRequestViews).
         /** @type {ns.View} */
-        var view = views[key];
+        var view = views[viewKey];
 
         //  Обновляем его.
-        view._updateHTML(node, selfLayout.views, params, options, events);
+        view._updateHTML(node, options, events);
 
         // Вставка ноды в DOM будет выполнена во время сортировки нод в боксе (ниже).
     }
@@ -361,6 +361,10 @@ ns.Box.prototype.isNone = function() {
     return !this.node;
 };
 
+ns.Box.prototype.isValid = function() {
+    return !!this.node;
+};
+
 /**
  * Очищает себя и все внутренние блоки.
  * Этот блок больше никогда не будет живым, этот метод используется для очистки памяти.
@@ -398,6 +402,7 @@ ns.Box.prototype.__setUniqueId = ns.View.prototype.__setUniqueId;
 ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
 ns.Box.prototype._hideNode = ns.View.prototype._hideNode;
 ns.Box.prototype._showNode = ns.View.prototype._showNode;
+ns.Box.prototype.isValidWithDesc = ns.View.prototype.isValidWithDesc;
 
 ns.Box.prototype.isOk = no.true;
 ns.Box.prototype.isLoading = no.false;

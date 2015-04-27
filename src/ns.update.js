@@ -92,6 +92,13 @@
     ns.Update.prototype._EVENTS_ORDER = ['ns-view-hide', 'ns-view-htmldestroy', 'ns-view-htmlinit', 'ns-view-async', 'ns-view-show', 'ns-view-touch'];
 
     /**
+     * Счетчик количества запросов моделей.
+     * @type {number}
+     * @private
+     */
+    ns.Update.prototype._requestCount = 0;
+
+    /**
      * Регистрирует указанное событие, добавляя к нему признаки ns.update
      * @private
      */
@@ -119,7 +126,9 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestModels = function(models) {
-        this.startTimer('requestModels');
+        var timerName = 'requestModels.' + this._requestCount;
+
+        this.startTimer(timerName);
         this.log('started models request', models);
 
         var allModelsValid = true;
@@ -131,14 +140,14 @@
         }
 
         if (allModelsValid) {
-            this.stopTimer('requestModels');
+            this.stopTimer(timerName);
             this.log('received models', models);
             return Vow.fulfill(models);
         }
 
         var promise = ns.request.models(models);
         promise.always(function() {
-            this.stopTimer('requestModels');
+            this.stopTimer(timerName);
         }, this);
 
         return promise
@@ -172,15 +181,20 @@
      * Проходит по layout и собирает список активных видов.
      * Для этих видов надо запросить модели.
      * @private
-     * @returns {{sync: ns.View[], async: ns.View[]}}
+     * @returns {ns.Update~updateViews}
      */
     ns.Update.prototype._getActiveViews = function() {
-        this.startTimer('collectModels');
+        var timerName = 'collectModels.' + this._requestCount;
+
+        this.startTimer(timerName);
         var views = this.view._getRequestViews({
             sync: [],
-            async: []
-        }, this.layout.views, this.params);
-        this.stopTimer('collectModels');
+            async: [],
+            // Флаг, что layout остался в неопределенном состоянии
+            // Надо запросить модели и пройтись еще раз
+            hasPatchLayout: false
+        }, this.layout, this.params);
+        this.stopTimer(timerName);
 
         this.log('collected incomplete views', views);
 
@@ -193,11 +207,18 @@
      * @returns {Vow.promise}
      */
     ns.Update.prototype._requestSyncModels = function() {
-        var views = this._getActiveViews().sync;
-        var models = views2models(views);
+        var views = this._getActiveViews();
+        var models = views2models(views.sync);
         this.log('collected needed models', models);
 
-        return this._requestModels(models);
+        return this._requestModels(models).then(function() {
+            // если есть патченный layout, то идем в рекурсивный перезапрос
+            // FIXME: хорошо бы поставить предел на всякий случай
+            if (views.hasPatchLayout) {
+                this._requestCount++;
+                return this._requestSyncModels();
+            }
+        }, null, this);
     };
 
     /**
@@ -230,12 +251,20 @@
         }, this);
 
         syncPromise.then(function() {
-            requestPromise.fulfill({
-                async: asyncPromises
-            });
+            // если есть патченный layout, то идем в рекурсивный перезапрос
+            // FIXME: хорошо бы поставить предел на всякий случай
+            if (views.hasPatchLayout) {
+                this._requestCount++;
+                requestPromise.sync(this._requestAllModels());
+
+            } else {
+                requestPromise.fulfill({
+                    async: asyncPromises
+                });
+            }
         }, function(e) {
             requestPromise.reject(e);
-        });
+        }, this);
 
         return requestPromise;
     };
@@ -300,7 +329,7 @@
             'ns-view-hide': [],
             'ns-view-htmldestroy': []
         };
-        this.view.beforeUpdateHTML(this.params, hideViewEvents);
+        this.view.beforeUpdateHTML(hideViewEvents);
         this._triggerViewEvents(hideViewEvents);
 
         var viewEvents = {
@@ -311,9 +340,7 @@
         };
 
         this.switchTimer('triggerHideEvents', 'insertNodes');
-        this.view._updateHTML(node, this.layout.views, this.params, {
-            toplevel: true
-        }, viewEvents);
+        this.view._updateHTML(node, {toplevel: true}, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
         this._triggerViewEvents(viewEvents);
@@ -681,6 +708,7 @@
      * @typedef {object} ns.Update~updateViews
      * @property {ns.View[]} sync Массив видов, которые надо обновить синхронно.
      * @property {ns.View[]} async Массив видов, которые надо обновить асинхронно.
+     * @property {boolean} hasPatchLayout Флаг, что в дереве есть неопределившиеся виды.
      */
 
 })();

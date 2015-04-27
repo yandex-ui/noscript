@@ -137,6 +137,8 @@
          */
         this.status = this.STATUS.NONE;
 
+        this.__customInit();
+
         // события, которые надо забиндить сразу при создании блока
         this._bindCreateEvents();
 
@@ -152,6 +154,12 @@
             this.__uniqueId =  'ns-view-id-' + (++uniqueViewId);
         }
     };
+
+    /**
+     * Специальная функция - точка расширения, в которой можно дополнить стандартный #_init.
+     * @private
+     */
+    ns.View.prototype.__customInit = no.nop;
 
     /**
      *
@@ -631,6 +639,25 @@
     ns.View.prototype.isValidSelf = ns.View.prototype.isValid;
 
     /**
+     *
+     * @returns {boolean}
+     */
+    ns.View.prototype.isValidWithDesc = function() {
+        //FIXME: надо привести в порядок всю логику вокруг
+        // isValid, isValidSelf, isValidWithDesc
+        if (!this.isValid()) {
+            return false;
+        }
+
+        for (var key in this.views) {
+            if (!this.views[key].isValidWithDesc()) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
      * Returns true if models are valid and not be updated after last view update.
      * @returns {boolean}
      */
@@ -700,32 +727,97 @@
      * требующие перерисовки. Раскладываем их в две "кучки": sync и async.
      * @param {ns.Update~updateViews} updated Hash for sync and async views.
      * @param {object} pageLayout Currently processing layout.
-     * @param {object} params Params.
+     * @param {object} updateParams Params.
      * @returns {object}
      * @private
      */
-    ns.View.prototype._getRequestViews = function(updated, pageLayout, params) {
+    ns.View.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
         var syncState = this.__evaluateState();
         // Добавляем себя в обновляемые виды
         this.__registerInUpdate(syncState, updated);
 
-        this._saveLayout(pageLayout);
+        /**
+         * Флаг, что можно идти по детям.
+         * @type {boolean}
+         */
+        var canGoFather = false;
+
+        // для асинков не ходим в patchLayout совсем
+        if (syncState) {
+            canGoFather = true;
+
+            // если еще не нашли patchLayout и у нас есть такая функция
+            if (typeof this.patchLayout === 'function') {
+
+                // Не надо патчить layout пока нет всех моделей
+                // После того, как модели будут запрошены, мы все равно сюда придем еще раз и получим правильный результат
+                if (this.isModelsValid()) {
+                    this.__patchLayout(pageLayout, updateParams);
+
+                } else {
+                    // т.к. patchLayout всегда что-то возвращает, то не имеет смысла идти по детям,
+                    // пока patchLayout не отработал
+                    canGoFather = false;
+
+                    // ставим флаг, что у нас есть patchLayout, но моделей нет, поэтому состояние неопределено
+                    updated.hasPatchLayout = true;
+                }
+            }
+
+        }
+
+        var layoutViews = pageLayout.views;
+        this._saveLayout(layoutViews);
 
         // Создаем детей и идем вниз только если находимся в синхронном состоянии
         // Иначе получится странная ситуация,
         // что дети асинхронного вида добавят себя как синхронные и для них будут запрошены модели.
-        if (syncState) {
+        if (canGoFather) {
             // Создаем подблоки
-            for (var view_id in pageLayout) {
-                this._addView(view_id, params, pageLayout[view_id].type);
+            for (var view_id in layoutViews) {
+                this._addView(view_id, updateParams, layoutViews[view_id].type);
             }
 
             this._apply(function(view, id) {
-                view._getRequestViews(updated, pageLayout[id].views, params);
+                view._getRequestViews(updated, layoutViews[id], updateParams);
             });
         }
 
         return updated;
+    };
+
+    /**
+     * Производит манипуляции с раскладкой.
+     * @param {object} pageLayout
+     * @param {object} updateParams
+     * @private
+     */
+    ns.View.prototype.__patchLayout = function(pageLayout, updateParams) {
+        // чистим старый layout
+        pageLayout.views = {};
+
+        var patchLayoutId = this.patchLayout(updateParams);
+        ns.View.assert(!!patchLayoutId, 11);
+
+        // компилим новый layout
+        // FIXME: а какие параметры передавать???
+        // FIXME: вообще все виды сейчас создаются с updateParams (а не view.params) из той логики,
+        // FIXME: что вид-родитель может вообще не иметь параметров, а ребенок может
+        var newViewLayout = ns.layout.page(patchLayoutId, updateParams);
+        this.__checkPatchLayout(newViewLayout);
+        // заменяем внутренности на обновленный layout
+        no.extend(pageLayout.views, newViewLayout);
+    };
+
+    /**
+     * Проверяет результат #patchLayout.
+     * @param {object} newLayout
+     * @private
+     */
+    ns.View.prototype.__checkPatchLayout = function(newLayout) {
+        for (var viewId in newLayout) {
+            ns.View.assert(newLayout[viewId].type === ns.L.BOX, 12);
+        }
     };
 
     /**
@@ -898,13 +990,13 @@
         }
 
         // если у вида невалидные модели, то ставим статус 'error'
-        if (!this.isModelsValid()) {
+        if (this.isModelsValid()) {
+            //  Сюда попадают только синхронные блоки.
+            tree.views = this._getDescViewTree();
+
+        } else {
             tree.state = 'error';
         }
-
-        //  Сюда попадают только синхронные блоки.
-
-        tree.views = this._getDescViewTree();
 
         return tree;
     };
@@ -956,7 +1048,15 @@
     ns.View.prototype._getPlaceholderTree = function() {
         var tree = this._getTree();
         tree.state = 'placeholder';
-        tree.views = this._getDescViewTree();
+
+        if (this.info.isCollection) {
+            tree.views = this._getDescViewTree();
+
+        } else {
+            this._apply(function(view) {
+                view._getUpdateTree(tree);
+            });
+        }
 
         return tree;
     };
@@ -1095,13 +1195,13 @@
         }
     };
 
-    ns.View.prototype.beforeUpdateHTML = function(params, events) {
+    ns.View.prototype.beforeUpdateHTML = function(events) {
         this._selfBeforeUpdateHTML(events);
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view) {
-                view.beforeUpdateHTML(params, events);
+                view.beforeUpdateHTML(events);
             });
         }
     };
@@ -1109,13 +1209,11 @@
     /**
      * Обновляем (если нужно) ноду блока.
      * @param {HTMLElement} node
-     * @param {object} layout
-     * @param {object} params
      * @param {object} updateOptions
      * @param {object} events
      * @private
      */
-    ns.View.prototype._updateHTML = function(node, layout, params, updateOptions, events) {
+    ns.View.prototype._updateHTML = function(node, updateOptions, events) {
 
         //  FIXME nop@: Велик могучим русский языка!
         //  Падежи не сходятся вообще :(
@@ -1199,8 +1297,8 @@
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
-            this._apply(function(view, id) {
-                view._updateHTML(viewNode, layout[id].views, params, options_next, events);
+            this._apply(function(view) {
+                view._updateHTML(viewNode, options_next, events);
             });
         }
     };
@@ -1821,7 +1919,9 @@
         7: 'you cannot specify params and params+ at the same time',
         8: 'you cannot specify params and params- at the same time',
         9: 'Model %s is not defined!',
-        10: 'Could not generate key for view %s'
+        10: 'Could not generate key for view %s',
+        11: '#patchLayout MUST returns valid layout ID',
+        12: '#patchLayout MUST returns layout with ns.Box at top'
     };
 
     /**

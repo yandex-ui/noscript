@@ -260,8 +260,7 @@ describe('ns.ViewCollection', function() {
         });
 
         it('должен вызвать функцию из intoViews для каждого элемента', function() {
-            // по 3 раза для каждого элемента (getDescView / beforeUpdateHTML / updateHTML )
-            expect(this.viewSplitter).to.have.callCount(9);
+            expect(this.viewSplitter).to.have.callCount(3);
         });
 
         it('должен вызвать функцию из intoViews в контексте коллекции', function() {
@@ -1061,61 +1060,6 @@ describe('ns.ViewCollection', function() {
         });
     });
 
-    describe('Перерисовка части валидной коллекции', function() {
-
-        beforeEach(function() {
-            ns.Model.define('invalid-model', {
-                methods: {
-                    canRequest: no.false
-                }
-            });
-
-            ns.Model.define('mc-item', {
-                params: {
-                    id: null
-                }
-            });
-
-            ns.Model.define('mc', {
-                isCollection: true
-            });
-
-            ns.View.define('vc-item', {
-                models: [ 'mc-item' ]
-            });
-
-            ns.ViewCollection.define('vc', {
-                models: [ 'mc', 'invalid-model' ],
-                split: {
-                    byModel: 'mc',
-                    intoViews: 'vc-item'
-                }
-            });
-
-            ns.View.define('app');
-            this.APP = ns.View.create('app');
-
-            ns.layout.define('app-3', {
-                'app': 'vc'
-            });
-
-            ns.Update.handleError = no.true;
-        });
-
-        it('should correctly update', function() {
-            var parent = ns.Model.get('mc');
-
-            var childA = ns.Model.get('mc-item', {id: 'A'}).setData({val: 'A'});
-            var childB = ns.Model.get('mc-item', {id: 'B'}).setData({val: 'A'});
-
-            parent.insert([childA, childB]);
-
-            var layout = ns.layout.page('app-3');
-            return new ns.Update(this.APP, layout, {id: 'A'}).render();
-        });
-
-    });
-
     describe('Перерисовка вложенных коллекций (VC1_INVALID -> VC2_VALID -> VC2_ITEM_SOME_INVALID) ->', function() {
 
         beforeEach(function() {
@@ -1266,7 +1210,14 @@ describe('ns.ViewCollection', function() {
             ns.Model.define('parent-mc-item', { params: {pid: null} });
 
             ns.Model.define('child-mc', {
-                isCollection: true
+                isCollection: true,
+                split: {
+                    items: '.items',
+                    model_id: 'child-mc-item',
+                    params: {
+                        cid: '.cid'
+                    }
+                }
             });
             ns.Model.define('child-mc-item', { params: {cid: null} });
 
@@ -1309,6 +1260,22 @@ describe('ns.ViewCollection', function() {
 
             this.view = ns.View.create('app');
             var layout = ns.layout.page('test');
+
+            ns.test.modelsValidAutorespondByMock(this.sinon, {
+                '/models/?_m=child-mc': {
+                    models: [
+                        {
+                            data: {
+                                items: [
+                                    {cid: 3, val: 3}
+                                ]
+                            }
+                        }
+                    ]
+
+                }
+            });
+
             return new ns.Update(this.view, layout, {})
                 .render()
                 .then(function() {
@@ -1317,11 +1284,30 @@ describe('ns.ViewCollection', function() {
                 }, null, this);
         });
 
+        it('должен перезапросить модель вложенной коллекции', function() {
+            expect(this.sinon.server.requests[0].url).to.be.equal('/models/?_m=child-mc');
+        });
+
+        it('должен нарисовать один элемент коллекции', function() {
+            var childVC = this.view.node.getElementsByClassName('ns-view-child-vc')[0];
+            var childVCContainer = childVC.getElementsByClassName('ns-view-container-desc')[0];
+            expect(childVCContainer.childNodes).to.have.length(1);
+        });
+
+        it('должен удалить старый элемент и заменить его на новый', function() {
+            var childVC = this.view.node.getElementsByClassName('ns-view-child-vc')[0];
+            var childVCContainer = childVC.getElementsByClassName('ns-view-container-desc')[0];
+            expect(childVCContainer.childNodes[0].getAttribute('data-key')).to.be.equal('view=child-vc-item&cid=3');
+        });
+
+        /*
+        Старое поведение, когда мы не ходили внутрить коллекции
         it('должен удалить элемент вложенной коллекции', function() {
             var childVC = this.view.node.getElementsByClassName('ns-view-child-vc')[0];
             var childVCContainer = childVC.getElementsByClassName('ns-view-container-desc')[0];
             expect(childVCContainer.childNodes).to.have.length(0);
         });
+        */
 
     });
 

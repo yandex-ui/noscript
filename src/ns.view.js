@@ -214,13 +214,11 @@
     };
 
     /**
-     * Обработчик htmldestroy
-     * @param {Array} [events] Массив событий.
+     * Внутренний обработчик htmldestroy
      * @protected
      */
-    ns.View.prototype._htmldestroy = function(events) {
+    ns.View.prototype.__onHtmldestroy = function() {
         this._unbindEvents('init');
-        events.push(this);
     };
 
     /**
@@ -235,18 +233,15 @@
 
     /**
      * Скрывает view
-     * @param {array} [events] Массив событий.
+     * @param {Array} [events] Массив событий.
      * @returns {boolean}
      * @protected
      */
-    ns.View.prototype._hide = function(events) {
-        var doUnbindEvents = !this.isLoading() && this._visible === true;
+    ns.View.prototype.hideAndUnbindEvents = function(events) {
+        var eventsWasUnbinded = this.__onHide();
 
-        if (doUnbindEvents) {
-            this._unbindEvents('show');
-            if (events) {
-                events.push(this);
-            }
+        if (eventsWasUnbinded && events) {
+            events.push(this);
         }
 
         // Скрывать и ставить флаг надо всегда.
@@ -255,9 +250,26 @@
         // Это происходит при быстрой навигации по интерфейсу.
 
         this._hideNode();
-        this._visible = false;
 
         // надо для триггера событий
+        return eventsWasUnbinded;
+    };
+
+    /**
+     * Убираем обработчики событие при скрытии/замены ноды.
+     * @returns {boolean}
+     * @protected
+     */
+    ns.View.prototype.__onHide = function() {
+        var doUnbindEvents = !this.isLoading() && this._visible === true;
+
+        if (doUnbindEvents) {
+            this._unbindEvents('show');
+        }
+
+        // Ставим флаг, что вид скрыт
+        this._visible = false;
+
         return doUnbindEvents;
     };
 
@@ -1151,8 +1163,8 @@
 
             //  вызываем htmldestory только если нода была заменена
             if (this.node && !this.isLoading()) {
-                this._hide(events['ns-view-hide']);
-                this._htmldestroy(events['ns-view-htmldestroy']);
+                this.__onHide();
+                this.__onHtmldestroy();
             }
 
             //  новая нода должна в любом случае попасть в DOM
@@ -1315,10 +1327,11 @@
 
         // если блок виден, то скрываем его
         if (this.isVisible()) {
-            this._hide([]);
             this.trigger("ns-view-hide");
             this.trigger("ns-view-htmldestroy");
-            this._htmldestroy([]);
+
+            this.hideAndUnbindEvents();
+            this.__onHtmldestroy();
         }
 
         this.__unbindModelsEvents();

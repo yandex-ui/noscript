@@ -192,8 +192,7 @@ ns.Box.prototype._hideInactiveViews = function(events) {
             // Скроем виды, не попавшие в layout
             var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
-                // Метод #_hide сам все сделает по правильной логике
-                descs[i]._hide(hideEvents);
+                descs[i].hideAndUnbindEvents(hideEvents);
             }
         }
     }
@@ -344,7 +343,7 @@ ns.Box.prototype._show = function() {
  * @returns {Boolean}
  * @protected
  */
-ns.Box.prototype._hide = function() {
+ns.Box.prototype.hideAndUnbindEvents = function() {
     if (this._visible === true) {
         this._hideNode();
         this._visible = false;

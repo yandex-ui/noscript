@@ -443,8 +443,8 @@ ns.ViewCollection.prototype._updateHTML = function(node, layout, params, updateO
         }
 
         if (hadOldNode && !this.isLoading()) {
-            this._hide(events['ns-view-hide']);
-            this._htmldestroy(events['ns-view-htmldestroy']);
+            this.__onHide();
+            this.__onHtmldestroy();
         }
 
         if ( this.isOk() ) {

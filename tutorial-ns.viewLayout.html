@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: ns.page</title>
+    <title>Tutorial: ns.viewLayout</title>
     
     
     
@@ -1393,7 +1393,7 @@
 
     <div class="main">
         
-            <h1 class="page-title">Tutorial: ns.page</h1>
+            <h1 class="page-title">Tutorial: ns.viewLayout</h1>
         
 
         <section>
@@ -1401,61 +1401,79 @@
 <header>
     
 
-    <h2>ns.page</h2>
+    <h2>ns.viewLayout</h2>
 </header>  
 
 <article>
-    <h2>Переходы по страницам (ns.page)</h2><p><code>ns.page</code> - специальный модуль для перехода по страницам внутри ns-приложения.</p>
-<p><code>ns.page.go</code> - главный метод. Разроваричивает адрес через <code>ns.router</code>, выбирает <code>layout</code>, запускает <code>ns.Update</code> и
-производит необходимые операции по смене урла в адресной строке и обновления названия (<code>document.title</code>) страницы.
-Метод возвращает промис от <code>ns.Update</code>, но иногда может вернуть отклоненный промис со статусами:</p>
-<ul>
-<li><code>block</code> - переход был заблокирован через <a href="#nspageblock"><code>ns.page.block</code></a></li>
-</ul>
-<p><code>ns.page.title</code> - точка расширения приложения. Позволяет задавать <a href="./ns.init.md#Заголовок-страницы">заголовки страниц</a>.</p>
-<p>Также модуль предоставляет полезные данные:</p>
-<ul>
-<li><code>ns.page.current</code> - текущие параметры страницы<ul>
-<li><code>ns.page.current.page</code> - название текущего <code>layout</code></li>
-<li><code>ns.page.current.params</code> - текущие параметры</li>
-</ul>
-</li>
-<li><code>ns.page.currentUrl</code> - адрес текущей страницы</li>
-</ul>
-<h2>ns.page.block</h2><p>Этот механизм позволяет блокировать переходы по страницам.
-Например, с помощью него можно блокировать уход с формы, если не были сохранены изменения.</p>
-<pre class="prettyprint source lang-js"><code>ns.View.define('my-view', {
-    events: {
-        'ns-view-show': function() {
-            // после показа вида, добавляем функцию блокировки
-            ns.page.block.add( this.checkChanges.bind(this) );
-        },
-        'ns-view-hide': function() {
-            // после скрытия вида, очищаем функции
-            ns.page.block.clear();
-        }
-    },
-    methods: {
-        /**
-         * @param {string} url ссылка, по которой выполняется переход
-         */
-        checkChanges: function(url) {
-            if (this.hasUnsavedChanges()) {
-                // здесь можно показать какое-то сообщение
-
-                // функция блокировки должна вернуть false, если переход нельзя осуществить
-                return false;
-            }
-
-            return true;
+    <h1>Динамическое изменение детей у ns.View</h1><p>Иногда бывают ситуации, когда возможностей менять раскладку страницы через ns.Box недостаточно.
+Например, дети вида зависят от его состояния, моделей и того, что недоступно в layout.
+Для решения этой проблемы создан метод <code>#patchLayout</code>.</p>
+<h2>patchLayout для ns.View</h2><pre class="prettyprint source lang-js"><code>ns.layout.define('layout1', {
+    'view-box@': {
+        'view1': {
+            'view2': {}
         }
     }
- });</code></pre><h2>ns.page.history</h2><p>Этот модуль хранит историю приложения.
-Он нужен, т.к. в History API нельзя получить произвольное состояние на N шагов назад.</p>
-<p>Имеет два метода:</p>
+});
+
+ns.layout.define('layout2', {
+    'view-box@': {
+        'view3': {
+            'view4': {}
+        }
+    }
+});
+
+ns.View.define('view', {
+    methods: {
+        patchLayout: function(updateParams) {
+            if (this.getModel('state').isGoodMoonPhase()) {
+                return 'layout1';
+            } else {
+                return 'layout2';
+            }
+        }
+    }
+});</code></pre><p>Описание и ограничение API <code>#patchLayout</code>:</p>
 <ul>
-<li><code>ns.page.history.back</code> - переход &quot;назад&quot;. Этот метод не аналогичен кнопке &quot;Назад&quot; в браузере. Так, при отсутствии истории, этот метод перейдет на дефолтную страницу приложения (<code>ns.page.getDefaultUrl</code>), а не выйдет из него.</li>
-<li><code>ns.page.history.getPrevious(n)</code> - возвращает урл N страниц назад. 0 - предыдующая страница.</li>
+<li>метод вызывается только, если все модели валидны. Если это не так, то <code>ns.Update</code> запрашивает модели.</li>
+<li>должен вернуть предопредленный <code>layoutID</code>, а не вид.</li>
+<li>должен всегда возвращать <code>layoutID</code>, причем он должен начинаться с <code>box</code>. Это связано с проблемами из <a href="https://github.com/yandex-ui/noscript/issues/533">#533</a>.</li>
+</ul>
+<h2>split.intoLayouts для ns.ViewCollection</h2><p>API схоже с <code>ns.View#patchLyaout</code>. По сути <code>intoLayouts</code> позволяет иметь неограниченно сложные элементы коллекции.</p>
+<p>Вместо <code>split.intoViews</code> коллекции объявляет <code>split.intoLayouts</code>,
+где возвращает какую раскладку будет иметь каждый элемент коллекции.</p>
+<pre class="prettyprint source lang-js"><code>ns.layout.define('layout1', {
+    'view-box@': {
+        'view1': {
+            'view2': {}
+        }
+    }
+});
+
+ns.layout.define('layout2', {
+    'view-box@': {
+        'view3': {
+            'view4': {}
+        }
+    }
+});
+
+ns.ViewCollection.define('view-collection', {
+    split: {
+        byModel: 'model-collection'
+        patchLayout: function(modelItem, viewItemParams) {
+            if (modelItem.isGoodMoonPhase()) {
+                return 'layout1';
+            } else {
+                return 'layout2';
+            }
+        }
+    }
+});</code></pre><p>Описание и ограничение API <code>split.intoLayouts</code>:</p>
+<ul>
+<li>метод вызывается только, если все модели валидны. Если это не так, то <code>ns.Update</code> запрашивает модели.</li>
+<li>поведение идентично <code>split.intoViews</code>.</li>
 </ul>
 </article>
 

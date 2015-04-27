@@ -73,6 +73,8 @@
                         
                             <li data-name="ns.byClass"><a href="ns.html#byClass">byClass</a></li>
                         
+                            <li data-name="ns.childrenIterator"><a href="ns.html#childrenIterator">childrenIterator</a></li>
+                        
                             <li data-name="ns.deentityify"><a href="ns.html#deentityify">deentityify</a></li>
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
@@ -216,6 +218,8 @@
                         <span class="subtitle">Static methods</span>
                         
                             <li data-name="ns.layout.define"><a href="ns.layout.html#define">define</a></li>
+                        
+                            <li data-name="ns.layout.generateSimple"><a href="ns.layout.html#generateSimple">generateSimple</a></li>
                         
                             <li data-name="ns.layout.page"><a href="ns.layout.html#page">page</a></li>
                         
@@ -459,6 +463,8 @@
                             <li data-name="ns.page.history.getPrevious"><a href="ns.page.history.html#getPrevious">getPrevious</a></li>
                         
                             <li data-name="ns.page.history.push"><a href="ns.page.history.html#push">push</a></li>
+                        
+                            <li data-name="ns.page.history.replace"><a href="ns.page.history.html#replace">replace</a></li>
                         
                     </ul>
                 
@@ -851,6 +857,8 @@
                 
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
                 
+                    <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
                     <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
@@ -1101,6 +1109,8 @@
             
                 <li data-name="ns.Update~PerformanceTimings"><a href="ns.Update.html#PerformanceTimings">PerformanceTimings</a></li>
             
+                <li data-name="ns.Update~updateViews"><a href="ns.Update.html#updateViews">updateViews</a></li>
+            
             </ul>
 
             <ul class="events itemMembers">
@@ -1175,11 +1185,11 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#__onHide"><a href="ns.View.html#__onHide">__onHide</a></li>
+                
+                    <li data-name="ns.View#__onHtmldestroy"><a href="ns.View.html#__onHtmldestroy">__onHtmldestroy</a></li>
+                
                     <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
-                
-                    <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
-                
-                    <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
                 
                     <li data-name="ns.View#_htmlinit"><a href="ns.View.html#_htmlinit">_htmlinit</a></li>
                 
@@ -1197,6 +1207,8 @@
                 
                     <li data-name="ns.View#getModelData"><a href="ns.View.html#getModelData">getModelData</a></li>
                 
+                    <li data-name="ns.View#hideAndUnbindEvents"><a href="ns.View.html#hideAndUnbindEvents">hideAndUnbindEvents</a></li>
+                
                     <li data-name="ns.View#invalidate"><a href="ns.View.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.View#isLoading"><a href="ns.View.html#isLoading">isLoading</a></li>
@@ -1210,6 +1222,8 @@
                     <li data-name="ns.View#isOk"><a href="ns.View.html#isOk">isOk</a></li>
                 
                     <li data-name="ns.View#isValid"><a href="ns.View.html#isValid">isValid</a></li>
+                
+                    <li data-name="ns.View#isValidWithDesc"><a href="ns.View.html#isValidWithDesc">isValidWithDesc</a></li>
                 
                     <li data-name="ns.View#isVisible"><a href="ns.View.html#isVisible">isVisible</a></li>
                 
@@ -1298,13 +1312,13 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.ViewCollection#__onHide"><a href="ns.ViewCollection.html#__onHide">__onHide</a></li>
+                
+                    <li data-name="ns.ViewCollection#__onHtmldestroy"><a href="ns.ViewCollection.html#__onHtmldestroy">__onHtmldestroy</a></li>
+                
                     <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_getModelVersion"><a href="ns.ViewCollection.html#_getModelVersion">_getModelVersion</a></li>
-                
-                    <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
-                
-                    <li data-name="ns.ViewCollection#_htmldestroy"><a href="ns.ViewCollection.html#_htmldestroy">_htmldestroy</a></li>
                 
                     <li data-name="ns.ViewCollection#_htmlinit"><a href="ns.ViewCollection.html#_htmlinit">_htmlinit</a></li>
                 
@@ -1320,9 +1334,15 @@
                 
                     <li data-name="ns.ViewCollection#destroy"><a href="ns.ViewCollection.html#destroy">destroy</a></li>
                 
+                    <li data-name="ns.ViewCollection#forEachItem"><a href="ns.ViewCollection.html#forEachItem">forEachItem</a></li>
+                
+                    <li data-name="ns.ViewCollection#getItemByModel"><a href="ns.ViewCollection.html#getItemByModel">getItemByModel</a></li>
+                
                     <li data-name="ns.ViewCollection#getModel"><a href="ns.ViewCollection.html#getModel">getModel</a></li>
                 
                     <li data-name="ns.ViewCollection#getModelData"><a href="ns.ViewCollection.html#getModelData">getModelData</a></li>
+                
+                    <li data-name="ns.ViewCollection#hideAndUnbindEvents"><a href="ns.ViewCollection.html#hideAndUnbindEvents">hideAndUnbindEvents</a></li>
                 
                     <li data-name="ns.ViewCollection#invalidate"><a href="ns.ViewCollection.html#invalidate">invalidate</a></li>
                 
@@ -1339,6 +1359,8 @@
                     <li data-name="ns.ViewCollection#isValid"><a href="ns.ViewCollection.html#isValid">isValid</a></li>
                 
                     <li data-name="ns.ViewCollection#isValidDesc"><a href="ns.ViewCollection.html#isValidDesc">isValidDesc</a></li>
+                
+                    <li data-name="ns.ViewCollection#isValidWithDesc"><a href="ns.ViewCollection.html#isValidWithDesc">isValidWithDesc</a></li>
                 
                     <li data-name="ns.ViewCollection#isVisible"><a href="ns.ViewCollection.html#isVisible">isVisible</a></li>
                 
@@ -1406,7 +1428,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 11
+            ns.view.js, line 19
         </div>
         
     </div>
@@ -1877,6 +1899,64 @@
         </tr>
 	
 	
+	
+        <tr>
+            
+                <td class="name"><code>11</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+                <td class="default">
+                
+                    #patchLayout MUST returns valid layout ID
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>12</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+                <td class="default">
+                
+                    #patchLayout MUST returns layout with ns.Box at top
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
 	</tbody>
 </table></dl>
         
@@ -2288,7 +2368,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1677
+            ns.view.js, line 1880
         </div>
         
     </div>
@@ -2467,7 +2547,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1658
+            ns.view.js, line 1861
         </div>
         
     </div>
@@ -2669,7 +2749,7 @@
     
         
         <div class="tag-source">
-            ns.view.js, line 1298
+            ns.view.js, line 1480
         </div>
         
     </div>
@@ -2889,7 +2969,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1549
+            ns.view.js, line 1747
         </div>
         
     </div>
@@ -3069,7 +3149,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1558
+            ns.view.js, line 1756
         </div>
         
     </div>
@@ -3146,7 +3226,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1356
+            ns.view.js, line 1547
         </div>
         
     </div>
@@ -3279,7 +3359,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1344
+            ns.view.js, line 1535
         </div>
         
     </div>
@@ -3405,6 +3485,153 @@ View.
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="__onHide">
+            
+            <span class="type-signature ">protected</span>__onHide<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 271
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Убираем обработчики событие при скрытии/замены ноды.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="__onHtmldestroy">
+            
+            <span class="type-signature ">protected</span>__onHtmldestroy<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 228
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Внутренний обработчик htmldestroy</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="_getCommonTree">
             
             _getCommonTree<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="ns.View.html#UpdateTree">ns.View~UpdateTree</a>}</span>
@@ -3412,7 +3639,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 765
+            ns.view.js, line 928
         </div>
         
     </div>
@@ -3482,257 +3709,6 @@ View.
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="_hide">
-            
-            <span class="type-signature ">protected</span>_hide<span class="signature">(<span class="optional">events</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.view.js, line 209
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Скрывает view</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>events</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Массив событий.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="_htmldestroy">
-            
-            <span class="type-signature ">protected</span>_htmldestroy<span class="signature">(<span class="optional">events</span>)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            ns.view.js, line 188
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Обработчик htmldestroy</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>events</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>Массив событий.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
         <h4 class="name" id="_htmlinit">
             
             <span class="type-signature ">protected</span>_htmlinit<span class="signature">(<span class="optional">events</span>)</span>
@@ -3740,7 +3716,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 198
+            ns.view.js, line 237
         </div>
         
     </div>
@@ -3863,7 +3839,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1134
+            ns.view.js, line 1310
         </div>
         
     </div>
@@ -3934,7 +3910,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1155
+            ns.view.js, line 1331
         </div>
         
     </div>
@@ -4050,7 +4026,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 964
+            ns.view.js, line 1132
         </div>
         
     </div>
@@ -4166,7 +4142,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 246
+            ns.view.js, line 307
         </div>
         
     </div>
@@ -4294,7 +4270,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1231
+            ns.view.js, line 1412
         </div>
         
     </div>
@@ -4366,7 +4342,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 930
+            ns.view.js, line 1098
         </div>
         
     </div>
@@ -4487,7 +4463,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 939
+            ns.view.js, line 1107
         </div>
         
     </div>
@@ -4601,6 +4577,134 @@ View.
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="hideAndUnbindEvents">
+            
+            <span class="type-signature ">protected</span>hideAndUnbindEvents<span class="signature">(<span class="optional">events</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 248
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Скрывает view</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>events</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                    
+                        <span class="optional">optional</span>
+                    
+                    
+                        
+                    
+                
+                <p>Массив событий.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="invalidate">
             
             invalidate<span class="signature">()</span>
@@ -4608,7 +4712,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 528
+            ns.view.js, line 588
         </div>
         
     </div>
@@ -4679,7 +4783,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 553
+            ns.view.js, line 613
         </div>
         
     </div>
@@ -4751,7 +4855,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 594
+            ns.view.js, line 673
         </div>
         
     </div>
@@ -4879,7 +4983,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 585
+            ns.view.js, line 664
         </div>
         
     </div>
@@ -4955,7 +5059,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 561
+            ns.view.js, line 621
         </div>
         
     </div>
@@ -5031,7 +5135,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 545
+            ns.view.js, line 605
         </div>
         
     </div>
@@ -5103,7 +5207,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 569
+            ns.view.js, line 629
         </div>
         
     </div>
@@ -5172,6 +5276,78 @@ View.
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="isValidWithDesc">
+            
+            isValidWithDesc<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.view.js, line 645
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="isVisible">
             
             isVisible<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
@@ -5179,7 +5355,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 616
+            ns.view.js, line 695
         </div>
         
     </div>
@@ -5255,7 +5431,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1163
+            ns.view.js, line 1339
         </div>
         
     </div>
@@ -5326,7 +5502,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 863
+            ns.view.js, line 1026
         </div>
         
     </div>
@@ -5465,7 +5641,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1187
+            ns.view.js, line 1368
         </div>
         
     </div>
@@ -5618,12 +5794,12 @@ View.
     <div class="nameContainer">
         <h4 class="name" id="updateAfter">
             
-            updateAfter<span class="signature">(promise)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+            updateAfter<span class="signature">(promise, params, updateInstance)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
         </h4>
     
         
         <div class="tag-source">
-            ns.view.js, line 1170
+            ns.view.js, line 1348
         </div>
         
     </div>
@@ -5682,6 +5858,52 @@ View.
             <td class="description last">
                 
                 <p>Промис, после которого запустить ns.Update</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                <p>Параметры для запуска ns.Update.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>updateInstance</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ns.Update.html">ns.Update</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
         </tr>
 	
 	
@@ -6010,6 +6232,37 @@ View.
         </tr>
 	
 	
+	
+        <tr>
+            
+                <td class="name"><code>paramsRewrite</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Функция, изменяющая параметры после создания стандартными способами.</p></td>
+        </tr>
+	
+	
 	</tbody>
 </table></dl>
         
@@ -6291,7 +6544,7 @@ View.
     
         
         <div class="tag-source">
-            ns.view.js, line 1237
+            ns.view.js, line 1418
         </div>
         
     </div>
@@ -6370,7 +6623,7 @@ View.
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Thu Mar 19 2015 14:49:20 GMT+0300 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Apr 27 2015 21:24:08 GMT+0300 (MSK)
         </footer>
     </div>
 </div>

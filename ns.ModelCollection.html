@@ -73,6 +73,8 @@
                         
                             <li data-name="ns.byClass"><a href="ns.html#byClass">byClass</a></li>
                         
+                            <li data-name="ns.childrenIterator"><a href="ns.html#childrenIterator">childrenIterator</a></li>
+                        
                             <li data-name="ns.deentityify"><a href="ns.html#deentityify">deentityify</a></li>
                         
                             <li data-name="ns.entityify"><a href="ns.html#entityify">entityify</a></li>
@@ -216,6 +218,8 @@
                         <span class="subtitle">Static methods</span>
                         
                             <li data-name="ns.layout.define"><a href="ns.layout.html#define">define</a></li>
+                        
+                            <li data-name="ns.layout.generateSimple"><a href="ns.layout.html#generateSimple">generateSimple</a></li>
                         
                             <li data-name="ns.layout.page"><a href="ns.layout.html#page">page</a></li>
                         
@@ -459,6 +463,8 @@
                             <li data-name="ns.page.history.getPrevious"><a href="ns.page.history.html#getPrevious">getPrevious</a></li>
                         
                             <li data-name="ns.page.history.push"><a href="ns.page.history.html#push">push</a></li>
+                        
+                            <li data-name="ns.page.history.replace"><a href="ns.page.history.html#replace">replace</a></li>
                         
                     </ul>
                 
@@ -851,6 +857,8 @@
                 
                     <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
                 
+                    <li data-name="ns.ModelCollection#models"><a href="ns.ModelCollection.html#models">models</a></li>
+                
                     <li data-name="ns.ModelCollection#params"><a href="ns.ModelCollection.html#params">params</a></li>
                 
                 </ul>
@@ -1101,6 +1109,8 @@
             
                 <li data-name="ns.Update~PerformanceTimings"><a href="ns.Update.html#PerformanceTimings">PerformanceTimings</a></li>
             
+                <li data-name="ns.Update~updateViews"><a href="ns.Update.html#updateViews">updateViews</a></li>
+            
             </ul>
 
             <ul class="events itemMembers">
@@ -1175,11 +1185,11 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.View#__onHide"><a href="ns.View.html#__onHide">__onHide</a></li>
+                
+                    <li data-name="ns.View#__onHtmldestroy"><a href="ns.View.html#__onHtmldestroy">__onHtmldestroy</a></li>
+                
                     <li data-name="ns.View#_getCommonTree"><a href="ns.View.html#_getCommonTree">_getCommonTree</a></li>
-                
-                    <li data-name="ns.View#_hide"><a href="ns.View.html#_hide">_hide</a></li>
-                
-                    <li data-name="ns.View#_htmldestroy"><a href="ns.View.html#_htmldestroy">_htmldestroy</a></li>
                 
                     <li data-name="ns.View#_htmlinit"><a href="ns.View.html#_htmlinit">_htmlinit</a></li>
                 
@@ -1197,6 +1207,8 @@
                 
                     <li data-name="ns.View#getModelData"><a href="ns.View.html#getModelData">getModelData</a></li>
                 
+                    <li data-name="ns.View#hideAndUnbindEvents"><a href="ns.View.html#hideAndUnbindEvents">hideAndUnbindEvents</a></li>
+                
                     <li data-name="ns.View#invalidate"><a href="ns.View.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.View#isLoading"><a href="ns.View.html#isLoading">isLoading</a></li>
@@ -1210,6 +1222,8 @@
                     <li data-name="ns.View#isOk"><a href="ns.View.html#isOk">isOk</a></li>
                 
                     <li data-name="ns.View#isValid"><a href="ns.View.html#isValid">isValid</a></li>
+                
+                    <li data-name="ns.View#isValidWithDesc"><a href="ns.View.html#isValidWithDesc">isValidWithDesc</a></li>
                 
                     <li data-name="ns.View#isVisible"><a href="ns.View.html#isVisible">isVisible</a></li>
                 
@@ -1298,13 +1312,13 @@
                 
                 <span class="subtitle">Instance methods</span>
                 
+                    <li data-name="ns.ViewCollection#__onHide"><a href="ns.ViewCollection.html#__onHide">__onHide</a></li>
+                
+                    <li data-name="ns.ViewCollection#__onHtmldestroy"><a href="ns.ViewCollection.html#__onHtmldestroy">__onHtmldestroy</a></li>
+                
                     <li data-name="ns.ViewCollection#_getCommonTree"><a href="ns.ViewCollection.html#_getCommonTree">_getCommonTree</a></li>
                 
                     <li data-name="ns.ViewCollection#_getModelVersion"><a href="ns.ViewCollection.html#_getModelVersion">_getModelVersion</a></li>
-                
-                    <li data-name="ns.ViewCollection#_hide"><a href="ns.ViewCollection.html#_hide">_hide</a></li>
-                
-                    <li data-name="ns.ViewCollection#_htmldestroy"><a href="ns.ViewCollection.html#_htmldestroy">_htmldestroy</a></li>
                 
                     <li data-name="ns.ViewCollection#_htmlinit"><a href="ns.ViewCollection.html#_htmlinit">_htmlinit</a></li>
                 
@@ -1320,9 +1334,15 @@
                 
                     <li data-name="ns.ViewCollection#destroy"><a href="ns.ViewCollection.html#destroy">destroy</a></li>
                 
+                    <li data-name="ns.ViewCollection#forEachItem"><a href="ns.ViewCollection.html#forEachItem">forEachItem</a></li>
+                
+                    <li data-name="ns.ViewCollection#getItemByModel"><a href="ns.ViewCollection.html#getItemByModel">getItemByModel</a></li>
+                
                     <li data-name="ns.ViewCollection#getModel"><a href="ns.ViewCollection.html#getModel">getModel</a></li>
                 
                     <li data-name="ns.ViewCollection#getModelData"><a href="ns.ViewCollection.html#getModelData">getModelData</a></li>
+                
+                    <li data-name="ns.ViewCollection#hideAndUnbindEvents"><a href="ns.ViewCollection.html#hideAndUnbindEvents">hideAndUnbindEvents</a></li>
                 
                     <li data-name="ns.ViewCollection#invalidate"><a href="ns.ViewCollection.html#invalidate">invalidate</a></li>
                 
@@ -1339,6 +1359,8 @@
                     <li data-name="ns.ViewCollection#isValid"><a href="ns.ViewCollection.html#isValid">isValid</a></li>
                 
                     <li data-name="ns.ViewCollection#isValidDesc"><a href="ns.ViewCollection.html#isValidDesc">isValidDesc</a></li>
+                
+                    <li data-name="ns.ViewCollection#isValidWithDesc"><a href="ns.ViewCollection.html#isValidWithDesc">isValidWithDesc</a></li>
                 
                     <li data-name="ns.ViewCollection#isVisible"><a href="ns.ViewCollection.html#isVisible">isVisible</a></li>
                 
@@ -1680,6 +1702,51 @@
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="models">models<span class="type-signature type array.<ns.model>">Array.&lt;<a href="ns.Model.html">ns.Model</a>></span> </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Массив элементов колелкции.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="params">params<span class="type-signature type object">object</span> </h4>
     </div>
     
@@ -1738,7 +1805,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 278
+            ns.modelCollection.js, line 308
         </div>
         
     </div>
@@ -1805,7 +1872,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 206
+            ns.modelCollection.js, line 236
         </div>
         
     </div>
@@ -1969,7 +2036,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 371
+            ns.model.js, line 372
         </div>
         
     </div>
@@ -2045,7 +2112,7 @@
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 314
+            ns.modelCollection.js, line 344
         </div>
         
     </div>
@@ -2204,7 +2271,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 466
+            ns.model.js, line 467
         </div>
         
     </div>
@@ -2318,7 +2385,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 381
+            ns.model.js, line 382
         </div>
         
     </div>
@@ -2437,7 +2504,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 392
+            ns.model.js, line 393
         </div>
         
     </div>
@@ -2686,7 +2753,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 40
+            ns.modelCollection.js, line 46
         </div>
         
     </div>
@@ -2834,7 +2901,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 363
+            ns.model.js, line 364
         </div>
         
     </div>
@@ -2906,7 +2973,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 271
+            ns.modelCollection.js, line 301
         </div>
         
     </div>
@@ -2984,7 +3051,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 410
+            ns.model.js, line 411
         </div>
         
     </div>
@@ -3179,7 +3246,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 346
+            ns.modelCollection.js, line 376
         </div>
         
     </div>
@@ -3422,7 +3489,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 402
+            ns.model.js, line 403
         </div>
         
     </div>
@@ -3568,7 +3635,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 232
+            ns.modelCollection.js, line 262
         </div>
         
     </div>
@@ -3736,7 +3803,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 263
+            ns.modelCollection.js, line 293
         </div>
         
     </div>
@@ -3875,7 +3942,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 251
+            ns.modelCollection.js, line 281
         </div>
         
     </div>
@@ -4016,7 +4083,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 454
+            ns.model.js, line 455
         </div>
         
     </div>
@@ -4139,7 +4206,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 355
+            ns.model.js, line 356
         </div>
         
     </div>
@@ -4256,7 +4323,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 413
+            ns.modelCollection.js, line 441
         </div>
         
     </div>
@@ -4984,7 +5051,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 423
+            ns.model.js, line 424
         </div>
         
     </div>
@@ -5070,7 +5137,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 236
+            ns.modelCollection.js, line 266
         </div>
         
     </div>
@@ -5327,7 +5394,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 393
+            ns.modelCollection.js, line 421
         </div>
         
     </div>
@@ -5443,7 +5510,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.modelCollection.js, line 456
+            ns.modelCollection.js, line 484
         </div>
         
     </div>
@@ -5561,7 +5628,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 432
+            ns.model.js, line 433
         </div>
         
     </div>
@@ -5640,7 +5707,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Thu Mar 19 2015 14:49:20 GMT+0300 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Mon Apr 27 2015 21:24:08 GMT+0300 (MSK)
         </footer>
     </div>
 </div>

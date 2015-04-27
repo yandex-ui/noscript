@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Философия работы noscript Node.js v0.10.36 Manual &amp; Documentation</title>
+  <title>Философия работы noscript Node.js v0.10.38 Manual &amp; Documentation</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/sh.css">
   <link rel="canonical" href="http://nodejs.org/api/index.md.html">
@@ -30,7 +30,7 @@
         </div> -->
         <div id="column1" class="interior">
           <header>
-            <!-- <h1>Node.js v0.10.36 Manual &amp; Documentation</h1> -->
+            <!-- <h1>Node.js v0.10.38 Manual &amp; Documentation</h1> -->
             <h1>Noscript документация одной страницей</h1>
             <!-- <div id="gtoc">
               <p>
@@ -116,6 +116,7 @@
 <li><a href="#index_md_params_2">params</a></li>
 </ul>
 </li>
+<li><a href="#index_md_paramsrewrite">paramsRewrite</a></li>
 </ul>
 </li>
 <li><a href="#index_md_21">Валидность</a></li>
@@ -143,6 +144,7 @@
 <li><a href="#index_md_events_1"><code>events</code></a></li>
 <li><a href="#index_md_methods_1">methods</a></li>
 <li><a href="#index_md_params_3">params</a></li>
+<li><a href="#index_md_paramsrewrite_1">paramsRewrite</a></li>
 </ul>
 </li>
 <li><a href="#index_md_24">Получение экземпляра модели</a></li>
@@ -1161,6 +1163,21 @@ ns.View.define(&apos;super-view&apos;, {
   // ns.key - готовая функция для склеивания параметров в строку
   params: ns.key
 })</code></pre>
+<h3>paramsRewrite<span><a class="mark" href="#index_md_paramsrewrite" id="index_md_paramsrewrite">#</a></span></h3>
+<p><code>paramsRewrite</code> - функция в декларации, изменяющая параметры после их создания стандартными способами.
+Она вызывается всегда и ее стоит использовать для динамического изменения параметров перед созданием вида.
+
+</p>
+<pre><code>ns.View.define(&apos;myView&apos;, {
+    &quot;models&quot;: [ &apos;album&apos;, &apos;photo&apos; ],
+    &quot;paramsRewrite&quot;: function(params) {
+        if (someConditions) {
+            params.newParam = 1;
+        }
+
+        return params;
+    }
+});</code></pre>
 <h2>Валидность<span><a class="mark" href="#index_md_21" id="index_md_21">#</a></span></h2>
 <p>Валидность view считается по двум факторам:
 
@@ -1446,6 +1463,26 @@ ns.Model.define(&apos;my-model&apos;, {
 if (params.flag) {
    // эта ветка выполнится, потому что params.flag === &quot;false&quot;
 }</code></pre>
+<h3>paramsRewrite<span><a class="mark" href="#index_md_paramsrewrite_1" id="index_md_paramsrewrite_1">#</a></span></h3>
+<p><code>paramsRewrite</code> - функция в декларации, изменяющая параметры после их создания стандартными способами.
+Она вызывается всегда и ее стоит использовать для динамического изменения параметров перед созданием модели.
+
+</p>
+<pre><code>ns.Model.define(&apos;myModel&apos;, {
+    &quot;params&quot;: {
+        &quot;p1&quot;: null,
+        &quot;p2&quot;: null,
+        &quot;p3&quot;: null,
+        &quot;p4&quot;: null
+    },
+    &quot;paramsRewrite&quot;: function(params) {
+        // бизнес-логика приложения предполагает, что p1 и p3 вместе быть не могут
+        if (params.p1 &amp;&amp; params.p3) {
+            delete params.p3;
+        }
+        return params;
+    }
+});</code></pre>
 <h2>Получение экземпляра модели<span><a class="mark" href="#index_md_24" id="index_md_24">#</a></span></h2>
 <div class="signature"><ul>
 <li><code>ns.Model.get(&apos;modelName&apos;, params)</code> - строит ключ из <code>params</code> и возвращает соответствующую модель. Если такого экземпляра нет, то он будет создан.</li>
@@ -2080,7 +2117,7 @@ ns.layout.define(&apos;main&apos;, {
           <li><a href="http://twitter.com/nodejs" class="twitter">@nodejs</a></li>
       </ul>
 
-      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.36/LICENSE">license</a>.</p>
+      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.10.38/LICENSE">license</a>.</p>
     </div> -->
 
   <script src="assets/sh_main.js"></script>

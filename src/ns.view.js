@@ -77,6 +77,13 @@
     ns.View.prototype.id = null;
 
     /**
+     * Флаг видимости вида.
+     * @type {boolean}
+     * @private
+     */
+    ns.View.prototype._visible = false;
+
+    /**
      * Уникальный идентификатор вида
      * @type {string}
      * @private
@@ -233,34 +240,42 @@
      * @protected
      */
     ns.View.prototype._hide = function(events) {
-        if (!this.isLoading() && this._visible === true) {
+        var doUnbindEvents = !this.isLoading() && this._visible === true;
+
+        if (doUnbindEvents) {
             this._unbindEvents('show');
-            this._hideNode();
-            this._visible = false;
             if (events) {
                 events.push(this);
             }
-            return true;
-
-        } else if (this.isLoading() && this._visible !== false) {
-            // Случай для асинхронных видов, которые отрендерили в состоянии async,
-            // но `_show` для них не выполнялся. Это происходит, например, при
-            // быстрой навигации по интерфейсу.
-            this._hideNode();
-            this._visible = false;
-
-            // Чтобы не триггерились события (см ns.box).
-            return false;
         }
 
-        return false;
+        // Скрывать и ставить флаг надо всегда.
+        // Например, для асинхронных видов, которые отрендерили в состоянии async,
+        // но `_show` для них не выполнялся
+        // Это происходит при быстрой навигации по интерфейсу.
+
+        this._hideNode();
+        this._visible = false;
+
+        // надо для триггера событий
+        return doUnbindEvents;
     };
 
     /**
+     * Ставим CSS-класс для скрытия ноды вида.
      * @private
      */
     ns.View.prototype._hideNode = function() {
-        this.node.className = this.node.className.replace(' ns-view-visible', '') + ' ns-view-hidden';
+        if (!this.node) {
+            return;
+        }
+
+        var oldClassName = this.node.className;
+        var newClassName = oldClassName.replace(' ns-view-visible', '').replace(' ns-view-hidden', '');
+        newClassName += ' ns-view-hidden';
+        if (oldClassName !== newClassName) {
+            this.node.className = newClassName;
+        }
     };
 
     /**
@@ -270,8 +285,7 @@
      * @returns {boolean}
      */
     ns.View.prototype._show = function(events) {
-        // При создании блока у него this._visible === undefined.
-        if (!this.isLoading() && this._visible !== true) {
+        if (!this.isLoading() && !this._visible) {
             if (!this.__modelsEventsBinded) {
                 // События моделей навешиваются один раз и снимаются только при уничтожении блока
                 // События специально навешиваются только после первого показа вида, чтобы избежать различных спецэффектов.
@@ -1134,6 +1148,7 @@
                 //  Все подблоки ниже уже не toplevel.
                 options_next.toplevel = false;
             }
+
             //  вызываем htmldestory только если нода была заменена
             if (this.node && !this.isLoading()) {
                 this._hide(events['ns-view-hide']);

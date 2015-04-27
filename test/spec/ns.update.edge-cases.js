@@ -184,6 +184,64 @@ describe('ns.Update. Синтетические случаи', function() {
 
     });
 
+    describe('Недорисованный async-view внутри бокса должен скрываться, если его больше нет в раскладке', function() {
+
+        beforeEach(function() {
+
+            ns.layout.define('page1', {
+                'app': {
+                    'box@': {
+                        'view1&': {}
+                    }
+                }
+            });
+
+            ns.layout.define('page2', {
+                'app': {
+                    'box@': {
+                        'view2': {}
+                    }
+                }
+            });
+
+            ns.Model.define('model-async');
+            ns.Model.get('model-async').setData({data: true});
+
+            ns.View.define('app');
+            ns.View.define('view1', {models: ['model-async']});
+            ns.View.define('view2');
+
+            this.view = ns.View.create('app');
+            var layout1 = ns.layout.page('page1');
+            var layout2 = ns.layout.page('page2');
+
+            return new ns.Update(this.view, layout1, {})
+                // рисуем "view1&" - все ок
+                .render()
+                // переключаем на "view2" - все ок
+                .then(function() {
+                    return new ns.Update(this.view, layout2, {}).render();
+                }, null, this)
+                // инвалидируем модель для на "view1&", чтобы вид остался в async-состоянии
+                // переключаем на "view1&"
+                .then(function() {
+                    ns.Model.get('model-async').invalidate();
+                    return new ns.Update(this.view, layout1, {}).render();
+                }, null, this)
+                // переключаем на "view2"
+                // Баг в том, что "view1&" не будет скрыт
+                .then(function() {
+                    return new ns.Update(this.view, layout2, {}).render();
+                }, null, this);
+        });
+
+        it('должен скрыть "view1&"', function() {
+            var view1Node = this.view.node.querySelector('.ns-view-view1');
+            expect(view1Node.className).to.contain(' ns-view-hidden');
+        });
+
+    });
+
     it('Не должен вызывать ns.request.models, если все модели валидные', function() {
         /*
          Этот тест решает следующую задачу:

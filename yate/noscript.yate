@@ -54,7 +54,7 @@ match .* ns-build-view {
 }
 
 match .* ns-build-view-content {
-    @class="ns-view-{ name() } { /.uniqueId }"
+    @class="ns-view-{ /.id } { /.uniqueId }"
     @data-key="{ /.key }"
     state = scalar(/.state)
 

@@ -929,6 +929,7 @@
         var tree = {
             box: this.info.isBox,
             collection: this.info.isCollection,
+            id: this.id,
             key: this.key,
             models: {},
             params: this.params,

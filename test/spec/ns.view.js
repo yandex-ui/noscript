@@ -881,6 +881,8 @@ describe('ns.View', function() {
             });
 
             this.view = ns.View.create('view1');
+            this.sinon.spy(this.view, 'trigger');
+
             var layout = ns.layout.page('app');
 
             return new ns.Update(this.view, layout, {})
@@ -916,6 +918,29 @@ describe('ns.View', function() {
             expect(this.onView2DestroySpy).to.have.callCount(1);
         });
 
+        it('должен вызвать события ns-view-hide если нода видима', function() {
+            this.view.destroy();
+            expect(this.view.trigger).to.be.calledWithExactly('ns-view-hide');
+        });
+
+        it('должен вызвать события ns-view-htmldestroy если нода существует', function() {
+            this.view.destroy();
+            expect(this.view.trigger).to.be.calledWithExactly('ns-view-htmldestroy');
+        });
+
+        it('не должен вызвать события ns-view-hide и ns-view-htmldestroy если ноды нет', function() {
+            this.view.node = null;
+            this.view.destroy();
+            expect(this.view.trigger).to.not.be.calledWithExactly('ns-view-hide');
+            expect(this.view.trigger).to.not.be.calledWithExactly('ns-view-htmldestroy');
+        });
+
+        it('не должен вызвать событие ns-view-hide если вид скрыт', function() {
+            this.view._visible = false;
+            this.view.destroy();
+            expect(this.view.trigger).to.not.be.calledWithExactly('ns-view-hide');
+            expect(this.view.trigger).to.be.calledWithExactly('ns-view-htmldestroy');
+        });
     });
 
     describe('#invalidate.', function() {
@@ -1470,7 +1495,7 @@ describe('ns.View', function() {
 
             var view = ns.View.create('view1');
             var page = ns.layout.page('test');
-            
+
             return new ns.Update(view, page, {id: 'foo\n\r'}).render().then(function() {
                 expect(view.node.querySelectorAll('div[data-key="view=vc-item&id=foo%0A%0D"]')).to.have.length(1);
             });

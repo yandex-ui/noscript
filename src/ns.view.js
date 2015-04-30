@@ -1423,12 +1423,14 @@
 
         this.views = {};
 
-        // если блок виден, то скрываем его
-        if (this.isVisible()) {
-            this.trigger("ns-view-hide");
-            this.trigger("ns-view-htmldestroy");
+        if (this.node && !this.isLoading()) {
+            // если блок виден, то скрываем его
+            if (this.isVisible()) {
+                this.trigger("ns-view-hide");
+                this.hideAndUnbindEvents();
+            }
 
-            this.hideAndUnbindEvents();
+            this.trigger("ns-view-htmldestroy");
             this.__onHtmldestroy();
         }
 

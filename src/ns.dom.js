@@ -35,7 +35,7 @@
     /**
      * Generates DOM from HTML-string.
      * @param {string} html
-     * @returns {Element}
+     * @returns {?Element}
      */
     ns.html2node = function(html) {
         if (!html) {

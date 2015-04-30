@@ -1145,8 +1145,8 @@
 
     /**
      * Ищет элемент для вида по его ключу
-     * @param {HTMLElement} node
-     * @returns {Node}
+     * @param {Element} node
+     * @returns {?Element}
      * @private
      */
     ns.View.prototype._extractNodeByKey = function(node) {
@@ -1166,9 +1166,9 @@
     };
 
     /**
-     *
-     * @param {HTMLElement} node
-     * @returns {Node}
+     * Ищет ноду для вида в отрендеренном DOM.
+     * @param {Element} node
+     * @returns {?Element} Ноды может не быть, эту ситуацию надо обрабатывать.
      * @private
      */
     ns.View.prototype._extractNode = function(node) {

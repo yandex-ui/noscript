@@ -1,5 +1,10 @@
 describe('ns.page', function() {
 
+    beforeEach(function() {
+        this.sinon.stub(ns.page.history, '_current', null);
+        this.sinon.stub(ns.page.history, '_history', []);
+    });
+
     describe('ns.page.go', function() {
 
         describe('redirect', function() {
@@ -223,6 +228,28 @@ describe('ns.page', function() {
                 it('ns.page._fillHistory не должен записывать историю при вызове с параметром preserve ', function() {
                     ns.page._fillHistory('/new', 'preserve');
                     expect(ns.page.history.push.called).to.be.eql(false);
+                });
+            });
+
+            describe('ns.page.history.push', function() {
+                beforeEach(function() {
+                    this.sinon.stub(ns, 'Update', function() {
+                        return {
+                            start: function() {
+                                return Vow.fulfill();
+                            }
+                        };
+                    });
+                });
+
+                it('Должен запомнить страницу после возврата на предыдущую', function() {
+                    return ns.page.go('/inbox').then(function() {
+                        return ns.page.go('/message/1').then(function() {
+                            return ns.page.go('/inbox').then(function() {
+                                expect(ns.page.history.getPrevious()).to.be.eql('/message/1');
+                            });
+                        });
+                    });
                 });
             });
 

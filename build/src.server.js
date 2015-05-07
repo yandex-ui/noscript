@@ -18,6 +18,7 @@ module.exports = function() {
     /* borschik:include:../src/ns.layout.js */
     /* borschik:include:../src/ns.log.js */
     /* borschik:include:../src/ns.page.js */
+    /* borschik:include:../src/ns.page.history.js */
     /* borschik:include:../src/ns.request.js */
     /* borschik:include:../src/ns.request.manager.js */
     /* borschik:include:../src/ns.router.js */

@@ -190,6 +190,7 @@ ns.reset = function() {
     ns.View._reset();
     ns.request._reset();
     ns.page._reset();
+    ns.page.history.reset();
 
     ns.MAIN_VIEW = null;
 };

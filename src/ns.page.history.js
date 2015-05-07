@@ -98,4 +98,13 @@
         return history[l - n - 1];
     };
 
+    /**
+     * Сбрасывает данные в начальное состояние.
+     * Метод используется в тестах.
+     */
+    ns.page.history.reset = function() {
+        ns.page.history._current = null;
+        ns.page.history._history = [];
+    };
+
 })();

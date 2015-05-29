@@ -2,10 +2,17 @@
  * @const
  * @type {Boolean}
  */
-ns.IS_TOUCH = Boolean(
-    'ontouchstart' in window ||
-    (window.DocumentTouch && document instanceof DocumentTouch)
-);
+ns.IS_TOUCH = (function() {
+    // даем возможность определять IS_TOUCH приложению
+    if (typeof window['NS_IS_TOUCH'] === 'boolean') {
+        return window['NS_IS_TOUCH'];
+    } else {
+        return Boolean(
+            'ontouchstart' in window ||
+            (window.DocumentTouch && document instanceof DocumentTouch)
+        );
+    }
+})();
 
 //TODO: Pointer events support (MSIE 10)
 

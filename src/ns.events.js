@@ -96,7 +96,7 @@ ns.Events.trigger = function(name, params) {
             try {
                 handlers[i].apply(this, arguments);
             } catch(e) {
-                ns.log.exception('ns.events', e);
+                ns.log.exception('ns.events', e, {name: name});
             }
         }
     }

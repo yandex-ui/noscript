@@ -183,7 +183,7 @@
             that.onItemTouched(evt, model);
         });
 
-        this.bindModel(model, 'ns-model-destroyed', function(evt) {
+        this.bindModel(model, 'ns-model-before-destroyed', function(evt) {
             that.onItemDestroyed(evt, model);
         });
     };
@@ -287,8 +287,8 @@
 
     /**
      * Метод вызывается, когда уничтожается элемент коллекции.
-     * @param {string} evt Событие 'ns-model-destroyed' от элемента коллекции.
-     * @param {ns.Model} model Уничтоженный элемент коллекции.
+     * @param {string} evt Событие 'ns-model-before-destroyed' от элемента коллекции.
+     * @param {ns.Model} model Уничтожаемый элемент коллекции.
      */
     ns.ModelCollection.prototype.onItemDestroyed = function(evt, model) {
         this.remove(model);

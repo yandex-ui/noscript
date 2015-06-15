@@ -720,13 +720,13 @@ describe('ns.ModelCollection', function() {
                 expect(this.onItemTouchedSpy.calledWithExactly('ns-model-touched', touchedModel)).to.be.equal(true);
             });
 
-            it('ns-model-destroyed', function() {
+            it('ns-model-before-destroyed', function() {
                 var destroyedModel = this.models[1];
                 var countElementsBefore = this.mc.models.length;
 
                 destroyedModel.destroy();
                 expect(this.onItemDestroyedSpy.callCount).to.be.equal(1);
-                expect(this.onItemDestroyedSpy.calledWithExactly('ns-model-destroyed', destroyedModel)).to.be.equal(true);
+                expect(this.onItemDestroyedSpy.calledWithExactly('ns-model-before-destroyed', destroyedModel)).to.be.equal(true);
                 expect(this.mc.models.length).to.be.equal(countElementsBefore - 1);
             });
         });

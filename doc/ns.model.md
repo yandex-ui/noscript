@@ -50,8 +50,7 @@ ns.Model.define('my-model', {
 Пример:
 ```js
 {
-    "my-custom-event": "onCustomEvent",
-    "my-custom-show@show": "onCustomShow"
+    "my-custom-event": "onCustomEvent"
 }
 ```
 
@@ -97,7 +96,7 @@ ns.Model.define('my-model', {
 Т.о. `0` станет `"0"`, `false` - `"false"`. А это значит, что параметры, которые в вашем приложении не обрабатываются как строки, надо приводить к правильному типу на сервере. Иначе, можно получить такую ошибку
 ```js
 // отправили параметры как
-// ?lag=false
+// ?flag=false
 //
 
 if (params.flag) {
@@ -176,6 +175,7 @@ this.get('.foo') -> "1"
 this.get('.bar.id') -> ["1"]
 ```
  - `#select(jpath)` - выбирает данные по jpath. В отличии от `#get`, не занимается приведением и всегда возвращает **массив** результатов выборки, т.о. формат результат остается стабильным при изменениях.
+
 ```js
 {
     "foo": "1",
@@ -190,6 +190,7 @@ this.get('.bar.id') -> ["1"]
 **Методы для изменения данных**:
 
  - `#set(jpath, value)` - изменяет данные по jpath. Поддерживаются только несложные jpath.
+
 ```js
 this.set('.foo', 2);
 ```
@@ -239,7 +240,7 @@ ns.Model.define('my-model', {
 ns.Model.define('my-model', {
     methods: {
         hasDataChanged: function(newData) {
-            var oldData = this.getData;
+            var oldData = this.getData();
             // изменяем данные, только если изменилось поле id
             return oldData.id !== newData.id
         }

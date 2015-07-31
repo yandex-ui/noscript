@@ -187,18 +187,24 @@
         var timerName = 'collectModels.' + this._requestCount;
 
         this.startTimer(timerName);
-        var views = this.view._getRequestViews({
+        var viewsToUpdate = {
             sync: [],
             async: [],
+
+            toHide: [],
+            toHtmlDestroy: [],
+
             // Флаг, что layout остался в неопределенном состоянии
             // Надо запросить модели и пройтись еще раз
             hasPatchLayout: false
-        }, this.layout, this.params);
+        };
+
+        this.view._getRequestViews(viewsToUpdate, this.layout, this.params);
         this.stopTimer(timerName);
 
-        this.log('collected incomplete views', views);
+        this.log('collected incomplete views', viewsToUpdate);
 
-        return views;
+        return viewsToUpdate;
     };
 
     /**
@@ -259,7 +265,9 @@
 
             } else {
                 requestPromise.fulfill({
-                    async: asyncPromises
+                    async: asyncPromises,
+                    toHide: views.toHide,
+                    toHtmlDestroy: views.toHtmlDestroy
                 });
             }
         }, function(e) {
@@ -324,22 +332,13 @@
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
 
-        this.startTimer('triggerHideEvents');
-        var hideViewEvents = {
-            'ns-view-hide': [],
-            'ns-view-htmldestroy': []
-        };
-        this.view.beforeUpdateHTML(hideViewEvents);
-        this._triggerViewEvents(hideViewEvents);
-
+        this.startTimer('insertNodes');
         var viewEvents = {
             'ns-view-async': [],
             'ns-view-htmlinit': [],
             'ns-view-show': [],
             'ns-view-touch': []
         };
-
-        this.switchTimer('triggerHideEvents', 'insertNodes');
         this.view._updateHTML(node, {toplevel: true}, viewEvents);
         this.switchTimer('insertNodes', 'triggerEvents');
 
@@ -370,10 +369,20 @@
      * потому что у видов будет уже другое состояние, если что-то поменяется между generateHTML и insertNodes
      * @private
      */
-    ns.Update.prototype._updateDOM = function() {
+    ns.Update.prototype._updateDOM = function(result) {
         if (this._expired()) {
             return this._rejectWithStatus(this.STATUS.EXPIRED);
         }
+
+        this.startTimer('triggerHideEvents');
+        if (result) {
+            //TODO: unbindEvents
+            this._triggerViewEvents({
+                'ns-view-hide': result.toHide,
+                'ns-view-htmldestroy': result.toHtmlDestroy
+            });
+        }
+        this.stopTimer('triggerHideEvents');
 
         var html = this._renderUpdateTree();
         this.startTimer('html2node');
@@ -443,7 +452,7 @@
         // начинаем цепочку с промиса, чтобы ловить ошибки в том числе и из _requestAllModels
         Vow.invoke(this._requestAllModels.bind(this))
             .then(function(result) {
-                this._updateDOM();
+                this._updateDOM(result);
                 this._fulfill(result);
             }, this._reject, this)
             // еще один reject, чтобы ловить ошибки из #_updateDOM
@@ -708,6 +717,8 @@
      * @typedef {object} ns.Update~updateViews
      * @property {ns.View[]} sync Массив видов, которые надо обновить синхронно.
      * @property {ns.View[]} async Массив видов, которые надо обновить асинхронно.
+     * @property {ns.View[]} toHide
+     * @property {ns.View[]} toHtmlDestroy
      * @property {boolean} hasPatchLayout Флаг, что в дереве есть неопределившиеся виды.
      */
 

@@ -245,12 +245,12 @@
      * @returns {boolean}
      * @protected
      */
-    ns.View.prototype.hideAndUnbindEvents = function(events) {
+    ns.View.prototype.hideAndUnbindEvents = function() {
         var eventsWasUnbinded = this.__onHide();
 
-        if (eventsWasUnbinded && events) {
-            events.push(this);
-        }
+        //if (eventsWasUnbinded && events) {
+        //    events.push(this);
+        //}
 
         // Скрывать и ставить флаг надо всегда.
         // Например, для асинхронных видов, которые отрендерили в состоянии async,
@@ -732,6 +732,10 @@
      * @private
      */
     ns.View.prototype._getRequestViews = function(updated, pageLayout, updateParams) {
+        if (window.debug && this.id === 'content2-async') {
+            debugger;
+        }
+
         var syncState = this.__evaluateState();
         // Добавляем себя в обновляемые виды
         this.__registerInUpdate(syncState, updated);
@@ -768,11 +772,13 @@
 
         var layoutViews = pageLayout.views;
         this._saveLayout(layoutViews);
+        this.__registerHideEvents(updated);
 
         // Создаем детей и идем вниз только если находимся в синхронном состоянии
         // Иначе получится странная ситуация,
         // что дети асинхронного вида добавят себя как синхронные и для них будут запрошены модели.
         if (canGoFather) {
+
             // Создаем подблоки
             for (var view_id in layoutViews) {
                 this._addView(view_id, updateParams, layoutViews[view_id].type);
@@ -782,8 +788,6 @@
                 view._getRequestViews(updated, layoutViews[id], updateParams);
             });
         }
-
-        return updated;
     };
 
     /**
@@ -893,6 +897,24 @@
             updatedViews.sync.push(this);
         } else {
             updatedViews.async.push(this);
+        }
+    };
+
+    /**
+     *
+     * @param {ns.Update~updateViews} updatedViews Обновляемые виды.
+     * @private
+     */
+    ns.View.prototype.__registerHideEvents = function(updatedViews) {
+        var viewWasInvalid = !this.isValidSelf();
+        if ( viewWasInvalid ) {
+            // если была видимая нода
+            if (this.node && !this.isLoading()) {
+                if (this.isVisible()) {
+                    updatedViews.toHide.push(this);
+                }
+                updatedViews.toHtmlDestroy.push(this);
+            }
         }
     };
 
@@ -1183,6 +1205,7 @@
         return viewNode;
     };
 
+    /*
     ns.View.prototype._selfBeforeUpdateHTML = function(events) {
         var viewWasInvalid = !this.isValidSelf();
         if ( viewWasInvalid ) {
@@ -1196,6 +1219,7 @@
         }
     };
 
+
     ns.View.prototype.beforeUpdateHTML = function(events) {
         this._selfBeforeUpdateHTML(events);
 
@@ -1206,6 +1230,7 @@
             });
         }
     };
+    */
 
     /**
      * Обновляем (если нужно) ноду блока.

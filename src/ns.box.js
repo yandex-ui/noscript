@@ -129,6 +129,8 @@ ns.Box.prototype._getRequestViews = function(updated, layout, params) {
 
     // сохраняем новый активный layout, в дальнейшем работает с ним
     this.active = layoutActive;
+
+    this.__registerHideEvents(updated);
 };
 
 /**
@@ -164,26 +166,12 @@ ns.Box.prototype._getViewTree = function() {
     return tree;
 };
 
-ns.Box.prototype.beforeUpdateHTML = function(events) {
-    var activeLayout = this.active;
-    for (var viewId in activeLayout) {
-        var viewKey = activeLayout[viewId];
-        //  Достаем ранее созданный блок (в _getRequestViews).
-        /** @type {ns.View} */
-        var view = this.views[viewKey];
-        view.beforeUpdateHTML(events);
-    }
-
-    this._hideInactiveViews(events);
-};
-
 /**
  * Скрываем все неактивные виды в боксе
- * @param {object} events
+ * @param {ns.Update~updateViews} updatedViews Обновляемые виды.
  * @private
  */
-ns.Box.prototype._hideInactiveViews = function(events) {
-    var hideEvents = events['ns-view-hide'];
+ns.Box.prototype.__registerHideEvents = function(updatedViews) {
     // Пройдёмся по всем вложенным видам, чтобы кинуть hide, которым не попали в newLayout
     for (var key in this.views) {
         var view = this.views[key];
@@ -193,8 +181,35 @@ ns.Box.prototype._hideInactiveViews = function(events) {
             // Скроем виды, не попавшие в layout
             var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
-                descs[i].hideAndUnbindEvents(hideEvents);
+                // тут могут быть боксы, а у них нет .trigger
+                if (descs[i].trigger) {
+                    updatedViews.toHide.push(descs[i]);
+                }
             }
+        }
+    }
+};
+
+/**
+ * Скрываем все неактивные виды в боксе
+ * @private
+ */
+ns.Box.prototype._hideInactiveViews = function() {
+    // Пройдёмся по всем вложенным видам, чтобы кинуть hide, которым не попали в newLayout
+    for (var key in this.views) {
+        var view = this.views[key];
+        // Если вид не входит в новый active
+        if (this.active[view.id] !== view.key) {
+
+            var descs = view._getDescendantsAndSelf( [] );
+            for (var i = 0, l = descs.length; i < l; i++) {
+                descs[i].hideAndUnbindEvents();
+            }
+
+            // удаляем скрытые виды из DOM
+            //if (view.node) {
+            //    ns.removeNode(view);
+            //}
         }
     }
 };
@@ -229,6 +244,8 @@ ns.Box.prototype._updateHTML = function(node, options, events) {
 
     var views = this.views;
     var boxLayout = this.active;
+
+    this._hideInactiveViews();
 
     //  Строим новый active согласно layout'у.
     //  Т.е. это тот набор блоков, которые должны быть видимы в боксе после окончания всего апдейта

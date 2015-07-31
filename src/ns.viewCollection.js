@@ -366,9 +366,7 @@ ns.ViewCollection.prototype._getRequestViews = function(updated, layout, updateP
     // Все элементы коллекции в контейнере, а коллекция может иметь собственную разметку, в т.ч. с другими видами
 
     this._saveLayout(pageLayout);
-
-    // При необходимости добавим текущий вид в список "запрашиваемых"
-    return updated;
+    this.__registerHideEvents(updated);
 };
 
 /**
@@ -508,6 +506,7 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
     return result;
 };
 
+/*
 ns.ViewCollection.prototype.beforeUpdateHTML = function(events) {
     this._selfBeforeUpdateHTML(events);
 
@@ -518,6 +517,7 @@ ns.ViewCollection.prototype.beforeUpdateHTML = function(events) {
         });
     }
 };
+*/
 
 /**
  *

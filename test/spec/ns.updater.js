@@ -704,7 +704,7 @@ describe('ns.Updater', function() {
             });
 
             it('should save state for page2', function() {
-                expect(ns.MAIN_VIEW.$node.find('.ns-view-my_view2').hasClass('ns-view-visible')).to.be.equal(true);
+                expect(ns.MAIN_VIEW.$node.find('.ns-view-my_view2')).to.have.length(1);
             });
 
         });
@@ -1075,16 +1075,17 @@ describe('ns.Updater', function() {
         });
 
         it('should hide async views', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async:not(.ns-view-hidden)')).to.have.length(0);
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async')).to.have.length(0);
         });
 
         it('should show only one view', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos')).to.have.length(1);
         });
 
-        it('should hide other fetching views', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-hidden')).to.have.length(1);
+        it('should show only one view ("view=todos&category=2")', function() {
+            expect(ns.MAIN_VIEW.$node.find('.ns-view-todos[data-key="view=todos&category=2"]')).to.have.length(1);
         });
+
     });
 
     describe('interrupting updates of async views inside a box - 2', function() {
@@ -1128,22 +1129,21 @@ describe('ns.Updater', function() {
         });
 
         it('should hide async views', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async:not(.ns-view-hidden)')).to.have.length(0);
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-async')).to.have.length(0);
         });
 
         it('should show only one view', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-visible')).to.have.length(1);
+            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos')).to.have.length(1);
         });
 
-        it('should hide other fetching views', function() {
-            expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos.ns-view-hidden')).to.have.length(1);
+        it('should show only one view ("view=todos&category=2")', function() {
+            expect(ns.MAIN_VIEW.$node.find('.ns-view-todos[data-key="view=todos&category=2"]')).to.have.length(1);
         });
 
-        it('should correctly switch views once navigated back', function(finish) {
-            ns.page.go('/1').then(function() {
-                expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos.ns-view-visible').getAttribute('data-key')).to.contain('category=1');
-                expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos.ns-view-hidden').getAttribute('data-key')).to.contain('category=2');
-                finish();
+        it('should correctly switch views once navigated back', function() {
+            return ns.page.go('/1').then(function() {
+                expect(ns.MAIN_VIEW.node.querySelectorAll('.ns-view-todos')).to.have.length(1);
+                expect(ns.MAIN_VIEW.node.querySelector('.ns-view-todos').getAttribute('data-key')).to.contain('category=1');
             });
         });
     });

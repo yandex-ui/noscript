@@ -1486,7 +1486,7 @@ describe('ns.ViewCollection', function() {
             });
 
             it('коллекция должна отрисоваться в обычном режиме', function() {
-                expect(this.view.node.querySelectorAll('.ns-view-vc.ns-view-visible')).to.have.length(1);
+                expect(this.view.node.querySelectorAll('.ns-view-vc')).to.have.length(1);
             });
 
             it('коллекция должна отрисовать свои элементы', function() {

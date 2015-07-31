@@ -393,7 +393,7 @@ ns.ViewCollection.prototype.__collectInactiveViews = function(activeItems) {
  * Уничтожает старые виды.
  * @private
  */
-ns.View.prototype.__destroyInactiveViews = function() {
+ns.ViewCollection.prototype.__destroyInactiveViews = function() {
     var views = this.__itemsToRemove;
     for (var i = 0, j = views.length; i < j; i++) {
         views[i].destroy();

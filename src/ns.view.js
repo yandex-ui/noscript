@@ -241,31 +241,20 @@
 
     /**
      * Скрывает view
-     * @param {Array} [events] Массив событий.
-     * @returns {boolean}
      * @protected
      */
-    ns.View.prototype.hideAndUnbindEvents = function(events) {
-        var eventsWasUnbinded = this.__onHide();
-
-        if (eventsWasUnbinded && events) {
-            events.push(this);
-        }
-
+    ns.View.prototype.hideAndUnbindEvents = function() {
         // Скрывать и ставить флаг надо всегда.
         // Например, для асинхронных видов, которые отрендерили в состоянии async,
         // но `_show` для них не выполнялся
         // Это происходит при быстрой навигации по интерфейсу.
 
         this._hideNode();
-
-        // надо для триггера событий
-        return eventsWasUnbinded;
+        this.__onHide();
     };
 
     /**
      * Убираем обработчики событие при скрытии/замены ноды.
-     * @returns {boolean}
      * @protected
      */
     ns.View.prototype.__onHide = function() {
@@ -277,8 +266,6 @@
 
         // Ставим флаг, что вид скрыт
         this._visible = false;
-
-        return doUnbindEvents;
     };
 
     /**
@@ -1183,7 +1170,16 @@
         return viewNode;
     };
 
-    ns.View.prototype._selfBeforeUpdateHTML = function(events) {
+    ns.View.prototype._selfBeforeUpdateHTML = function(events, toHide) {
+        if (toHide) {
+            // этот вид надо гарантированно спрятать, если он был виден
+            var isVisible = this._visible === true && !this.isLoading();
+            if (isVisible) {
+                events['ns-view-hide'].push(this);
+            }
+            return;
+        }
+
         var viewWasInvalid = !this.isValidSelf();
         if ( viewWasInvalid ) {
             // если была видимая нода
@@ -1196,13 +1192,18 @@
         }
     };
 
-    ns.View.prototype.beforeUpdateHTML = function(events) {
-        this._selfBeforeUpdateHTML(events);
+    /**
+     * Собирает события ns-view-hide и ns-view-destroy
+     * @param {object} events
+     * @param {boolean} toHide Вид надо спрятать, так решил его родитель
+     */
+    ns.View.prototype.beforeUpdateHTML = function(events, toHide) {
+        this._selfBeforeUpdateHTML(events, toHide);
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
             this._apply(function(view) {
-                view.beforeUpdateHTML(events);
+                view.beforeUpdateHTML(events, toHide);
             });
         }
     };

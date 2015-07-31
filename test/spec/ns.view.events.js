@@ -830,4 +830,53 @@ describe('ns.View.events', function() {
 
     });
 
+    describe('"ns-view-hide" вызываются на старой ноде, которая еще видна', function() {
+
+        beforeEach(function() {
+            ns.log.exception.restore();
+            this.sinon.stub(ns.log, 'exception', function(name, error) {
+                throw error;
+            });
+
+            ns.layout.define('view1', {
+                'app content@': {
+                    'view1': {}
+                }
+            }, 'app');
+
+            ns.layout.define('view2', {
+                'app content@': {
+                    'view2': {}
+                }
+            }, 'app');
+
+            this.onHideSpy = this.sinon.spy(function() {
+                // Не придумал как проконтроллировать этот процесс нормально,
+                // так что сделал тест тут.
+                // expect выкинет ошибку и тест завалится.
+                expect(this.node.className).to.contain(' ns-view-visible');
+            });
+
+            ns.View.define('view1', {
+                events: {
+                    'ns-view-hide': this.onHideSpy
+                }
+            });
+
+            ns.View.define('view2');
+
+            var layout1 = ns.layout.page('view1', {});
+            return new ns.Update(this.APP, layout1, {}).render();
+        });
+
+        it('в момент события ns-view-hide нода еще видна', function() {
+            var layout2 = ns.layout.page('view2', {});
+            return new ns.Update(this.APP, layout2, {}).render().then(function() {
+                // это специальная проверка, что тест вообще отработал
+                expect(this.onHideSpy).to.have.callCount(1);
+            }, this);
+        });
+
+    });
+
 });

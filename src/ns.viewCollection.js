@@ -508,17 +508,6 @@ ns.ViewCollection.prototype._getDescViewTree = function() {
     return result;
 };
 
-ns.ViewCollection.prototype.beforeUpdateHTML = function(events) {
-    this._selfBeforeUpdateHTML(events);
-
-    // проходимся по элементам коллекции
-    if (!this.isLoading()) {
-        this._apply(function(view) {
-            view.beforeUpdateHTML(events);
-        });
-    }
-};
-
 /**
  *
  * @param {HTMLElement} node

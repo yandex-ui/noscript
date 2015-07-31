@@ -164,36 +164,31 @@ ns.Box.prototype._getViewTree = function() {
     return tree;
 };
 
-ns.Box.prototype.beforeUpdateHTML = function(events) {
-    var activeLayout = this.active;
-    for (var viewId in activeLayout) {
-        var viewKey = activeLayout[viewId];
+ns.Box.prototype.beforeUpdateHTML = function(events, toHide) {
+    for (var viewKey in this.views) {
         //  Достаем ранее созданный блок (в _getRequestViews).
         /** @type {ns.View} */
         var view = this.views[viewKey];
-        view.beforeUpdateHTML(events);
-    }
+        toHide = toHide || (this.active[view.id] !== view.key);
 
-    this._hideInactiveViews(events);
+        view.beforeUpdateHTML(events, toHide);
+    }
 };
 
 /**
  * Скрываем все неактивные виды в боксе
- * @param {object} events
  * @private
  */
-ns.Box.prototype._hideInactiveViews = function(events) {
-    var hideEvents = events['ns-view-hide'];
+ns.Box.prototype._hideInactiveViews = function() {
     // Пройдёмся по всем вложенным видам, чтобы кинуть hide, которым не попали в newLayout
     for (var key in this.views) {
         var view = this.views[key];
         // Если вид не входит в новый active
         if (this.active[view.id] !== view.key) {
-
             // Скроем виды, не попавшие в layout
             var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
-                descs[i].hideAndUnbindEvents(hideEvents);
+                descs[i].hideAndUnbindEvents();
             }
         }
     }
@@ -226,6 +221,8 @@ ns.Box.prototype._updateHTML = function(node, options, events) {
     if (!this.node) {
         throw new Error("[ns.Box] Can't find node for '" + this.id + "'");
     }
+
+    this._hideInactiveViews();
 
     var views = this.views;
     var boxLayout = this.active;
@@ -333,10 +330,7 @@ ns.Box.prototype.hideAndUnbindEvents = function() {
     if (this._visible === true) {
         this._hideNode();
         this._visible = false;
-        // always returns false to prevent events trigger
     }
-
-    return false;
 };
 
 /**

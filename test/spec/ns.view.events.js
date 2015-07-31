@@ -833,6 +833,8 @@ describe('ns.View.events', function() {
     describe('"ns-view-hide" вызываются на старой ноде, которая еще видна', function() {
 
         beforeEach(function() {
+            var that = this;
+
             ns.log.exception.restore();
             this.sinon.stub(ns.log, 'exception', function(name, error) {
                 throw error;
@@ -854,7 +856,7 @@ describe('ns.View.events', function() {
                 // Не придумал как проконтроллировать этот процесс нормально,
                 // так что сделал тест тут.
                 // expect выкинет ошибку и тест завалится.
-                expect(this.node.className).to.contain(' ns-view-visible');
+                expect($.contains(that.APP.node, this.node)).to.equal(true);
             });
 
             ns.View.define('view1', {

@@ -236,8 +236,7 @@ describe('ns.Update. Синтетические случаи', function() {
         });
 
         it('должен скрыть "view1&"', function() {
-            var view1Node = this.view.node.querySelector('.ns-view-view1');
-            expect(view1Node.className).to.contain(' ns-view-hidden');
+            expect(this.view.node.querySelectorAll('.ns-view-view1')).to.have.length(0);
         });
 
     });

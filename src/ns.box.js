@@ -185,6 +185,17 @@ ns.Box.prototype._hideInactiveViews = function() {
         var view = this.views[key];
         // Если вид не входит в новый active
         if (this.active[view.id] !== view.key) {
+
+            // Мы проверили большой эксперимент и выяснили,
+            // что если не скрывать вьюхи, а детачить их из DOM,
+            // то приложение работает быстрее, когда открыто продолжительное время.
+
+            // вид может не быть отрисован,
+            // но уже уйти в скрытие
+            if (view.node) {
+                ns.removeNode(view.node);
+            }
+
             // Скроем виды, не попавшие в layout
             var descs = view._getDescendantsAndSelf( [] );
             for (var i = 0, l = descs.length; i < l; i++) {
@@ -313,7 +324,6 @@ ns.Box.prototype._transferViewsToNewNode = function(oldNode) {
  */
 ns.Box.prototype._show = function() {
     if (this._visible === false) {
-        this._showNode();
         this._visible = true;
         // always returns false to prevent events trigger
     }
@@ -328,7 +338,6 @@ ns.Box.prototype._show = function() {
  */
 ns.Box.prototype.hideAndUnbindEvents = function() {
     if (this._visible === true) {
-        this._hideNode();
         this._visible = false;
     }
 };
@@ -380,8 +389,6 @@ ns.Box.prototype.destroy = function() {
 // копируем нужные методы из ns.View
 ns.Box.prototype.__setUniqueId = ns.View.prototype.__setUniqueId;
 ns.Box.prototype._getCommonTree = ns.View.prototype._getCommonTree;
-ns.Box.prototype._hideNode = ns.View.prototype._hideNode;
-ns.Box.prototype._showNode = ns.View.prototype._showNode;
 ns.Box.prototype.isValidWithDesc = ns.View.prototype.isValidWithDesc;
 
 ns.Box.prototype.isOk = no.true;

@@ -259,10 +259,6 @@ ns.ViewCollection.prototype._addView = function(id, params, modelItem) {
     var view = this._getView(id, params);
     if (!view) {
         view = ns.View.create(id, params);
-        // скрыть элементы коллекции бесмысленно, они скроются вместе с коллекцией,
-        // поэтому обнуляем методы
-        view._showNode = no.nop;
-        view._hideNode = no.nop;
 
         var viewKey = view.key;
         var modelKey = modelItem.key;

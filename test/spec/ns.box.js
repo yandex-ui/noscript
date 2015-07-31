@@ -154,9 +154,9 @@ describe('ns.Box', function() {
 
     });
 
-    describe('view select', function() {
+    describe('view select ->', function() {
 
-        describe('regular view', function() {
+        describe('regular view ->', function() {
 
             beforeEach(function() {
                 var layout = ns.layout.page('content2', {});
@@ -167,13 +167,9 @@ describe('ns.Box', function() {
                 expect($(this.APP.node).find('.ns-view-content2')).to.have.length(1);
             });
 
-            it('should have visible node for "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2').hasClass('ns-view-visible')).to.be.equal(true);
-            });
-
         });
 
-        describe('async view', function() {
+        describe('async view ->', function() {
 
             beforeEach(function() {
                 var layout = ns.layout.page('content3', {});
@@ -182,11 +178,6 @@ describe('ns.Box', function() {
 
             it('should have node for "content3"', function() {
                 expect($(this.APP.node).find('.ns-view-content3')).to.have.length(1);
-            });
-
-            it('should have visible node for "content2" ', function() {
-                //TODO: i'm not sure that this is valid test
-                expect($(this.APP.node).find('.ns-view-content3').hasClass('ns-view-visible')).to.be.equal(false);
             });
 
         });
@@ -219,16 +210,8 @@ describe('ns.Box', function() {
                 expect($(this.APP.node).find('.ns-view-content1')).to.have.length(1);
             });
 
-            it('should have visible node for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1').hasClass('ns-view-visible')).to.be.equal(true);
-            });
-
-            it('should have node for "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2')).to.have.length(1);
-            });
-
-            it('should have hidden node for "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2').hasClass('ns-view-hidden')).to.be.equal(true);
+            it('should not have node for "content2" ', function() {
+                expect($(this.APP.node).find('.ns-view-content2')).to.have.length(0);
             });
 
         });
@@ -254,16 +237,12 @@ describe('ns.Box', function() {
                 });
             });
 
-            it('should have two nodes for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1')).to.have.length(2);
+            it('should have one node for "content1" ', function() {
+                expect($(this.APP.node).find('.ns-view-content1')).to.have.length(1);
             });
 
-            it('should have first hidden node for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1:eq(0)').hasClass('ns-view-hidden')).to.be.equal(true);
-            });
-
-            it('should have second visible node for "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1:eq(1)').hasClass('ns-view-visible')).to.be.equal(true);
+            it('should have second visible node for "content1" (view=content1&p=2) ', function() {
+                expect($(this.APP.node).find('.ns-view-content1[data-key="view=content1&p=2"]')).to.be.length(1);
             });
 
         });
@@ -304,19 +283,12 @@ describe('ns.Box', function() {
                 });
             });
 
-            describe('first pass', function() {
+            describe('first pass ->', function() {
 
                 it('should create second "content3" node', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
-                    ).to.have.length(2);
-                });
-
-                it('should hide first "content3" node', function() {
-                    var that = this;
-                    expect(
-                        $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
                     ).to.have.length(1);
                 });
 
@@ -329,7 +301,7 @@ describe('ns.Box', function() {
 
             });
 
-            describe('second pass', function() {
+            describe('second pass ->', function() {
 
                 beforeEach(function(done) {
                     this.sinon.server.requests[1].respond(
@@ -353,20 +325,13 @@ describe('ns.Box', function() {
                     var that = this;
                     expect(
                         $(that.APP.node).find('.ns-view-content3')
-                    ).to.have.length(2);
-                });
-
-                it('should hide first "content3" node', function() {
-                    var that = this;
-                    expect(
-                        $(that.APP.node).find('.ns-view-content3.ns-view-hidden')
                     ).to.have.length(1);
                 });
 
-                it('should show second "content3" node', function() {
+                it('should show second "content3" node ("view=content3&p=2")', function() {
                     var that = this;
                     expect(
-                        $(that.APP.node).find('.ns-view-content3.ns-view-visible')
+                        $(that.APP.node).find('.ns-view-content3[data-key="view=content3&p=2"]')
                     ).to.have.length(1);
                 });
 
@@ -374,7 +339,7 @@ describe('ns.Box', function() {
 
         });
 
-        describe('"content4"(pOwn=1) -> "content4"(pOwn=2), where pOwn depends only of models', function() {
+        describe('"content4"(pOwn=1) -> "content4"(pOwn=2), where pOwn depends only of models ->', function() {
 
             beforeEach(function(done) {
                 var model = ns.Model.get('model4');
@@ -398,16 +363,12 @@ describe('ns.Box', function() {
                 });
             });
 
-            it('should have two nodes for "content4" ', function() {
-                expect($(this.APP.node).find('.ns-view-content4')).to.have.length(2);
+            it('should have one node for "content4" ', function() {
+                expect($(this.APP.node).find('.ns-view-content4')).to.have.length(1);
             });
 
-            it('should have first hidden node for "content4" ', function() {
-                expect($(this.APP.node).find('.ns-view-content4:eq(0)').hasClass('ns-view-hidden')).to.be.equal(true);
-            });
-
-            it('should have second visible node for "content4" ', function() {
-                expect($(this.APP.node).find('.ns-view-content4:eq(1)').hasClass('ns-view-visible')).to.be.equal(true);
+            it('should have second visible node for "content4" "view=content4&pOwn=2"', function() {
+                expect($(this.APP.node).find('.ns-view-content4[data-key="view=content4&pOwn=2"]')).to.have.length(1);
             });
 
         });
@@ -433,12 +394,12 @@ describe('ns.Box', function() {
                 });
             });
 
-            it('should have two nodes for view "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1').length).to.be.equal(2);
+            it('should have one node for view "content1" ', function() {
+                expect($(this.APP.node).find('.ns-view-content1')).to.be.length(1);
             });
 
-            it('should have one visible node for view "content1" ', function() {
-                expect($(this.APP.node).find('.ns-view-content1.ns-view-visible').length).to.be.equal(1);
+            it('should have one visible node for view "content1" "view=content1&p=2" ', function() {
+                expect($(this.APP.node).find('.ns-view-content1[data-key="view=content1&p=2"]')).to.be.length(1);
             });
         });
 
@@ -468,11 +429,11 @@ describe('ns.Box', function() {
             });
 
             it('should have one visible for view "content2" ', function() {
-                expect($(this.APP.node).find('.ns-view-content2:eq(0)').hasClass('ns-view-visible')).to.be.equal(true);
+                expect($(this.APP.node).find('.ns-view-content2')).to.be.length(1);
             });
         });
 
-        describe('Update of ns.Box`s parent and child at the same time', function() {
+        describe('Update of ns.Box`s parent and child at the same time ->', function() {
             beforeEach(function() {
 
                 // layout
@@ -516,7 +477,7 @@ describe('ns.Box', function() {
                 delete this.APP;
             });
 
-            describe('single redraw', function() {
+            describe('single redraw ->', function() {
                 beforeEach(function(done) {
                     var APP = this.APP;
 
@@ -540,20 +501,17 @@ describe('ns.Box', function() {
                     });
                 });
 
-                it('should have 2 visible nodes for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be.equal(2);
+                it('should have 1 visible node for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild')).to.have.length(1);
                 });
 
                 it('should have 1 visible node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be.equal(1);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild[data-key="view=vChild&p=2"]')).to.have.length(1);
                 });
 
-                it('should have 1 hidden node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be.equal(1);
-                });
             });
 
-            describe('multiple redraw', function() {
+            describe('multiple redraw ->', function() {
                 beforeEach(function(done) {
                     var APP = this.APP;
 
@@ -588,17 +546,14 @@ describe('ns.Box', function() {
                     });
                 });
 
-                it('should have 2 visible nodes for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be.equal(2);
+                it('should have 1 visible node for view vChild', function() {
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild').length).to.be.equal(1);
                 });
 
                 it('should have 1 visible node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-visible').length).to.be.equal(1);
+                    expect(this.APP.node.querySelectorAll('.ns-view-vChild[data-key="view=vChild&p=1"]')).to.have.length(1);
                 });
 
-                it('should have 1 hidden node for view vChild', function() {
-                    expect(this.APP.node.querySelectorAll('.ns-view-vChild.ns-view-hidden').length).to.be.equal(1);
-                });
             });
 
         });
@@ -621,7 +576,6 @@ describe('ns.Box', function() {
                 }
             }, 'app');
 
-
             new ns.Update(
                 this.APP,
                 ns.layout.page('box1', {}),
@@ -640,27 +594,27 @@ describe('ns.Box', function() {
 
         });
 
-        it('should have two boxes in "content@"', function() {
+        it('should have one box in "content@"', function() {
             expect(
                 this.APP.node.querySelector('.ns-view-content').childNodes
-            ).to.have.length(2);
+            ).to.have.length(1);
         });
 
-        it('should set "box1@" as hidden', function() {
+        it('should remove "box1@" from DOM', function() {
             expect(
-                this.APP.node.querySelector('.ns-view-box1').classList.contains('ns-view-hidden')
-            ).to.equal(true);
+                this.APP.node.querySelectorAll('.ns-view-box1')
+            ).to.have.length(0);
         });
 
         it('should set "box2@" as visible', function() {
             expect(
-                this.APP.node.querySelector('.ns-view-box2').classList.contains('ns-view-visible')
-            ).to.equal(true);
+                this.APP.node.querySelectorAll('.ns-view-box2')
+            ).to.have.length(1);
         });
 
     });
 
-    describe('views inside box keep sequence', function() {
+    describe('views inside box keep sequence ->', function() {
 
         beforeEach(function(finish) {
 
@@ -707,20 +661,17 @@ describe('ns.Box', function() {
             ns.reset();
         });
 
-        it('total of 3 views are inside .ns-view-content', function() {
-            expect(this.children.length).to.be.equal(3);
+        it('total of 2 views are inside .ns-view-content', function() {
+            expect(this.children.length).to.be.equal(2);
         });
 
-        it('first view is "a" and it is hidden', function() {
-            expect($(this.children[0]).is('.ns-view-a.ns-view-hidden')).to.be.ok;
+        it('first view is "a" with param one', function() {
+            expect($(this.children[0]).is('.ns-view-a')).to.be.ok;
+            expect($(this.children[0]).data('key')).to.be.equal('view=a&t=one');
         });
 
-        it('second view is also "a" and it is visible', function() {
-            expect($(this.children[1]).is('.ns-view-a.ns-view-visible')).to.be.ok;
-        });
-
-        it('third one is "b" view and it is visible', function() {
-            expect($(this.children[2]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        it('third one is "b"', function() {
+            expect($(this.children[1]).is('.ns-view-b')).to.be.ok;
         });
 
     });
@@ -742,12 +693,9 @@ describe('ns.Box', function() {
 
         a, b and c are just sorted in a new way.
     */
-    describe('sorting views inside box', function() {
+    describe('sorting views inside box ->', function() {
 
         beforeEach(function(finish) {
-
-            var that = this;
-
             ns.router.routes = {
                 route: {
                     '/':  'index1',
@@ -806,16 +754,16 @@ describe('ns.Box', function() {
             expect(this.children.length).to.be.equal(3);
         });
 
-        it('first view is "c" and it is visible', function() {
-            expect($(this.children[0]).is('.ns-view-c.ns-view-visible')).to.be.ok;
+        it('first view is "c"', function() {
+            expect($(this.children[0]).is('.ns-view-c')).to.be.ok;
         });
 
-        it('second view is "b" and it is visible', function() {
-            expect($(this.children[1]).is('.ns-view-b.ns-view-visible')).to.be.ok;
+        it('second view is "b"', function() {
+            expect($(this.children[1]).is('.ns-view-b')).to.be.ok;
         });
 
-        it('finally third view is "a" and it is visible', function() {
-            expect($(this.children[2]).is('.ns-view-a.ns-view-visible')).to.be.ok;
+        it('finally third view is "a"', function() {
+            expect($(this.children[2]).is('.ns-view-a')).to.be.ok;
         });
 
     });

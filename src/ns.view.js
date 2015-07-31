@@ -249,7 +249,6 @@
         // но `_show` для них не выполнялся
         // Это происходит при быстрой навигации по интерфейсу.
 
-        this._hideNode();
         this.__onHide();
     };
 
@@ -269,23 +268,6 @@
     };
 
     /**
-     * Ставим CSS-класс для скрытия ноды вида.
-     * @private
-     */
-    ns.View.prototype._hideNode = function() {
-        if (!this.node) {
-            return;
-        }
-
-        var oldClassName = this.node.className;
-        var newClassName = oldClassName.replace(' ns-view-visible', '').replace(' ns-view-hidden', '');
-        newClassName += ' ns-view-hidden';
-        if (oldClassName !== newClassName) {
-            this.node.className = newClassName;
-        }
-    };
-
-    /**
      * Показывает View
      * @param {array} [events] Массив событий.
      * @protected
@@ -299,7 +281,6 @@
                 this.__bindModelsEvents();
             }
             this._bindEvents('show');
-            this._showNode();
             this._visible = true;
             if (events) {
                 events.push(this);
@@ -308,13 +289,6 @@
         }
 
         return false;
-    };
-
-    /**
-     * @private
-     */
-    ns.View.prototype._showNode = function() {
-        this.node.className = this.node.className.replace(' ns-view-hidden', '') + ' ns-view-visible';
     };
 
     /**

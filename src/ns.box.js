@@ -274,7 +274,7 @@ ns.Box.prototype._sortViewNodes = function() {
     var views = this.views;
 
     // Итератор по HTMLCollection, который возвращает видимые ноды видов.
-    var viewNodesIterator = ns.childrenIterator(this.node, true);
+    var viewNodesIterator = ns.childrenIterator(this.node);
 
     for (var viewId in active) {
         var viewKey = active[viewId];

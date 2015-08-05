@@ -51,23 +51,16 @@
     /**
      * Возвращает итератор детям ноды.
      * @param {HTMLElement} node Нода-контейнер.
-     * @param {boolean} doVisibleCheck Делать проверку на видимость (в понятии ns) вида.
      * @returns {{getNext: function}}
      */
-    ns.childrenIterator = function(node, doVisibleCheck) {
+    ns.childrenIterator = function(node) {
         // Итератор по HTMLCollection, который возвращает видимые ноды видов.
         return (function(children) {
             var position = -1;
-            var childrenCount = children.length;
             return {
                 getNext: function() {
-                    for (position += 1; position < childrenCount; position++) {
-                        var child = children[position];
-                        if (!doVisibleCheck || ns.hasClass(child, 'ns-view-visible')) {
-                            return child;
-                        }
-                    }
-                    return null;
+                    position++;
+                    return children[position] || null;
                 }
             };
         })(node.children);

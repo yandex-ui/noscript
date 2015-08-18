@@ -169,9 +169,9 @@ ns.Box.prototype.beforeUpdateHTML = function(events, toHide) {
         //  Достаем ранее созданный блок (в _getRequestViews).
         /** @type {ns.View} */
         var view = this.views[viewKey];
-        toHide = toHide || (this.active[view.id] !== view.key);
+        var toHideView = toHide || (this.active[view.id] !== view.key);
 
-        view.beforeUpdateHTML(events, toHide);
+        view.beforeUpdateHTML(events, toHideView);
     }
 };
 

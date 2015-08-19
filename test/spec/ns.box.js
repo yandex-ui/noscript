@@ -893,9 +893,13 @@ describe('ns.Box', function() {
                 });
         });
         
-        it('view content2 should be hidden, view content1 should be visible', function() {
+        it('view content2 should be hidden', function() {
             var views = this.APP.views.content.views;
             expect(views['view=content2'].isVisible()).to.be.equal(false);
+        });
+
+        it('view content1 should be visible', function() {
+            var views = this.APP.views.content.views;
             expect(views['view=content1&p=1'].isVisible()).to.be.equal(true);
         });
     });

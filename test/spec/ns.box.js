@@ -879,4 +879,29 @@ describe('ns.Box', function() {
 
     });
 
+    describe('Box should hide inactive views only', function() {
+        beforeEach(function() {
+            var that = this;
+            var page1Params = {};
+            var page1 = ns.layout.page('content2', page1Params);
+            var page2Params = {p: 1};
+            var page2 = ns.layout.page('content1', page2Params);
+
+            return new ns.Update(this.APP, page1, page1Params).render()
+                .then(function() {
+                    return new ns.Update(that.APP, page2, page2Params).render();
+                });
+        });
+        
+        it('view content2 should be hidden', function() {
+            var views = this.APP.views.content.views;
+            expect(views['view=content2'].isVisible()).to.be.equal(false);
+        });
+
+        it('view content1 should be visible', function() {
+            var views = this.APP.views.content.views;
+            expect(views['view=content1&p=1'].isVisible()).to.be.equal(true);
+        });
+    });
+
 });

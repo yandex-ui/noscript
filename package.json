@@ -6,7 +6,7 @@
     },
     "name": "noscript",
     "description": "JavaScript MVC framework",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "homepage": "https://github.com/yandex-ui/noscript",
     "repository": {
         "type": "git",

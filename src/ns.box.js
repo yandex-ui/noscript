@@ -226,6 +226,9 @@ ns.Box.prototype._updateHTML = function(node, options, events) {
             oldNode = this.node;
             // Обновим ноду бокса
             this.node = newNode;
+
+            // обновили ноду - эмулируем скрытие и показ
+            this._visible = false;
         }
     }
 

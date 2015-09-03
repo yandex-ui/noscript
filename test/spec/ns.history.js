@@ -42,6 +42,13 @@ describe('ns.history', function() {
             expect(ns.history.followAnchorHref).to.have.callCount(0);
         });
 
+        it('не должен перейти по ссылке, если baseDir совпадает, но задан атрибут target', function() {
+            this.sinon.stub(ns.router, 'baseDir', '/my/');
+            this.event.currentTarget.target = '_self';
+
+            ns.history._onAnchorClick(this.event);
+            expect(ns.history.followAnchorHref).to.have.callCount(0);
+        });
     });
 
 });

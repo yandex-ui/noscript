@@ -98,18 +98,17 @@
         }
 
         var href = target.getAttribute('href');
-        if (!href) {
+
+        if (!href || target.getAttribute('target')) {
             return true;
         }
 
-        if (target.getAttribute('target') !== '_blank') {
-            var returnValue = ns.history.followAnchorHref(href, target);
-            // если вернули Promise, то ссылка была обработана и
-            // надо сделать preventDefault
-            if (Vow.isPromise(returnValue)) {
-                e.preventDefault();
-                return true;
-            }
+        var returnValue = ns.history.followAnchorHref(href, target);
+        // если вернули Promise, то ссылка была обработана и
+        // надо сделать preventDefault
+        if (Vow.isPromise(returnValue)) {
+            e.preventDefault();
+            return true;
         }
     };
 

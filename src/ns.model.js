@@ -48,6 +48,13 @@
     ns.Model.prototype.params = null;
 
     /**
+     * Промис исправления ошибки запроса.
+     * @type {Vow.Promise}
+     * @private
+     */
+    ns.Model.prototype._errorFixingPromise = null;
+
+    /**
      *
      * @param {string} id
      * @param {object} params
@@ -332,9 +339,41 @@
      * @param {*} error
      */
     ns.Model.prototype.setError = function(error) {
-        this.data = null;
-        this.error = error;
-        this.status = this.STATUS.ERROR;
+        if (this.isErrorCanBeFixed(error)) {
+            this._errorFixingPromise = this.fixError(error);
+
+        } else {
+            this.data = null;
+            this.error = error;
+            this.status = this.STATUS.ERROR;
+        }
+    };
+
+    /**
+     * Возвращает true, если модель способна исправить эту ошибку.
+     * @description
+     * Этот метод нужно переопределить, если модель имеет возможность исправлять ошибки.
+     * Например, запросы подписываеются временным token.
+     * Если токен протух, то модель прозрачно может его перезапросить и сделать перезапрос себя.
+     * @see fixError
+     * @abstract
+     * @param {*} error
+     */
+    ns.Model.prototype.isErrorCanBeFixed = function(error) {
+        /* jshint unused: false */
+        return false;
+    };
+
+    /**
+     * Возвращает Promise, который должен исправить ошибку и после которого модель можно перезапросить
+     * @see isErrorCanBeFixed
+     * @abstract
+     * @param {*} error
+     * @returns {Vow.Promise}
+     */
+    ns.Model.prototype.fixError = function(error) {
+        /* jshint unused: false */
+        return Vow.resolve();
     };
 
     /**
@@ -371,7 +410,7 @@
      */
     ns.Model.prototype.canRequest = function() {
         //  do-модели нельзя перезапрашивать.
-        return !this.retries || !this.isDo() && this.retries < this.RETRY_LIMIT;
+        return (!this.retries || !this.isDo()) && this.retries < this.RETRY_LIMIT;
     };
 
     /**
@@ -458,6 +497,30 @@
         this.promise = new Vow.Promise();
 
         return this;
+    };
+
+    /**
+     * Сообщает моделе о том, что ее запрос завершился.
+     * При этом модель может быть в любом статусе.
+     */
+    ns.Model.prototype.finishRequest = function() {
+        if (this._errorFixingPromise) {
+            this._errorFixingPromise.then(this.__finishRequest, this.__finishRequest, this);
+
+        } else {
+            this.__finishRequest();
+        }
+    };
+
+    ns.Model.prototype.__finishRequest = function() {
+        if (this._errorFixingPromise) {
+            // удаляем промисы при завершении исправления
+            this._errorFixingPromise = null;
+            // количество попыток надо обнулить
+            this.retries = 0;
+        }
+
+        this.promise.fulfill();
     };
 
     /**

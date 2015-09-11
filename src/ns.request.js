@@ -334,7 +334,7 @@
             // это не означает, что завершится весь ns.request
             ns.request.manager.done(model);
 
-            model.promise.fulfill();
+            model.finishRequest();
         }
     };
 

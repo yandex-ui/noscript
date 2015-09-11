@@ -2,11 +2,19 @@
 
     /**
      * Делает запрос моделей с сервера.
-     * Аргументы можно передавать в 3 форматах:
+     * Аргументы можно передавать в следующих форматах:
      *   - string item, params - одна модель и опциональные параметры для нее
-     *   - array item[], params - массив моделей и опциональные единые для всех параметры
-     *   - array item[] - массив моделей вида {id: modelName, params: modelParams}
-     * @param {String|Array|Object} items Массив названий моделей.
+     *     ns.request('model', params)
+     *   - string[], params - массив моделей и опциональные единые для всех параметры
+     *     ns.request(['model1', 'model2'], params)
+     *   - object[] - массив моделей вида {id: modelName, params: modelParams}
+     *     ns.request([
+     *       {id: 'model1', params: params1},
+     *       {id: 'model2', params: params2},
+     *     ])
+     *   - ns.Model[] - массив экземпляров моделей
+     *     ns.request([ modelInstance1, modelInstance2 ]);
+     * @param {String|Array} items Массив названий моделей.
      * @param {object} [params] Параметры моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
@@ -20,7 +28,7 @@
     /**
      * Делает запрос моделей с сервера, не учитывая их закешированности.
      * @see ns.request
-     * @param {String|Array|Object} items Массив названий моделей.
+     * @param {String|Array} items Массив названий моделей.
      * @param {object} [params] Параметры моделей.
      * @param {object} [options] Опции запроса.
      * @param {Boolean} [options.forced=false] Не учитывать закешированность моделей при запросе.
@@ -401,8 +409,13 @@
         var models = [];
         for (var i = 0, l = items.length; i < l; i++) {
             var item = items[i];
-            if (item.model && item.model instanceof ns.Model) {
+            // ns.request( [ ModelInstance ] )
+            if (item instanceof ns.Model) {
+                models.push(item);
+
+            } else if (item.model && item.model instanceof ns.Model) {
                 models.push(item.model);
+
             } else {
                 models.push(ns.Model.get(item.id, item.params));
             }

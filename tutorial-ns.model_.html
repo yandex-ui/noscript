@@ -782,6 +782,10 @@
                 
                     <li data-name="ns.Model#extractError"><a href="ns.Model.html#extractError">extractError</a></li>
                 
+                    <li data-name="ns.Model#finishRequest"><a href="ns.Model.html#finishRequest">finishRequest</a></li>
+                
+                    <li data-name="ns.Model#fixError"><a href="ns.Model.html#fixError">fixError</a></li>
+                
                     <li data-name="ns.Model#get"><a href="ns.Model.html#get">get</a></li>
                 
                     <li data-name="ns.Model#getData"><a href="ns.Model.html#getData">getData</a></li>
@@ -797,6 +801,8 @@
                     <li data-name="ns.Model#invalidate"><a href="ns.Model.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.Model#isDo"><a href="ns.Model.html#isDo">isDo</a></li>
+                
+                    <li data-name="ns.Model#isErrorCanBeFixed"><a href="ns.Model.html#isErrorCanBeFixed">isErrorCanBeFixed</a></li>
                 
                     <li data-name="ns.Model#isValid"><a href="ns.Model.html#isValid">isValid</a></li>
                 
@@ -885,6 +891,10 @@
                 
                     <li data-name="ns.ModelCollection#extractError"><a href="ns.ModelCollection.html#extractError">extractError</a></li>
                 
+                    <li data-name="ns.ModelCollection#finishRequest"><a href="ns.ModelCollection.html#finishRequest">finishRequest</a></li>
+                
+                    <li data-name="ns.ModelCollection#fixError"><a href="ns.ModelCollection.html#fixError">fixError</a></li>
+                
                     <li data-name="ns.ModelCollection#get"><a href="ns.ModelCollection.html#get">get</a></li>
                 
                     <li data-name="ns.ModelCollection#getData"><a href="ns.ModelCollection.html#getData">getData</a></li>
@@ -904,6 +914,8 @@
                     <li data-name="ns.ModelCollection#invalidate"><a href="ns.ModelCollection.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.ModelCollection#isDo"><a href="ns.ModelCollection.html#isDo">isDo</a></li>
+                
+                    <li data-name="ns.ModelCollection#isErrorCanBeFixed"><a href="ns.ModelCollection.html#isErrorCanBeFixed">isErrorCanBeFixed</a></li>
                 
                     <li data-name="ns.ModelCollection#isValid"><a href="ns.ModelCollection.html#isValid">isValid</a></li>
                 
@@ -988,6 +1000,10 @@
                 
                     <li data-name="ns.ModelUniq#extractError"><a href="ns.ModelUniq.html#extractError">extractError</a></li>
                 
+                    <li data-name="ns.ModelUniq#finishRequest"><a href="ns.ModelUniq.html#finishRequest">finishRequest</a></li>
+                
+                    <li data-name="ns.ModelUniq#fixError"><a href="ns.ModelUniq.html#fixError">fixError</a></li>
+                
                     <li data-name="ns.ModelUniq#get"><a href="ns.ModelUniq.html#get">get</a></li>
                 
                     <li data-name="ns.ModelUniq#getData"><a href="ns.ModelUniq.html#getData">getData</a></li>
@@ -1003,6 +1019,8 @@
                     <li data-name="ns.ModelUniq#invalidate"><a href="ns.ModelUniq.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.ModelUniq#isDo"><a href="ns.ModelUniq.html#isDo">isDo</a></li>
+                
+                    <li data-name="ns.ModelUniq#isErrorCanBeFixed"><a href="ns.ModelUniq.html#isErrorCanBeFixed">isErrorCanBeFixed</a></li>
                 
                     <li data-name="ns.ModelUniq#isValid"><a href="ns.ModelUniq.html#isValid">isValid</a></li>
                 
@@ -1203,6 +1221,8 @@
                 
                     <li data-name="ns.View#_show"><a href="ns.View.html#_show">_show</a></li>
                 
+                    <li data-name="ns.View#beforeUpdateHTML"><a href="ns.View.html#beforeUpdateHTML">beforeUpdateHTML</a></li>
+                
                     <li data-name="ns.View#destroy"><a href="ns.View.html#destroy">destroy</a></li>
                 
                     <li data-name="ns.View#getModel"><a href="ns.View.html#getModel">getModel</a></li>
@@ -1334,6 +1354,8 @@
                 
                     <li data-name="ns.ViewCollection#_show"><a href="ns.ViewCollection.html#_show">_show</a></li>
                 
+                    <li data-name="ns.ViewCollection#beforeUpdateHTML"><a href="ns.ViewCollection.html#beforeUpdateHTML">beforeUpdateHTML</a></li>
+                
                     <li data-name="ns.ViewCollection#destroy"><a href="ns.ViewCollection.html#destroy">destroy</a></li>
                 
                     <li data-name="ns.ViewCollection#forEachItem"><a href="ns.ViewCollection.html#forEachItem">forEachItem</a></li>
@@ -1433,8 +1455,7 @@ ns.Model.define('my-model', {
 }</code></pre><p>Обработчиком может быть название метода из прототипа или функция.</p>
 <p>Пример:</p>
 <pre class="prettyprint source lang-js"><code>{
-    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
-    &quot;my-custom-show@show&quot;: &quot;onCustomShow&quot;
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;
 }</code></pre><h3>methods</h3><p><code>methods</code> - объект с методами. По сути является прототипом объекта.</p>
 <pre class="prettyprint source lang-js"><code>/**
  * @classdesc prj.mMyModel
@@ -1461,7 +1482,7 @@ ns.Model.define('my-model', {
 <p>Важно понимать, что HTTP - текстовый протокол, поэтому все значения отправятся как строки.
 Т.о. <code>0</code> станет <code>&quot;0&quot;</code>, <code>false</code> - <code>&quot;false&quot;</code>. А это значит, что параметры, которые в вашем приложении не обрабатываются как строки, надо приводить к правильному типу на сервере. Иначе, можно получить такую ошибку</p>
 <pre class="prettyprint source lang-js"><code>// отправили параметры как
-// ?lag=false
+// ?flag=false
 //
 
 if (params.flag) {
@@ -1516,18 +1537,20 @@ if (params.flag) {
 }
 this.get('.foo') -> &quot;1&quot;
 this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
-<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre class="prettyprint source lang-js"><code>{
- &quot;foo&quot;: &quot;1&quot;,
- &quot;bar&quot;: [
-     { &quot;id&quot;: 1 }
- ]
+<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.</li>
+</ul>
+<pre class="prettyprint source lang-js"><code>{
+    &quot;foo&quot;: &quot;1&quot;,
+    &quot;bar&quot;: [
+        { &quot;id&quot;: 1 }
+    ]
 }
 this.get('.foo') -> [&quot;1&quot;]
-this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
-</ul>
-<p><strong>Методы для изменения данных</strong>:</p>
+this.get('.bar.id') -> [&quot;1&quot;]</code></pre><p><strong>Методы для изменения данных</strong>:</p>
 <ul>
-<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.<pre class="prettyprint source lang-js"><code>this.set('.foo', 2);</code></pre></li>
+<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.</li>
+</ul>
+<pre class="prettyprint source lang-js"><code>this.set('.foo', 2);</code></pre><ul>
 <li><code>#setData(data)</code> - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.</li>
 </ul>
 <h2>Пре- и постобработка данных</h2><h3>extractData</h3><p>Метод извлекает данные из ответа сервера. По умолчанию берется поле <code>data</code> из ответа. Если метод не возвращает данные, то считается, что модель загружена с ошибкой.</p>
@@ -1554,7 +1577,7 @@ this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
 <pre class="prettyprint source lang-js"><code>ns.Model.define('my-model', {
     methods: {
         hasDataChanged: function(newData) {
-            var oldData = this.getData;
+            var oldData = this.getData();
             // изменяем данные, только если изменилось поле id
             return oldData.id !== newData.id
         }
@@ -1608,7 +1631,7 @@ this.get('.bar.id') -> [&quot;1&quot;]</code></pre></li>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Fri May 29 2015 16:43:39 GMT+0300 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Fri Sep 11 2015 18:30:00 GMT+0300 (MSK)
         </footer>
     </div>
 </div>

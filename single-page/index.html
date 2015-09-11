@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Философия работы noscript Node.js v0.12.2 Manual &amp; Documentation</title>
+  <title>Философия работы noscript Node.js v2.4.0 Manual &amp; Documentation</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/sh.css">
   <link rel="canonical" href="http://nodejs.org/api/index.md.html">
@@ -30,7 +30,7 @@
         </div> -->
         <div id="column1" class="interior">
           <header>
-            <!-- <h1>Node.js v0.12.2 Manual &amp; Documentation</h1> -->
+            <!-- <h1>Node.js v2.4.0 Manual &amp; Documentation</h1> -->
             <h1>Noscript документация одной страницей</h1>
             <!-- <div id="gtoc">
               <p>
@@ -354,7 +354,7 @@ ns.layout(&apos;todo&apos;, {
 </p>
 <p>Экземпляры видов создаются только автоматически в результате работы контроллера обновления (ns.Updater)
 Виды могут быть вложенны друг в друга. На странице всегда существует <code>корневой вид</code>, внутри которого находятся остальные виды приложения.
-Существуют специальные виды: бокс, асинхронный вид, вид-коллексия.
+Существуют специальные виды: бокс, асинхронный вид, вид-коллекция.
 Шаблон вида может иметь различную структуру в зависимости от используемого шаблонизатора. В комплекте с noscript идёт набор .yate шаблонов, задающих определённую структуру.
 Так же есть ряд нюансов, которые нужно учитывать при написании собственных шаблонов.
 
@@ -946,7 +946,7 @@ ns.View.define(&apos;my-view&apos;, {
 <p>Если не указано когда вешать обработчик, то оно будет навешан при показе вида и снят при скрытии.
 
 </p>
-<p>&quot;Косимческие&quot; события работают через единую шину <code>ns.events</code>
+<p>&quot;Космические&quot; события работают через единую шину <code>ns.events</code>
 </p>
 <pre><code class="js">ns.events.trigger(&apos;my-custom-event&apos;);</code></pre>
 <h4>Встроенные события<span><a class="mark" href="#index_md_19" id="index_md_19">#</a></span></h4>
@@ -1251,13 +1251,13 @@ ns.View.define(&apos;super-view&apos;, {
     &quot; my-class&quot;
 }</code></pre>
 <ul>
-<li><code>ns-build-view</code> - с помощью этой моды можно поменять корневой узел у вьюхи. Например,<pre><code>match .my-span-view ns-build-view {
-  &lt;span&gt;
-      apply . ns-build-view-content
-  &lt;/span&gt;
-}</code></pre>
-</li>
+<li><code>ns-build-view</code> - с помощью этой моды можно поменять корневой узел у вьюхи. Например,</li>
 </ul>
+<pre><code>match .my-span-view ns-build-view {
+    &lt;span&gt;
+        apply . ns-build-view-content
+    &lt;/span&gt;
+}</code></pre>
 <h2>Содержимое View<span><a class="mark" href="#index_md_view_2" id="index_md_view_2">#</a></span></h2>
 <h3>ns-view-content и ns-view-desc<span><a class="mark" href="#index_md_ns_view_content_ns_view_desc" id="index_md_ns_view_content_ns_view_desc">#</a></span></h3>
 <p><code>ns-view-content</code> - самая главная мода, отвечает за содержимое view при нормальной отрисовке.
@@ -1508,8 +1508,7 @@ ns.Model.define(&apos;my-model&apos;, {
 <p>Пример:
 </p>
 <pre><code class="js">{
-    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;,
-    &quot;my-custom-show@show&quot;: &quot;onCustomShow&quot;
+    &quot;my-custom-event&quot;: &quot;onCustomEvent&quot;
 }</code></pre>
 <h3>methods<span><a class="mark" href="#index_md_methods_1" id="index_md_methods_1">#</a></span></h3>
 <p><code>methods</code> - объект с методами. По сути является прототипом объекта.
@@ -1548,7 +1547,7 @@ ns.Model.define(&apos;my-model&apos;, {
 Т.о. <code>0</code> станет <code>&quot;0&quot;</code>, <code>false</code> - <code>&quot;false&quot;</code>. А это значит, что параметры, которые в вашем приложении не обрабатываются как строки, надо приводить к правильному типу на сервере. Иначе, можно получить такую ошибку
 </p>
 <pre><code class="js">// отправили параметры как
-// ?lag=false
+// ?flag=false
 //
 
 if (params.flag) {
@@ -1618,22 +1617,24 @@ if (params.flag) {
 this.get(&apos;.foo&apos;) -&gt; &quot;1&quot;
 this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 </li>
-<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.<pre><code class="js">{
- &quot;foo&quot;: &quot;1&quot;,
- &quot;bar&quot;: [
-     { &quot;id&quot;: 1 }
- ]
+<li><code>#select(jpath)</code> - выбирает данные по jpath. В отличии от <code>#get</code>, не занимается приведением и всегда возвращает <strong>массив</strong> результатов выборки, т.о. формат результат остается стабильным при изменениях.</li>
+</ul>
+<pre><code class="js">{
+    &quot;foo&quot;: &quot;1&quot;,
+    &quot;bar&quot;: [
+        { &quot;id&quot;: 1 }
+    ]
 }
 this.get(&apos;.foo&apos;) -&gt; [&quot;1&quot;]
 this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
-</li>
-</ul>
 <p><strong>Методы для изменения данных</strong>:
 
 </p>
 <ul>
-<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.<pre><code class="js">this.set(&apos;.foo&apos;, 2);</code></pre>
-</li>
+<li><code>#set(jpath, value)</code> - изменяет данные по jpath. Поддерживаются только несложные jpath.</li>
+</ul>
+<pre><code class="js">this.set(&apos;.foo&apos;, 2);</code></pre>
+<ul>
 <li><code>#setData(data)</code> - устаналивает полностью новые данные. В частности, этот метод вызывается при получении данных с сервера.</li>
 </ul>
 <h2>Пре- и постобработка данных<span><a class="mark" href="#index_md_28" id="index_md_28">#</a></span></h2>
@@ -1673,7 +1674,7 @@ this.get(&apos;.bar.id&apos;) -&gt; [&quot;1&quot;]</code></pre>
 <pre><code class="js">ns.Model.define(&apos;my-model&apos;, {
     methods: {
         hasDataChanged: function(newData) {
-            var oldData = this.getData;
+            var oldData = this.getData();
             // изменяем данные, только если изменилось поле id
             return oldData.id !== newData.id
         }
@@ -2208,7 +2209,7 @@ ns.layout.define(&apos;main&apos;, {
           <li><a href="http://twitter.com/nodejs" class="twitter">@nodejs</a></li>
       </ul>
 
-      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v0.12.2/LICENSE">license</a>.</p>
+      <p>Copyright <a href="http://joyent.com/">Joyent, Inc</a>, Node.js is a <a href="/trademark-policy.pdf">trademark</a> of Joyent, Inc. View <a href="https://raw.github.com/joyent/node/v2.4.0/LICENSE">license</a>.</p>
     </div> -->
 
   <script src="assets/sh_main.js"></script>

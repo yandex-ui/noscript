@@ -782,6 +782,10 @@
                 
                     <li data-name="ns.Model#extractError"><a href="ns.Model.html#extractError">extractError</a></li>
                 
+                    <li data-name="ns.Model#finishRequest"><a href="ns.Model.html#finishRequest">finishRequest</a></li>
+                
+                    <li data-name="ns.Model#fixError"><a href="ns.Model.html#fixError">fixError</a></li>
+                
                     <li data-name="ns.Model#get"><a href="ns.Model.html#get">get</a></li>
                 
                     <li data-name="ns.Model#getData"><a href="ns.Model.html#getData">getData</a></li>
@@ -797,6 +801,8 @@
                     <li data-name="ns.Model#invalidate"><a href="ns.Model.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.Model#isDo"><a href="ns.Model.html#isDo">isDo</a></li>
+                
+                    <li data-name="ns.Model#isErrorCanBeFixed"><a href="ns.Model.html#isErrorCanBeFixed">isErrorCanBeFixed</a></li>
                 
                     <li data-name="ns.Model#isValid"><a href="ns.Model.html#isValid">isValid</a></li>
                 
@@ -885,6 +891,10 @@
                 
                     <li data-name="ns.ModelCollection#extractError"><a href="ns.ModelCollection.html#extractError">extractError</a></li>
                 
+                    <li data-name="ns.ModelCollection#finishRequest"><a href="ns.ModelCollection.html#finishRequest">finishRequest</a></li>
+                
+                    <li data-name="ns.ModelCollection#fixError"><a href="ns.ModelCollection.html#fixError">fixError</a></li>
+                
                     <li data-name="ns.ModelCollection#get"><a href="ns.ModelCollection.html#get">get</a></li>
                 
                     <li data-name="ns.ModelCollection#getData"><a href="ns.ModelCollection.html#getData">getData</a></li>
@@ -904,6 +914,8 @@
                     <li data-name="ns.ModelCollection#invalidate"><a href="ns.ModelCollection.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.ModelCollection#isDo"><a href="ns.ModelCollection.html#isDo">isDo</a></li>
+                
+                    <li data-name="ns.ModelCollection#isErrorCanBeFixed"><a href="ns.ModelCollection.html#isErrorCanBeFixed">isErrorCanBeFixed</a></li>
                 
                     <li data-name="ns.ModelCollection#isValid"><a href="ns.ModelCollection.html#isValid">isValid</a></li>
                 
@@ -988,6 +1000,10 @@
                 
                     <li data-name="ns.ModelUniq#extractError"><a href="ns.ModelUniq.html#extractError">extractError</a></li>
                 
+                    <li data-name="ns.ModelUniq#finishRequest"><a href="ns.ModelUniq.html#finishRequest">finishRequest</a></li>
+                
+                    <li data-name="ns.ModelUniq#fixError"><a href="ns.ModelUniq.html#fixError">fixError</a></li>
+                
                     <li data-name="ns.ModelUniq#get"><a href="ns.ModelUniq.html#get">get</a></li>
                 
                     <li data-name="ns.ModelUniq#getData"><a href="ns.ModelUniq.html#getData">getData</a></li>
@@ -1003,6 +1019,8 @@
                     <li data-name="ns.ModelUniq#invalidate"><a href="ns.ModelUniq.html#invalidate">invalidate</a></li>
                 
                     <li data-name="ns.ModelUniq#isDo"><a href="ns.ModelUniq.html#isDo">isDo</a></li>
+                
+                    <li data-name="ns.ModelUniq#isErrorCanBeFixed"><a href="ns.ModelUniq.html#isErrorCanBeFixed">isErrorCanBeFixed</a></li>
                 
                     <li data-name="ns.ModelUniq#isValid"><a href="ns.ModelUniq.html#isValid">isValid</a></li>
                 
@@ -1203,6 +1221,8 @@
                 
                     <li data-name="ns.View#_show"><a href="ns.View.html#_show">_show</a></li>
                 
+                    <li data-name="ns.View#beforeUpdateHTML"><a href="ns.View.html#beforeUpdateHTML">beforeUpdateHTML</a></li>
+                
                     <li data-name="ns.View#destroy"><a href="ns.View.html#destroy">destroy</a></li>
                 
                     <li data-name="ns.View#getModel"><a href="ns.View.html#getModel">getModel</a></li>
@@ -1334,6 +1354,8 @@
                 
                     <li data-name="ns.ViewCollection#_show"><a href="ns.ViewCollection.html#_show">_show</a></li>
                 
+                    <li data-name="ns.ViewCollection#beforeUpdateHTML"><a href="ns.ViewCollection.html#beforeUpdateHTML">beforeUpdateHTML</a></li>
+                
                     <li data-name="ns.ViewCollection#destroy"><a href="ns.ViewCollection.html#destroy">destroy</a></li>
                 
                     <li data-name="ns.ViewCollection#forEachItem"><a href="ns.ViewCollection.html#forEachItem">forEachItem</a></li>
@@ -1428,7 +1450,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 861
+            ns.model.js, line 924
         </div>
         
     </div>
@@ -1667,7 +1689,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 372
+            ns.model.js, line 411
         </div>
         
     </div>
@@ -1745,7 +1767,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 178
+            ns.model.js, line 185
         </div>
         
     </div>
@@ -1825,7 +1847,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 467
+            ns.model.js, line 530
         </div>
         
     </div>
@@ -1939,7 +1961,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 382
+            ns.model.js, line 421
         </div>
         
     </div>
@@ -2058,7 +2080,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 393
+            ns.model.js, line 432
         </div>
         
     </div>
@@ -2168,6 +2190,210 @@
             
 <dt>
     <div class="nameContainer inherited">
+        <h4 class="name" id="finishRequest">
+            
+                <span class="inherited"><a href="ns.Model.html#finishRequest">inherited</a></span>
+            
+            finishRequest<span class="signature">()</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.model.js, line 506
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Сообщает моделе о том, что ее запрос завершился.
+При этом модель может быть в любом статусе.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="fixError">
+            
+                <span class="inherited"><a href="ns.Model.html#fixError">inherited</a></span>
+            
+            <span class="type-signature ">abstract</span>fixError<span class="signature">(error)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Vow.Promise}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.model.js, line 374
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Возвращает Promise, который должен исправить ошибку и после которого модель можно перезапросить</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li>isErrorCanBeFixed</li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
         <h4 class="name" id="get">
             
                 <span class="inherited"><a href="ns.Model.html#get">inherited</a></span>
@@ -2177,7 +2403,7 @@
     
         
         <div class="tag-source">
-            ns.model.js, line 217
+            ns.model.js, line 224
         </div>
         
     </div>
@@ -2307,7 +2533,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 995
+            ns.model.js, line 1058
         </div>
         
     </div>
@@ -2385,7 +2611,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 326
+            ns.model.js, line 333
         </div>
         
     </div>
@@ -2459,7 +2685,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 364
+            ns.model.js, line 403
         </div>
         
     </div>
@@ -2533,7 +2759,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 411
+            ns.model.js, line 450
         </div>
         
     </div>
@@ -2611,7 +2837,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 318
+            ns.model.js, line 325
         </div>
         
     </div>
@@ -2730,7 +2956,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 169
+            ns.model.js, line 176
         </div>
         
     </div>
@@ -2803,7 +3029,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 403
+            ns.model.js, line 442
         </div>
         
     </div>
@@ -2867,6 +3093,133 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
         
             
 <dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="isErrorCanBeFixed">
+            
+                <span class="inherited"><a href="ns.Model.html#isErrorCanBeFixed">inherited</a></span>
+            
+            <span class="type-signature ">abstract</span>isErrorCanBeFixed<span class="signature">(error)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            ns.model.js, line 362
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Этот метод нужно переопределить, если модель имеет возможность исправлять ошибки.
+Например, запросы подписываеются временным token.
+Если токен протух, то модель прозрачно может его перезапросить и сделать перезапрос себя.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li>fixError</li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <div class="nameContainer">
         <h4 class="name" id="isValid">
             
@@ -2875,7 +3228,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 896
+            ns.model.js, line 959
         </div>
         
     </div>
@@ -2948,7 +3301,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 455
+            ns.model.js, line 494
         </div>
         
     </div>
@@ -3071,7 +3424,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 356
+            ns.model.js, line 395
         </div>
         
     </div>
@@ -3190,7 +3543,7 @@ var bar = model.get('.foo.bar'); // model.data.foo.bar (если foo сущес�
     
         
         <div class="tag-source">
-            ns.model.js, line 230
+            ns.model.js, line 237
         </div>
         
     </div>
@@ -3314,7 +3667,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 245
+            ns.model.js, line 252
         </div>
         
     </div>
@@ -3500,7 +3853,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 288
+            ns.model.js, line 295
         </div>
         
     </div>
@@ -3663,7 +4016,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 334
+            ns.model.js, line 341
         </div>
         
     </div>
@@ -3777,7 +4130,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 424
+            ns.model.js, line 463
         </div>
         
     </div>
@@ -3855,7 +4208,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 934
+            ns.model.js, line 997
         </div>
         
     </div>
@@ -4004,7 +4357,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 441
+            ns.model.js, line 480
         </div>
         
     </div>
@@ -4122,7 +4475,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 75
+            ns.model.js, line 82
         </div>
         
     </div>
@@ -4195,7 +4548,7 @@ This methods always returns array of results.</p>
     
         
         <div class="tag-source">
-            ns.model.js, line 433
+            ns.model.js, line 472
         </div>
         
     </div>
@@ -4274,7 +4627,7 @@ This methods always returns array of results.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Fri May 29 2015 16:43:39 GMT+0300 (MSK)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Fri Sep 11 2015 18:29:59 GMT+0300 (MSK)
         </footer>
     </div>
 </div>

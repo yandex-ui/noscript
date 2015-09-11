@@ -120,6 +120,42 @@ describe('ns.request.js', function() {
             });
         });
 
+        describe('ns.request( [modelInstance] ) ->', function() {
+
+            beforeEach(function() {
+                ns.Model.define('model');
+
+                this.modelInstance = ns.Model.get('model');
+                ns.request([this.modelInstance]);
+            });
+
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models).to.have.callCount(1);
+            });
+
+            it('should call ns.request.models with given model instance', function() {
+                expect(ns.request.models).to.be.calledWith([this.modelInstance]);
+            });
+        });
+
+        describe('ns.request( [doModelInstance] ) ->', function() {
+
+            beforeEach(function() {
+                ns.Model.define('do-model');
+
+                this.modelInstance = ns.Model.get('do-model');
+                ns.request([this.modelInstance]);
+            });
+
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models).to.have.callCount(1);
+            });
+
+            it('should call ns.request.models with given model instance', function() {
+                expect(ns.request.models).to.be.calledWith([this.modelInstance]);
+            });
+        });
+
     });
 
     describe('ns.forcedRequest', function() {

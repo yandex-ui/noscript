@@ -156,6 +156,42 @@ describe('ns.request.js', function() {
             });
         });
 
+        describe('ns.request( [modelInstance] ) ->', function() {
+
+            beforeEach(function() {
+                ns.Model.define('model');
+
+                this.modelInstance = ns.Model.get('model');
+                ns.request([this.modelInstance]);
+            });
+
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models).to.have.callCount(1);
+            });
+
+            it('should call ns.request.models with given model instance', function() {
+                expect(ns.request.models).to.be.calledWith([this.modelInstance]);
+            });
+        });
+
+        describe('ns.request( [doModelInstance] ) ->', function() {
+
+            beforeEach(function() {
+                ns.Model.define('do-model');
+
+                this.modelInstance = ns.Model.get('do-model');
+                ns.request([this.modelInstance]);
+            });
+
+            it('should call ns.request.models once', function() {
+                expect(ns.request.models).to.have.callCount(1);
+            });
+
+            it('should call ns.request.models with given model instance', function() {
+                expect(ns.request.models).to.be.calledWith([this.modelInstance]);
+            });
+        });
+
     });
 
     describe('ns.forcedRequest', function() {
@@ -890,6 +926,120 @@ describe('ns.request.js', function() {
                     }, this);
                 }, null, this);
             })
+
+        });
+
+    });
+
+    describe('Исправления моделями ошибки запроса ->', function() {
+
+        beforeEach(function() {
+            this.sinon.spy(ns, 'request');
+            this.sinon.spy(ns, 'forcedRequest');
+
+            // эмулируем последовательность запросов
+            var xsrfTokenResponse = {
+                models: [{
+                    data: {'token': 'new'}
+                }]
+            };
+
+            var invalidTokenResponse = {
+                models: [{
+                    error: {type: 'INVALID_TOKEN'}
+                }]
+            };
+
+            var validTokenResponse = {
+                models: [{
+                    data: {status: 'ok'}
+                }]
+            };
+
+            var nsHttpString = this.sinon.stub(ns, 'http');
+            nsHttpString.withArgs('/models/?_m=xsrf-token')
+                .returns(Vow.resolve(xsrfTokenResponse));
+
+            nsHttpString.withArgs('/models/?_m=do-model-fixable')
+                .onCall(0).returns(Vow.resolve(invalidTokenResponse))
+                .onCall(1).returns(Vow.resolve(validTokenResponse));
+
+            nsHttpString.withArgs('/models/?_m=model-fixable')
+                .onCall(0).returns(Vow.resolve(invalidTokenResponse))
+                .onCall(1).returns(Vow.resolve(validTokenResponse));
+        });
+
+        describe('Обычная модель ->', function() {
+
+            beforeEach(function() {
+
+                ns.Model.define('xsrf-token', {});
+
+                ns.Model.define('model-fixable', {
+
+                    methods: {
+
+                        isErrorCanBeFixed: function(error) {
+                            return error && error.type === 'INVALID_TOKEN';
+                        },
+
+                        fixError: function() {
+                            return ns.request(['xsrf-token']);
+                        }
+
+                    }
+
+                });
+
+                this.model = ns.Model.get('model-fixable');
+
+                return ns.forcedRequest([this.model]);
+            });
+
+            it('модель должна стать валидной', function() {
+                expect(this.model.isValid()).to.be.equal(true);
+            });
+
+            it('должен выполнить все перезапросы', function() {
+                expect(ns.http).to.have.callCount(3);
+            });
+
+        });
+
+        describe('do-модель ->', function() {
+
+            beforeEach(function() {
+
+                ns.Model.define('xsrf-token', {});
+
+                ns.Model.define('do-model-fixable', {
+
+                    methods: {
+
+                        isErrorCanBeFixed: function(error) {
+                            return error && error.type === 'INVALID_TOKEN';
+                        },
+
+                        fixError: function() {
+                            return ns.request(['xsrf-token']);
+                        }
+
+                    }
+
+                });
+
+                this.model = ns.Model.get('do-model-fixable');
+
+                return ns.forcedRequest([this.model]);
+            });
+
+            it('модель должна стать валидной', function() {
+                expect(this.model.isValid()).to.be.equal(true);
+            });
+
+            it('должен выполнить все перезапросы', function() {
+                expect(ns.http).to.have.callCount(3);
+            });
 
         });
 

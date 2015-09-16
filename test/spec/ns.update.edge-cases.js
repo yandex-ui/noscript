@@ -263,4 +263,69 @@ describe('ns.Update. Синтетические случаи', function() {
                 expect(ns.request.models).to.have.callCount(0);
             });
     });
+
+    describe.only('Отрисовка двух одинаковых видов в разных частях дерева', function() {
+
+        /*
+Есть дерево
+"app": {
+    "box1@": {
+        "view1": {}
+    },
+    "box2@": {
+        "view1": {}
+    }
+}
+
+В разных частях дерева есть одна и та же вьюха, но ее разные экземпляры.
+
+Допустим, что модель у view1 инвалидировалась и их надо перерисовать.
+Дерево отрисовки будет выглядеть вот так
+{
+ "view1": { ... это экземпляр от box1@  }
+}
+
+Потом придет второй view1 и добавит себя то же дерево, потому что там ключами являются ID
+{
+ "view1": { ... это экземпляр от box2@  }
+}
+
+Получится, что при отрисовке view1 из box1@ заберет себе ноду от view2 из box2@,
+и второй вьюхе ничего не достанется и будет исключение "Can't find node"
+         */
+
+        beforeEach(function() {
+            ns.Model.define('model1');
+            ns.Model.get('model1').setData({ version: 1 });
+
+            ns.View.define('app');
+            ns.View.define('view1', {
+                models: ['model1']
+            });
+
+            ns.layout.define('app', {
+                'app': {
+                    'box1@': {
+                        'view1': {}
+                    },
+                    'box2@': {
+                        'view1': {}
+                    }
+                }
+            });
+
+            this.APP = ns.View.create('app');
+
+            return new ns.Update(this.APP, ns.layout.page('app'), {}).render();
+        });
+
+        it('1', function() {
+            // вызываем обновление вьюх
+            ns.Model.get('model1').setData({ version: 2 });
+
+            return this.APP.update();
+        });
+
+    });
+
 });

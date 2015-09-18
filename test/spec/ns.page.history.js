@@ -25,4 +25,16 @@ describe('ns.page.history', function() {
 
     });
 
+    describe('.replace', function() {
+        it('не должен записать историю при первом переходе', function() {
+            ns.page.history.replace('/app');
+            expect(ns.page.history.getPrevious()).to.be.equal(undefined);
+        });
+
+        it('должен переписать историю', function() {
+            ns.page.history.push('/app1');
+            ns.page.history.replace('/app2');
+            expect(ns.page.history.getPrevious()).to.be.equal('/app2');
+        });
+    });
 });

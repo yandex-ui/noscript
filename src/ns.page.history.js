@@ -54,10 +54,13 @@
     ns.page.history.replace = function(url) {
         var nsHistory = ns.page.history;
 
-        // remove prev
-        nsHistory._history.pop();
-        // insert new
-        nsHistory._history.push(url);
+        if (nsHistory._current) {
+            // remove prev
+            nsHistory._history.pop();
+            // insert new
+            nsHistory._history.push(url);
+        }
+
         // save current
         nsHistory._current = url;
     };

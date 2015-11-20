@@ -1,5 +1,5 @@
 // Testing utilities
-var expect = require('karma-sinon-chai/node_modules/chai').expect;
+var expect = require('chai').expect;
 var noscript = require('../../');
 noscript(); // warm up
 

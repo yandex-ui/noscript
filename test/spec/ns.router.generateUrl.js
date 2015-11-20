@@ -33,14 +33,14 @@ describe('generate url', function() {
         });
     });
 
-    describe('optional parameter', function() {
+    describe('optional parameter ->', function() {
 
         beforeEach(function() {
             ns.router.routes = {
                 route: {
                     '/folder/{name=inbox}': 'folder',
                     '/{context=}/alert': 'alert-somewhere',
-                    '/folder/{name=inbox}/file': 'folder-file'
+                    '/folder/{name=inbox}/file/{id:int=1}': 'folder-file'
                 }
             };
             ns.router.init();
@@ -63,9 +63,10 @@ describe('generate url', function() {
         });
 
         it('middle optional parameter', function() {
-            expect( ns.router.generateUrl('folder-file') ).to.be.equal('/folder/file');
+            expect( ns.router.generateUrl('folder-file') ).to.be.equal('/folder/inbox/file');
             expect( ns.router.generateUrl('folder-file', { name: 'inbox' }) ).to.be.equal('/folder/inbox/file');
             expect( ns.router.generateUrl('folder-file', { name: 'favorites' }) ).to.be.equal('/folder/favorites/file');
+            expect( ns.router.generateUrl('folder-file', { name: 'favorites', id: 2 }) ).to.be.equal('/folder/favorites/file/2');
         });
     });
 

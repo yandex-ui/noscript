@@ -164,6 +164,7 @@
 
         var error = {
             error: this.STATUS.MODELS,
+            expired: this._expired(),
             invalidModels: err.invalid,
             validModels: err.valid
         };

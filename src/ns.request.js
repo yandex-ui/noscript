@@ -158,11 +158,11 @@
         this.options = options || {};
 
         this.promise = new Vow.Promise();
-        this.promise.progress(function(notify) {
-            if (notify === 'abort') {
-                this.abort();
-            }
-        }, this);
+
+        var that = this;
+        this.promise.abort = function() {
+            that.abort();
+        };
     };
 
     // ------------------------------------------------------------------------------------------------------------- //
@@ -347,7 +347,10 @@
      */
     Request.prototype.abort = function() {
         if (this._httpRequest) {
-            this._httpRequest.notify('abort');
+            if (this._httpRequest.abort) {
+                this._httpRequest.abort();
+            }
+
             this._httpRequest = undefined;
         }
     };

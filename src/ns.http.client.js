@@ -24,11 +24,11 @@ ns.http = function(url, params, options) {
             });
         });
 
-    promise.progress(function(notify) {
-        if (notify === 'abort') {
+    promise.abort = function() {
+        if (!this.isResolved()) {
             jqXHR.abort();
         }
-    });
+    };
 
     return promise;
 };

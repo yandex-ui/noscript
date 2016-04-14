@@ -508,8 +508,8 @@
      * @private
      */
     ns.Update.prototype.abort = function() {
-        if (this._requestModelsPromise) {
-            this._requestModelsPromise.notify('abort');
+        if (this._requestModelsPromise && this._requestModelsPromise.abort) {
+            this._requestModelsPromise.abort();
         }
 
         // reject promise

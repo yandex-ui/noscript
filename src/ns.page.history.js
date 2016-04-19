@@ -53,13 +53,22 @@
      */
     ns.page.history.replace = function(url) {
         var nsHistory = ns.page.history;
+        var previousUrl = nsHistory._history.pop();
+        var currentUrl = nsHistory._current;
 
-        // remove prev
-        nsHistory._history.pop();
-        // insert new
-        nsHistory._history.push(url);
+        if (previousUrl !== url && currentUrl !== url) {
+            nsHistory._history.push(url);
+        }
+
         // save current
         nsHistory._current = url;
+    };
+
+    ns.page.history.redirect = function(url) {
+        var nsHistory = ns.page.history;
+
+        nsHistory._current = url;
+        nsHistory._previous = nsHistory.getPrevious();
     };
 
     /**

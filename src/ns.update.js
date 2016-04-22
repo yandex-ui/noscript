@@ -61,6 +61,8 @@
         if (!ns.Update._addToQueue(this)) {
             this.abort();
         }
+
+        this.parentUpdate = options.parentUpdate;
     };
 
     no.extend(ns.Update.prototype, ns.profile);
@@ -668,6 +670,19 @@
         var i;
         var j;
 
+        var checkParentExecFlag = function(update, flag) {
+            if (update.parentUpdate) {
+                if (update.parentUpdate.EXEC_FLAG === flag) {
+                    return true;
+
+                } else {
+                    return checkParentExecFlag(update.parentUpdate, flag);
+                }
+            }
+
+            return update.EXEC_FLAG === flag;
+        };
+
         // if newUpdate is global we should terminate all non-parallel updates
         if (newRunExecutionFlag === FLAG_GLOBAL) {
             var survivedRuns = [];
@@ -681,7 +696,7 @@
                 var run = currentRuns[i];
 
                 // don't terminated paraller updates
-                if (run.EXEC_FLAG === FLAG_PARALLEL) {
+                if (checkParentExecFlag(run, FLAG_PARALLEL)) {
                     survivedRuns.push(run);
 
                 } else {

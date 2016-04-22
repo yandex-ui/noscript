@@ -1327,8 +1327,8 @@
         var that = this;
         promise.then(function() {
             that.update(params, {
-                // тайминги можно снять только после завершения работы
-                timers: updateInstance.getTimers()
+                parentUpdate: updateInstance,
+                timers: updateInstance.getTimers() // тайминги можно снять только после завершения работы
             });
         });
 

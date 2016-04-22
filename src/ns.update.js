@@ -61,6 +61,8 @@
         if (!ns.Update._addToQueue(this)) {
             this.abort();
         }
+
+        this.parentUpdate = options.parentUpdate;
     };
 
     no.extend(ns.Update.prototype, ns.profile);
@@ -670,7 +672,7 @@
                 var run = currentRuns[i];
 
                 // don't terminated paraller updates
-                if (run.EXEC_FLAG === FLAG_PARALLEL) {
+                if (checkParentExecFlag(run, FLAG_PARALLEL)) {
                     survivedRuns.push(run);
 
                 } else {
@@ -681,14 +683,9 @@
             currentUpdates = survivedRuns;
 
         } else if (newRunExecutionFlag === FLAG_ASYNC) { // async update
-
-            // check whether we have one global update
-            for (i = 0, j = currentRuns.length; i < j; i++) {
-                if (currentRuns[i].EXEC_FLAG === FLAG_GLOBAL) {
-                    return false;
-                }
+            if (checkParentRun(newUpdate, currentRuns)) {
+                return false;
             }
-
         }
 
         currentUpdates.push(newUpdate);
@@ -711,4 +708,37 @@
      * @property {boolean} hasPatchLayout Флаг, что в дереве есть неопределившиеся виды.
      */
 
+     function checkParentExecFlag(update, flag) {
+         if (update.parentUpdate) {
+             if (update.parentUpdate.EXEC_FLAG === flag) {
+                 return true;
+
+             } else {
+                 return checkParentExecFlag(update.parentUpdate, flag);
+             }
+         }
+
+         return update.EXEC_FLAG === flag;
+     }
+
+     function checkParentRun(update, runs) {
+         if (!runs.length) {
+             return false;
+         }
+
+         if (runs.indexOf(update) !== -1) {
+             return true;
+         }
+
+         if (update.parentUpdate) {
+             if (runs.indexOf(update.parentUpdate) !== -1) {
+                 return true;
+
+             } else {
+                 return checkParentRun(update.parentUpdate, runs);
+             }
+         }
+
+         return false;
+     }
 })();

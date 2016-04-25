@@ -670,19 +670,6 @@
         var i;
         var j;
 
-        var checkParentExecFlag = function(update, flag) {
-            if (update.parentUpdate) {
-                if (update.parentUpdate.EXEC_FLAG === flag) {
-                    return true;
-
-                } else {
-                    return checkParentExecFlag(update.parentUpdate, flag);
-                }
-            }
-
-            return update.EXEC_FLAG === flag;
-        };
-
         // if newUpdate is global we should terminate all non-parallel updates
         if (newRunExecutionFlag === FLAG_GLOBAL) {
             var survivedRuns = [];

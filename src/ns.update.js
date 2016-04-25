@@ -49,6 +49,7 @@
          * @type {ns.U.EXEC}
          */
         this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
+        this.parentUpdate = options.parentUpdate;
 
         this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
 
@@ -61,8 +62,6 @@
         if (!ns.Update._addToQueue(this)) {
             this.abort();
         }
-
-        this.parentUpdate = options.parentUpdate;
     };
 
     no.extend(ns.Update.prototype, ns.profile);

@@ -693,8 +693,13 @@
             currentUpdates = survivedRuns;
 
         } else if (newRunExecutionFlag === FLAG_ASYNC) { // async update
-            if (checkParentRun(newUpdate, currentRuns)) {
-                return false;
+            if (!checkParentExecFlag(newUpdate, FLAG_PARALLEL)) {
+                // check whether we have one global update
+                for (i = 0, j = currentRuns.length; i < j; i++) {
+                    if (currentRuns[i].EXEC_FLAG === FLAG_GLOBAL) {
+                        return false;
+                    }
+                }
             }
         }
 
@@ -729,26 +734,5 @@
          }
 
          return update.EXEC_FLAG === flag;
-     }
-
-     function checkParentRun(update, runs) {
-         if (!runs.length) {
-             return false;
-         }
-
-         if (runs.indexOf(update) !== -1) {
-             return true;
-         }
-
-         if (update.parentUpdate) {
-             if (runs.indexOf(update.parentUpdate) !== -1) {
-                 return true;
-
-             } else {
-                 return checkParentRun(update.parentUpdate, runs);
-             }
-         }
-
-         return false;
      }
 })();

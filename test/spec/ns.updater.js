@@ -790,6 +790,7 @@ describe('ns.Updater', function() {
                     try {
                         expect(data).to.be.eql({
                             error: ns.U.STATUS.MODELS,
+                            expired: false,
                             invalidModels: [ns.Model.get('model')],
                             validModels: []
                         });

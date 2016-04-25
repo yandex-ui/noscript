@@ -668,7 +668,6 @@
 
         var newRunExecutionFlag = newUpdate.EXEC_FLAG;
         var i;
-        var j;
 
         // if newUpdate is global we should terminate all non-parallel updates
         if (newRunExecutionFlag === FLAG_GLOBAL) {

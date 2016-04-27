@@ -19,10 +19,62 @@ describe('ns.page', function() {
                 this.sinon.stub(ns.page, 'redirect');
             });
 
-            it('calls ns.page.redirect in "/" ', function() {
-                ns.page.go('/');
+            it('calls ns.page.redirect in "/" ', function(done) {
 
-                expect(ns.page.redirect.calledOnce).to.be.equal(true);
+                ns.page.go('/').then(function() {
+                    expect(ns.page.redirect).to.have.callCount(1);
+                    done();
+                }, function() {
+                    done('reject');
+                });
+            });
+
+            describe('go on page with redirect', function() {
+
+                beforeEach(function() {
+                    ns.page.history._history = [];
+                    this.sinon.stub(ns.page, 'followRoute').returns(Vow.fulfill());
+
+                    ns.page.history.push('/1');
+                    ns.page.history.push('/2');
+                });
+
+                afterEach(function() {
+                    ns.page.followRoute.restore();
+                });
+
+                it('calls correct redirect', function(done) {
+                    ns.page.go('/')
+                        .then(function() {
+                            expect(ns.page.redirect).have.been.calledWith(
+                                '/inbox'
+                            );
+                            done();
+                        }, function() {
+                            done('reject');
+                        });
+                });
+
+                it('history length is correct', function(done) {
+                    ns.page.go('/')
+                        .then(function() {
+                            expect(ns.page.history._history.length).to.be.equal(2);
+                            done();
+                        }, function() {
+                            done('reject');
+                        });
+                });
+
+                it('previous page is correct', function(done) {
+                    ns.page.go('/')
+                        .then(function() {
+                            expect(ns.page.history.getPrevious()).to.be.equal('/2');
+                            done();
+                        }, function() {
+                            done('reject');
+                        });
+                });
+
             });
 
         });
@@ -73,7 +125,7 @@ describe('ns.page', function() {
                         expect(that.spy).to.have.callCount(1);
                         done();
                     }, function() {
-                        done('reject')
+                        done('reject');
                     });
                 });
 
@@ -88,7 +140,7 @@ describe('ns.page', function() {
 
                         done();
                     }, function() {
-                        done('reject')
+                        done('reject');
                     });
                 });
 

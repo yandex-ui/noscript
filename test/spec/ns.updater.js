@@ -136,7 +136,7 @@ describe('ns.Updater', function() {
                 this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
                 this.update.generateHTML()
                     .then(function(html) {
-                        this.$node = $(ns.html2node(html));
+                        this.$node = $(html);
                         done();
                     }, this);
 
@@ -176,6 +176,10 @@ describe('ns.Updater', function() {
                 expect(arg).to.have.property('requestModels.0').that.is.at.least(0);
                 expect(arg).to.have.property('collectViews').that.is.at.least(0);
                 expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+            });
+
+            it('should return ns-view-app as a root node', function() {
+                expect(this.$node.hasClass('ns-view-app')).to.be.ok();
             });
         });
 

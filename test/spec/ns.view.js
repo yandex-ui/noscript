@@ -203,11 +203,8 @@ describe('ns.View', function() {
         beforeEach(function() {
             ns.View.define('some-view', {});
             this.view = ns.View.create('some-view');
-            this.testHtml =
-                '<div class="ns-root">' +
-                    '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>' +
-                '</div>';
-            this.testNode = $(this.testHtml)[0];
+            this.testHtml = '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>';
+            this.testNode = ns.html2node(this.testHtml);
             this.resultNode = $(this.testNode).children()[0];
         });
 
@@ -231,11 +228,8 @@ describe('ns.View', function() {
             ns.View.define('some-view', {});
 
             this.view = ns.View.create('some-view');
-            this.testHtml =
-                '<div class="ns-root">' +
-                    '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>' +
-                '</div>';
-            this.testNode = $(this.testHtml)[0];
+            this.testHtml = '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>';
+            this.testNode = ns.html2node(this.testHtml);
             this.resultNode = $(this.testNode).children()[0];
 
             this.sinon.spy(this.view, '_extractNodeByKey');

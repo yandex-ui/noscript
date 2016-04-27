@@ -32,9 +32,7 @@ key modelError( /.models.*[ .status == 'error' ], name() ) {
 
 // @private
 match / {
-    <div class="ns-root">
-        apply .views.* ns-view
-    </div>
+    apply .views.* ns-view
 }
 
 // делает chroot для view и генерит обертку с помощью ns-build-view

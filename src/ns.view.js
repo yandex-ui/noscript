@@ -136,6 +136,7 @@
          * @private
          */
         this.status = this.STATUS.NONE;
+        this.destroyed = false;
 
         this.__customInit();
 
@@ -1190,7 +1191,6 @@
      * @private
      */
     ns.View.prototype._updateHTML = function(node, updateOptions, events) {
-
         //  FIXME nop@: Велик могучим русский языка!
         //  Падежи не сходятся вообще :(
         //
@@ -1430,6 +1430,7 @@
         this.models = null;
         this.params = null;
         this.status = this.STATUS.NONE;
+        this.destroyed = true;
 
         this._modelsHandlers = null;
     };

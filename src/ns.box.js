@@ -26,6 +26,7 @@ ns.Box = function(id, params) {
     this.active = {};
 
     this._visible = false;
+    this.destroyed = false;
 
     this.info = {
         isBox: true,
@@ -387,6 +388,7 @@ ns.Box.prototype.destroy = function() {
     this.views = null;
 
     this._visible = false;
+    this.destroyed = true;
 };
 
 // копируем нужные методы из ns.View

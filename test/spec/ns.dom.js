@@ -35,4 +35,14 @@ describe('ns.dom.js', function() {
 
     });
 
+    describe('ns.html2node', function() {
+        it('должен вернуть null если не передана строка html', function() {
+            expect(ns.html2node()).to.be.equal(null);
+        });
+
+        it('должен вернуть ноду, преобразованную из строки, внутри ноды-враппера', function() {
+            expect(ns.html2node('<div>test</div>').outerHTML).to.be.equal('<div><div>test</div></div>');
+        });
+    });
+
 });

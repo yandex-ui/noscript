@@ -1377,4 +1377,177 @@ describe('ns.Updater', function() {
         });
     });
 
+    describe('Обновление асинхронного вида', function() {
+        beforeEach(function() {
+            ns.layout.define('page', {
+                'app': {
+                    'subbox': {}
+                }
+            });
+
+            ns.layout.define('subpage', {
+                'photo': {
+                    'ads&' : true
+                }
+            });
+
+            ns.router.routes = {
+                'route': {
+                    '/page': 'page'
+                }
+            };
+            ns.router.init();
+
+            ns.Model.define('my_model1');
+            ns.Model.define('my_model2');
+            ns.Model.define('my_model3');
+
+            ns.View.define('app');
+            ns.View.define('photo', {
+                models: [ 'my_model1' ],
+                methods: {
+                    parallelUpdate: function() {
+                        var update = new ns.Update(this, ns.layout.page('subpage', {}), {}, { execFlag: ns.U.EXEC.PARALLEL });
+                        return update.render();
+                    }
+                }
+            });
+            ns.View.define('ads', {
+                models: [ 'my_model2' ]
+            });
+
+            ns.View.define('subbox', {
+                events: {
+                    'ns-view-show': 'onShow'
+                },
+
+                models: [ 'my_model3' ],
+
+                ctor: function() {
+                    this.promise = new Vow.Promise();
+                },
+
+                methods: {
+                    onShow: function() {
+                        var layout = ns.layout.page('subpage', {});
+                        var targetNode = this.node.appendChild(document.createElement('div'));
+
+                        this.vPhoto = ns.View.create('photo');
+                        this.vPhoto._setNode(targetNode);
+                        this.vPhoto.invalidate();
+
+                        this.updater = new ns.Update(this.vPhoto, layout, {}, { execFlag: ns.U.EXEC.PARALLEL });
+                        this.promise.sync(this.updater.render());
+                    }
+                }
+            });
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            this.sinon.stub(ns.request, 'models', function(models) {
+                for (var i = 0; i < models.length; i++) {
+                    models[i].setData({ data: true });
+                }
+                return Vow.fulfill(models);
+            });
+        });
+
+        it('Глобальное обновление не должно прерывать асинхронного, запущенное из параллельного', function(done) {
+            ns.page.go('/page')
+                .then(function() {
+                    var vSubbox = ns.MAIN_VIEW.views.subbox;
+                    var promises = [ vSubbox.promise ];
+
+                    // глобальный ставит в очередь, когда в очереди находится асинк апдейт
+                    promises.push(ns.page.go(ns.page.currentUrl, 'preserve').fail(function() {
+                        done('ns.Update global fails');
+                    }));
+
+                    vSubbox.promise.then(function(info) {
+                        Vow.all(info.async).fail(function() {
+                            done('ns.Update async fails !!!');
+                        });
+
+                    }).fail(function() {
+                        done('ns.Update parallel fails');
+                    });
+
+                    Vow.all(promises).then(function(info) {
+                        return Vow.all(info.reduce(function(data, res) { return data.concat(res.async); }, []));
+                    }).then(function() {
+                        expect(vSubbox.vPhoto.views.ads.status).to.equal('ok');
+                        done();
+                    });
+                })
+                .fail(function() {
+                    done('ns.Update fails');
+                });
+        });
+
+        it('Асинхронное обновление, запущенное из параллельного, должно добавляться в очередь на обработку на смотря на наличие выполняемого глобального', function(done) {
+            ns.page.go('/page')
+                .then(function() {
+                    var vSubbox = ns.MAIN_VIEW.views.subbox;
+                    var promises = [ vSubbox.promise ];
+
+                    Vow.all(promises).then(function(info) {
+                        return Vow.all(info.reduce(function(data, res) { return data.concat(res.async); }, []));
+                    }).then(function() {
+                        var subPromises = [];
+
+                        ns.Model.invalidate('my_model1');
+                        ns.Model.invalidate('my_model2');
+                        ns.Model.invalidate('my_model3');
+
+                        subPromises.push(ns.page.go(ns.page.currentUrl, 'preserve').fail(function() {
+                            done('ns.Update global fails');
+                        }));
+
+                        // асинк ставит в очередь в момент, когда в очереди находится глобальный апдейт
+                        subPromises.push(vSubbox.vPhoto.parallelUpdate().then(function(info) {
+                            Vow.all(info.async).fail(function() {
+                                done('ns.Update async fails !!!');
+                            });
+
+                            return info;
+                        }).fail(function() {
+                            done('ns.Update parallel fails');
+                        }));
+
+                        Vow.all(subPromises).then(function(info) {
+                            return Vow.all(info.reduce(function(data, res) { return data.concat(res.async); }, []));
+                        }).then(function() {
+                            expect(vSubbox.vPhoto.views.ads.status).to.equal('ok');
+                            done();
+                        });
+                    }).fail(function() {
+                        done('ns.Update fails');
+                    });
+                })
+                .fail(function() {
+                    done('ns.Update fails');
+                });
+        });
+
+        it('Обновление должно выполнится без изменения вида, если вид или его предок был уничтожен до завершения обновления', function() {
+            var promise = new Vow.Promise();
+
+            return ns.page.go('/page')
+                .then(function() {
+                    var vSubbox = ns.MAIN_VIEW.views.subbox;
+
+                    return vSubbox.promise.then(function(info) {
+                        vSubbox.vPhoto.destroy();
+
+                        return Vow.all(info.async);
+                    }).then(function() {
+                        expect(vSubbox.vPhoto.destroyed).to.equal(true);
+                    });
+                })
+                .fail(function(reason) {
+                    return Vow.reject('ns.Update fails ' + JSON.stringify(reason));
+                });
+        });
+    });
+
 });

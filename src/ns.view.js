@@ -1413,16 +1413,7 @@
         this.__unbindModelsEvents();
 
         if (this.node) {
-            this.$node
-                // события
-                .off()
-                // данные
-                .removeData()
-                // удаляем из DOM
-                .remove();
-
-            this.node = null;
-            this.$node = null;
+            ns.View.removeViewNode(this, true);
         }
 
         this.info = null;
@@ -1991,6 +1982,59 @@
             return 'keepValid';
         }
         return decl;
+    };
+
+    ns.View.prototype.__killViewNode = function() {
+        this.$node
+            // данные
+            .removeData()
+            // удаляем из DOM
+            .remove();
+
+        this.node = null;
+        this.$node = null;
+    };
+
+    ns.View.prototype.__removeViewNodeFromDomOnly = function() {
+        ns.removeNode(this.node);
+    };
+
+
+    /**
+     * Специальный метод удаления ноды вида.
+     * Умеет проигрывать анимацию перед удалением ноды из DOM.
+     */
+    ns.View.removeViewNode = function(viewInstance, isDestroyed) {
+        var viewId = viewInstance.id;
+        var viewInfo = ns.View.infoLite(viewId);
+        var shouldAnimateOnHide = viewInfo.methods && viewInfo.methods.animateOnHide;
+
+        // В случае, когда вид уничтожается мы проигрываем анимацию и только после этого
+        // удаляем ноду из DOM и чистим следы ноды в инстансе вида.
+        if (isDestroyed) {
+            // Сразу отключаем обработчики событий потому что анимания может продлиться какое-то время
+            // но обрабатывать какие-то события при этом не стоит на старой ноде вида.
+            viewInstance.$node.off();
+
+            if (shouldAnimateOnHide) {
+                viewInstance
+                    .animateOnHide()
+                    .then(viewInstance.__killViewNode, viewInstance);
+            } else {
+                viewInstance.__killViewNode();
+            }
+
+        // В случае скрытия ноды вида мы вначале проигрываем анимацию и только после этого
+        // удаляем ноду из DOM-а.
+        } else {
+            if (shouldAnimateOnHide) {
+                viewInstance
+                    .animateOnHide()
+                    .then(viewInstance.__removeViewNodeFromDomOnly, viewInstance);
+            } else {
+                viewInstance.__removeViewNodeFromDomOnly();
+            }
+        }
     };
 
     /**

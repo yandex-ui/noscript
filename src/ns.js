@@ -79,10 +79,11 @@ ns.renderString = function(json, mode, module) {
  * @param {*} json Данные
  * @param {string} mode Модификатор.
  * @param {string} [module='main'] Название модуля.
- * @returns {HTMLElement}
+ * @returns {?HTMLElement}
  */
 ns.renderNode = function(json, mode, module) {
-    return ns.html2node(ns.renderString(json, mode, module));
+    var node = ns.html2node(ns.renderString(json, mode, module));
+    return node ? node.firstChild : null;
 };
 
 /**

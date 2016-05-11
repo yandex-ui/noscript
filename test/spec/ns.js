@@ -50,5 +50,13 @@ describe('ns.js', function() {
         });
     });
 
-});
+    describe('ns.renderNode', function() {
+        it('должен вернуть null, если не найден модификатор в указанном модуле', function() {
+            expect(ns.renderNode()).to.be.equal(null);
+        });
 
+        it('должен вернуть ноду модификатора', function() {
+            expect(ns.renderNode({}, 'ns-renderNode').outerHTML).to.be.equal('<div>test</div>');
+        });
+    });
+});

@@ -136,6 +136,7 @@
          * @private
          */
         this.status = this.STATUS.NONE;
+        this.destroyed = false;
 
         this.__customInit();
 
@@ -1190,7 +1191,6 @@
      * @private
      */
     ns.View.prototype._updateHTML = function(node, updateOptions, events) {
-
         //  FIXME nop@: Велик могучим русский языка!
         //  Падежи не сходятся вообще :(
         //
@@ -1327,8 +1327,8 @@
         var that = this;
         promise.then(function() {
             that.update(params, {
-                // тайминги можно снять только после завершения работы
-                timers: updateInstance.getTimers()
+                parentUpdate: updateInstance,
+                timers: updateInstance.getTimers() // тайминги можно снять только после завершения работы
             });
         });
 
@@ -1430,6 +1430,7 @@
         this.models = null;
         this.params = null;
         this.status = this.STATUS.NONE;
+        this.destroyed = true;
 
         this._modelsHandlers = null;
     };

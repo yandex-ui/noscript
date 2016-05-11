@@ -49,6 +49,7 @@
          * @type {ns.U.EXEC}
          */
         this.EXEC_FLAG = options.execFlag || ns.U.EXEC.GLOBAL;
+        this.parentUpdate = options.parentUpdate;
 
         this.log('created instance', this, 'with layout', this.layout, 'and params', this.params);
 
@@ -193,15 +194,20 @@
         var timerName = 'collectModels.' + this._requestCount;
 
         this.startTimer(timerName);
-        var views = this.view._getRequestViews({
+
+        var views = {
             sync: [],
             async: [],
             // Флаг, что layout остался в неопределенном состоянии
             // Надо запросить модели и пройтись еще раз
             hasPatchLayout: false
-        }, this.layout, this.params);
-        this.stopTimer(timerName);
+        };
 
+        if (!this.view.destroyed) {
+            this.view._getRequestViews(views, this.layout, this.params);
+        }
+
+        this.stopTimer(timerName);
         this.log('collected incomplete views', views);
 
         return views;
@@ -310,7 +316,11 @@
         var tree = {
             'views': {}
         };
-        this.view._getUpdateTree(tree);
+
+        if (!this.view.destroyed) {
+            this.view._getUpdateTree(tree);
+        }
+
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
 
@@ -340,7 +350,11 @@
             'ns-view-hide': [],
             'ns-view-htmldestroy': []
         };
-        this.view.beforeUpdateHTML(hideViewEvents, false);
+
+        if (!this.view.destroyed) {
+            this.view.beforeUpdateHTML(hideViewEvents, false);
+        }
+
         this._triggerViewEvents(hideViewEvents);
 
         var viewEvents = {
@@ -351,7 +365,11 @@
         };
 
         this.switchTimer('triggerHideEvents', 'insertNodes');
-        this.view._updateHTML(node, {toplevel: true}, viewEvents);
+
+        if (!this.view.destroyed) {
+            this.view._updateHTML(node, {toplevel: true}, viewEvents);
+        }
+
         this.switchTimer('insertNodes', 'triggerEvents');
 
         this._triggerViewEvents(viewEvents);
@@ -661,7 +679,6 @@
         var currentRuns = currentUpdates;
         var FLAGS = ns.U.EXEC;
         var FLAG_GLOBAL = FLAGS.GLOBAL;
-        var FLAG_PARALLEL = FLAGS.PARALLEL;
         var FLAG_ASYNC = FLAGS.ASYNC;
 
         var newRunExecutionFlag = newUpdate.EXEC_FLAG;
@@ -681,7 +698,7 @@
                 var run = currentRuns[i];
 
                 // don't terminated paraller updates
-                if (run.EXEC_FLAG === FLAG_PARALLEL) {
+                if (isInParallelUpdate(run)) {
                     survivedRuns.push(run);
 
                 } else {
@@ -692,14 +709,14 @@
             currentUpdates = survivedRuns;
 
         } else if (newRunExecutionFlag === FLAG_ASYNC) { // async update
-
-            // check whether we have one global update
-            for (i = 0, j = currentRuns.length; i < j; i++) {
-                if (currentRuns[i].EXEC_FLAG === FLAG_GLOBAL) {
-                    return false;
+            if (!isInParallelUpdate(newUpdate)) {
+                // check whether we have one global update
+                for (i = 0, j = currentRuns.length; i < j; i++) {
+                    if (currentRuns[i].EXEC_FLAG === FLAG_GLOBAL) {
+                        return false;
+                    }
                 }
             }
-
         }
 
         currentUpdates.push(newUpdate);
@@ -722,4 +739,16 @@
      * @property {boolean} hasPatchLayout Флаг, что в дереве есть неопределившиеся виды.
      */
 
+     /**
+      * Обновление является параллельным, либо запущено из параллельного.
+      * @param {ns.Update} update
+      * @returns {boolean}
+      */
+     function isInParallelUpdate(update) {
+         if (update.parentUpdate) {
+             return isInParallelUpdate(update.parentUpdate);
+         }
+
+         return update.EXEC_FLAG === ns.U.EXEC.PARALLEL;
+     }
 })();

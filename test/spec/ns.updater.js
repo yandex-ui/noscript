@@ -1377,4 +1377,65 @@ describe('ns.Updater', function() {
         });
     });
 
+    describe('Пререопределение handleError совместно с patchLayout вызывает зацикливание перезапросов моделей, если хотя бы одна модель в виде с patchLayout оказалани невалидна', function() {
+        beforeEach(function() {
+            ns.layout.define('app', {
+                'view1': { 'view2': {} }
+            });
+
+            ns.layout.define('view-layout', {
+                'box@': { 'view3': {} }
+            });
+
+            ns.Model.define('my_model1');
+            ns.Model.define('my_model2');
+
+            ns.View.define('view1');
+            ns.View.define('view2', {
+                models: [ 'my_model1' ],
+                methods: {
+                    patchLayout: function() {
+                        return 'view-layout';
+                    }
+                }
+            });
+            ns.View.define('view3');
+
+            this.view = ns.View.create('view1');
+
+            this.server = sinon.fakeServer.create();
+            this.server.autoRespond = true;
+            this.server.respondWith(/.*/, function(xhr) {
+                xhr.respond(
+                    200,
+                    { 'Content-Type': 'application/json' },
+                    JSON.stringify({ models: [ { error: 'letter not found' } ] })
+                );
+            });
+        });
+
+        it('Должен вывести контент с ошибкой у вида, содержащего patchLayout, без отрисовки вложенного лайаута', function() {
+            // в случае ошибки будет зацикливание и на 10 цикле возвращаем ошибку Update
+            var loop = 0;
+            this.sinon.stub(ns.Update, 'handleError', function() {
+                loop++;
+                if (loop > 10) {
+                    return false;
+                }
+                return true;
+            });
+
+            return new ns.Update(this.view, ns.layout.page('app'), {})
+                .render()
+                .then(function(info) {
+                    return Vow.all(info.async);
+                })
+                .then(function() {
+                    expect(ns.Update.handleError.calledOnce).to.be.equal(true);
+                    expect(this.view.node.querySelector('.ns-view-view2').innerHTML).to.equal('test ns-view-error-content');
+                    expect(this.view.node.querySelector('.ns-view-view3')).to.equal(null);
+                }, this);
+        });
+    });
+
 });

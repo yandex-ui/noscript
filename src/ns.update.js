@@ -131,13 +131,7 @@
         this.startTimer(timerName);
         this.log('started models request', models);
 
-        var allModelsValid = true;
-        for (var i = 0, j = models.length; i < j; i++) {
-            if (!models[i].isValid()) {
-                allModelsValid = false;
-                break;
-            }
-        }
+        var allModelsValid = !this._checkModelsInvalid(models);
 
         if (allModelsValid) {
             this.stopTimer(timerName);
@@ -179,6 +173,17 @@
     };
 
     /**
+     * Проверка валидности массива моделей.
+     * @param {array} models
+     * @returns {boolean} true, eсли хотя бы одна модель не валидна
+     */
+    ns.Update.prototype._checkModelsInvalid = function(models) {
+        return (models || []).some(function(model) {
+            return !model.isValid();
+        });
+    };
+
+    /**
      * Проходит по layout и собирает список активных видов.
      * Для этих видов надо запросить модели.
      * @private
@@ -212,12 +217,14 @@
         var models = views2models(views.sync);
         this.log('collected needed models', models);
 
-        return this._requestModels(models).then(function() {
+        return this._requestModels(models).then(function(result) {
             // если есть патченный layout, то идем в рекурсивный перезапрос
             // FIXME: хорошо бы поставить предел на всякий случай
             if (views.hasPatchLayout) {
-                this._requestCount++;
-                return this._requestSyncModels();
+                if (!this._checkModelsInvalid(result)) {
+                    this._requestCount++;
+                    return this._requestSyncModels();
+                }
             }
         }, null, this);
     };
@@ -251,18 +258,21 @@
             return view.updateAfter(this.promise, this.params, this);
         }, this);
 
-        syncPromise.then(function() {
+        syncPromise.then(function(result) {
             // если есть патченный layout, то идем в рекурсивный перезапрос
             // FIXME: хорошо бы поставить предел на всякий случай
             if (views.hasPatchLayout) {
-                this._requestCount++;
-                requestPromise.sync(this._requestAllModels());
-
-            } else {
-                requestPromise.fulfill({
-                    async: asyncPromises
-                });
+                if (!this._checkModelsInvalid(result)) {
+                    this._requestCount++;
+                    requestPromise.sync(this._requestAllModels());
+                    return;
+                }
             }
+
+            requestPromise.fulfill({
+                async: asyncPromises
+            });
+
         }, function(e) {
             requestPromise.reject(e);
         }, this);

@@ -668,7 +668,7 @@ ns.ViewCollection.prototype._updateHTML = function(node, updateOptions, events) 
                     // либо непосредственно на ноду, либо на document. В первом случае
                     // события переедут вместе со старой нодой, а во втором останутся там,
                     // где и были раньше
-                    ns.replaceNode(view._extractNode(newNode), view.node);
+                    ns.replaceNode(view.node, view._extractNode(newNode));
                 }
             }
 

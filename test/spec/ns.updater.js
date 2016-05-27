@@ -790,6 +790,7 @@ describe('ns.Updater', function() {
                     try {
                         expect(data).to.be.eql({
                             error: ns.U.STATUS.MODELS,
+                            expired: false,
                             invalidModels: [ns.Model.get('model')],
                             validModels: []
                         });
@@ -1377,7 +1378,6 @@ describe('ns.Updater', function() {
         });
     });
 
-<<<<<<< HEAD
     describe('Пререопределение handleError совместно с patchLayout вызывает зацикливание перезапросов моделей, если хотя бы одна модель в виде с patchLayout оказалани невалидна', function() {
         beforeEach(function() {
             ns.layout.define('app', {

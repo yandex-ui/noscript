@@ -1065,10 +1065,16 @@
     /**
      * Returns data of model.
      * @param {string} id Model ID
+     * @param {string} [jpath]
      * @returns {*}
      */
-    ns.View.prototype.getModelData = function(id) {
-        return this.getModel(id).getData();
+    ns.View.prototype.getModelData = function(id, jpath) {
+        var model = this.getModel(id);
+
+        if (jpath) {
+            return model.get(jpath);
+        }
+        return model.getData();
     };
 
     /**

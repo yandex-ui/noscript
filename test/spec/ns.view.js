@@ -98,7 +98,7 @@ describe('ns.View', function() {
             });
 
             this.params = {p: 1};
-            this.modelData = 'modeldata' + Math.random();
+            this.modelData = {foo: 'modeldata' + Math.random()};
 
             this.model = ns.Model.get('test-getModel', this.params);
             this.model.setData(this.modelData);
@@ -119,6 +119,10 @@ describe('ns.View', function() {
 
         it("getModelData should returns view's model data", function() {
             expect(this.view.getModelData('test-getModel')).to.be.equal(this.modelData);
+        });
+
+        it("getModelData with jpath should returns view's model data using that jpath", function() {
+            expect(this.view.getModelData('test-getModel', '.foo')).to.be.equal(this.modelData.foo);
         });
 
         it('должен создавать модели по своим параметрам', function() {

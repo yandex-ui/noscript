@@ -33,13 +33,14 @@ ns.Events.on = function(name, handler) {
  * @param {function} handler Обработчик события.
  * @returns {ns.Events}
  */
-ns.Events.once = function( name, handler ) {
+ns.Events.once = function(name, handler) {
     var that = this;
     var once = function() {
         that.off( name, once );
         handler.apply(this, arguments);
     };
-    this.on( name, once );
+    once.__original = handler;
+    this.on(name, once);
     return this;
 };
 
@@ -56,11 +57,12 @@ ns.Events.off = function(name, handler) {
         handlers = this._nsevents_handlers && this._nsevents_handlers[name];
         if (handlers) {
             //  Ищем этот хэндлер среди уже забинженных обработчиков этого события.
-            var i = handlers.indexOf(handler);
-
-            if (i !== -1) {
-                //  Нашли и удаляем этот обработчик.
-                handlers.splice(i, 1);
+            for (var i = 0, l = handlers.length; i < l; i++) {
+                if (handlers[i] === handler || handlers[i].__original === handler) {
+                    //  Нашли и удаляем этот обработчик.
+                    handlers.splice(i, 1);
+                    break;
+                }
             }
         }
     } else {

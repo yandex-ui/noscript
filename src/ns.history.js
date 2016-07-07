@@ -84,7 +84,7 @@
         }
 
         // если hostname ссылки не равен нашему хосту, то она внешняя и ее обрабатывать не надо
-        if (target.hostname !== window.location.hostname) {
+        if (target.hostname && target.hostname !== window.location.hostname) {
             return true;
         }
 

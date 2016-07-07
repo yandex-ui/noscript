@@ -45,6 +45,13 @@ describe('ns.history', function() {
             ns.history._onAnchorClick(this.event);
             expect(ns.history.followAnchorHref).to.have.callCount(0);
         });
+
+        it('не должен перейти по ссылке, если href=javascript:void(0)', function() {
+            this.event.currentTarget.href = 'javascript:void(0)';
+
+            ns.history._onAnchorClick(this.event);
+            expect(ns.history.followAnchorHref).to.have.callCount(0);
+        });
     });
 
 });

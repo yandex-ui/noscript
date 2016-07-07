@@ -83,6 +83,10 @@
             return true;
         }
 
+        if (!/^https?:/.test(target.protocol)) {
+            return true;
+        }
+
         // если hostname ссылки не равен нашему хосту, то она внешняя и ее обрабатывать не надо
         if (target.hostname && target.hostname !== window.location.hostname) {
             return true;

@@ -179,7 +179,7 @@ describe('ns.Updater', function() {
             });
 
             it('should return ns-view-app as a root node', function() {
-                expect(this.$node.hasClass('ns-view-app')).to.be.ok();
+                expect(this.$node.hasClass('ns-view-app')).to.be.ok;
             });
         });
 

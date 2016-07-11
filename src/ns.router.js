@@ -70,8 +70,18 @@ ns.router = function(url) {
         page: ns.R.NOT_FOUND,
         params: {}
     };
-
 };
+
+/**
+ * Энкодит значения параметров.
+ * Доступно для переопределения в приложении.
+ */
+ns.router.encodeValue = encodeURIComponent;
+/**
+ * Декодит значения параметров.
+ * Доступно для переопределения в приложении.
+ */
+ns.router.decodeValue = decodeURIComponent;
 
 /**
  * Первый символ урла. Если приложение работает на хешах, то его надо переопределить в #.
@@ -101,7 +111,7 @@ ns.router._getParamsRouteFromUrl = function(route, parsedChunks) {
         if (paramValueFromURL) {
             // try to decode
             try {
-                paramValueFromURL = decodeURIComponent(paramValueFromURL);
+                paramValueFromURL = ns.router.decodeValue(paramValueFromURL);
             } catch(e) {
                 // fallback to default value
                 paramValueFromURL = '';
@@ -312,7 +322,7 @@ ns.router._generateUrl = function(def, params) {
                     return null;
                 }
 
-                svalue += encodeURIComponent(pvalue);
+                svalue += ns.router.encodeValue(pvalue);
                 delete query[param.name];
             }
         }

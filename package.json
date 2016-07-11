@@ -40,7 +40,8 @@
         "sinon": "*",
         "request": "2.36.x",
         "yate": "*",
-        "mutationobserver-shim": "~0.2.8"
+        "mutationobserver-shim": "~0.2.8",
+        "sinon-chai": "^2.8.0"
     },
     "optionalDependencies": {},
     "engines": {

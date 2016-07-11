@@ -4,6 +4,7 @@ describe('ns.history', function() {
 
         beforeEach(function() {
             this.sinon.stub(ns.history, 'followAnchorHref');
+            this.sinon.stub(ns.router, 'baseDir', '/my/');
 
             this.event = {
                 currentTarget: document.createElement('a')
@@ -11,7 +12,6 @@ describe('ns.history', function() {
         });
 
         it('должен перейти по ссылке, если baseDir совпадает частично', function() {
-            this.sinon.stub(ns.router, 'baseDir', '/my/');
             this.event.currentTarget.href = '/my/page1';
 
             ns.history._onAnchorClick(this.event);
@@ -19,7 +19,6 @@ describe('ns.history', function() {
         });
 
         it('должен перейти по ссылке, если baseDir совпадает полностью', function() {
-            this.sinon.stub(ns.router, 'baseDir', '/my/');
             this.event.currentTarget.href = '/my/';
 
             ns.history._onAnchorClick(this.event);
@@ -27,7 +26,6 @@ describe('ns.history', function() {
         });
 
         it('не должен перейти по ссылке, если baseDir не совпадает совсем', function() {
-            this.sinon.stub(ns.router, 'baseDir', '/my/');
             this.event.currentTarget.href = '/another/page1';
 
             ns.history._onAnchorClick(this.event);
@@ -35,7 +33,6 @@ describe('ns.history', function() {
         });
 
         it('не должен перейти по ссылке, если baseDir не совпадает частично', function() {
-            this.sinon.stub(ns.router, 'baseDir', '/my/');
             this.event.currentTarget.href = '/my';
 
             ns.history._onAnchorClick(this.event);
@@ -43,8 +40,14 @@ describe('ns.history', function() {
         });
 
         it('не должен перейти по ссылке, если baseDir совпадает, но задан атрибут target', function() {
-            this.sinon.stub(ns.router, 'baseDir', '/my/');
             this.event.currentTarget.target = '_self';
+
+            ns.history._onAnchorClick(this.event);
+            expect(ns.history.followAnchorHref).to.have.callCount(0);
+        });
+
+        it('не должен перейти по ссылке, если href=javascript:void(0)', function() {
+            this.event.currentTarget.href = 'javascript:void(0)';
 
             ns.history._onAnchorClick(this.event);
             expect(ns.history.followAnchorHref).to.have.callCount(0);

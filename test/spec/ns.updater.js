@@ -136,7 +136,7 @@ describe('ns.Updater', function() {
                 this.update = new ns.Update(this.view, ns.layout.page('asyncLayout', {}), {});
                 this.update.generateHTML()
                     .then(function(html) {
-                        this.$node = $(ns.html2node(html));
+                        this.$node = $(html);
                         done();
                     }, this);
 
@@ -176,6 +176,10 @@ describe('ns.Updater', function() {
                 expect(arg).to.have.property('requestModels.0').that.is.at.least(0);
                 expect(arg).to.have.property('collectViews').that.is.at.least(0);
                 expect(arg).to.have.property('generateHTML').that.is.at.least(0);
+            });
+
+            it('should return ns-view-app as a root node', function() {
+                expect(this.$node.hasClass('ns-view-app')).to.be.ok();
             });
         });
 
@@ -786,6 +790,7 @@ describe('ns.Updater', function() {
                     try {
                         expect(data).to.be.eql({
                             error: ns.U.STATUS.MODELS,
+                            expired: false,
                             invalidModels: [ns.Model.get('model')],
                             validModels: []
                         });
@@ -1370,6 +1375,240 @@ describe('ns.Updater', function() {
                 });
 
             return promise;
+        });
+    });
+
+    describe('Пререопределение handleError совместно с patchLayout вызывает зацикливание перезапросов моделей, если хотя бы одна модель в виде с patchLayout оказалани невалидна', function() {
+        beforeEach(function() {
+            ns.layout.define('app', {
+                'view1': { 'view2': {} }
+            });
+
+            ns.layout.define('view-layout', {
+                'box@': { 'view3': {} }
+            });
+
+            ns.Model.define('my_model1');
+            ns.Model.define('my_model2');
+
+            ns.View.define('view1');
+            ns.View.define('view2', {
+                models: [ 'my_model1' ],
+                methods: {
+                    patchLayout: function() {
+                        return 'view-layout';
+                    }
+                }
+            });
+            ns.View.define('view3');
+
+            this.view = ns.View.create('view1');
+
+            this.server = sinon.fakeServer.create();
+            this.server.autoRespond = true;
+            this.server.respondWith(/.*/, function(xhr) {
+                xhr.respond(
+                    200,
+                    { 'Content-Type': 'application/json' },
+                    JSON.stringify({ models: [ { error: 'letter not found' } ] })
+                );
+            });
+        });
+
+        it('Должен вывести контент с ошибкой у вида, содержащего patchLayout, без отрисовки вложенного лайаута', function() {
+            // в случае ошибки будет зацикливание и на 10 цикле возвращаем ошибку Update
+            var loop = 0;
+            this.sinon.stub(ns.Update, 'handleError', function() {
+                loop++;
+                if (loop > 10) {
+                    return false;
+                }
+                return true;
+            });
+
+            return new ns.Update(this.view, ns.layout.page('app'), {})
+                .render()
+                .then(function(info) {
+                    return Vow.all(info.async);
+                })
+                .then(function() {
+                    expect(ns.Update.handleError.calledOnce).to.be.equal(true);
+                    expect(this.view.node.querySelector('.ns-view-view2').innerHTML).to.equal('test ns-view-error-content');
+                    expect(this.view.node.querySelector('.ns-view-view3')).to.equal(null);
+                }, this);
+        });
+    });
+
+    describe('Обновление асинхронного вида', function() {
+        beforeEach(function() {
+            ns.layout.define('page', {
+                'app': {
+                    'subbox': {}
+                }
+            });
+
+            ns.layout.define('subpage', {
+                'photo': {
+                    'ads&' : true
+                }
+            });
+
+            ns.router.routes = {
+                'route': {
+                    '/page': 'page'
+                }
+            };
+            ns.router.init();
+
+            ns.Model.define('my_model1');
+            ns.Model.define('my_model2');
+            ns.Model.define('my_model3');
+
+            ns.View.define('app');
+            ns.View.define('photo', {
+                models: [ 'my_model1' ],
+                methods: {
+                    parallelUpdate: function() {
+                        var update = new ns.Update(this, ns.layout.page('subpage', {}), {}, { execFlag: ns.U.EXEC.PARALLEL });
+                        return update.render();
+                    }
+                }
+            });
+            ns.View.define('ads', {
+                models: [ 'my_model2' ]
+            });
+
+            ns.View.define('subbox', {
+                events: {
+                    'ns-view-show': 'onShow'
+                },
+
+                models: [ 'my_model3' ],
+
+                ctor: function() {
+                    this.promise = new Vow.Promise();
+                },
+
+                methods: {
+                    onShow: function() {
+                        var layout = ns.layout.page('subpage', {});
+                        var targetNode = this.node.appendChild(document.createElement('div'));
+
+                        this.vPhoto = ns.View.create('photo');
+                        this.vPhoto._setNode(targetNode);
+                        this.vPhoto.invalidate();
+
+                        this.updater = new ns.Update(this.vPhoto, layout, {}, { execFlag: ns.U.EXEC.PARALLEL });
+                        this.promise.sync(this.updater.render());
+                    }
+                }
+            });
+
+            ns.MAIN_VIEW = ns.View.create('app');
+
+            this.sinon.stub(ns.request, 'models', function(models) {
+                for (var i = 0; i < models.length; i++) {
+                    models[i].setData({ data: true });
+                }
+                return Vow.fulfill(models);
+            });
+        });
+
+        it('Глобальное обновление не должно прерывать асинхронного, запущенное из параллельного', function(done) {
+            ns.page.go('/page')
+                .then(function() {
+                    var vSubbox = ns.MAIN_VIEW.views.subbox;
+                    var promises = [ vSubbox.promise ];
+
+                    // глобальный ставит в очередь, когда в очереди находится асинк апдейт
+                    promises.push(ns.page.go(ns.page.currentUrl, 'preserve').fail(function() {
+                        done('ns.Update global fails');
+                    }));
+
+                    vSubbox.promise.then(function(info) {
+                        Vow.all(info.async).fail(function() {
+                            done('ns.Update async fails !!!');
+                        });
+
+                    }).fail(function() {
+                        done('ns.Update parallel fails');
+                    });
+
+                    Vow.all(promises).then(function(info) {
+                        return Vow.all(info.reduce(function(data, res) { return data.concat(res.async); }, []));
+                    }).then(function() {
+                        expect(vSubbox.vPhoto.views.ads.status).to.equal('ok');
+                        done();
+                    });
+                })
+                .fail(function() {
+                    done('ns.Update fails');
+                });
+        });
+
+        it('Асинхронное обновление, запущенное из параллельного, должно добавляться в очередь на обработку на смотря на наличие выполняемого глобального', function(done) {
+            ns.page.go('/page')
+                .then(function() {
+                    var vSubbox = ns.MAIN_VIEW.views.subbox;
+                    var promises = [ vSubbox.promise ];
+
+                    Vow.all(promises).then(function(info) {
+                        return Vow.all(info.reduce(function(data, res) { return data.concat(res.async); }, []));
+                    }).then(function() {
+                        var subPromises = [];
+
+                        ns.Model.invalidate('my_model1');
+                        ns.Model.invalidate('my_model2');
+                        ns.Model.invalidate('my_model3');
+
+                        subPromises.push(ns.page.go(ns.page.currentUrl, 'preserve').fail(function() {
+                            done('ns.Update global fails');
+                        }));
+
+                        // асинк ставит в очередь в момент, когда в очереди находится глобальный апдейт
+                        subPromises.push(vSubbox.vPhoto.parallelUpdate().then(function(info) {
+                            Vow.all(info.async).fail(function() {
+                                done('ns.Update async fails !!!');
+                            });
+
+                            return info;
+                        }).fail(function() {
+                            done('ns.Update parallel fails');
+                        }));
+
+                        Vow.all(subPromises).then(function(info) {
+                            return Vow.all(info.reduce(function(data, res) { return data.concat(res.async); }, []));
+                        }).then(function() {
+                            expect(vSubbox.vPhoto.views.ads.status).to.equal('ok');
+                            done();
+                        });
+                    }).fail(function() {
+                        done('ns.Update fails');
+                    });
+                })
+                .fail(function() {
+                    done('ns.Update fails');
+                });
+        });
+
+        it('Обновление должно выполнится без изменения вида, если вид или его предок был уничтожен до завершения обновления', function() {
+            var promise = new Vow.Promise();
+
+            return ns.page.go('/page')
+                .then(function() {
+                    var vSubbox = ns.MAIN_VIEW.views.subbox;
+
+                    return vSubbox.promise.then(function(info) {
+                        vSubbox.vPhoto.destroy();
+
+                        return Vow.all(info.async);
+                    }).then(function() {
+                        expect(vSubbox.vPhoto.destroyed).to.equal(true);
+                    });
+                })
+                .fail(function(reason) {
+                    return Vow.reject('ns.Update fails ' + JSON.stringify(reason));
+                });
         });
     });
 

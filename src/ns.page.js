@@ -57,11 +57,6 @@
 
         var route = ns.router(url);
 
-        // router says "redirect"
-        if (route.page === ns.R.REDIRECT) {
-            return ns.page.redirect(route.redirect);
-        }
-
         if (route.page === ns.R.NOT_APP_URL) {
             if (historyAction === 'replace') {
                 window.location.replace(route.redirect);
@@ -92,6 +87,12 @@
 
                 ns.page._setCurrent(route, url);
                 ns.page._fillHistory(url, historyAction);
+
+                // router says "redirect"
+                if (route.page === ns.R.REDIRECT) {
+                    return ns.page.redirect(route.redirect);
+                }
+
                 ns.page.title();
 
                 return ns.page.startUpdate(route);
@@ -134,13 +135,22 @@
      */
     ns.page._fillHistory = function(url, action) {
         // action еще может быть "preserve", т.е. ничего не делаем
-        if (action === 'push') {
-            ns.history.pushState(url);
-            ns.page.history.push(url);
-
-        } else if (action === 'replace') {
-            ns.history.replaceState(url);
-            ns.page.history.replace(url);
+        switch (action) {
+            case 'init':
+                ns.page.history.push(url);
+                break;
+            case 'push':
+                ns.history.pushState(url);
+                ns.page.history.push(url);
+                break;
+            case 'replace':
+                ns.history.replaceState(url);
+                ns.page.history.replace(url);
+                break;
+            case'redirect':
+                ns.history.replaceState(url);
+                ns.page.history.redirect(url);
+                break;
         }
     };
 
@@ -151,7 +161,7 @@
      */
     ns.page.redirect = function(url) {
         ns.history.replaceState(url);
-        return ns.page.go(url, true);
+        return ns.page.go(url, 'redirect');
     };
 
     /**

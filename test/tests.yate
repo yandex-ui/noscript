@@ -75,3 +75,9 @@ match .span-tag-view ns-build-view {
 match .span-tag-view ns-view-content {
     "span"
 }
+
+match / ns-renderNode {
+    <div>
+        "test"
+    </div>
+}

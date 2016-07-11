@@ -33,9 +33,9 @@
     };
 
     /**
-     * Generates DOM from HTML-string.
+     * Returns DOM node with children generated from HTML-string.
      * @param {string} html
-     * @returns {?Element}
+     * @returns {?HTMLElement}
      */
     ns.html2node = function(html) {
         if (!html) {
@@ -45,7 +45,7 @@
         var div = document.createElement('div');
         div.innerHTML = html;
 
-        return div.firstChild;
+        return div;
     };
 
     /**

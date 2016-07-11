@@ -98,7 +98,7 @@ describe('ns.View', function() {
             });
 
             this.params = {p: 1};
-            this.modelData = 'modeldata' + Math.random();
+            this.modelData = {foo: 'modeldata' + Math.random()};
 
             this.model = ns.Model.get('test-getModel', this.params);
             this.model.setData(this.modelData);
@@ -119,6 +119,10 @@ describe('ns.View', function() {
 
         it("getModelData should returns view's model data", function() {
             expect(this.view.getModelData('test-getModel')).to.be.equal(this.modelData);
+        });
+
+        it("getModelData with jpath should returns view's model data using that jpath", function() {
+            expect(this.view.getModelData('test-getModel', '.foo')).to.be.equal(this.modelData.foo);
         });
 
         it('должен создавать модели по своим параметрам', function() {
@@ -203,11 +207,8 @@ describe('ns.View', function() {
         beforeEach(function() {
             ns.View.define('some-view', {});
             this.view = ns.View.create('some-view');
-            this.testHtml =
-                '<div class="ns-root">' +
-                    '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>' +
-                '</div>';
-            this.testNode = $(this.testHtml)[0];
+            this.testHtml = '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>';
+            this.testNode = ns.html2node(this.testHtml);
             this.resultNode = $(this.testNode).children()[0];
         });
 
@@ -231,11 +232,8 @@ describe('ns.View', function() {
             ns.View.define('some-view', {});
 
             this.view = ns.View.create('some-view');
-            this.testHtml =
-                '<div class="ns-root">' +
-                    '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>' +
-                '</div>';
-            this.testNode = $(this.testHtml)[0];
+            this.testHtml = '<div class="ns-view-some-view ' + this.view.__uniqueId + '" data-key="' + this.view.key + '"></div>';
+            this.testNode = ns.html2node(this.testHtml);
             this.resultNode = $(this.testNode).children()[0];
 
             this.sinon.spy(this.view, '_extractNodeByKey');

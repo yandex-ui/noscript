@@ -136,6 +136,7 @@
          * @private
          */
         this.status = this.STATUS.NONE;
+        this.destroyed = false;
 
         this.__customInit();
 
@@ -1064,10 +1065,16 @@
     /**
      * Returns data of model.
      * @param {string} id Model ID
+     * @param {string} [jpath]
      * @returns {*}
      */
-    ns.View.prototype.getModelData = function(id) {
-        return this.getModel(id).getData();
+    ns.View.prototype.getModelData = function(id, jpath) {
+        var model = this.getModel(id);
+
+        if (jpath) {
+            return model.get(jpath);
+        }
+        return model.getData();
     };
 
     /**
@@ -1190,7 +1197,6 @@
      * @private
      */
     ns.View.prototype._updateHTML = function(node, updateOptions, events) {
-
         //  FIXME nop@: Велик могучим русский языка!
         //  Падежи не сходятся вообще :(
         //
@@ -1327,8 +1333,8 @@
         var that = this;
         promise.then(function() {
             that.update(params, {
-                // тайминги можно снять только после завершения работы
-                timers: updateInstance.getTimers()
+                parentUpdate: updateInstance,
+                timers: updateInstance.getTimers() // тайминги можно снять только после завершения работы
             });
         });
 
@@ -1430,6 +1436,7 @@
         this.models = null;
         this.params = null;
         this.status = this.STATUS.NONE;
+        this.destroyed = true;
 
         this._modelsHandlers = null;
     };

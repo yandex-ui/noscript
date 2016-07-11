@@ -676,13 +676,15 @@ ns.ViewCollection.prototype._updateHTML = function(node, updateOptions, events) 
 
             prev = view;
         });
+    }
 
+    this.__destroyInactiveViews();
+
+    if (!this.isLoading()) {
         // проверяет, что порядок видом соответствует порядку элементов коллекции
         // этот метод нужен для обработки изменения позиции элемента
         this.__sortViewItems();
     }
-
-    this.__destroyInactiveViews();
 };
 
 /**

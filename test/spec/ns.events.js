@@ -118,16 +118,39 @@ describe('ns.Events', function() {
         beforeEach(function() {
             this.spy = this.sinon.spy();
             ns.events.once('test', this.spy);
-            ns.events.trigger('test');
-            ns.events.trigger('test');
         });
 
         it('должен вызвать обработчик один раз', function() {
+            ns.events.trigger('test');
+            ns.events.trigger('test');
             expect(this.spy).to.have.callCount(1);
         });
 
         it('должен вызвать обработчик в контексте ns.events', function() {
+            ns.events.trigger('test');
             expect(this.spy.getCall(0).thisValue).to.be.equal(ns.events);
+        });
+
+        it('должен отписаться при вызове ns.events.off', function() {
+            ns.events.off('test', this.spy);
+            ns.events.trigger('test');
+            expect(this.spy).to.have.callCount(0);
+        });
+        it('двойной once', function() {
+            ns.events.once('test', this.spy);
+            ns.events.trigger('test');
+            expect(this.spy).to.have.callCount(2);
+        });
+        it('двойной once и off', function() {
+            ns.events.once('test', this.spy);
+            ns.events.off('test', this.spy);
+            ns.events.trigger('test');
+            expect(this.spy).to.have.callCount(1);
+        });
+        it('должен отписаться на off', function() {
+            ns.events.off('test');
+            ns.events.trigger('test');
+            expect(this.spy).to.have.callCount(0);
         });
 
     });

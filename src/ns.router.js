@@ -111,7 +111,7 @@ ns.router._getParamsRouteFromUrl = function(route, parsedChunks) {
         if (paramValueFromURL) {
             // try to decode
             try {
-                paramValueFromURL = ns.router.decodeValue(paramValueFromURL);
+                paramValueFromURL = ns.router.decodeValue(paramValueFromURL, rparam.name);
             } catch(e) {
                 // fallback to default value
                 paramValueFromURL = '';
@@ -321,8 +321,7 @@ ns.router._generateUrl = function(def, params) {
                 if (!ns.router._isParamValid(pvalue, param.type)) {
                     return null;
                 }
-
-                svalue += ns.router.encodeValue(pvalue);
+                svalue += ns.router.encodeValue(pvalue, param.name);
                 delete query[param.name];
             }
         }

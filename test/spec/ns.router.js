@@ -306,4 +306,44 @@ describe('ns.router', function() {
         test_route('/from/var/logs/nginx/copy', { page: 'page', params: { dialog: 'copy', 'from-path': '/var/logs/nginx' } } );
         test_route('/from/var/logs/nginx', { page: 'page', params: { 'from-path': '/var/logs/nginx' } } );
     });
+
+    describe('encodeValue and decodeValue', function() {
+        beforeEach(function() {
+            ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
+
+            ns.router.routes = {
+                route: {
+                    '/from{id:path}': 'page',
+                }
+            };
+            ns.router.init();
+
+            ns.router.encodeValue = this.sinon.stub();
+            ns.router.decodeValue = this.sinon.stub();
+        });
+        afterEach(function() {
+            ns.router.encodeValue = encodeURIComponent;
+            ns.router.decodeValue = decodeURIComponent;
+        });
+
+        describe('#encodeValue', function() {
+            beforeEach(function() {
+                ns.router.generateUrl('page', { id: '/hello/world' });
+            });
+
+            it('должен принимать в аргументах значение и название параметра', function() {
+                expect(ns.router.encodeValue.calledWith('/hello/world', 'id')).to.be.true;
+            });
+        });
+
+        describe('#decodeValue', function() {
+            beforeEach(function() {
+                ns.router('/from/hello/world');
+            });
+
+            it('должен принимать в аргументах значение и название параметра', function() {
+                expect(ns.router.decodeValue.calledWith('/hello/world', 'id')).to.be.true;
+            });
+        });
+    });
 });

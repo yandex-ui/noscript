@@ -7,6 +7,9 @@
 
 [Документация и best practice](https://yandex-ui.github.io/noscript/single-page/) | [JSDoc](https://yandex-ui.github.io/noscript/)
 
+## Примеры
+- [noscript-demo](https://github.com/yandex-ui/noscript-demo) - мини демо проект. Удобен для быстрых экспериментов с фреймворком и для проверки гипотез / демонстрации багов.
+
 ## Плагины
 
 [noscript-bosphorus](https://github.com/yandex-ui/noscript-bosphorus). Реализует мост между yate и видом/моделями и позволяет вызывать их методы из шаблона.

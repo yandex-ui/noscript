@@ -740,8 +740,12 @@
                 this._addView(view_id, updateParams, layoutViews[view_id].type);
             }
 
+            var parentId = this.id;
             this._apply(function(view, id) {
-                view._getRequestViews(updated, layoutViews[id], updateParams);
+                var views = layoutViews[id];
+
+                ns.View.assert(!!views, 13, [parentId]);
+                view._getRequestViews(updated, views, updateParams);
             });
         }
 
@@ -1906,7 +1910,8 @@
         9: 'Model %s is not defined!',
         10: 'Could not generate key for view %s',
         11: '#patchLayout MUST returns valid layout ID',
-        12: '#patchLayout MUST returns layout with ns.Box at top'
+        12: '#patchLayout MUST returns layout with ns.Box at top',
+        13: 'You cannot change children inside of a regular view. Maybe "%s" should be ns.Box.'
     };
 
     /**

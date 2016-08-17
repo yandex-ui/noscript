@@ -614,4 +614,36 @@ describe('ns.View dynamic layouts ->', function() {
 
     });
 
+    describe('При изменении деток у обычного вида', function() {
+        beforeEach(function() {
+            ns.layout.define('app1', {
+               'app': {
+                 'view2': {}
+               }
+            });
+            ns.layout.define('app2', {
+               'app': {
+                 'view3': {}
+               }
+            });
+
+            ns.View.define('app');
+            ns.View.define('view2');
+            ns.View.define('view3');
+
+            this.view = ns.View.create('app');
+
+            return new ns.Update(this.view, ns.layout.page('app1'), {}).render();
+        });
+
+        it('апдейт должен бросить понятное исключение', function() {
+            return new ns.Update(this.view, ns.layout.page('app2'), {})
+                .render()
+                .then(null, function(err) {
+                    expect(
+                        ns.assert.fail.bind(ns, 'ns.View', ns.View.ERROR_CODES[13], 'app')
+                    ).to.throw(err.message);
+                });
+        });
+    })
 });

@@ -307,7 +307,7 @@ describe('ns.router', function() {
         test_route('/from/var/logs/nginx', { page: 'page', params: { 'from-path': '/var/logs/nginx' } } );
     });
 
-    describe('encodeValue and decodeValue', function() {
+    describe('encodeParamValue and decodeParamValue', function() {
         beforeEach(function() {
             ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
 
@@ -318,31 +318,31 @@ describe('ns.router', function() {
             };
             ns.router.init();
 
-            ns.router.encodeValue = this.sinon.stub();
-            ns.router.decodeValue = this.sinon.stub();
+            ns.router.encodeParamValue = this.sinon.stub();
+            ns.router.decodeParamValue = this.sinon.stub();
         });
         afterEach(function() {
-            ns.router.encodeValue = encodeURIComponent;
-            ns.router.decodeValue = decodeURIComponent;
+            ns.router.encodeParamValue = encodeURIComponent;
+            ns.router.decodeParamValue = decodeURIComponent;
         });
 
-        describe('#encodeValue', function() {
+        describe('#encodeParamValue', function() {
             beforeEach(function() {
                 ns.router.generateUrl('page', { id: '/hello/world' });
             });
 
             it('должен принимать в аргументах значение и название параметра', function() {
-                expect(ns.router.encodeValue.calledWith('/hello/world', 'id')).to.be.true;
+                expect(ns.router.encodeParamValue.calledWith('/hello/world', 'id')).to.be.true;
             });
         });
 
-        describe('#decodeValue', function() {
+        describe('#decodeParamValue', function() {
             beforeEach(function() {
-                ns.router('/from/hello/world');
+                ns.router('/from/hello/world?foo=bar');
             });
 
             it('должен принимать в аргументах значение и название параметра', function() {
-                expect(ns.router.decodeValue.calledWith('/hello/world', 'id')).to.be.true;
+                expect(ns.router.decodeParamValue.calledWith('/hello/world', 'id')).to.be.true;
             });
         });
     });

@@ -75,13 +75,17 @@ ns.router = function(url) {
 /**
  * Энкодит значения параметров.
  * Доступно для переопределения в приложении.
+ * @param {string} pValue значение параметра
+ * @param {string} [pName] имя параметра
  */
-ns.router.encodeValue = encodeURIComponent;
+ns.router.encodeParamValue = encodeURIComponent;
 /**
  * Декодит значения параметров.
  * Доступно для переопределения в приложении.
+ * @param {string} pValue значение параметра
+ * @param {string} [pName] имя параметра
  */
-ns.router.decodeValue = decodeURIComponent;
+ns.router.decodeParamValue = decodeURIComponent;
 
 /**
  * Первый символ урла. Если приложение работает на хешах, то его надо переопределить в #.
@@ -111,7 +115,7 @@ ns.router._getParamsRouteFromUrl = function(route, parsedChunks) {
         if (paramValueFromURL) {
             // try to decode
             try {
-                paramValueFromURL = ns.router.decodeValue(paramValueFromURL, rparam.name);
+                paramValueFromURL = ns.router.decodeParamValue(paramValueFromURL, rparam.name);
             } catch(e) {
                 // fallback to default value
                 paramValueFromURL = '';
@@ -321,7 +325,7 @@ ns.router._generateUrl = function(def, params) {
                 if (!ns.router._isParamValid(pvalue, param.type)) {
                     return null;
                 }
-                svalue += ns.router.encodeValue(pvalue, param.name);
+                svalue += ns.router.encodeParamValue(pvalue, param.name);
                 delete query[param.name];
             }
         }

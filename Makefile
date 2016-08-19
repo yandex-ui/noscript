@@ -2,8 +2,12 @@ export NPM_BIN:=$(CURDIR)/node_modules/.bin
 # it should be export PATH:=$(CURDIR)/node_modules/.bin:$(PATH)
 # but there is bug in OSX https://discussions.apple.com/thread/2520853
 
+PACKAGE_VERSION = `node -p -e "require('./package.json').version"`
+
 # сборка для npm
 dist: build/*.js src/*.js | node_modules
+	rm -f .version
+	printf $(PACKAGE_VERSION) -n > .version
 	mkdir -p dist
 	$(NPM_BIN)/borschik -i build/src.client.js -o dist/noscript.js -m no
 	$(NPM_BIN)/borschik -i build/src.client.js -o dist/noscript.min.js -m yes

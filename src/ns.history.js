@@ -83,7 +83,11 @@
             return true;
         }
 
-        if (!/^https?:/.test(target.protocol)) {
+        // не обрабатываем переход по ссылке
+        // если у ссылки нет протокола (случай href="javascript:void(0)")
+        // NOTE: В ИЕ11 ссылки созданные через document.createElement не имеют protocol,
+        // поэтому дополнительно необходимо проверить, что он вообще есть
+        if (target.protocol && !/^https?:/.test(target.protocol)) {
             return true;
         }
 

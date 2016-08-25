@@ -446,6 +446,43 @@ describe('ns.request.js', function() {
                 });
             });
 
+            describe('#626 ограничение количества перезапросов при переопределении canRequest', function() {
+                beforeEach(function(done) {
+                    this.model.canRequest = function() {
+                        return true;
+                    };
+                    var counts = [];
+                    for (var i = 0; i < this.model.RETRY_LIMIT + 1; i++) {
+                        counts.push(i);
+                    }
+
+                    // RETRY_LIMIT + 1 ответов с разницей в 100 мс,
+                    // сервер все время отвечает 500 и подниматься не собирается.
+                    // По идее, ns должен попробовать сделать RETRY_LIMIT запроса и на этом успокоиться
+                    counts.forEach(function(i) {
+                        window.setTimeout(function() {
+                            var request = this.sinon.server.requests[i];
+
+                            if (!request || i === counts[counts.length - 1]) {
+                                return done();
+                            }
+                            request.respond(
+                                500,
+                                {"Content-Type": "application/json"},
+                                JSON.stringify({
+                                    models: [
+                                        {data: false}
+                                    ]
+                                })
+                            );
+                        }.bind(this), i * 10);
+                    }, this);
+                });
+
+                it('должен сделать RETRY_LIMIT запросов', function() {
+                    expect(this.sinon.server.requests.length).to.be.equal(this.model.RETRY_LIMIT);
+                });
+            });
         });
 
         describe('do-model', function() {

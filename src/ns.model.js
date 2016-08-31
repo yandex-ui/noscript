@@ -405,13 +405,22 @@
     };
 
     /**
-     * Возвращает, можно ли запрашивать / перезапрашивать модель.
+     * Возвращает, можно ли запрашивать / перезапрашивать модель:
+     * - публичный canRequest разрешает перезапрос
+     * - do-модели нельзя перезапрашивать
+     * - модель была перезапрошена не более RETRY_LIMIT раз
      * @returns {boolean}
      */
-    ns.Model.prototype.canRequest = function() {
-        //  do-модели нельзя перезапрашивать.
-        return (!this.retries || !this.isDo()) && this.retries < this.RETRY_LIMIT;
+    ns.Model.prototype._canRequest = function() {
+        return this.canRequest() && (!this.retries || !this.isDo()) && this.retries < this.RETRY_LIMIT;
     };
+
+    /**
+     * Позволяет пользователю расширить
+     * проверку на возможность запроса модели
+     * @return {boolean}
+     */
+    ns.Model.prototype.canRequest = no.true;
 
     /**
      *

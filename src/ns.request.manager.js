@@ -58,7 +58,7 @@ ns.request.manager = {
                 }
 
             } else if (request.status === REQUEST_STATUS.FAILED) {
-                if (request.model.canRequest()) {
+                if (request.model._canRequest()) {
                     this._createRequest(model, requestId);
                     return true;
 
@@ -92,7 +92,7 @@ ns.request.manager = {
                      Тогда мы попадем в эту ветку и перезапросим модель.
                      */
 
-                    if (model.canRequest()) {
+                    if (model._canRequest()) {
                         // надо ее перезапросить
                         this._createRequest(model, requestId);
                         return true;

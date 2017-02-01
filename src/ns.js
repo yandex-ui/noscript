@@ -6,8 +6,6 @@
  */
 var ns = {};
 
-ns.VERSION = 'borschik:include:../.version';
-
 /**
  * Удобная функция для расстановки TODO, кидает исключение при вызове.
  */

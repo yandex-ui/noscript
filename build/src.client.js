@@ -35,6 +35,7 @@
 
     // ns.box должен подключаться после ns.view, т.к. берет методы из него
     /* borschik:include:../src/ns.box.js */
+    ns.VERSION = 'borschik:include:../.version';
 
     window.no = no;
     window.ns = ns;

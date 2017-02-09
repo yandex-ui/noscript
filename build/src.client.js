@@ -7,6 +7,7 @@
     /* borschik:include:../node_modules/nommon/lib/no.jpath.js */
 
     /* borschik:include:../src/ns.js */
+    /* borschik:include:../src/ns.version.js */
     /* borschik:include:../src/ns.consts.js */
     /* borschik:include:../src/ns.consts.events.js */
     /* borschik:include:../src/ns.consts.client.js */
@@ -35,7 +36,6 @@
 
     // ns.box должен подключаться после ns.view, т.к. берет методы из него
     /* borschik:include:../src/ns.box.js */
-    ns.VERSION = 'borschik:include:../.version';
 
     window.no = no;
     window.ns = ns;

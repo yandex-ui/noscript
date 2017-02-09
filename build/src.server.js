@@ -5,6 +5,7 @@ module.exports = function() {
     /* borschik:include:../src/vow.log.js */
 
     /* borschik:include:../src/ns.js */
+    /* borschik:include:../src/ns.version.js */
     /* borschik:include:../src/ns.consts.js */
     /* borschik:include:../src/ns.consts.events.js */
     /* borschik:include:../src/ns.entityify.js */
@@ -28,7 +29,6 @@ module.exports = function() {
 
     // ns.box должен подключаться после ns.view, т.к. берет методы из него
     /* borschik:include:../src/ns.box.js */
-    ns.VERSION = 'borschik:include:../.version';
 
     return ns;
 }

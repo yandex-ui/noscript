@@ -6,8 +6,9 @@ PACKAGE_VERSION = `node -p -e "require('./package.json').version"`
 
 # сборка для npm
 dist: build/*.js src/*.js | node_modules
-	rm -f .version
-	printf $(PACKAGE_VERSION) -n > .version
+	echo '// DO NOT CHANGE MANUALLY (use Makefile)' > src/ns.version.js
+	printf "ns.VERSION = '%s';\n" $(PACKAGE_VERSION) >> src/ns.version.js
+	echo '// DO NOT CHANGE MANUALLY' >> src/ns.version.js
 	mkdir -p dist
 	$(NPM_BIN)/borschik -i build/src.client.js -o dist/noscript.js -m no
 	$(NPM_BIN)/borschik -i build/src.client.js -o dist/noscript.min.js -m yes

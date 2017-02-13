@@ -645,7 +645,7 @@ describe('ns.View dynamic layouts ->', function() {
                 .render()
                 .then(null, function(err) {
                     expect(
-                        ns.assert.fail.bind(ns, 'ns.View', ns.View.ERROR_CODES[13], 'view2')
+                        ns.assert.fail.bind(ns, 'ns.View', ns.View.ERROR_CODES[13], 'app')
                     ).to.throw(err.message);
                 });
         });

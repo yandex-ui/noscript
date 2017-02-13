@@ -740,11 +740,10 @@
                 this._addView(view_id, updateParams, layoutViews[view_id].type);
             }
 
-            var parentId = this.id;
             this._apply(function(view, id) {
                 var views = layoutViews[id];
 
-                ns.View.assert(!!views, 13, [parentId]);
+                ns.View.assert(!!views, 13, [id]);
                 view._getRequestViews(updated, views, updateParams);
             });
         }

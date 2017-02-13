@@ -633,6 +633,10 @@ describe('ns.View dynamic layouts ->', function() {
 
             this.view = ns.View.create('app');
 
+            // Отключаем логирование исключений.
+            ns.log.exception.restore();
+            this.sinon.stub(ns.log, 'exception');
+
             return new ns.Update(this.view, ns.layout.page('app1'), {}).render();
         });
 
@@ -641,7 +645,7 @@ describe('ns.View dynamic layouts ->', function() {
                 .render()
                 .then(null, function(err) {
                     expect(
-                        ns.assert.fail.bind(ns, 'ns.View', ns.View.ERROR_CODES[13], 'app')
+                        ns.assert.fail.bind(ns, 'ns.View', ns.View.ERROR_CODES[13], 'view2')
                     ).to.throw(err.message);
                 });
         });

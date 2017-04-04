@@ -222,9 +222,11 @@ describe('generate url', function() {
     describe('special chars in url', function() {
         beforeEach(function() {
             ns.router.regexps['any'] = '.+';
+            ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
             ns.router.routes = {
                 route: {
-                    '/tag/{tag:any}': 'tag'
+                    '/tag/{tag:any}': 'tag',
+                    '/client{id:path}': 'client'
                 }
             };
             ns.router.init();
@@ -238,6 +240,10 @@ describe('generate url', function() {
         it('%%%', function() {
             expect(ns.router('/tag/%25%25%25')).to.be.eql({ page: 'tag', params: { tag: '%%%' } });
             expect(ns.router.generateUrl('tag', { tag: '%%%' })).to.be.eql('/tag/%25%25%25');
+        });
+
+        it('?', function() {
+            expect(ns.router.generateUrl('client', { id: '/disk/ngi?nx', foo: '1' })).to.be.eql('/client/disk/ngi%3Fnx?foo=1');
         });
 
     });

@@ -309,11 +309,11 @@ describe('ns.router', function() {
 
     describe('encodeParamValue and decodeParamValue', function() {
         beforeEach(function() {
-            ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
+            ns.router.regexps.any = '.+?';
 
             ns.router.routes = {
                 route: {
-                    '/from{id:path}': 'page',
+                    '/{id:any}': 'page',
                 }
             };
             ns.router.init();
@@ -328,21 +328,21 @@ describe('ns.router', function() {
 
         describe('#encodeParamValue', function() {
             beforeEach(function() {
-                ns.router.generateUrl('page', { id: '/hello/world' });
+                ns.router.generateUrl('page', { id: 'hello' });
             });
 
             it('должен принимать в аргументах значение и название параметра', function() {
-                expect(ns.router.encodeParamValue.calledWith('/hello/world', 'id')).to.be.true;
+                expect(ns.router.encodeParamValue.calledWith('hello', 'id')).to.be.true;
             });
         });
 
         describe('#decodeParamValue', function() {
             beforeEach(function() {
-                ns.router('/from/hello/world?foo=bar');
+                ns.router('/hello?foo=bar');
             });
 
             it('должен принимать в аргументах значение и название параметра', function() {
-                expect(ns.router.decodeParamValue.calledWith('/hello/world', 'id')).to.be.true;
+                expect(ns.router.decodeParamValue.calledWith('hello', 'id')).to.be.true;
             });
         });
     });

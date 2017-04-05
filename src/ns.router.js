@@ -321,11 +321,12 @@ ns.router._generateUrl = function(def, params) {
                     continue;
                 }
 
+                pvalue = ns.router.encodeParamValue(pvalue, param.name);
                 // Проверка типа.
                 if (!ns.router._isParamValid(pvalue, param.type)) {
                     return null;
                 }
-                svalue += ns.router.encodeParamValue(pvalue, param.name);
+                svalue += pvalue;
                 delete query[param.name];
             }
         }

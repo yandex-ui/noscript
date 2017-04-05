@@ -240,6 +240,36 @@ describe('generate url', function() {
             expect(ns.router.generateUrl('tag', { tag: '%%%' })).to.be.eql('/tag/%25%25%25');
         });
 
+        it('?', function() {
+            expect(ns.router('/tag/%3Fcool')).to.be.eql({ page: 'tag', params: { tag: '?cool' } });
+            expect(ns.router.generateUrl('tag', { tag: '?cool' })).to.be.eql('/tag/%3Fcool');
+        });
+    });
+
+    describe('специальный тип path ->', function() {
+        beforeEach(function() {
+            ns.router.regexps.path = '(?:\\/[^\\/\\?]+)+';
+            ns.router.routes = {
+                route: {
+                    '/client{id:path}': 'client'
+                }
+            };
+            ns.router.init();
+
+            ns.router.encodeParamValue = function(value, name) {
+                if (name === 'id') {
+                    return value.split('/').map(encodeURIComponent).join('/');
+                }
+                return encodeURIComponent(value);
+            };
+        });
+        afterEach(function() {
+            ns.router.encodeParamValue = encodeURIComponent;
+        });
+
+        it('должен корректно обработать ? в значение параметра', function() {
+            expect(ns.router.generateUrl('client', { id: '/disk/ngi?nx', foo: '1' })).to.be.eql('/client/disk/ngi%3Fnx?foo=1');
+        });
     });
 
     describe('GET-параметры вне урла', function() {

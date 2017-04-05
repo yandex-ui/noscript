@@ -305,6 +305,8 @@ describe('ns.router', function() {
         test_route('/from/var/logs/nginx/copy|', { page: 'page', params: { dialog: 'copy', div: '|', 'from-path': '/var/logs/nginx' } } );
         test_route('/from/var/logs/nginx/copy', { page: 'page', params: { dialog: 'copy', 'from-path': '/var/logs/nginx' } } );
         test_route('/from/var/logs/nginx', { page: 'page', params: { 'from-path': '/var/logs/nginx' } } );
+        test_route('/from/var/logs/ng%3Finx', { page: 'page', params: { 'from-path': '/var/logs/ng?inx' } } );
+        test_route('/from/var/logs/ng%3Finx?foo=1&bar=2', { page: 'page', params: { 'from-path': '/var/logs/ng?inx', foo: '1', bar: '2' } } );
     });
 
     describe('encodeParamValue and decodeParamValue', function() {

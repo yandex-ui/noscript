@@ -194,7 +194,7 @@ ns.Box.prototype._hideInactiveViews = function() {
             // вид может не быть отрисован,
             // но уже уйти в скрытие
             if (view.node) {
-                ns.removeNode(view.node);
+                ns.View.removeViewNode(view, false);
             }
 
             // Скроем виды, не попавшие в layout
@@ -370,16 +370,7 @@ ns.Box.prototype.destroy = function() {
     }
 
     if (this.node) {
-        $(this.node)
-            // события
-            .off()
-            // данные
-            .removeData()
-            // удаляем из DOM
-            .remove();
-
-        this.node = null;
-        this.$node = null;
+        ns.View.removeViewNode(this, true);
     }
 
     this.active = null;

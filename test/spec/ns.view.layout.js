@@ -633,6 +633,10 @@ describe('ns.View dynamic layouts ->', function() {
 
             this.view = ns.View.create('app');
 
+            // Отключаем логирование исключений.
+            ns.log.exception.restore();
+            this.sinon.stub(ns.log, 'exception');
+
             return new ns.Update(this.view, ns.layout.page('app1'), {}).render();
         });
 

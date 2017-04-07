@@ -876,7 +876,12 @@
      */
     ns.View.prototype._getUpdateTree = function(tree) {
         if ( !this.isValid() ) {
-            tree.views[this.id] = this._getViewTree();
+            var viewTree = this._getViewTree();
+            if (viewTree.models.__hasInvalidModels__) {
+                delete viewTree.models.__hasInvalidModels__;
+                tree.__hasInvalidModels__ = true;
+            }
+            tree.views[this.id] = viewTree;
         } else {
             this._apply(function(view) {
                 view._getUpdateTree(tree);
@@ -1047,6 +1052,13 @@
                 // structure for convenient matching
                 modelsData[id][id] = model.getData();
             } else {
+                // Special case - some of the models was invalidated - if it was during ns.Update - it will be aborted.
+                // @see #649
+                if (model.status === 'invalid') {
+                    // Special property - will be deleted in caller method _getUpdateTree.
+                    modelsData.__hasInvalidModels__ = true;
+                }
+
                 // insuccessful model status
                 modelsData[id].status = 'error';
                 // structure for convenient matching

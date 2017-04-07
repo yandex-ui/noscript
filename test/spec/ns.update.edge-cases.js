@@ -263,4 +263,82 @@ describe('ns.Update. Синтетические случаи', function() {
                 expect(ns.request.models).to.have.callCount(0);
             });
     });
+
+    xdescribe('Если на момент обновления DOM-а одна из моделей в status=invalid => ns.Update должен абортиться =>', function() {
+        beforeEach(function() {
+            ns.Model.define('m1');
+            ns.Model.get('m1').setData({});
+
+            ns.View.define('app');
+            ns.View.define('v1', { models: [ 'm1' ] });
+
+            ns.layout.define('app', {
+                'app': {
+                    'v1': {}
+                }
+            });
+
+            this.sinon.server.autoRespond = true;
+            this.sinon.server.respond(function(xhr) {
+                xhr.respond(
+                    200,
+                    { 'Content-Type': 'application/json' },
+                    JSON.stringify({
+                        models: [
+                            { data: true }
+                        ]
+                    })
+                );
+            });
+
+            this.view = ns.View.create('app');
+            this.layout = ns.layout.page('app');
+
+            this.firstUpdateDone = this.sinon.spy();
+
+            return new ns.Update(this.view, this.layout, {}).render()
+                .then(this.firstUpdateDone);
+        });
+
+        it('первый ns.Update успешно выполняется', function() {
+            expect(this.firstUpdateDone).to.have.callCount(1);
+        });
+
+        describe('после запроса моделей кто-то успевает вызвать invalidate у модели m1 =>', function() {
+            beforeEach(function() {
+                var origRequestAllModels = ns.Update.prototype._requestAllModels;
+                ns.Update.prototype._requestAllModels = function() {
+                    var resultPromise = origRequestAllModels.apply(this, arguments);
+                    resultPromise.then(function() {
+                        ns.Model.get('m1').invalidate();
+                    });
+                    return resultPromise;
+                };
+
+                this.update = new ns.Update(this.view, this.layout, {});
+            });
+
+            it('второй ns.Update не должен завершиться', function(finish) {
+                this.update.render()
+                    .then(function() {
+                        finish('second ns.Update should not resolve');
+                    }, function(result) {
+                        try {
+                            expect(result.error).to.be.equal(ns.U.STATUS.EXPIRED);
+                            finish();
+                        } catch(e) {
+                            finish(e);
+                        }
+                    });
+            })
+
+            // it('', function() {
+            //     expect(this.secondUpdateDone).to.have.callCount(0);
+            // });
+
+            // it('у второго ns.Update должен вызваться abort', function() {
+            //     expect(this.update.abort).to.have.callCount(1);
+            // });
+        });
+    });
 });

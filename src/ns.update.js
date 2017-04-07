@@ -321,6 +321,10 @@
             this.view._getUpdateTree(tree);
         }
 
+        if (tree.__hasInvalidModels__) {
+            this.abort();
+        }
+
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
 

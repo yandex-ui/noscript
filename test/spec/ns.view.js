@@ -1501,4 +1501,72 @@ describe('ns.View', function() {
 
     });
 
+    describe('#_getModelsForTree', function() {
+        beforeEach(function() {
+            ns.Model.define('good-data');
+            ns.Model.get('good-data').setData({ foo: 'bar' });
+
+            ns.Model.define('with-error');
+            ns.Model.get('with-error').setError({ error: 'what was that?' });
+
+            ns.Model.define('just-created');
+
+            ns.Model.define('invalidated-with-data');
+            ns.Model.get('invalidated-with-data').setData({ forever: 'sure' });
+            ns.Model.get('invalidated-with-data').invalidate();
+
+            ns.Model.define('invalidated-with-no-data');
+            ns.Model.get('invalidated-with-no-data').setData({ forever: 'almost sure' });
+            ns.Model.get('invalidated-with-no-data')._reset(ns.M.STATUS.INVALID);
+
+            ns.Model.define('destroyed');
+            ns.Model.get('destroyed').setData({ foo: 'baz' });
+            ns.Model.get('destroyed').destroy();
+
+            ns.View.define('view', {
+                params: { id: null },
+                models: [
+                    'good-data',
+                    'with-error',
+                    'just-created',
+                    'invalidated-with-data',
+                    'invalidated-with-no-data',
+                    'destroyed'
+                ]
+            });
+
+            this.view = ns.View.create('view', { id: 'app' });
+        });
+
+        it('complex test with different models in different states', function() {
+            expect(this.view._getModelsForTree()).to.be.eql({
+                'good-data': {
+                    status: 'ok',
+                    'good-data': { foo: 'bar' }
+                },
+                'with-error': {
+                    status: 'error',
+                    'with-error': { error: 'what was that?' }
+                },
+                'just-created': {
+                    status: 'error',
+                    'just-created': null
+                },
+                'invalidated-with-data': {
+                    status: 'ok',
+                    'invalidated-with-data': { forever: 'sure' } // @see #649
+                },
+                'invalidated-with-no-data': {
+                    status: 'error',
+                    'invalidated-with-no-data': null
+                },
+                'destroyed': {
+                    status: 'error',
+                    'destroyed': null
+                }
+            });
+        });
+
+    });
+
 });

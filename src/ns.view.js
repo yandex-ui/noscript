@@ -1029,7 +1029,9 @@
     };
 
     /**
-     *
+     * Returns models for view tree.
+     * It consists of models and their statuses (ok / error).
+     * If any of the models has error status - ns-view-error-content mode will be rendered for that view.
      * @returns {*}
      * @private
      */
@@ -1041,7 +1043,10 @@
             /** @type ns.Model */
             var model = models[id];
             modelsData[id] = {};
-            if (model.isValid()) {
+            // treat model as valid in case
+            // - it is really a valid one
+            // - it has invalid status but in has real data too (@see #649)
+            if (model.isValid() || (model.status === this.STATUS.INVALID && !!model.getData())) {
                 // successful model status
                 modelsData[id].status = 'ok';
                 // structure for convenient matching

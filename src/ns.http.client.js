@@ -12,7 +12,7 @@ ns.http = function(url, params, options) {
     options.data = params;
 
     var promise = new Vow.Promise();
-    $.ajax(options)
+    var jqXHR = $.ajax(options)
         .done(function(data) {
             promise.fulfill(data);
         })
@@ -23,6 +23,12 @@ ns.http = function(url, params, options) {
                 xhr: jqXHR
             });
         });
+
+    promise.abort = function() {
+        if (!this.isResolved()) {
+            jqXHR.abort();
+        }
+    };
 
     return promise;
 };

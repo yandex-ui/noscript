@@ -140,12 +140,12 @@
             return Vow.fulfill(models);
         }
 
-        var promise = ns.request.models(models);
-        promise.always(function() {
+        this._requestModelsPromise = ns.request.models(models);
+        this._requestModelsPromise.always(function() {
             this.stopTimer(timerName);
         }, this);
 
-        return promise
+        return this._requestModelsPromise
             .then(this._onRequestModelsOK, this._onRequestModelsError, this);
     };
 
@@ -537,7 +537,9 @@
      * @private
      */
     ns.Update.prototype.abort = function() {
-        //TODO: Should we abort ns.request?
+        if (this._requestModelsPromise && this._requestModelsPromise.abort) {
+            this._requestModelsPromise.abort();
+        }
 
         // reject promise
         this._reject({

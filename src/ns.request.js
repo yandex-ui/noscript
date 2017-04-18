@@ -158,6 +158,11 @@
         this.options = options || {};
 
         this.promise = new Vow.Promise();
+
+        var that = this;
+        this.promise.abort = function() {
+            that.abort();
+        };
     };
 
     // ------------------------------------------------------------------------------------------------------------- //
@@ -190,12 +195,11 @@
      * @param {ns.Model[]} requesting Список моделей, которые надо запросить.
      */
     Request.prototype.request = function(loading, requesting) {
+        this.abort();
+
         var all = [];
-        // promise от http-запроса
-        var httpRequest;
 
         if (requesting.length) {
-
             var regularRequests = [];
             var customRequests = [];
 
@@ -233,7 +237,7 @@
                 ns.request.addRequestParams(params);
                 // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
                 // мог зарезолвится без завершения http-запроса
-                httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params);
+                this._httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params);
 
                 all = all.concat(regularRequests.map(model2Promise));
             }
@@ -241,7 +245,7 @@
         }/* else {
             //TODO: надо перепроверить поведение, если нет запросов
             // создаем фейковый зарезолвленный promise
-            httpRequest = new no.Promise().resolve();
+            this._httpRequest = new no.Promise().resolve();
         }
         */
 
@@ -256,8 +260,8 @@
         if (all.length) {
             var that = this;
 
-            if (httpRequest) {
-                httpRequest.then(function(r) {
+            if (this._httpRequest) {
+                this._httpRequest.then(function(r) {
                     if (ns.request.canProcessResponse(r) === false) {
                         // если ответ обработать нельзя, то удаляем модели из запроса и отклоняем промис
                         ns.request.manager.clean(that.models);
@@ -335,6 +339,19 @@
             ns.request.manager.done(model);
 
             model.finishRequest();
+        }
+    };
+
+    /**
+     * Отмена выполнения запроса
+     */
+    Request.prototype.abort = function() {
+        if (this._httpRequest) {
+            if (this._httpRequest.abort) {
+                this._httpRequest.abort();
+            }
+
+            this._httpRequest = undefined;
         }
     };
 

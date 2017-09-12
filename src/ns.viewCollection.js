@@ -34,7 +34,10 @@ ns.ViewCollection.define = function(id, info, baseClass) {
         var autogenerateLayoutId = ns.layout.generateSimple(info.split.intoViews, 'ns-auto-layout-' + id);
         delete info.split.intoViews;
         /* jshint -W054 */
-        info.split.intoLayouts = new Function('', 'return "' + autogenerateLayoutId + '"');
+        // info.split.intoLayouts = new Function('', 'return "' + autogenerateLayoutId + '"');
+        info.split.intoLayouts = function() {
+            return autogenerateLayoutId;
+        };
 
     } else if (typeof info.split.intoViews === 'function') {
         info.split.intoLayouts = function(model, params) {

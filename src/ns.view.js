@@ -1197,6 +1197,9 @@
      * Обновляем (если нужно) ноду блока.
      * @param {HTMLElement} node
      * @param {object} updateOptions
+     * @package {boolean} updateOptions.toplevel
+     * @package {boolean} [updateOptions.parent_added]
+     * @package {ns.View~UpdateTree} [updateOptions.updateTree]
      * @param {object} events
      * @private
      */
@@ -1212,6 +1215,7 @@
         //   "my-root-view2": {/* tree 2 */}
         // }
         var options_next;
+
         if (updateOptions.toplevel) {
             options_next = no.extend({}, updateOptions);
 
@@ -1283,8 +1287,28 @@
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме
         if (!this.asyncState) {
+            // Вычисляем поддерево updateTree для текущего вида.
+            var updateTree = updateOptions.updateTree ? updateOptions.updateTree.views[this.id] : null;
+            var parentId = this.id;
+
             this._apply(function(view) {
-                view._updateHTML(viewNode, options_next, events);
+                // Обновляем вложенный вид если
+                // - для текущего вида не указан updateTree
+                // - для текущего вида указан updateTree и в нём присутствует вложенный вид
+                if (!updateTree || updateTree.views[view.id]) {
+                    // Для вложенного вида передаём либо весь updateOptions.updateTree,
+                    // либо своё поддерево updateOptions.updateTree.
+                    var nested_update_tree = !updateTree ? updateOptions.updateTree : updateTree.views[view.id];
+                    var nested_options_next = no.extend({}, options_next, { updateTree: nested_update_tree });
+
+                    view._updateHTML(viewNode, nested_options_next, events);
+                }
+
+                if (ns.DEBUG) {
+                    if (updateTree && !updateTree.views[view.id]) {
+                        ns.log.debug('[ns.View] skip updating HTML for ' + view.id + ' inside ' + parentId, updateTree);
+                    }
+                }
             });
         }
     };

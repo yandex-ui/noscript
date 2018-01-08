@@ -321,6 +321,8 @@
             this.view._getUpdateTree(tree);
         }
 
+        this.updateTree = tree;
+
         this.log('created render tree', tree);
         this.stopTimer('collectViews');
 
@@ -367,7 +369,7 @@
         this.switchTimer('triggerHideEvents', 'insertNodes');
 
         if (!this.view.destroyed) {
-            this.view._updateHTML(node, {toplevel: true}, viewEvents);
+            this.view._updateHTML(node, { toplevel: true, updateTree: this.updateTree }, viewEvents);
         }
 
         this.switchTimer('insertNodes', 'triggerEvents');

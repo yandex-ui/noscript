@@ -44,7 +44,7 @@ describe('ns.page.history', function() {
             expect(ns.page.history._history).to.be.eql([]);
         });
 
-        it('в истории 1 урл - меняет только текущий урл', function() {
+        it('в истории 1 урл - меняется только текущий урл', function() {
             this.sinon.stub(ns.page.history, '_current', this.url2);
             this.sinon.stub(ns.page.history, '_history', [
                 this.url1
@@ -58,7 +58,7 @@ describe('ns.page.history', function() {
             ]);
         });
 
-        it('в истории 2 урла - меняет только текущий урл', function() {
+        it('в истории 2 урла - меняется только текущий урл', function() {
             this.sinon.stub(ns.page.history, '_current', this.url3);
             this.sinon.stub(ns.page.history, '_history', [
                 this.url1,

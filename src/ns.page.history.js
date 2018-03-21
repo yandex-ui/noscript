@@ -56,8 +56,9 @@
         var previousUrl = nsHistory._history.pop();
         var currentUrl = nsHistory._current;
 
-        if (previousUrl !== url && currentUrl !== url) {
-            nsHistory._history.push(url);
+        // prevent duplicates in history after replace
+        if (previousUrl && previousUrl !== url && currentUrl !== url) {
+            nsHistory._history.push(previousUrl);
         }
 
         // save current

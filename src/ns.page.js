@@ -19,6 +19,16 @@
     ns.page.currentUrl = null;
 
     /**
+     * Урл самого последнего (планируемого) перехода
+     *
+     * Выставляется до ns.page.currentUrl
+     *
+     * @type {string}
+     * @private
+     */
+    ns.page._lastTransitionUrl = null;
+
+    /**
      * Действие с историей по умолчанию.
      * @constant
      * @type {string}
@@ -43,7 +53,12 @@
             historyAction = 'replace';
         }
 
-        url = url || ns.page.getCurrentUrl();
+        var isPageRefresh = false;
+
+        if (!url) {
+            url = ns.page.getCurrentUrl();
+            isPageRefresh = true;
+        }
 
         // возможность заблокировать переход
         if (!ns.page.block.check(url)) {
@@ -76,6 +91,10 @@
          */
         ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
+        if (!isPageRefresh) {
+            ns.page._lastTransitionUrl = url;
+        }
+
         // не надо пушить в историю тот же самый URL
         // это очень легко сделать, если просто обновлять страницу через ns.page.go()
         if (historyAction === 'push' && url === ns.page.currentUrl) {
@@ -84,6 +103,15 @@
 
         return ns.page.followRoute(route)
             .then(function() {
+                var lastTransitionUrl = ns.page._lastTransitionUrl;
+
+                if (isPageRefresh && lastTransitionUrl && url !== lastTransitionUrl) {
+                    ns.log.debug(
+                        '[ns.page.go] refresh ' + url + ' blocked by transition to ' + lastTransitionUrl
+                    );
+
+                    return Vow.reject('block by transition');
+                }
 
                 ns.page._setCurrent(route, url);
                 ns.page._fillHistory(url, historyAction);
@@ -96,7 +124,14 @@
                 ns.page.title();
 
                 return ns.page.startUpdate(route);
-            }, triggerPageErrorLoad);
+            }, function(err) {
+                var lastTransitionUrl = ns.page._lastTransitionUrl;
+                if (!isPageRefresh && lastTransitionUrl && lastTransitionUrl === url) {
+                    ns.page._lastTransitionUrl = null;
+                }
+
+                return triggerPageErrorLoad(err);
+            });
     };
 
     ns.page.followRoute = function(route) {
@@ -225,5 +260,4 @@
         // proxy reject value
         return Vow.reject(err);
     }
-
 })();

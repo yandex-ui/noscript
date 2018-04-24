@@ -280,7 +280,7 @@ describe('ns.page', function() {
 
         });
 
-        describe('Проставление _lastTransitionUrl', function() {
+        describe('Проставление _lastTransition', function() {
 
             beforeEach(function() {
                 this.sinon.stub(ns.page, 'currentUrl');
@@ -293,37 +293,73 @@ describe('ns.page', function() {
                 this.sinon.stub(ns.page, 'redirect').returns(Vow.resolve());
                 this.sinon.stub(ns.page, 'title');
                 this.sinon.stub(ns.page, 'startUpdate').returns(Vow.resolve());
+                this.sinon.stub(ns.page, 'getCurrentUrl').returns('test_url');
+
+                this.sinon.stub(ns.page._lastTransition, 'set');
+                this.sinon.stub(ns.page._lastTransition, 'unset');
+                this.sinon.stub(ns.page._lastTransition, 'shouldBlockByTransition').returns(false);
             });
 
-            it('Не должен проставлять _lastTransitionUrl, если ns.page.go вызвали без url', function() {
-                ns.page._lastTransitionUrl = null;
-                return ns.page.go().then(function() {
-                    expect(ns.page._lastTransitionUrl).to.be.equal(null);
-                });
-            });
-
-            it('Должен проставлять _lastTransitionUrl, если дошли до генерирования события ns-page-before-load',
+            it('Должен вызвать _lastTransition.set c правильными параметрами, если ns.page.go вызвали без url',
                 function() {
-                    return ns.page.go('nextUrl').then(function() {
-                        expect(ns.events.trigger).to.have.been.calledWith(
-                            'ns-page-before-load', [ns.page.current, { page: 'test_page' }], 'nextUrl'
-                        );
-                        expect(ns.page._lastTransitionUrl).to.be.equal('nextUrl');
+                    return ns.page.go().then(function() {
+                        expect(ns.page._lastTransition.set).to.have.been.calledWith('test_url', true);
                     });
                 }
             );
 
-            it('Должен сбрасывать _lastTransitionUrl, если сфейлился ns.page.followRoute при этом переходе',
+            it('Должен вызвать _lastTransition.set c правильными параметрами, если ns.page.go вызвали c url',
+                function() {
+                    return ns.page.go('new_test_url').then(function() {
+                        expect(ns.page._lastTransition.set).to.have.been.calledWith('new_test_url');
+                    });
+                }
+            );
+
+            it('Должен вызвать _lastTransition.shouldBlockByTransition c правильными параметрами, ' +
+                'если ns.page.go вызвали без url',
+                function() {
+                    return ns.page.go().then(function() {
+                        expect(ns.page._lastTransition.shouldBlockByTransition)
+                            .to.have.been.calledWith('test_url', true);
+                    });
+                }
+            );
+
+            it('Должен вызвать _lastTransition.shouldBlockByTransition c правильными параметрами, ' +
+                'если ns.page.go вызвали c url',
+                function() {
+                    return ns.page.go('new_test_url').then(function() {
+                        expect(ns.page._lastTransition.shouldBlockByTransition)
+                            .to.have.been.calledWith('new_test_url', false);
+                    });
+                }
+            );
+
+            it('Должен прервать ns.page.go, если _lastTransition.shouldBlockByTransition вернул true', function() {
+                ns.page._lastTransition.shouldBlockByTransition.returns(true);
+
+                return ns.page.go().fail(function(errMsg) {
+                    expect(errMsg).to.be.equal('block by transition');
+                });
+            });
+
+            it('Должен вызвать _lastTransition.unset, если сфейлился ns.page.followRoute при этом переходе',
                 function() {
                     ns.page.followRoute.returns(Vow.reject('error'));
 
                     return ns.page.go('nextUrl').fail(function(errMsg) {
                         expect(errMsg).to.be.equal('error');
-                        expect(ns.page._lastTransitionUrl).to.be.equal(null);
-                        expect(ns.events.trigger).to.have.been.calledWith('ns-page-error-load', errMsg);
+                        expect(ns.page._lastTransition.unset).to.have.been.calledWith('nextUrl', false);
                     });
                 }
             );
+
+            it('Должен вызвать _lastTransition.unset, при завершении перехода', function() {
+                return ns.page.go('nextUrl').then(function() {
+                    expect(ns.page._lastTransition.unset).to.have.been.calledWith('nextUrl', false);
+                });
+            });
 
         });
 

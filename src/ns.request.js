@@ -88,7 +88,7 @@
      * @param {object[]} models Список моделей с параметрами.
      * @returns {Vow.Promise}
      */
-    ns.request.fetch = function(models) {
+    ns.request.fetchModels = function(models) {
         var modelsNames = models.map(models2name);
         var url = ns.request.URL + '?_m=' + modelsNames.join(',');
         var params = models2params(models);
@@ -249,7 +249,7 @@
             if (regularRequests.length) {
                 // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
                 // мог зарезолвится без завершения http-запроса
-                httpRequest = ns.request.fetch(regularRequests);
+                httpRequest = ns.request.fetchModels(regularRequests);
 
                 all = all.concat(regularRequests.map(model2Promise));
             }

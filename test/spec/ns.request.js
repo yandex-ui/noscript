@@ -535,7 +535,7 @@ describe('ns.request.js', function() {
 
     });
 
-    describe('fetch', function() {
+    describe('fetchModels', function() {
 
         beforeEach(function() {
             this.sinon.stub(ns, 'http');

@@ -84,6 +84,27 @@
     ns.request.URL = '/models/';
 
     /**
+     * Запрашивает модели с сервера.
+     * @param {object[]} models Список моделей с параметрами.
+     * @returns {Vow.Promise}
+     */
+    ns.request.fetch = function(models) {
+        var modelsNames = models.map(models2name);
+        var url = ns.request.URL + '?_m=' + modelsNames.join(',');
+        var params = models2params(models);
+        var options = {};
+
+        ns.request.addRequestParams(params);
+
+        if (ns.request.FORMAT === 'json') {
+            params = JSON.stringify(params);
+            options.contentType = 'application/json; encoding=utf-8';
+        }
+
+        return ns.http(url, params, options);
+    };
+
+    /**
      * Метод для проверки ответа данных.
      * Может использоваться, например, при проверки авторизации.
      * @returns {boolean}
@@ -226,14 +247,9 @@
             all = all.concat(customRequests);
 
             if (regularRequests.length) {
-
-                //  Запрашиваем модели, которые нужно запросить.
-                var params = models2params(regularRequests);
-                var modelsNames = regularRequests.map(models2name);
-                ns.request.addRequestParams(params);
                 // отдельный http-promise нужен для того, чтобы реквест с этой моделью, запрашиваемой в другом запросе,
                 // мог зарезолвится без завершения http-запроса
-                httpRequest = ns.http(ns.request.URL + '?_m=' + modelsNames.join(','), params);
+                httpRequest = ns.request.fetch(regularRequests);
 
                 all = all.concat(regularRequests.map(model2Promise));
             }
@@ -339,6 +355,17 @@
     };
 
     function models2params(models) {
+        if (ns.request.FORMAT === 'json') {
+            return {
+                models: models.map(function(model) {
+                    return {
+                        name: models2name(model),
+                        params: model.getRequestParams()
+                    };
+                })
+            };
+        }
+
         var params = {};
 
         for (var i = 0, l = models.length; i < l; i++) {
@@ -347,7 +374,7 @@
             var model = models[i];
 
             //  Добавляем служебный параметр, содержащий id модели, которую мы хотим запросить.
-            params[ '_model' + suffix ] = model.id;
+            params[ '_model' + suffix ] = models2name(model);
 
             //  Каждая модель прокидывает в params все свои параметры.
             //  При этом к имени параметра добавляется суффикс.

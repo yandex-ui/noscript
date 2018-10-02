@@ -535,6 +535,62 @@ describe('ns.request.js', function() {
 
     });
 
+    describe('fetch', function() {
+
+        beforeEach(function() {
+            this.sinon.stub(ns, 'http');
+            this.sinon.stub(ns.request, 'addRequestParams');
+
+            ns.Model.define('test-model-fetch1', { params: { foo: null } });
+            ns.Model.define('test-model-fetch2', { params: { bar: null } });
+        });
+
+        it('should use form format', function() {
+            ns.request([
+                { id: 'test-model-fetch1', params: { foo: 123 } },
+                { id: 'test-model-fetch2', params: { bar: 456 } }
+            ]);
+
+            expect(ns.request.addRequestParams).to.have.been.calledWithExactly({
+                '_model.0': 'test-model-fetch1',
+                'foo.0': 123,
+                '_model.1': 'test-model-fetch2',
+                'bar.1': 456
+            });
+            expect(ns.http).to.have.been.calledWithExactly(
+                '/models/?_m=test-model-fetch1,test-model-fetch2',
+                {
+                    '_model.0': 'test-model-fetch1',
+                    'foo.0': 123,
+                    '_model.1': 'test-model-fetch2',
+                    'bar.1': 456
+                },
+                {}
+            );
+        });
+
+        it('should use json format', function() {
+            ns.request.FORMAT = 'json';
+            ns.request([
+                { id: 'test-model-fetch1', params: { foo: 123 } },
+                { id: 'test-model-fetch2', params: { bar: 456 } }
+            ]);
+            delete ns.request.FORMAT;
+
+            expect(ns.request.addRequestParams).to.have.been.calledWithExactly({
+                models: [
+                    { name: 'test-model-fetch1', params: { foo: 123 } },
+                    { name: 'test-model-fetch2', params: { bar: 456 } }
+                ]
+            });
+            expect(ns.http).to.have.been.calledWithExactly(
+                '/models/?_m=test-model-fetch1,test-model-fetch2',
+                '{"models":[{"name":"test-model-fetch1","params":{"foo":123}},{"name":"test-model-fetch2","params":{"bar":456}}]}',
+                { contentType: 'application/json; encoding=utf-8' }
+            );
+        });
+    });
+
     describe('requests combinations', function() {
         // ключ + forced. первый не парсится второй, все ресолвит
 

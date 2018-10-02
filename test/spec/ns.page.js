@@ -280,6 +280,147 @@ describe('ns.page', function() {
 
         });
 
+        describe('Проставление _lastTransition', function() {
+
+            beforeEach(function() {
+                this.sinon.stub(ns.page, 'currentUrl');
+                this.sinon.stub(ns.page.block, 'check').returns(true);
+                this.sinon.stub(ns, 'router').returns({ page: 'test_page' });
+                this.sinon.stub(ns.events, 'trigger');
+                this.sinon.stub(ns.page, 'followRoute').returns(Vow.resolve());
+                this.sinon.stub(ns.page, '_setCurrent');
+                this.sinon.stub(ns.page, '_fillHistory');
+                this.sinon.stub(ns.page, 'redirect').returns(Vow.resolve());
+                this.sinon.stub(ns.page, 'title');
+                this.sinon.stub(ns.page, 'startUpdate').returns(Vow.resolve());
+                this.sinon.stub(ns.page, 'getCurrentUrl').returns('test_url');
+
+                this.sinon.stub(ns.page._lastTransition, 'set');
+                this.sinon.stub(ns.page._lastTransition, 'unset');
+                this.sinon.stub(ns.page._lastTransition, 'shouldBlockByTransition').returns(false);
+            });
+
+            it('Должен вызвать _lastTransition.set c правильными параметрами, если ns.page.go вызвали без url',
+                function() {
+                    return ns.page.go().then(function() {
+                        expect(ns.page._lastTransition.set).to.have.been.calledWith('test_url', true);
+                    });
+                }
+            );
+
+            it('Должен вызвать _lastTransition.set c правильными параметрами, если ns.page.go вызвали c url',
+                function() {
+                    return ns.page.go('new_test_url').then(function() {
+                        expect(ns.page._lastTransition.set).to.have.been.calledWith('new_test_url');
+                    });
+                }
+            );
+
+            it('Должен вызвать _lastTransition.shouldBlockByTransition c правильными параметрами, ' +
+                'если ns.page.go вызвали без url',
+                function() {
+                    return ns.page.go().then(function() {
+                        expect(ns.page._lastTransition.shouldBlockByTransition)
+                            .to.have.been.calledWith('test_url', true);
+                    });
+                }
+            );
+
+            it('Должен вызвать _lastTransition.shouldBlockByTransition c правильными параметрами, ' +
+                'если ns.page.go вызвали c url',
+                function() {
+                    return ns.page.go('new_test_url').then(function() {
+                        expect(ns.page._lastTransition.shouldBlockByTransition)
+                            .to.have.been.calledWith('new_test_url', false);
+                    });
+                }
+            );
+
+            it('Должен прервать ns.page.go, если _lastTransition.shouldBlockByTransition вернул true', function() {
+                ns.page._lastTransition.shouldBlockByTransition.returns(true);
+
+                return ns.page.go().fail(function(errMsg) {
+                    expect(errMsg).to.be.equal('block by transition');
+                });
+            });
+
+            it('Должен вызвать _lastTransition.unset, если сфейлился ns.page.followRoute при этом переходе',
+                function() {
+                    ns.page.followRoute.returns(Vow.reject('error'));
+
+                    return ns.page.go('nextUrl').fail(function(errMsg) {
+                        expect(errMsg).to.be.equal('error');
+                        expect(ns.page._lastTransition.unset).to.have.been.calledWith('nextUrl', false);
+                    });
+                }
+            );
+
+            it('Должен вызвать _lastTransition.unset, при завершении перехода', function() {
+                return ns.page.go('nextUrl').then(function() {
+                    expect(ns.page._lastTransition.unset).to.have.been.calledWith('nextUrl', false);
+                });
+            });
+
+        });
+
+        describe('Переходы при обновлении страницы', function() {
+
+            function checkCallUpdate(url) {
+                return ns.page.go(url).then(function() {
+                    expect(ns.page.startUpdate).has.callCount(1);
+                    expect(ns.page.startUpdate).to.have.been.calledWith({ page: 'test_page' });
+                });
+            }
+
+            beforeEach(function() {
+                this.sinon.stub(ns, 'router').returns({ page: 'test_page' });
+                this.sinon.stub(ns.log, 'debug');
+                this.sinon.stub(ns.layout, 'page');
+                this.sinon.stub(ns.events, 'trigger');
+                this.sinon.stub(ns.page, 'getCurrentUrl').returns('test');
+                this.sinon.stub(ns.page, 'followRoute').returns(Vow.resolve());
+
+                this.sinon.stub(ns.page, 'startUpdate').returns(Vow.resolve());
+
+                ns.page._lastTransitionUrl = 'nextUrl';
+            });
+
+            it('Если апдейт идёт не для обновления страницы, то должен вызвать ns.page.startUpdate', function() {
+                ns.page._lastTransitionUrl = 'prevUrl';
+                return checkCallUpdate('nextUrl');
+            });
+
+            it('Если апдейт для обновления страницы, и нет _lastTransitionUrl, то должен вызвать ns.page.startUpdate',
+                function() {
+                    ns.page._lastTransitionUrl = null;
+                    return checkCallUpdate();
+                }
+            );
+
+            it('Если апдейт для обновления страницы, и _lastTransitionUrl = currentUrl, то должен вызвать ns.Update',
+                function() {
+                    ns.page.getCurrentUrl.returns('nextUrl');
+
+                    return checkCallUpdate();
+                }
+            );
+
+            it('Если апдейт для обновления страницы, и _lastTransitionUrl != currentUrl, то должен вызвать ns.Update',
+                function() {
+                    ns.page.getCurrentUrl.returns('prevUrl');
+
+                    return ns.page.go().fail(function(errMsg) {
+                        expect(ns.log.debug).has.callCount(1);
+                        expect(ns.log.debug).to.have.been.calledWith(
+                            '[ns.page.go] refresh prevUrl blocked by transition to nextUrl'
+                        );
+                        expect(errMsg).to.be.equal('block by transition');
+                    });
+                }
+            );
+
+        });
+
     });
 
     describe('getDefaultUrl', function() {

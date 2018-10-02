@@ -19,6 +19,65 @@
     ns.page.currentUrl = null;
 
     /**
+     * Состояние переходов между страницами
+     *
+     * @type {{ url: string, count: number }}
+     * @private
+     */
+    ns.page._lastTransition = {
+        url: null,
+        count: 0
+    };
+
+    /**
+     * Устанавливает урл перехода, если нужно то увеличивает счётчик переходов на страницу
+     *
+     * Не учитывает переход, если это обновление страницы
+     *
+     * @param {string} url
+     * @param {boolean} isPageRefresh
+     */
+    ns.page._lastTransition.set = function(url, isPageRefresh) {
+        if (isPageRefresh || !url) {
+            return;
+        }
+
+        if (this.url === url) {
+            ++this.count;
+        } else {
+            this.url = url;
+            this.count = 1;
+        }
+    };
+
+    /**
+     * Сбрасывает состояние перехода, если есть несколько переходов на страницу, то уменьшает счётчик переходов,
+     * если есть всего 1 активный переход на данную страницу, то сбрасывает url
+     *
+     * Не сбрасывает переход, если это обновление страницы
+     *
+     * @param {string} url
+     * @param {boolean} isPageRefresh
+     */
+    ns.page._lastTransition.unset = function(url, isPageRefresh) {
+        if (!isPageRefresh && this.url && this.url === url) {
+            var count = Math.max(this.count - 1, 0);
+            this.count = count;
+            this.url = count ? this.url : null;
+        }
+    };
+
+    /**
+     * Определяет, нужно ли блокировать переход (обновление страницы) из-за другого перехода
+     * @param {string} url
+     * @param {boolean} isPageRefresh
+     * @return {boolean}
+     */
+    ns.page._lastTransition.shouldBlockByTransition = function(url, isPageRefresh) {
+        return isPageRefresh && this.url && this.url !== url;
+    };
+
+    /**
      * Действие с историей по умолчанию.
      * @constant
      * @type {string}
@@ -43,7 +102,12 @@
             historyAction = 'replace';
         }
 
-        url = url || ns.page.getCurrentUrl();
+        var isPageRefresh = false;
+
+        if (!url) {
+            url = ns.page.getCurrentUrl();
+            isPageRefresh = true;
+        }
 
         // возможность заблокировать переход
         if (!ns.page.block.check(url)) {
@@ -76,6 +140,8 @@
          */
         ns.events.trigger('ns-page-before-load', [ns.page.current, route], url);
 
+        ns.page._lastTransition.set(url, isPageRefresh);
+
         // не надо пушить в историю тот же самый URL
         // это очень легко сделать, если просто обновлять страницу через ns.page.go()
         if (historyAction === 'push' && url === ns.page.currentUrl) {
@@ -84,6 +150,13 @@
 
         return ns.page.followRoute(route)
             .then(function() {
+                if (ns.page._lastTransition.shouldBlockByTransition(url, isPageRefresh)) {
+                    ns.log.debug(
+                        '[ns.page.go] refresh ' + url + ' blocked by transition to ' + ns.page._lastTransition.url
+                    );
+
+                    return Vow.reject('block by transition');
+                }
 
                 ns.page._setCurrent(route, url);
                 ns.page._fillHistory(url, historyAction);
@@ -96,7 +169,18 @@
                 ns.page.title();
 
                 return ns.page.startUpdate(route);
-            }, triggerPageErrorLoad);
+
+            }, triggerPageErrorLoad)
+            .then(
+                function(data) {
+                    ns.page._lastTransition.unset(url, isPageRefresh);
+                    return data;
+                },
+                function(err) {
+                    ns.page._lastTransition.unset(url, isPageRefresh);
+                    return Vow.reject(err);
+                }
+            );
     };
 
     ns.page.followRoute = function(route) {
@@ -225,5 +309,4 @@
         // proxy reject value
         return Vow.reject(err);
     }
-
 })();

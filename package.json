@@ -37,7 +37,7 @@
         "mocha": "^2.3.0",
         "nock": "0.36.2",
         "phantomjs": "^1.9",
-        "sinon": "*",
+        "sinon": "4.5.0",
         "request": "2.36.x",
         "yate": "*",
         "mutationobserver-shim": "~0.2.8",

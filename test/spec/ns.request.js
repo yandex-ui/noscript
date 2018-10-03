@@ -543,6 +543,13 @@ describe('ns.request.js', function() {
 
             ns.Model.define('test-model-fetch1', { params: { foo: null } });
             ns.Model.define('test-model-fetch2', { params: { bar: null } });
+            ns.Model.define('test-model-fetch3', {
+                params: { a: null, b: null, c: null, d: null, e: null }
+            });
+            ns.Model.define('test-model-fetch4', {
+                params: { a: null, b: null, c: null, d: null, e: null },
+                isStrictParams: true
+            });
         });
 
         it('should use form format', function() {
@@ -579,13 +586,51 @@ describe('ns.request.js', function() {
 
             expect(ns.request.addRequestParams).to.have.been.calledWithExactly({
                 models: [
-                    { name: 'test-model-fetch1', params: { foo: 123 } },
-                    { name: 'test-model-fetch2', params: { bar: 456 } }
+                    { name: 'test-model-fetch1', params: { foo: '123' } },
+                    { name: 'test-model-fetch2', params: { bar: '456' } }
                 ]
             });
             expect(ns.http).to.have.been.calledWithExactly(
                 '/models/?_m=test-model-fetch1,test-model-fetch2',
-                '{"models":[{"name":"test-model-fetch1","params":{"foo":123}},{"name":"test-model-fetch2","params":{"bar":456}}]}',
+                '{"models":[{"name":"test-model-fetch1","params":{"foo":"123"}},{"name":"test-model-fetch2","params":{"bar":"456"}}]}',
+                { contentType: 'application/json; encoding=utf-8' }
+            );
+        });
+
+        it('should use json format with string params', function() {
+            ns.request.FORMAT = 'json';
+            ns.request([
+                { id: 'test-model-fetch3', params: { a: 'foo', b: 123, c: true, d: null, e: undefined } },
+            ]);
+            delete ns.request.FORMAT;
+
+            expect(ns.request.addRequestParams).to.have.been.calledWithExactly({
+                models: [
+                    { name: 'test-model-fetch3', params: { a: 'foo', b: '123', c: 'true' } },
+                ]
+            });
+            expect(ns.http).to.have.been.calledWithExactly(
+                '/models/?_m=test-model-fetch3',
+                '{"models":[{"name":"test-model-fetch3","params":{"a":"foo","b":"123","c":"true"}}]}',
+                { contentType: 'application/json; encoding=utf-8' }
+            );
+        });
+
+        it('should use json format with strict params', function() {
+            ns.request.FORMAT = 'json';
+            ns.request([
+                { id: 'test-model-fetch4', params: { a: 'foo', b: 123, c: true, d: null, e: undefined } },
+            ]);
+            delete ns.request.FORMAT;
+
+            expect(ns.request.addRequestParams).to.have.been.calledWithExactly({
+                models: [
+                    { name: 'test-model-fetch4', params: { a: 'foo', b: 123, c: true, d: null } },
+                ]
+            });
+            expect(ns.http).to.have.been.calledWithExactly(
+                '/models/?_m=test-model-fetch4',
+                '{"models":[{"name":"test-model-fetch4","params":{"a":"foo","b":123,"c":true,"d":null}}]}',
                 { contentType: 'application/json; encoding=utf-8' }
             );
         });

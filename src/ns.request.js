@@ -358,9 +358,11 @@
         if (ns.request.FORMAT === 'json') {
             return {
                 models: models.map(function(model) {
+                    var params = model.getRequestParams();
                     return {
                         name: models2name(model),
-                        params: model.getRequestParams()
+                        // для обратной совместимости приводим параметры к строке, если не задан isStrictParams
+                        params: model.info.isStrictParams ? params : ns.parseQuery($.param(params))
                     };
                 })
             };

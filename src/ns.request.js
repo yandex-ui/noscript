@@ -454,7 +454,7 @@
     }
 
     function models2name(model) {
-        return model.id;
+        return model.info.serverId || model.id;
     }
 
 })();

@@ -826,13 +826,13 @@
         for (var i = 0, l = pNames.length; i < l; i++) {
             var pName = pNames[i];
             var pValue = params[pName];
+            var defValue = defaults[pName];
 
-            //  Нельзя просто написать params[pName] || defaults[pName] --
-            //  т.к. params[pName] может быть 0 или ''.
-            pValue = (pValue === undefined) ? defaults[pName] : pValue;
-
-            if (pValue != null) {
+            // isStrictParams позволяет передавать null-параметры
+            if (info.isStrictParams ? pValue !== undefined : pValue != null) {
                 result[pName] = pValue;
+            } else if (defValue != null) {
+                result[pName] = defValue;
             }
         }
 

@@ -362,7 +362,7 @@
                     return {
                         name: models2name(model),
                         // для обратной совместимости приводим параметры к строке, если не задан isStrictParams
-                        params: model.info.isStrictParams ? params : ns.parseQuery($.param(params))
+                        params: model.info.isStrictParams ? params : ns.parseQuery(ns.params2query(params))
                     };
                 })
             };

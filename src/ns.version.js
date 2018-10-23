@@ -1,3 +1,3 @@
 // DO NOT CHANGE MANUALLY (use Makefile)
-ns.VERSION = '0.8.15';
+ns.VERSION = '0.8.15-fix-660';
 // DO NOT CHANGE MANUALLY

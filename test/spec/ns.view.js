@@ -1155,7 +1155,7 @@ describe('ns.View', function() {
 
     });
 
-    describe('updateHTML', function() {
+    describe('#_updateHTML()', function() {
 
         describe('redraw async view with child depens on same model', function() {
 
@@ -1389,6 +1389,44 @@ describe('ns.View', function() {
 
         });
 
+        describe('обновление ноды валидного вида, вложенного в бокс', function() {
+            beforeEach(function() {
+                ns.View.define('view-1');
+                this.view = ns.View.create('view-1');
+                this.view.node = document.createElement('div');
+                this.view.asyncState = false;
+
+                this.newViewNode = document.createElement('div');
+                this.nodeFromUpdate = document.createElement('div');
+
+                this.sinon.stub(this.view, '_extractNode').withArgs(this.nodeFromUpdate).returns(this.newViewNode);
+                this.sinon.stub(this.view, 'isValid').returns(true);
+                this.sinon.stub(this.view, 'isLoading').returns(false);
+                this.sinon.stub(this.view, 'isOk').returns(true);
+
+                this.sinon.stub(this.view, '__onHide');
+                this.sinon.stub(this.view, '__onHtmldestroy');
+                this.sinon.stub(this.view, '_htmlinit');
+                this.sinon.stub(this.view, '_saveModelsVersions');
+                this.sinon.stub(this.view, '_show');
+                this.sinon.stub(this.view, '_apply');
+                this.sinon.stub(this.view, '_setNode');
+            });
+
+            it('должен подновить ноду валидного вида', function() {
+                var updateOptions = { toplevel: false, parent_added: true };
+                var events = {
+                    'ns-view-touch': []
+                };
+
+                this.view._updateHTML(this.nodeFromUpdate, updateOptions, events);
+
+                expect(this.view._setNode)
+                    .to.have.callCount(1)
+                    .and
+                    .to.be.calledWithExactly(this.newViewNode);
+            });
+        });
     });
 
     describe('ns.View update after model destruction', function() {

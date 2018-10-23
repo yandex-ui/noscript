@@ -1201,12 +1201,9 @@
      * @private
      */
     ns.View.prototype._updateHTML = function(node, updateOptions, events) {
-        //  FIXME nop@: Велик могучим русский языка!
-        //  Падежи не сходятся вообще :(
-        //
         // при обработке toplevel-view надо скопировать первоначальные updateOptions
-        // инчае, при обновлении параллельных веток дерева, toplevel оказажется только первая
-        // и, соответственно, DOM-надо обновиться только у нее
+        // иначе, при обновлении параллельных веток дерева, toplevel === true будет только у первой и,
+        // соответственно, DOM-нода обновится только у нее
         // {
         //   "my-root-view1": {/* tree 1 */},
         //   "my-root-view2": {/* tree 2 */}
@@ -1219,13 +1216,26 @@
             options_next = updateOptions;
         }
 
+        var viewNode;
+        var extractedViewNode = node ? this._extractNode(node) : null;
         var viewWasInvalid = !this.isValid();
 
-        var viewNode;
+        // Особый случай, когда нужно обновить ноду вида:
+        // обновилась нода родительского вида, при этом текущий вид был валиден.
+        // @see #660
+        var viewNodeWasInvalid = (
+            this.isValid() &&
+            this.node &&
+            extractedViewNode &&
+            extractedViewNode !== this.node &&
+            updateOptions.parent_added &&
+            !updateOptions.toplevel
+        );
+
         //  Если блок уже валидный, ничего не делаем, идем ниже по дереву.
-        if ( viewWasInvalid ) {
+        if ( viewWasInvalid || viewNodeWasInvalid ) {
             //  Ищем новую ноду блока.
-            viewNode = this._extractNode(node);
+            viewNode = extractedViewNode;
             ns.View.assert(!!viewNode, 6, [this.id]);
 
             //  Обновляем весь блок.
@@ -1279,6 +1289,7 @@
 
         //  Т.к. мы, возможно, сделали replaceNode, то внутри node уже может не быть
         //  никаких подблоков. В этом случае, нужно брать viewNode.
+        //  TODO фалбек на node - совсем не понятно, зачем :/
         viewNode = viewNode || node;
 
         //  Рекурсивно идем вниз по дереву, если не находимся в async-режиме

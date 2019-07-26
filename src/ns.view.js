@@ -951,6 +951,8 @@
         // всегда собираем данные, в том числе закешированные модели для async-view
         tree.models = this._getModelsForTree();
 
+        this._fixTreeStateByModels(tree);
+
         // для асинхронного вида не идем вниз по дереву
         if (tree.state === 'loading') {
             return tree;
@@ -966,6 +968,28 @@
         }
 
         return tree;
+    };
+
+    /**
+     * Обновляем состояние отрисовки дерева исходя из состояния моделей.
+     * @param {ns.View~UpdateTree} tree Дерево для шаблонизации вида.
+     * @private
+     */
+    ns.View.prototype._fixTreeStateByModels = function(tree) {
+        var hasLoadingModels = false;
+
+        for (var id in tree.models) {
+            // Если модель в статусе ошибки (это может быть и не ошибка, но так устроен _getModelsForTree)
+            // и при этом самой ошибки нет - значит, возможно, она ещё не загрузилась.
+            if (tree.models[id].status === 'error' && !tree.models[id][id]) {
+                hasLoadingModels = true;
+                break;
+            }
+        }
+
+        if (hasLoadingModels) {
+            tree.state = 'loading';
+        }
     };
 
     /**

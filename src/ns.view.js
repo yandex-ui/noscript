@@ -905,7 +905,7 @@
             // loading - ns-view-async-content
             // error - ns-view-error-content
             // placeholder - специальная отрисовка
-            state: this.asyncState ? 'loading': 'ok',
+            state: (!this.asyncState || this.isModelsValid()) ? 'ok' : 'loading',
 
             // фейковое дерево, чтобы удобно матчится в yate
             tree: {},

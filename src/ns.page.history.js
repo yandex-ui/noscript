@@ -37,10 +37,9 @@
                 // user pressed back button in browser
                 if (prevPage === url) {
                     nsHistory._history.pop();
-
-                } else {
-                    nsHistory._history.push(nsHistory._current);
                 }
+
+                nsHistory._history.push(nsHistory._current);
             }
         }
 

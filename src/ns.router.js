@@ -287,7 +287,11 @@ ns.router._generateUrl = function(def, params) {
     var pvalue;
     var param;
 
-    for (var i = 0; i < def.sections.length; i++) {
+    // флаг, что у урле есть хотя бы один указанный (не дефолтный) параметр
+    var hasDefinedValue = false;
+
+    // склеиваем урл с конца, чтобы убирать неуказанные дефолтные значения
+    for (var i = def.sections.length - 1; i >= 0; i--) {
         section = def.sections[i];
         svalue = '';
 
@@ -297,9 +301,15 @@ ns.router._generateUrl = function(def, params) {
             if (!param.name) {
                 // Добавляем статический кусок урла как есть.
                 svalue += param.default_value;
+                hasDefinedValue = true;
+
             } else {
                 pvalue = params[param.name];
                 var is_param_present = param.name in params;
+
+                if (is_param_present) {
+                    hasDefinedValue = true;
+                }
 
                 // Выставляем дефолтное значение только необязательным параметрам.
                 if (param.is_optional && !is_param_present) {
@@ -317,7 +327,9 @@ ns.router._generateUrl = function(def, params) {
                 }
 
                 // Опциональный параметр не должен попасть в урл, если он не указан явно в params.
-                if (param.is_optional && !is_param_present) {
+                // Это происходит до тех пор, пока нет одного указанного параметра (hasDefinedValue === true)
+                // Опциональные части без дефолтного значения тоже пропускаем
+                if ((!hasDefinedValue || !pvalue) && param.is_optional && !is_param_present) {
                     continue;
                 }
 
@@ -336,7 +348,7 @@ ns.router._generateUrl = function(def, params) {
             continue;
         }
 
-        result.push(svalue);
+        result.unshift(svalue);
     }
 
     url = result.join('/');
